@@ -3,6 +3,7 @@ import Home from '../views/index.vue';
 import Screen from '../views/Screen/index.vue';
 import Project from '../views/TotalScreen/ProdeucePlan/index.vue';
 import Quality from '../views/TotalScreen/quality/index.vue';
+import Injection from '@/views/Injection/views/index.vue'
 const routes = [
   {
     path: '/',
@@ -31,6 +32,12 @@ const routes = [
     name: 'Quality',
     component: Quality,
     props: (route) => ({ prodLine: route.query.prodLine }), // 传递查询参数 prodLine
+  }, 
+   {
+    path: '/injection',
+    name: 'Injection',
+    component: Injection,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
 ];
 
