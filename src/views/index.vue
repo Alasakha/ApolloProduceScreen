@@ -8,16 +8,18 @@
     <h1>阿波罗产线看板</h1>
     <h2>请选择生产线</h2>
   </div>
+
   <div class="button_box">
-    <button
+        <button
       class="custom-btn btn-5"
       v-for="line in lines"
       :key="line.id"
       @click="selectLine(line.id)"
     >
-      <span>生产线 {{ line.id }}</span>
+      <span>{{ line.name }}</span>
     </button>
-  </div>
+    
+    </div>
 </div>
 
 </body>
@@ -32,21 +34,45 @@ const router = useRouter();
 
 
 const lines = ref([
-  { id: '1004A', selected: false },
-  { id: '1004B', selected: false },
-  { id: '1004C', selected: false },
-  { id: '1005A', selected: false },
-  { id: '1005B', selected: false }
+  { id: "1004A", name: "生产线1004A" },
+  { id: "1004B", name: "生产线1004B" },
+  { id: "1004C", name: "生产线1004C" },
+  { id: "1005A", name: "生产线1005A" },
+  { id: "1005B", name: "生产线1005B" },
+  { id: "1004", name: "1004 生产计划" },
+  { id: "1005", name: "1005 生产计划" },
+  { id: "2004", name: "2004 质量检测" },
+  { id: "2005", name: "2005 质量检测" }
 ]);
 
-const selectLine =(id) => {
+const selectLine = (id) => {
   lines.value.forEach((line) => {
     line.selected = line.id === id;
   });
 
-  const targetPath = { path: '/screen', query: { prodLine: id.toString() } };
-  console.log('Navigating to:', targetPath);
-  router.push(targetPath);
+  let targetPath = "/screen"; // 默认跳转到 /screen
+  if (id === "1004" || id === "1005") {
+    targetPath = "/project";
+  } else if (id === "2004" || id === "2005") {
+    targetPath = "/quality";
+  }
+
+  router.push({ path: targetPath, query: { prodLine: id } });
+  console.log("Navigating to:", targetPath, "with prodLine:", id);
+};
+
+const scrollContainer = ref(null);
+
+const scrollLeft = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollLeft -= 200; // 左滑 200px
+  }
+};
+
+const scrollRight = () => {
+  if (scrollContainer.value) {
+    scrollContainer.value.scrollLeft += 200; // 右滑 200px
+  }
 };
 </script>
 
@@ -173,4 +199,15 @@ h2{
   margin-top: 0;
   font-size: 3vw;
 } 
+
+.arrow-btn {
+  background: none;
+  border: none;
+  font-size: 2rem;
+  cursor: pointer;
+  color: aliceblue;
+}
+.arrow-btn:hover {
+  color: #fff;
+}
 </style>

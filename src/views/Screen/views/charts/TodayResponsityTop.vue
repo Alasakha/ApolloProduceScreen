@@ -12,7 +12,7 @@ import { useRoute } from 'vue-router';
 import { eventBus } from '../../../../utils/eventbus';
 import { formatPieChartData } from '../../../../utils/map';
 
-  const route = useRoute();
+const route = useRoute();
 const prodLine = route.query.prodLine;
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
@@ -73,6 +73,8 @@ if (formattedData.length === 0) {
 
   }
   h1{
+  margin-top: 0;
+  margin-bottom: 0;
     font-size: 1.5vw;
     color:aliceblue;
     letter-spacing: 0.5vw;

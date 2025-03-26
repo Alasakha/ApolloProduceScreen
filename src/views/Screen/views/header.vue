@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title title-main">总装{{ decideName(prodLine) }}线管理看板</div>
+    <div class="title title-main">{{ decideName(prodLine) }}线管理看板</div>
     <!-- 次要标题 -->
     <div class="title title-sub">本月生产计划总数：<span style="color:rgb(4, 248, 250)">{{ cumulativePassRate.plan }}</span></div> 
   </div>

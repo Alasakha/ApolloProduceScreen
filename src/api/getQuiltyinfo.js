@@ -61,3 +61,12 @@ export const getResponsityCategoryRank = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }
+
+//近五日合格率
+export const getFivedayRate = (prodLine) => {
+  return request({
+    url: '/quality/passRateByCx',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}  

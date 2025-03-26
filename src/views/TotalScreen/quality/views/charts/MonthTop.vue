@@ -1,40 +1,42 @@
 <template>
-  <div class="box1" > 
-        <BarChart :chartData="chartData" />
+
+  <div class="box1"> 
+        <h1>月度责任TOP5</h1>
+        <dv-scroll-ranking-board :config="config" style="width:90%;height:80%" />
   </div>
   </template>
   
   
 <script setup>
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
-import { getFivedayRate } from '../../../../api/getQuiltyinfo';
+import { getResponsityDepartmentCategoryRank } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '../../../../utils/eventbus';
-import { formatPieChartData } from '../../../../utils/map';
-import BarChart from '../../../../components/bar.vue';
-const route = useRoute();
+import { eventBus } from '@/utils/eventBus';
+import { formatPieChartData } from '@/utils/map';
+  const route = useRoute();
 const prodLine = route.query.prodLine;
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-  
-const chartData = ref({
-  axisData: [],
-  seriesData: []
-});
 
-const processData = (data) => {
+  const config = reactive({
+    waitTime:5000,
+    fontSize:15,
+    data: [],
+    unit: '个',
+  })
 
-if (data.length === 0 ) {
+  const processData = (data) => {
+
+const formattedData = formatPieChartData(data, 'md002', 'total');
+console.log(formattedData);
+if (formattedData.length === 0) {
+
   isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
 } else {
-    // 提取日期和对应的百分比
-for (let date in data) { // 过滤掉空值
-    chartData.value.axisData.push(date);
-    chartData.value.seriesData.push(parseFloat(data[date]));
-} 
-console.log(chartData.value)
+
   isDataEmpty.value = false;
+  config.data = formattedData;  // 这里赋值给 config.data
 }
 };
 
@@ -49,7 +51,7 @@ console.log(chartData.value)
   });
   
   const fetchData = () => {
-    getFivedayRate(prodLine).then(res => {
+    getResponsityDepartmentCategoryRank(prodLine).then(res => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
     processData(res.data);
   }).catch(() => {
@@ -69,7 +71,6 @@ console.log(chartData.value)
     align-items: center;
     justify-content: start;
     color:aliceblue;
-    margin-top: 1.5vh;
   }
 
   h1{

@@ -7,12 +7,21 @@
     "noUnusedLocals": true,
     "noUnusedParameters": true,
     "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true
+    "noUncheckedSideEffectImports": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    }
   },
   "include": [
     "src/**/*.ts",
     "src/**/*.tsx",
     "src/**/*.vue",
-    "src/main.js"
-, "src/utils/eventbus.js", "src/router/index.js", "src/router/index.js"  ]
+    "src/main.js",
+    "src/utils/eventbus.js",
+    "src/router/index.js",
+    "src/router/index.js"
+  ]
 }
