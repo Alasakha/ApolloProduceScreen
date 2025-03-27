@@ -2,11 +2,15 @@
 
 <body>
   <Header></Header>
+  <Middle></Middle>
+  <Bottom></Bottom>
 </body>
 </template>
 
 <script setup lang="ts">
 import Header from'@/views/Injection/views/Header/index.vue'
+import Middle from '@/views/Injection/views/Middle/index.vue'
+import Bottom from '@/views/Injection/views/Bottom/index.vue'
 </script>
 
 
