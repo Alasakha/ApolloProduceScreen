@@ -3,10 +3,10 @@
     <div class="flex-1 justify-center items-center text-4xl flex text-white">{{ dateStr }}</div>
 
     <div class="text-5xl font-bold bg-gradient-to-r text-cyan-100  z-1000 flex-1 justify-center items-center flex">
-      设备运营中心
+    注塑生产管理看板
     </div>
 
-    <div class="flex-1 flex justify-around items-center"><Time></Time></div>
+    <div class="flex-1 flex justify-center items-center"><Time></Time></div>
 
   </div>
 </template>

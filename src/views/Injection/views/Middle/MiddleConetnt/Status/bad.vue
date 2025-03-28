@@ -18,7 +18,8 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
-
+import {getDeviceStatus} from '@/api/getInjection'
+const badvalue = ref()
 const badIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
@@ -37,12 +38,18 @@ const drawhstatusIndicators = () => {
       {
         type: 'gauge',
         progress: {
-          show: true,
-          width: 18
-        },
+        show: true,
+        width: 18,
+        // 进度条的颜色s
+      },
+      
         axisLine: {
           lineStyle: {
-            width: 18
+            width: 18,
+            color: [
+            [0.6, 'rgba(248, 90, 73, 1)'],
+              [1, 'rgba(216, 216, 216, 1)'],
+            ]
           }
         },
         axisTick: {
@@ -79,7 +86,7 @@ const drawhstatusIndicators = () => {
         },
         data: [
           {
-            value: 70
+            value: badvalue.value
           }
         ]
       }
@@ -99,8 +106,18 @@ const resizeChart = () => {
   }
 };
 
+const fetchData = async () => {
+  try {
+    const res = await getDeviceStatus();
+    badvalue.value = res.data.deviceFault
+    nextTick(drawhstatusIndicators);
+  } catch (error) {
+    console.error('数据获取失败:', error);
+  }
+};
 // 组件挂载时初始化图表
 onMounted(() => {
+  fetchData()
   nextTick(() => {
     drawhstatusIndicators();
   });

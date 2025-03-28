@@ -18,10 +18,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
+import {getDeviceStatus} from '@/api/getInjection'
 
 const totalIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
+const totalvalue = ref()
 let chartInstance: echarts.ECharts | null = null;
 
 // 初始化 ECharts
@@ -79,7 +81,7 @@ const drawhstatusIndicators = () => {
         },
         data: [
           {
-            value: 100
+            value: totalvalue.value
           }
         ]
       }
@@ -99,8 +101,19 @@ const resizeChart = () => {
   }
 };
 
+const fetchData = async () => {
+  try {
+    const res = await getDeviceStatus();
+    totalvalue.value = res.data.deviceTotal
+    nextTick(drawhstatusIndicators);
+  } catch (error) {
+    console.error('数据获取失败:', error);
+  }
+};
+
 // 组件挂载时初始化图表
 onMounted(() => {
+  fetchData()
   nextTick(() => {
     drawhstatusIndicators();
   });

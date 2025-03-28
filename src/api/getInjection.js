@@ -8,3 +8,31 @@ export const getProductPlanCompleteRate = () => {
     method: 'get',
   })
 }
+
+export const getProductPassRate = () => {
+  return request({
+    url: '/injection/FTQ',
+    method: 'get',
+  })
+}
+
+export const getBadCategory = () => {
+  return request({
+    url: '/injection/failure',
+    method: 'get',
+  })
+}
+
+export const getDeviceStatus = () => {
+  return request({
+    url: '/injection/deviceStatus',
+    method: 'get',
+  })
+}
+
+export const getabnormalInfo = () => {
+  return request({
+    url: '/injection/abnormal',
+    method: 'get',
+  })
+}

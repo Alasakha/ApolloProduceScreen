@@ -1,7 +1,7 @@
 <template>
   <!-- 数据加载完成且非空时显示图表 -->
   <div v-show="!isLoading" class="h-[100%] w-full">
-    <div ref="completedIndicators" class="h-[32vh] w-[30vw]"></div>
+    <div ref="completedIndicators" class="h-[27vh] w-[25vw]"></div>
   </div>
 </template>
 
@@ -24,8 +24,21 @@ const drawcompletedIndicators = () => {
   const option = {  
     tooltip: { trigger: 'axis' },
   legend: {
-    data: ['系列1', '系列2', '系列3', '系列4'],
-    textStyle: { color:'white' }
+    data: ['102050101001', '102050101002', '102050101003', '102050101004'],
+    textStyle: { 
+      color:'white' ,
+      fontSize: 10 // 设置字体大小
+    },
+    top: '0%', // 调整图例与图表之间的距离
+    itemWidth: 15,   // 图例图标的宽度
+    itemHeight: 10,  // 图例图标的高度
+  },
+  grid: {
+    top:'25%',
+    left: '0%',
+    right: '0%',
+    bottom: '0%', // 增加图表底部空白，调整与图例之间的间距
+    containLabel: true
   },
     xAxis: {
       type: 'category',
@@ -36,22 +49,22 @@ const drawcompletedIndicators = () => {
     },
   series: [
     {
-      name: '系列1',
+      name: '102050101001',
       data: handleData.value.series[0].data, // 设置 y 轴数据
       type: 'bar',
     },
     {
-      name: '系列2',
+      name: '102050101002',
       data: handleData.value.series[1].data, // 设置 y 轴数据
       type: 'bar',
     },
     {
-      name: '系列3',
+      name: '102050101003',
       data: handleData.value.series[2].data, // 设置 y 轴数据
       type: 'bar',
     },
     {
-      name: '系列4',
+      name: '102050101004',
       data: handleData.value.series[3].data, // 设置 y 轴数据
       type: 'bar',
     },
@@ -67,9 +80,6 @@ const fetchData = async () => {
     handleData.value = formatProductionRateData(res.data); // 处理数据
     isLoading.value = false;
     
-    console.log('处理后的数据:', handleData.value);
-   console.log('x轴',convertDateFormat(handleData.value.dates))
-   console.log('y轴',handleData.value.series[1].data)
     nextTick(drawcompletedIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);

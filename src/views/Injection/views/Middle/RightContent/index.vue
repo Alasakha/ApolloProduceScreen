@@ -2,14 +2,14 @@
   <div class="grid grid-rows-2 gap-4 h-full">
     <!-- 点检统计分析 -->
     <DashboardCard class="flex-1">
-      <template #title>生产计划达成率</template>
-      <div>这里放图表或数据...</div>
+      <template #title>故障统计分析</template>
+      <Statistic/>
     </DashboardCard>
 
     <!-- 设备状态 -->
     <DashboardCard class="flex-1">
-      <template #title>产品合格率</template>
-      <div>设备数据...</div>
+      <template #title>故障类型统计</template>
+      <div><Category/></div>
     </DashboardCard>
 
   </div>
@@ -17,4 +17,6 @@
 
 <script setup lang="ts">
 import DashboardCard from "@/components/DashboardCard.vue";
+import Category from './Category/index.vue'
+import Statistic from './Statistic/index.vue'
 </script>

@@ -18,10 +18,12 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
+import {getDeviceStatus} from '@/api/getInjection'
 
 const runIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
+const runvalue = ref('')
 let chartInstance: echarts.ECharts | null = null;
 
 // 初始化 ECharts
@@ -42,7 +44,11 @@ const drawhstatusIndicators = () => {
         },
         axisLine: {
           lineStyle: {
-            width: 18
+            width: 18,
+            color: [
+            [0, 'rgba(248, 90, 73, 1)'],
+              [1, 'rgba(216, 216, 216, 1)'],
+            ]
           }
         },
         axisTick: {
@@ -79,7 +85,7 @@ const drawhstatusIndicators = () => {
         },
         data: [
           {
-            value: 70
+            value: Number(runvalue.value)
           }
         ]
       }
@@ -92,6 +98,18 @@ const drawhstatusIndicators = () => {
   window.addEventListener('resize', resizeChart);
 };
 
+const fetchData = async () => {
+  try {
+    const res = await getDeviceStatus();
+    runvalue.value = res.data.deviceRun
+    console.log( 'run',runvalue.value)
+    nextTick(drawhstatusIndicators);
+  } catch (error) {
+    console.error('数据获取失败:', error);
+  }
+};
+
+
 // 窗口变化时重绘图表
 const resizeChart = () => {
   if (chartInstance) {
@@ -101,6 +119,7 @@ const resizeChart = () => {
 
 // 组件挂载时初始化图表
 onMounted(() => {
+  fetchData()
   nextTick(() => {
     drawhstatusIndicators();
   });

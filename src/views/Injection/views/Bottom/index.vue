@@ -10,7 +10,7 @@
   <div class="right_part flex-1">
     <dv-border-box12>
       <div dv-bg>
-        dv-border-box-12
+        <RightContent/>
       </div>
     </dv-border-box12>
   </div>
@@ -20,6 +20,7 @@
 
 <script lang="ts" setup>
 import { BorderBox12 as DvBorderBox12 } from '@kjgl77/datav-vue3'
+import RightContent from './RightContent/index.vue'
 </script>
 
 

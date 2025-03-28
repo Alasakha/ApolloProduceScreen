@@ -9,7 +9,7 @@
     <!-- 设备状态 -->
     <DashboardCard class="">
       <template #title>电能</template>  
-      <div>设备数据...</div>
+      <div><Energy></Energy></div>
     </DashboardCard>
 
   </div>
@@ -18,4 +18,5 @@
 <script setup lang="ts">
 import DashboardCard from "@/components/DashboardCard.vue";
 import charts from './Status/index.vue'
+import Energy from './energy/index.vue'
 </script>
