@@ -20,7 +20,7 @@
     "src/**/*.tsx",
     "src/**/*.vue",
     "src/main.js",
-    "src/utils/eventbus.js",
+    "src/utils/eventbus.ts",
     "src/router/index.js",
     "src/router/index.js"
   ]

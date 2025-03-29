@@ -36,3 +36,10 @@ export const getabnormalInfo = () => {
     method: 'get',
   })
 }
+
+export const getMaintanceInfo = () => {
+  return request({
+    url: '/injection/maintenance',
+    method: 'get',
+  })
+}

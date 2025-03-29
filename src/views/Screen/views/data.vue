@@ -39,7 +39,7 @@ import DataCard from "../../../components/DataCard.vue"; // 导入封装组件
 import EffiectCard from "../../../components/EffiectCard.vue"; // 导入封装组件
 import { getMonthTotalInfo ,getTodayProductionInfo,getEfficiencyInfo} from '../../../api/getProduceinfo';
 import { useRoute } from 'vue-router';
-  import { eventBus } from '../../../utils/eventbus';
+import { eventBus } from '@/utils/eventbus';
 // 定义数据
 const MonthlyData = ref()
 const TodayData = ref()

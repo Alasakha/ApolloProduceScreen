@@ -10,7 +10,7 @@
 import { ref, onMounted ,onBeforeUnmount} from 'vue';
 import { getcumulativePassRate } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数

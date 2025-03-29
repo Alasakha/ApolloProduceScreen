@@ -19,10 +19,12 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
 import {getDeviceStatus} from '@/api/getInjection'
+import { eventBus } from '@/utils/eventbus';
 const stopIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
-const runvalue = ref()
+const shutdownvalue = ref()
+const totalvalue = ref()
 let chartInstance: echarts.ECharts | null = null;
 
 // 初始化 ECharts
@@ -37,22 +39,31 @@ const drawhstatusIndicators = () => {
     series: [
       {
         type: 'gauge',
+        max: totalvalue.value, // 让最大值动态等于 totalvalue
         progress: {
-          show: true,
-          width: 18
-        },
+        show: true,
+        width: 10,
+        itemStyle: {
+          color: 'yellow' // 这里修改进度条的颜色
+        }
+      },
         axisLine: {
           lineStyle: {
-            width: 18
+            width: 5,
           }
         },
+        pointer: {
+        itemStyle: {
+          color: 'yellow' // 修改指针颜色
+        }
+      },
         axisTick: {
           show: false
         },
         splitLine: {
-          length: 1,
+          length: 3,
           lineStyle: {
-            width: 2,
+            width: 1,
             color: '#999'
           }
         },
@@ -62,7 +73,7 @@ const drawhstatusIndicators = () => {
           fontSize: 0,
         },
         anchor: {
-          show: true,
+          show: false,
           showAbove: true,
           size: 10,
           itemStyle: {
@@ -75,12 +86,12 @@ const drawhstatusIndicators = () => {
         detail: {
           valueAnimation: true,
           fontSize: 30,
-          offsetCenter: [0, '50%'],
+          offsetCenter: [0, '100%'],
           color:'yellow'
         },
         data: [
           {
-            value: runvalue.value
+            value: Number(shutdownvalue.value)
           }
         ]
       }
@@ -103,8 +114,8 @@ const resizeChart = () => {
 const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
-    runvalue.value = res.data.deviceShutdown
-    console.log('shut', runvalue.value)
+    shutdownvalue.value = res.data.deviceShutdown
+    totalvalue.value = res.data.deviceTotal
     nextTick(drawhstatusIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);
@@ -117,6 +128,7 @@ onMounted(() => {
   nextTick(() => {
     drawhstatusIndicators();
   });
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 组件卸载时清理资源
@@ -126,6 +138,7 @@ onBeforeUnmount(() => {
     chartInstance = null;
   }
   window.removeEventListener('resize', resizeChart);
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
 });
 </script>
 

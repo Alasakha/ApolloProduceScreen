@@ -19,7 +19,7 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
 import {getDeviceStatus} from '@/api/getInjection'
-
+import { eventBus } from '@/utils/eventbus';
 const totalIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
@@ -35,58 +35,67 @@ const drawhstatusIndicators = () => {
 
   // 配置 option
   const option: echarts.EChartsOption = {
-    series: [
-      {
-        type: 'gauge',
-        progress: {
-          show: true,
-          width: 18
-        },
-        axisLine: {
-          lineStyle: {
-            width: 18
-          }
-        },
-        axisTick: {
-          show: false
-        },
-        splitLine: {
-          length: 1,
-          lineStyle: {
-            width: 2,
-            color: '#999'
-          }
-        },
-        axisLabel: {
-          distance: 25,
-          color: '#999',
-          fontSize: 0,
-        },
-        anchor: {
-          show: true,
-          showAbove: true,
-          size: 10,
-          itemStyle: {
-            borderWidth: 10
-          }
-        },
-        title: {
-          show: false
-        },
-        detail: {
-          valueAnimation: true,
-          fontSize: 30,
-          offsetCenter: [0, '50%'],
-          color:'green'
-        },
-        data: [
-          {
-            value: totalvalue.value
-          }
-        ]
-      }
-    ]
-  };
+  series: [
+    {
+      max: totalvalue.value, // 让最大值动态等于 totalvalue
+      type: 'gauge',
+      progress: {
+        show: true,
+        width: 10,
+        itemStyle: {
+          color: 'green' // 这里修改进度条的颜色
+        }
+      },
+      axisLine: {
+        lineStyle: {
+          width: 10,
+        }
+      },
+      axisTick: {
+        show: false
+      },
+      splitLine: {
+        length: 3,
+        lineStyle: {
+          width: 1,
+          color: '#999'
+        }
+      },
+      axisLabel: {
+        distance: 25,
+        color: '#999',
+        fontSize: 0,
+      },
+      anchor: {
+        show: false,
+        showAbove: true,
+        size: 10,
+        itemStyle: {
+          borderWidth: 10
+        }
+      },
+      title: {
+        show: false
+      },
+      pointer: {
+        itemStyle: {
+          color: 'green' // 修改指针颜色
+        }
+      },
+      detail: {
+        valueAnimation: true,
+        fontSize: 30,
+        offsetCenter: [0, '100%'],
+        color: 'green' // 这里确保数值的颜色也是绿色
+      },
+      data: [
+        {
+          value: totalvalue.value
+        }
+      ]
+    }
+  ]
+};
 
   chartInstance.setOption(option);
 
@@ -117,6 +126,7 @@ onMounted(() => {
   nextTick(() => {
     drawhstatusIndicators();
   });
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 组件卸载时清理资源
@@ -126,6 +136,7 @@ onBeforeUnmount(() => {
     chartInstance = null;
   }
   window.removeEventListener('resize', resizeChart);
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
 });
 </script>
 

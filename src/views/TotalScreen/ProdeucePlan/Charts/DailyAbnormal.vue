@@ -20,7 +20,7 @@ import * as echarts from 'echarts';
 import { getabnormalProductionDaliyInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { formatPieChartData } from '@/utils/map';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 import { getColorByType } from '@/utils/color';
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数

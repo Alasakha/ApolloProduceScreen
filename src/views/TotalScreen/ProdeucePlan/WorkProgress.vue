@@ -13,7 +13,7 @@
 import { ref, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue';
 import { getTodayOrderProgressInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 import BarChart from '@/components/bar.vue';
 
 const chartData = ref({

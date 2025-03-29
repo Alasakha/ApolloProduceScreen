@@ -11,7 +11,7 @@
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
 import { getResponsityDepartmentCategoryRank } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
   const route = useRoute();
 const prodLine = route.query.prodLine;

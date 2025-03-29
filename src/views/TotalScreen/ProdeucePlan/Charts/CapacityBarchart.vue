@@ -26,7 +26,7 @@ import { ref, onMounted, watch, nextTick ,onBeforeUnmount} from 'vue';
 import * as echarts from 'echarts';
 import { getColumnarHourInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 
 const route = useRoute();
 const prodLine = route.query.prodLine;

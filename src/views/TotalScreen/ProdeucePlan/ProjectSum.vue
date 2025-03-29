@@ -12,7 +12,7 @@
 import { ref ,onMounted,onBeforeUnmount} from 'vue';
 import { useRoute } from 'vue-router';
 import { getMonthTotalInfo } from '@/api/getProduceinfo';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数 

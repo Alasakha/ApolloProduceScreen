@@ -19,11 +19,13 @@
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import * as echarts from 'echarts';
 import {getDeviceStatus} from '@/api/getInjection'
+import { eventBus } from '@/utils/eventbus';
 const badvalue = ref()
 const badIndicators = ref<HTMLDivElement | null>(null);
 const isLoading = ref(false);
 const isDataEmpty = ref(false);
 let chartInstance: echarts.ECharts | null = null;
+const totalvalue = ref()
 
 // 初始化 ECharts
 const drawhstatusIndicators = () => {
@@ -37,29 +39,28 @@ const drawhstatusIndicators = () => {
     series: [
       {
         type: 'gauge',
+        max:totalvalue.value,
         progress: {
         show: true,
-        width: 18,
-        // 进度条的颜色s
+        width: 10,
+        itemStyle: {
+          color: 'red' // 这里修改进度条的颜色
+        }
       },
       
         axisLine: {
           lineStyle: {
-            width: 18,
-            color: [
-            [0.6, 'rgba(248, 90, 73, 1)'],
-              [1, 'rgba(216, 216, 216, 1)'],
-            ]
+            width: 10,
           }
         },
         axisTick: {
           show: false
         },
         splitLine: {
-          length: 1,
+          length: 3,
           lineStyle: {
-            width: 2,
-            color: 'red'
+            width: 1,
+            color: '#999'
           }
         },
         axisLabel: {
@@ -68,7 +69,7 @@ const drawhstatusIndicators = () => {
           fontSize: 0,
         },
         anchor: {
-          show: true,
+          show: false,
           showAbove: true,
           size: 10,
           itemStyle: {
@@ -81,9 +82,14 @@ const drawhstatusIndicators = () => {
         detail: {
           valueAnimation: true,
           fontSize: 30,
-          offsetCenter: [0, '50%'],
+          offsetCenter: [0, '100%'],
           color:'red'
         },
+        pointer: {
+        itemStyle: {
+          color: 'red' // 修改指针颜色
+        }
+      },
         data: [
           {
             value: badvalue.value
@@ -110,6 +116,7 @@ const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
     badvalue.value = res.data.deviceFault
+    totalvalue.value=res.data.deviceTotal
     nextTick(drawhstatusIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);
@@ -121,6 +128,7 @@ onMounted(() => {
   nextTick(() => {
     drawhstatusIndicators();
   });
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 组件卸载时清理资源
@@ -128,6 +136,7 @@ onBeforeUnmount(() => {
   if (chartInstance) {
     chartInstance.dispose();
     chartInstance = null;
+    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
   }
   window.removeEventListener('resize', resizeChart);
 });

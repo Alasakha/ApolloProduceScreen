@@ -12,3 +12,12 @@ export function convertDateFormat(dateMap) {
 
   return result;
 }
+
+export function convertXXXXYYZZtoYYZZ(inputDate) {
+  const date = new Date(inputDate);
+  const month = date.getMonth() + 1; // 获取月份（0为1月，所以要加1）
+  const day = date.getDate(); // 获取日期
+  return `${month}-${day}`;
+}
+
+

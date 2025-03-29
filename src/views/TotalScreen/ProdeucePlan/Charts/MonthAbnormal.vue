@@ -25,7 +25,7 @@ import * as echarts from 'echarts';
 import { getabnormalProductionMonthInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { formatPieChartData } from '@/utils/map';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 import { getColorByType } from '@/utils/color';
 
 const route = useRoute();

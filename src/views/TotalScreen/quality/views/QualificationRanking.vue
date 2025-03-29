@@ -12,7 +12,7 @@ import { getProductPassRateRank } from '@/api/getQuiltyinfo';
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
 import { useRoute } from 'vue-router';
 import { formatPieChartData } from '@/utils/map';
-import { eventBus } from '@/utils/eventBus'; 
+import { eventBus } from '@/utils/eventbus'; 
 
 const route = useRoute();
 const prodLine = route.query.prodLine;

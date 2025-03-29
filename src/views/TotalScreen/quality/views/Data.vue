@@ -16,7 +16,7 @@ import DataCard from '@/components/DataCard.vue';
 import { getPaassedInfo } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { ref, onMounted,onBeforeUnmount } from 'vue';
-import { eventBus } from '@/utils/eventBus';
+import { eventBus } from '@/utils/eventbus';
 
 
 const passedInfo = ref({})
