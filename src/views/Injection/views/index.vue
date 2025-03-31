@@ -1,9 +1,14 @@
 <template>
 
 <body>
-  <Header></Header>
-  <Middle></Middle>
-  <Bottom></Bottom>
+  <dv-border-box13 title="dv-border-box-13" :title-width="400" :animate="false">
+      <div dv-bg>
+        <Header></Header>
+        <Middle></Middle>
+        <Bottom></Bottom>
+      </div>
+    </dv-border-box13>
+
 </body>
 </template>
 
@@ -25,6 +30,4 @@ body{
  position: relative;
  transition: transform 0.3s ease-in-out;
 }
-
-
 </style>

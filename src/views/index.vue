@@ -5,75 +5,107 @@
   <div class="center-box">
     <img :src="motorImage" style="width: 30%;" mode="widthFix" />
   <div class="title">
-    <h1>阿波罗产线看板</h1>
-    <h2>请选择生产线</h2>
+    <h1>阿波罗管理看板</h1>
+    <h2>请选择看板</h2>
   </div>
 
   <div class="button_box">
-        <button
-      class="custom-btn btn-5"
-      v-for="line in lines"
-      :key="line.id"
-      @click="selectLine(line.id)"
-    >
-      <span>{{ line.name }}</span>
-    </button>
-    
+    <div class="block text-center w-full" m="t-4" >
+
+      <el-carousel trigger="click" height="20vh" :interval="3000">
+        <!-- 走马灯第 1 组：前 5 个 -->
+        <el-carousel-item>
+          <div class="small justify-center h-[200px] flex items-center gap-4">
+            <button
+              v-for="line in getRange(0, 5)"
+              :key="line.id"
+              class="custom-btn btn-5 w-[120px] h-[50px]"
+              @click="selectLine(line)"
+            >
+              {{ line.name }}
+            </button>
+          </div>
+        </el-carousel-item>
+
+        <!-- 走马灯第 2 组：第 5 ~ 8 个 -->
+        <el-carousel-item>
+          <div class="small justify-center h-[200px] flex items-center gap-4">
+            <button
+              v-for="line in getRange(5, 13)"
+              :key="line.id"
+              class="custom-btn btn-5 w-[120px] h-[50px]"
+              @click="selectLine(line)"
+            >
+              {{ line.name }}
+            </button>
+          </div>
+        </el-carousel-item>
+
+        <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
+        <el-carousel-item>
+          <div class="small justify-center h-[200px] flex items-center gap-4">
+            <button
+              v-for="line in getRange(13, 14)"
+              :key="line.id"
+              class="custom-btn btn-5 w-[120px] h-[50px]"
+              @click="selectLine(line)"
+            >
+              {{ line.name }}
+            </button>
+          </div>
+        </el-carousel-item>
+      </el-carousel>
     </div>
+  </div>
 </div>
 
 </body>
 </template>
 
 <script setup >
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+
 import motorImage from '../assets/Motor.jpg';
+import { ref } from "vue";
+import { useRouter } from "vue-router";
 
 const router = useRouter();
 
-
 const lines = ref([
-  { id: "1004A", name: "生产线1004A" },
-  { id: "1004B", name: "生产线1004B" },
-  { id: "1004C", name: "生产线1004C" },
-  { id: "1005A", name: "生产线1005A" },
-  { id: "1005B", name: "生产线1005B" },
-  { id: "1004", name: "1004 生产计划" },
-  { id: "1005", name: "1005 生产计划" },
-  { id: "2004", name: "2004 质量检测" },
-  { id: "2005", name: "2005 质量检测" }
+  { id: "1004A", name: "生产线1004A",router:"S" },
+  { id: "1004B", name: "生产线1004B",router:"S" },
+  { id: "1004C", name: "生产线1004C",router:"S" },
+  { id: "1005A", name: "生产线1005A",router:"S" },
+  { id: "1005B", name: "生产线1005B",router:"S" },
+  { id: "1004", name: "1004生产计划",router:"P" },
+  { id: "1005", name: "1005生产计划",router:"P"},
+  { id: "2004", name: "2004生产计划",router:"P" },
+  { id: "2005", name: "2005生产计划",router:"P" },
+  { id: "2004", name: "2004质量检测",router:"Q" },
+  { id: "2005", name: "2005质量检测",router:"Q" },
+  { id: "1004", name: "1004质量检测",router:"Q" },
+  { id: "1005", name: "1005质量检测",router:"Q" },
+  { id: null, name: "注塑看板",router:"/injection" },
 ]);
 
-const selectLine = (id) => {
-  lines.value.forEach((line) => {
-    line.selected = line.id === id;
-  });
-
-  let targetPath = "/screen"; // 默认跳转到 /screen
-  if (id === "1004" || id === "1005") {
-    targetPath = "/project";
-  } else if (id === "2004" || id === "2005") {
-    targetPath = "/quality";
-  }
-
-  router.push({ path: targetPath, query: { prodLine: id } });
-  console.log("Navigating to:", targetPath, "with prodLine:", id);
+// 获取 lines 中指定范围的数据
+const getRange = (start, end) => {
+  return lines.value.slice(start, end);
 };
 
-const scrollContainer = ref(null);
-
-const scrollLeft = () => {
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollLeft -= 200; // 左滑 200px
+const selectLine = (line) => {
+  if(line.router == 'S'){
+    router.push({ path: "/screen", query: { prodLine: line.id } });
   }
+  else if(line.router == 'P'){
+    router.push({ path: "/project", query: { prodLine: line.id } });
+  }else if(line.router == 'Q'){
+    router.push({ path: "/quality", query: { prodLine: line.id } });
+  }else{
+    router.push({ path: line.router, query: { prodLine: line.id } });
+  }
+ 
 };
 
-const scrollRight = () => {
-  if (scrollContainer.value) {
-    scrollContainer.value.scrollLeft += 200; // 右滑 200px
-  }
-};
 </script>
 
 <style scoped>
@@ -200,14 +232,21 @@ h2{
   font-size: 3vw;
 } 
 
-.arrow-btn {
-  background: none;
-  border: none;
-  font-size: 2rem;
+.custom-btn {
+  background-color: aliceblue;
+  color: black;
+  border: 2px solid black;
+  padding: 10px 20px;
   cursor: pointer;
-  color: aliceblue;
+  font-size: 1rem;
+  font-weight: bold;
 }
-.arrow-btn:hover {
-  color: #fff;
+
+.button_box {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 }
 </style>

@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-[url(@/assets/energy.png)] w-full h-[30vh] bg-cover bg-center relative w-full flex justify-center items-center gap-10 p-4 ">
+  <div class=" w-full h-[30vh] bg-cover bg-center relative w-full flex justify-center items-center gap-10 p-4 ">
 <!-- 总耗电量 -->
 <div class="relative flex flex-col items-center p-4 border border-cyan-400 rounded-lg bg-[#08101b]">
       <!-- 设备名称 -->
