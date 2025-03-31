@@ -5,10 +5,11 @@
 
     <!-- 内容层 -->
     <div class="flex w-full h-full justify-between items-center relative z-10">
-      <div class="flex-1 flex justify-center items-center 
+      
+      <div class="flex-1 flex justify-center items-center justify-around
       text-3xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
       tracking-wide">
-        {{ dateStr }}
+        {{ dateStr }} <img src="@/assets/APOLLO.png" alt="" class="w-[50%]">
       </div>
 
       <!-- 标题单独提取，不受 opacity 影响 -->

@@ -76,24 +76,32 @@ const drawcompletedIndicators = () => {
     },
     series: [
       {
-        name: '达成率',
+        name: '生产数据',
         type: 'bar',  // 设置为柱状图
         data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
         label: {
-        show: true, // 显示数值
-        position: 'top', // 让数值显示在柱子顶部
-        color: 'rgb(83, 234, 253)', // 让数值颜色与柱子一致
-        fontSize: 14, // 设置字体大小
-        fontWeight: 'bold' // 加粗提高可读性
-      },
-        itemStyle: {
-          color: 'rgb(83, 234, 253)',  // 设置柱状图的颜色
+          show: true,
+          position: 'top',
+          color: 'rgb(83, 234, 253)',
+          fontSize: 14,
+          fontWeight: 'bold',
         },
+        itemStyle: {
+          color: 'rgb(83, 234, 253)',
+        },
+      },
+      {
+        name: '合格率折线',
+        type: 'line',  // 设置为折线图
+        data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
         lineStyle: {
-          color: 'rgb(83, 234, 253)',  // 设置线条颜色，如果使用线条类型图表
-        }
-      }
-    ]
+          color: 'orange',  // 设置折线颜色
+          width: 2,  // 设置折线宽度
+        },
+        symbol: 'circle',  // 折线图的点形状
+        symbolSize: 6,  // 点的大小
+      },
+    ],
   };
 
   completedIndicatorsElement.setOption(option);

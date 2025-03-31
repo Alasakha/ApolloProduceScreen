@@ -80,7 +80,7 @@ const drawcompletedIndicators = () => {
     },
     series: [
       {
-        name: '达成率',
+        name: '合格率',
         type: 'bar',  // 设置为柱状图
         data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
         label: {
