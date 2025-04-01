@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title title-main">质量管理看板</div>
+    <div class="title title-main">{{handleTitle(prodLine)}}质量管理看板</div>
     <div class="title">合格率目标：{{ cumulativePassRate.target }}</div>
     <div class="title">本月累计合格率：{{ cumulativePassRate.passPercent }}%</div>
   </div>
@@ -28,6 +28,16 @@ const fetchData = () => {
     };
   });
   console.log(cumulativePassRate.value);
+};
+
+const handleTitle = (prodLine) => {
+  if (/^1/.test(prodLine)) {
+    return '一课'
+  } else if (/^2/.test(prodLine)) {
+    return '二课'
+  } else {
+    return null
+  }
 };
 
 // 在组件挂载时启动定时获取数据

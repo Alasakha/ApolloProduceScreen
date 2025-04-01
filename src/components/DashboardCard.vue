@@ -7,7 +7,7 @@
     </div>  
 
     <!-- 主题内容部分 -->
-    <div class="card-body" style="background-color: rgba(3, 16, 61, 0.2); height: 90%;">
+    <div class="card-body" style="background-color: rgba(3, 16, 61, 0.5); height: 90%;">
       <slot></slot>
     </div>
   </div>

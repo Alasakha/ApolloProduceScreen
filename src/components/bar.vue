@@ -61,23 +61,19 @@ const loadChart = () => {
     animationEasingUpdate: "cubicOut", // 缓动效果
     animationType: 'move',
     grid: { left: "5%", right: "5%", bottom: "5%", containLabel: true },
-    xAxis: {
-      type: "value",    // 使用数值型 X 轴
-      min: 0,           // 设置最小值为 0
-      max: 100,         // 设置最大值为 100
+        xAxis: {
+      type: "value",
+      min: 0,
+      max: 100,
       axisLabel: {
         color: "#fff",
         fontSize: 10,
-        formatter: (value) => `${value.toFixed(0)}%` // **确保百分比保留 1 位小数**
+        formatter: (value) => `${value.toFixed(0)}%`
       },
       splitLine: {
-          show: true,        // 显示分割线
-          lineStyle: {
-            color: '#ffffff', // 设置分割线颜色
-            type: 'dashed'    // 设置分割线类型为虚线
-          }
-        }
-      
+        show: false // ❌ 隐藏 X 轴的虚线
+      }
+          
     },
     yAxis: {
       type: "category",
@@ -85,7 +81,7 @@ const loadChart = () => {
       data: chunkedXAxis.value,
       axisLabel: { color: "#fff", fontSize: 14 },
 
- axisLabel: { // 控制坐标轴标签  
+      axisLabel: { // 控制坐标轴标签  
                         show: true, 
                         inside: true,
                         interval: 0, //横轴信息全部显
@@ -97,7 +93,7 @@ const loadChart = () => {
                             align: 'left',
                             padding: [0, 0, 10, 0]
                         }
-                    }
+                    },
     },
     series: [{
   barWidth: 100, // Increase the width of the bars

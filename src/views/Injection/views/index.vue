@@ -1,7 +1,7 @@
 <template>
 
 <body>
-  <dv-border-box13 title="dv-border-box-13" :title-width="400" :animate="false">
+  <dv-border-box13 title="dv-border-box-13">
       <div dv-bg>
         <Header></Header>
         <Middle></Middle>
@@ -24,7 +24,8 @@ body{
  width: 100vw;
  height: 100vh;
  background: 
-   url('@/assets/screen1.png') no-repeat center center;
+ linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+   url('@/assets/background.jpg') no-repeat center center;
  background-size: cover;
  transform-origin: center center;
  position: relative;

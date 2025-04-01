@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title title-main">生产计划管理看板</div>
+    <div class="title title-main">{{ handleTitle(prodLine) }}生产计划管理看板</div>
     <div class="title">
       本月生产计划总数：
       <span :style="{ color: '#00FFFF' }">{{ MonthlyData.plan }}</span>
@@ -16,6 +16,16 @@ import { eventBus } from '@/utils/eventbus';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数 
+const handleTitle = (prodLine) => {
+  if (/^1/.test(prodLine)) {
+    return '一课'
+  } else if (/^2/.test(prodLine)) {
+    return '二课'
+  } else {
+    return null
+  }
+};
+
 const MonthlyData = ref({});  // 确保它是一个对象
 
 

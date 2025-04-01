@@ -78,11 +78,12 @@ const updateChart = () => {
     },
     },
     yAxis: {
-      type: 'value',
+      type: 'value', 
       axisLabel: {
         color:'#fff',
         fontSize: 15,
       },
+
       lineStyle: {
       color: '#33ccff', // 设置横线颜色（红色）
       width: 20, // 线条宽度
@@ -98,6 +99,20 @@ const updateChart = () => {
     },
     label: {
         show: true, // 显示标签
+        position: 'top', // 标签显示的位置（可以是 'top', 'inside', 'insideTop', 'insideBottom' 等）
+        color: '#fff', // 标签文字颜色
+        fontSize: 14, // 字体大小
+        fontWeight: 'bold' // 字体加粗
+      }
+      },
+      {
+        data: values.value,
+        type: 'line',
+        itemStyle: {
+      color: 'orange', // 修改柱子颜色
+    },
+    label: {
+        show: false, // 显示标签
         position: 'top', // 标签显示的位置（可以是 'top', 'inside', 'insideTop', 'insideBottom' 等）
         color: '#fff', // 标签文字颜色
         fontSize: 14, // 字体大小

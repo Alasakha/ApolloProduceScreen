@@ -2,7 +2,6 @@
   <!-- 小图表的外边框组件 -->
   <dv-border-box-1 class="box1">
     <div class="workprogress">
-      <div class="ranking-title">今日工单完成进度</div>
       <!-- 将 chartData 传递给 BarChart 组件 -->
       <BarChart :chartData="chartData" />
     </div>
