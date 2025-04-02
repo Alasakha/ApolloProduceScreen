@@ -1,47 +1,41 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue';
+import Header from './Header/index.vue'
+import Row from './Row/index.vue'
+import Quality from './Quality/index.vue'
+import Goods from './Goods/index.vue'
+import Bottom from './Bottom/index.vue'
 
-const props = defineProps({
-  msg: String
-});
-
-const emit = defineEmits(['update']);
-
-const state = reactive({
-  count: 0
-});
-
-const doubleCount = computed(() => state.count * 2);
-
-watch(() => state.count, (newVal) => {
-  console.log('Count changed:', newVal);
-});
-
-const increment = () => {
-  state.count++;
-  emit('update', state.count);
-};
-
+import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
 </script>
 
 <template>
-  <div class="index">
-    <h1>{{ props.msg }}</h1>
-    <p>Count: {{ state.count }}</p>
-    <p>Double Count: {{ doubleCount }}</p>
-    <button @click="increment">Increment</button>
-  </div>
+<body>
+  <dv-full-screen-container>
+
+    <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
+
+        <Header></Header>
+     <Row></Row>
+     <Quality></Quality>
+     <Goods></Goods>
+     <Bottom></Bottom>
+
+    </dv-border-box11>
+  </dv-full-screen-container>
+</body>
 </template>
 
 <style scoped>
-.index {
-  text-align: center;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  font-size: 16px;
+body{
+ width: 100vw;
+ height: 100vh;
+ background: 
+ linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+   url('@/assets/background.jpg') no-repeat center center;
+ background-size: cover;
+ transform-origin: center center;
+ position: relative;
+ transition: transform 0.3s ease-in-out;
 }
 </style>

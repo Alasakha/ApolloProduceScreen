@@ -57,11 +57,11 @@ onMounted(() => {
   display: flex;
   flex-direction: column; /* 纵向排列 */  
   align-items: center; /* 默认左对齐，你也可以选择 center 来居中对齐 */
-  justify-content: center; /* 垂直居中 */
+  justify-content: start; /* 垂直居中 */
+  width: 80%;
 }
 
 .title {
-  margin-bottom: 10px; /* 控制行与行之间的间距 */
   font-size: 1.5vw;
   color: white;
 }

@@ -107,7 +107,6 @@ body{
   justify-content: start;
   align-items: center;
   padding-right: 8vw;
-  margin-top: 1.5vh;
 }
 
 /* 下方数据展示区域 */

@@ -78,7 +78,7 @@ const drawcompletedIndicators = () => {
       {
         name: '生产数据',
         type: 'bar',  // 设置为柱状图
-        data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
+        data: rawData.values.map(item => parseFloat((item ?? '0').toString().replace('%', ''))),
         label: {
           show: true,
           position: 'top',
@@ -93,7 +93,7 @@ const drawcompletedIndicators = () => {
       {
         name: '合格率折线',
         type: 'line',  // 设置为折线图
-        data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
+        data: rawData.values.map(item => parseFloat((item ?? '0').toString().replace('%', ''))),
         lineStyle: {
           color: 'orange',  // 设置折线颜色
           width: 2,  // 设置折线宽度

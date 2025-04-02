@@ -21,8 +21,7 @@ const drawcompletedIndicators = () => {
   if (!rateIndicators.value) return;
 
   const rawData = toRaw(handleData.value); // 解包数据
-  console.log('Raw Dates:', rawData.dates);
-  console.log('Raw Values:', rawData.values);
+
 
   const completedIndicatorsElement = echarts.init(rateIndicators.value);
   const option = {
@@ -80,7 +79,7 @@ const drawcompletedIndicators = () => {
     },
     series: [
       {
-        name: '合格率',
+        name: '达成率',
         type: 'bar',  // 设置为柱状图
         data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
         label: {

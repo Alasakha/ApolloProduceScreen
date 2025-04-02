@@ -9,56 +9,27 @@
     <h2>请选择看板</h2>
   </div>
 
-  <div class="button_box">
-    <div class="block text-center w-full" m="t-4" >
+  <div class="button_box ">
 
-      <el-carousel trigger="click" height="20vh" :interval="3000">
+
         <!-- 走马灯第 1 组：前 5 个 -->
-        <el-carousel-item>
-          <div class="small justify-center h-[200px] flex items-center gap-4">
-            <button
-              v-for="line in getRange(0, 5)"
-              :key="line.id"
-              class="custom-btn btn-5 w-[120px] h-[50px]"
-              @click="selectLine(line)"
-            >
-              {{ line.name }}
-            </button>
-          </div>
-        </el-carousel-item>
-
-        <!-- 走马灯第 2 组：第 5 ~ 8 个 -->
-        <el-carousel-item>
-          <div class="small justify-center h-[200px] flex items-center gap-4">
-            <button
-              v-for="line in getRange(5, 13)"
-              :key="line.id"
-              class="custom-btn btn-5 w-[120px] h-[50px]"
-              @click="selectLine(line)"
-            >
-              {{ line.name }}
-            </button>
-          </div>
-        </el-carousel-item>
+          <div class="small  h-[200px] flex items-center gap-4 flex flex-wrap">
 
         <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
-        <el-carousel-item>
-          <div class="small justify-center h-[200px] flex items-center gap-4">
+     
             <button
-              v-for="line in getRange(13, 14)"
+              v-for="line in lines"
               :key="line.id"
               class="custom-btn btn-5 w-[120px] h-[50px]"
               @click="selectLine(line)"
             >
               {{ line.name }}
             </button>
-          </div>
-        </el-carousel-item>
-      </el-carousel>
+   
+  
     </div>
   </div>
 </div>
-
 </body>
 </template>
 
@@ -78,13 +49,14 @@ const lines = ref([
   { id: "1005B", name: "生产线1005B",router:"S" },
   { id: "1004", name: "1004生产计划",router:"P" },
   { id: "1005", name: "1005生产计划",router:"P"},
+  { id: "1004", name: "1004质量检测",router:"Q" },
+  { id: "1005", name: "1005质量检测",router:"Q" },
   { id: "2004", name: "2004生产计划",router:"P" },
   { id: "2005", name: "2005生产计划",router:"P" },
   { id: "2004", name: "2004质量检测",router:"Q" },
   { id: "2005", name: "2005质量检测",router:"Q" },
-  { id: "1004", name: "1004质量检测",router:"Q" },
-  { id: "1005", name: "1005质量检测",router:"Q" },
   { id: null, name: "注塑看板",router:"/injection" },
+  { id: null, name: "供应链看板",router:"/scm" },
 ]);
 
 // 获取 lines 中指定范围的数据
