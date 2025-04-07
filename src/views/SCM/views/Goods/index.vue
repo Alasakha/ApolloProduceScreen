@@ -1,47 +1,21 @@
 <script setup>
 import { ref, reactive, computed, watch } from 'vue';
-
-const props = defineProps({
-  msg: String
-});
-
-const emit = defineEmits(['update']);
-
-const state = reactive({
-  count: 0
-});
-
-const doubleCount = computed(() => state.count * 2);
-
-watch(() => state.count, (newVal) => {
-  console.log('Count changed:', newVal);
-});
-
-const increment = () => {
-  state.count++;
-  emit('update', state.count);
-};
-
+import caigoudanhuiqianbujishi from './views/caigoudanhuiqianbujishi.vue';
+import daohuo from './views/daohuo.vue';
+import daohuobujishi from './views/daohuobujishi.vue';
+import huiqianbujishi from './views/huiqianbujishi.vue';
 </script>
 
 <template>
-  <div class="index h-[25vh] w-full">
-    <h1>{{ props.msg }}</h1>
-    <p>Count: {{ state.count }}</p>
-    <p>Double Count: {{ doubleCount }}</p>
-    <button @click="increment">Increment</button>
-  </div>
+  <div class="flex h-[25vh] w-full mt-3 " >
+<daohuo class="flex-1"></daohuo>
+<daohuobujishi class="flex-1"></daohuobujishi>
+<huiqianbujishi class="flex-1"></huiqianbujishi>
+<caigoudanhuiqianbujishi class="flex-1"></caigoudanhuiqianbujishi>
+</div>
+
 </template>
 
 <style scoped>
-.index {
-  text-align: center;
-  font-family: Arial, sans-serif;
-  padding: 20px;
-}
-button {
-  margin-top: 10px;
-  padding: 5px 10px;
-  font-size: 16px;
-}
+
 </style>

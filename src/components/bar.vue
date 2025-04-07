@@ -48,7 +48,7 @@ const loadChart = () => {
 
   let option = {
     title: {
-    text: '近五日合格率', // Title text 
+    text: '今日工单进度', // Title text 
     left: 'center', // Position of the title
     textStyle: {
       color: '#fff', // Title color

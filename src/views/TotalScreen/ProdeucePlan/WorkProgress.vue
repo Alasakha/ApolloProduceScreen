@@ -37,8 +37,6 @@ const processData = (data) => {
 
   isDataEmpty.value = false;
 
-
-
   // 格式化数据
   chartData.value = {
     axisData: data.map(item => item.gd), // 工单号
