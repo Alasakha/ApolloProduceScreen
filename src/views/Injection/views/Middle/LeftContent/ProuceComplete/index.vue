@@ -85,6 +85,7 @@ const drawcompletedIndicators = () => {
           color: 'rgb(83, 234, 253)',
           fontSize: 14,
           fontWeight: 'bold',
+          formatter: '{c}%' // 显示百分比
         },
         itemStyle: {
           color: 'rgb(83, 234, 253)',
@@ -112,7 +113,6 @@ const fetchData = async () => {
   try {
     const res = await getProductPlanCompleteRate();  // 调用接口获取数据
     handleData.value = formatProductionRateData(res.data)
-    console.log(handleData.value)
     isLoading.value = false;
     nextTick(drawcompletedIndicators);  // 绘制图表
   } catch (error) {

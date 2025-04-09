@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getJinhuoHege } from '@/api/getScmInfo.js';
-
+import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -49,7 +49,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '进货合格率近五天柱状图',
+      text: '供方来料合格率',
       left: 'center',
       textStyle: {
         color: '#fff',
@@ -86,16 +86,27 @@ const updateChart = () => {
         data: seriesData.value,
         type: 'bar',
         itemStyle: {
-          color: '#3498db',
+          color:(params)=>{
+            const value = seriesData.value[params.dataIndex];
+            if (value >= 98) {
+              return '#2bc50c'; // 绿色
+            } else if (value >= 95) {
+              return 'ffa500'; // 黄色
+            } else {
+              return '#FF0000'; // 红色
+            }
+          }
         },
         label: {
-          show: true,
-          position: 'insideTop',
-          color: '#fff',
-          fontSize: 14,
-          fontWeight: 'bold',
-          formatter: '{c}%'
-        }
+  show: true,
+  position: 'insideTop',
+  color: '#fff',
+  fontSize: 14,
+  fontWeight: 'bold',
+  formatter: function (params) {
+    return `${params.value.toFixed(1)}%`; // 保留一位小数
+  }
+}
       },
       {
         name: '合格率变化趋势', // 新增折线图
@@ -135,10 +146,14 @@ const resizeChart = () => {
 // 8. 页面挂载时获取数据
 onMounted(() => {
   fetchData();
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 9. 组件卸载时移除监听事件
 onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose(); // 销毁图表实例
+  }
   window.removeEventListener('resize', resizeChart);
 });
 </script>

@@ -6,15 +6,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick ,onBeforeUnmount} from 'vue';
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getBadCategory } from '@/api/getInjection';
 import { eventBus } from '@/utils/eventbus';
+
 const BadCategoryIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const Data = ref({ faultType: [] }); // 初始化数据
-const uniqueGuZhangTypeNames = ref([]); // 用于存储不重复的故障类型名称
 const total = ref([]); // 用于存储总数
 
 // 预设所有可能的故障类型名称和对应的颜色
@@ -31,74 +31,42 @@ const drawBadCategoryIndicators = () => {
 
   const BadCategoryIndicatorsElement = echarts.init(BadCategoryIndicators.value);
 
+  // 过滤掉值为 0 的数据
+  const validData = allGuZhangTypes
+    .map((type, index) => ({
+      value: total.value[index],
+      name: type,
+    }))
+    .filter((item) => item.value > 0); // 只保留值大于 0 的数据
+
   const option = {
     tooltip: {
-      trigger: 'axis',
-      axisPointer: {
-        type: 'shadow'
-      },
-      textStyle: {
-        color: 'rgb(83, 234, 239)' // 设置tooltip的字体颜色为蓝色
-      }
+      trigger: 'item',
+      formatter: '{a} <br/>{b}: {c} ({d}%)', // 显示名称、值和百分比
     },
     legend: {
-      data: ['缺料异常', '设备异常', '质量异常'], // 图例显示故障类型名称
+      orient: 'vertical',
+      left: 'left',
       textStyle: {
-        color: 'rgb(83, 234, 239)' // 设置图例的字体颜色为蓝色
-      }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
-      containLabel: true
-    },
-    xAxis: {
-      type: 'value',
-      boundaryGap: [0, 0.01], // 设置为 [0, 0.01] 来确保条形图正确显示
-      axisLabel: {
-        color: 'rgb(83, 234, 239)' // 设置x轴刻度标签的字体颜色为蓝色
+        color: 'rgb(83, 234, 239)', // 设置图例的字体颜色为蓝色
       },
-      axisLine: {
-        lineStyle: {
-          color: 'rgb(83, 234, 239)' // 设置x轴线的颜色为蓝色
-        }
-      }
-    },
-    yAxis: {
-      type: 'category',
-      data: ['缺料异常', '设备异常', '质量异常'], // 三种异常类型作为y轴刻度
-      axisLabel: {
-        color: 'rgb(83, 234, 239)' // 设置y轴刻度标签的字体颜色为蓝色
-      },
-      axisLine: {
-        lineStyle: {
-          color: 'rgb(83, 234, 239)' // 设置y轴线的颜色为蓝色
-        }
-      }
     },
     series: [
       {
-        name: '异常数量',
-        type: 'bar',
-        data: [total.value[0], total.value[1], total.value[2]], // 接口返回的数据：[3, 4, 0] 对应三个异常类型的数量
+        name: '异常类型',
+        type: 'pie',
+        radius: ['40%', '70%'], // 饼图的半径
+        data: validData, // 使用过滤后的数据
+
         itemStyle: {
-          color: (params) => {
-            // 为每种异常类型设置不同颜色
-            const colors = ['#FF6347', '#FFA500', '#FFD700']; // 红色，橙色，黄色
-            return colors[params.dataIndex];
-          }
+          color: (params) => guZhangTypeColors[params.name], // 根据类型设置颜色
         },
         label: {
-          show: true,
-          position: 'right',
-          textStyle: {
-            color: 'rgb(83, 234, 239)', // 设置柱子上的文本（如数值）的字体颜色为蓝色
-            fontSize: 14, // 设置字体大小
-          }
-        }
-      }
-    ]
+          color: 'rgb(83, 234, 239)', // 设置标签的字体颜色为蓝色
+          formatter: (params) => `${params.seriesName}: ${params.value}`, // 显示名称: 数值%
+        },
+      },
+    ],
   };
 
   // 设置图表
@@ -112,16 +80,12 @@ const fetchData = async () => {
     isLoading.value = false;
     Data.value = res.data.faultType;
 
-    // 提取后端返回的故障类型名称
-    const returnedGuZhangTypeNames = Data.value.map(item => item.guZhangTypeName);
-    console.log(returnedGuZhangTypeNames)
     // 根据所有预设的故障类型名称填充缺失的数据
-    uniqueGuZhangTypeNames.value = allGuZhangTypes;
-    total.value = allGuZhangTypes.map(type => {
-      const data = Data.value.find(item => item.guZhangTypeName === type);
+    total.value = allGuZhangTypes.map((type) => {
+      const data = Data.value.find((item) => item.guZhangTypeName === type);
       return data ? parseInt(data.total, 10) : 0; // 如果没有返回数据，设置为 0
     });
-    console.log(total.value)
+
     nextTick(drawBadCategoryIndicators); // 在 DOM 更新后绘制图表
   } catch (error) {
     console.error('数据获取失败:', error);
@@ -132,14 +96,12 @@ const fetchData = async () => {
 
 onMounted(() => {
   fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  eventBus.on('refreshData', fetchData); // 监听全局刷新事件
 });
 
-
-  // 清理定时器，避免组件卸载后定时器继续执行
-  onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-  });
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', fetchData); // 组件销毁时取消监听
+});
 </script>
 
 <style scoped>

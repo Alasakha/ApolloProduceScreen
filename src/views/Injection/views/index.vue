@@ -1,13 +1,14 @@
 <template>
 
 <body>
-  <dv-border-box13 title="dv-border-box-13">
+  <dv-border-box11 title="浙江阿波罗运动科技股份有限公司" :title-width="400" :animate="false">
       <div dv-bg>
+        <div class="w-full h-[5vh]"></div>
         <Header></Header>
         <Middle></Middle>
         <Bottom></Bottom>
       </div>
-    </dv-border-box13>
+    </dv-border-box11>
 
 </body>
 </template>

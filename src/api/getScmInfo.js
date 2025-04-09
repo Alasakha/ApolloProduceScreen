@@ -62,3 +62,39 @@ export const getWarningNextDay = () => {
     method: 'get',
   })
 }
+
+
+// /SCM/top3SupplierLastMonth
+export const getTop3SupplierLastMonth = () => {
+  return request({
+    url: '/SCM/top3SupplierLastMonth',
+    method: 'get',
+  })
+}
+
+// 获取天气API
+export const getWeather = () => {
+  return request({
+    url: '/SCM/getCurrentWeather',
+    method: 'get',
+  })
+}
+
+
+///SCM/warningNextDay1 次日生产欠料预警 总装一课
+
+export const getWarningNextDay1  = () => {
+  return request({
+    url: '/SCM/warningNextDay1',
+    method: 'get',
+  })
+}
+
+///SCM/warningNextDay1 次日生产欠料预警 总装二课
+
+export const getWarningNextDay2  = () => {
+  return request({
+    url: '/SCM/warningNextDay2',
+    method: 'get',
+  })
+}

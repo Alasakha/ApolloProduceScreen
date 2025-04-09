@@ -3,7 +3,7 @@
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getTop5SuppliersDelayedSignature } from '@/api/getScmInfo.js';
-
+import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -28,7 +28,6 @@ const fetchData = () => {
   getTop5SuppliersDelayedSignature()
     .then(res => {
       rawData.value = res.data;
-      console.log(rawData.value);
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -53,7 +52,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '到货不及时供应商TOP5',
+      text: '回签不及时供应商T0P5',
       left: 'center',
       textStyle: {
         color: '#fff',
@@ -70,8 +69,15 @@ const updateChart = () => {
         color: '#fff',
         fontSize: 12,
         formatter: function (value) {
-          return value.toFixed(2) + '%'; // 将数值转换为百分比并保留两位小数
+          return value.toFixed(1) + '%'; // 将数值转换为百分比并保留两位小数
         }
+      },
+      name: '及时率 (百分比)',
+      nameLocation: 'end', // X轴单位位置调整到右侧
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
       },
     },
     yAxis: {
@@ -79,8 +85,15 @@ const updateChart = () => {
       type: 'category',
       axisLabel: {
         color: '#fff',
-        fontSize: 15,
-      }
+        fontSize: 10,
+      },
+      name: '供应商名称',
+      nameLocation: 'end', // X轴单位位置调整到右侧
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
+      },
     },
     series: [
       {
@@ -102,7 +115,7 @@ const updateChart = () => {
     grid: {
       top: '15%',  // 调整标题和图表的间距
       left: '2%', // 让 Y 轴有更合适的边距
-      right: '10%', // 右侧留一点边距
+      right: '20%', // 右侧留一点边距
       bottom: '5%', // 减少底部空白，让柱状图向下填充
       containLabel: true // 让标签不会被裁剪
     },
@@ -121,10 +134,12 @@ const resizeChart = () => {
 // 8. 页面挂载时获取数据
 onMounted(() => {
   fetchData();
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 9. 组件卸载时移除监听事件并销毁图表
 onBeforeUnmount(() => {
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
   if (chartInstance) {
     chartInstance.dispose(); // 销毁图表实例
   }

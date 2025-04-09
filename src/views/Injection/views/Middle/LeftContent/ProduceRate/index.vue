@@ -20,7 +20,10 @@ const handleData = ref({ dates: [], rates: [] }); // 初始化数据
 const drawcompletedIndicators = () => {
   if (!rateIndicators.value) return;
 
-  const rawData = toRaw(handleData.value); // 解包数据
+const rawData = toRaw(handleData.value); // 解包响应式数据
+
+const xData = Object.keys(rawData); // ['04-03', '04-04', ...]
+const yData = Object.values(rawData).map(v => parseFloat(v)); // 把"80%" → 80
 
 
   const completedIndicatorsElement = echarts.init(rateIndicators.value);
@@ -30,6 +33,10 @@ const drawcompletedIndicators = () => {
       textStyle: {
         color: 'rgb(83, 234, 253)',  // 设置 tooltip 文字颜色
       },
+          formatter: (params) => {
+      const item = params[0]; // 因为 trigger: 'axis'，params 是一个数组
+      return `日期: ${item.name}    合格率：${item.value}%`;
+    }
     },
     legend: {
       data: ['生产数据'],
@@ -51,7 +58,7 @@ const drawcompletedIndicators = () => {
     },
     xAxis: {
       type: 'category',
-      data: rawData.dates,  // X 轴为日期
+      data: xData,  // X 轴为日期
       axisLine: {
         lineStyle: {
           color: 'rgb(83, 234, 253)',  // 设置 X 轴线条颜色
@@ -81,17 +88,29 @@ const drawcompletedIndicators = () => {
       {
         name: '达成率',
         type: 'bar',  // 设置为柱状图
-        data: rawData.values.map(item => parseFloat(item.replace('%', ''))),  // 将百分比转为数字
+        data:  yData,  // 将百分比转为数字
         label: {
           show: true,
           position: 'top',
           color: 'rgb(83, 234, 253)',
           fontSize: 14,
           fontWeight: 'bold',
+          formatter: (params) => `${params.value}%` // ✅ 顶部加百分号
         },
         itemStyle: {
           color: 'rgb(83, 234, 253)',
         },
+      },
+      {
+        name: '达成率折线',
+        type: 'line',  // 设置为折线图
+        data: yData,
+        lineStyle: {
+          color: 'orange',  // 设置折线颜色
+          width: 2,  // 设置折线宽度
+        },
+        symbol: 'circle',  // 折线图的点形状
+        symbolSize: 6,  // 点的大小
       },
     ],
   };
@@ -105,7 +124,7 @@ const drawcompletedIndicators = () => {
 const fetchData = async () => {
   try {
     const res = await getProductPassRate();
-    handleData.value = formatProductionRateData(res.data); // 处理数据
+    handleData.value = res.data; // 直接使用接口返回的数据
     console.log(handleData.value)
     isLoading.value = false;
     nextTick(drawcompletedIndicators);
@@ -113,31 +132,9 @@ const fetchData = async () => {
     console.error('数据获取失败:', error);
     isLoading.value = false;
     isDataEmpty.value = true;
-  }
-};
-
-// 格式化数据函数
-const formatProductionRateData = (data) => {
-  const dates = data.map(item => convertDateFormat(item.td003));  // 转换日期格式
-  const values = data.map(item => item.rate);  // 提取所有值
-
-  return {
-    dates,  // X 轴数据
-    values, // Y 轴数据
+    }
   };
-};
 
-  //日期转换
-  function convertDateFormat(inputDate) {
-  // 将输入日期转为字符串，确保是8位数（即 'YYYYMMDD' 格式）
-  const dateStr = inputDate.toString();
-
-  // 提取月份和日期
-  const month = dateStr.slice(4, 6);  // 获取第5和第6个字符（即月份）
-  const day = dateStr.slice(6, 8);    // 获取第7和第8个字符（即日期）
-
-  return `${parseInt(month)}-${parseInt(day)}`;  // 去掉前导零并返回格式
-}
 
 onMounted(() => {
   fetchData(); // 组件挂载时先请求一次

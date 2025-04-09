@@ -5,7 +5,7 @@
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getTop5PurchaseBad } from '@/api/getScmInfo.js';
-
+import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -64,33 +64,49 @@ const updateChart = () => {
       }
     },
     xAxis: {
-      type: 'value',
-      min: 0,  // 设置最小值为0
-      max: 100, // 设置最大值为100
+      type: 'category', // 改为 category 类型
+      data: categories.value, // 使用问题描述作为 X 轴数据
       axisLabel: {
         interval: 0,
         color: '#fff',
-        fontSize: 12,
+        fontSize: 12
+      },
+      name: '问题描述',
+      nameLocation: 'end',
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
       },
     },
     yAxis: {
-      data: categories.value,
-      type: 'category',
+      type: 'value', // 改为 value 类型
+      min: 0, // 设置最小值为 0
       axisLabel: {
         color: '#fff',
-        fontSize: 15,
-      }
+        fontSize: 12,
+        formatter: function (value) {
+          return value.toFixed(0); // 显示整数值
+        }
+      },
+      name: '数量',
+      nameLocation: 'end',
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [0, 0, 10, 0]
+      },
     },
     series: [
       {
-        data: seriesData.value,
+        data: seriesData.value, // 使用不良问题数量数据
         type: 'bar',
         itemStyle: {
-          color: '#3498db',
+          color: '#3498db', // 设置柱状图颜色
         },
         label: {
           show: true,
-          position: 'insideTop',
+          position: 'top', // 显示在柱子顶部
           color: '#fff',
           fontSize: 14,
           fontWeight: 'bold',
@@ -98,17 +114,16 @@ const updateChart = () => {
       },
     ],
     grid: {
-      top: '15%',  // 调整标题和图表的间距
-      left: '2%', // 让 Y 轴有更合适的边距
-      right: '10%', // 右侧留一点边距
-      bottom: '5%', // 减少底部空白，让柱状图向下填充
+      top: '15%', // 调整标题和图表的间距
+      left: '5%', // 左侧留出空间
+      right: '10%', // 右侧留出空间
+      bottom: '10%', // 底部留出空间
       containLabel: true // 让标签不会被裁剪
     },
   };
 
   chartInstance.setOption(option);
 };
-
 // 7. 监听窗口变化，自适应图表
 const resizeChart = () => {
   if (chartInstance) {
@@ -119,6 +134,7 @@ const resizeChart = () => {
 // 8. 页面挂载时获取数据
 onMounted(() => {
   fetchData();
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 9. 组件卸载时移除监听事件并销毁图表

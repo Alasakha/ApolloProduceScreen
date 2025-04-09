@@ -3,18 +3,23 @@
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getTop5PurchaserSignBackDelayed } from '@/api/getScmInfo.js';
-
+import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
 let chartInstance = null;
 
 // 2. 计算属性 - 取前面5个数
-const sortedData = computed(() =>
-  rawData.value
-    .slice() // 复制原始数据
-    .slice(0, 5) // 取前五个数据
-);
+const sortedData = computed(() => {
+  
+  if (rawData.value.length === 0) {
+    return [];
+  }
+  const data = rawData.value.slice(0, 5).reverse(); // 取前五个数据并反转顺序
+
+  return data;
+});
+
 const categories = computed(() => sortedData.value.map(item => item.purchaserName)); 
 const seriesData = computed(() => sortedData.value.map(item => (parseFloat(item.ratio) * 100).toFixed(1)));
 // 3. 监听数据变化，确保获取数据后绘制
@@ -22,12 +27,10 @@ watch(rawData, () => {
   nextTick(() => drawIndicators()); 
 }, { deep: true, immediate: true });
 
-// 4. 获取 API 数据
 const fetchData = () => {
   getTop5PurchaserSignBackDelayed()
     .then(res => {
-      rawData.value = res.data;
-      console.log(rawData.value);
+      rawData.value = res.data; // 确保 rawData 是后端返回的原始数据
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -52,7 +55,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '采购单单回签不及时采购员TO5',
+      text: '采购单回签不及时采购员TO5',
       left: 'center',
       textStyle: {
         color: '#fff',
@@ -64,12 +67,19 @@ const updateChart = () => {
       type: 'value',
       min: 0,  // 设置最小值为0
       max: 100, // 设置最大值为100
+      name: '合格率 (百分比)',
+      nameLocation: 'end', // X轴单位位置调整到右侧
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
+      },
       axisLabel: {
         interval: 0,
         color: '#fff',
-        fontSize: 12,
+        fontSize: 10,
         formatter: function (value) {
-          return value.toFixed(2) + '%'; // 将数值转换为百分比并保留两位小数
+          return value.toFixed(0) + '%'; // 将数值转换为百分比并保留两位小数
         }
       },
     },
@@ -78,8 +88,15 @@ const updateChart = () => {
       type: 'category',
       axisLabel: {
         color: '#fff',
-        fontSize: 15,
-      }
+        fontSize: 10,
+      },
+      name: '名字(采购员)',
+      nameLocation: 'end', // X轴单位位置调整到右侧
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
+      },
     },
     series: [
       {
@@ -92,7 +109,7 @@ const updateChart = () => {
           show: true,
           position: 'right',
           color: '#fff',
-          fontSize: 14,
+          fontSize: 10,
           fontWeight: 'bold',
           formatter: '{c}%' // 显示百分比
         }
@@ -101,7 +118,7 @@ const updateChart = () => {
     grid: {
       top: '15%',  // 调整标题和图表的间距
       left: '2%', // 让 Y 轴有更合适的边距
-      right: '10%', // 右侧留一点边距
+      right: '15%', // 右侧留一点边距
       bottom: '5%', // 减少底部空白，让柱状图向下填充
       containLabel: true // 让标签不会被裁剪
     },
@@ -120,10 +137,12 @@ const resizeChart = () => {
 // 8. 页面挂载时获取数据
 onMounted(() => {
   fetchData();
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 9. 组件卸载时移除监听事件并销毁图表
 onBeforeUnmount(() => {
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
   if (chartInstance) {
     chartInstance.dispose(); // 销毁图表实例
   }

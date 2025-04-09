@@ -2,7 +2,7 @@
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getTop5SupplierBad } from '@/api/getScmInfo.js';
-
+import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -27,7 +27,6 @@ const fetchData = () => {
   getTop5SupplierBad()
     .then(res => {
       rawData.value = res.data;
-      console.log(rawData.value);
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -61,36 +60,50 @@ const updateChart = () => {
       }
     },
     xAxis: {
-      type: 'value',
-      min: 0,  // 设置最小值为0
-      max: 100, // 设置最大值为100
+      type: 'category', // 改为 category 类型
+      data: categories.value, // 使用供应商名称作为 X 轴数据
       axisLabel: {
         interval: 0,
         color: '#fff',
-        fontSize: 12,
-        formatter: function (value) {
-          return value.toFixed(2) + '%'; // 将数值转换为百分比并保留两位小数
-        }
+        fontSize: 12
+      },
+      name: '供应商',
+      nameLocation: 'end',
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [15, 0, 0, 0]
       },
     },
     yAxis: {
-      data: categories.value,
-      type: 'category',
+      type: 'value', // 改为 value 类型
+      min: 0, // 设置最小值为 0
+      max: 100, // 设置最大值为 100
       axisLabel: {
         color: '#fff',
-        fontSize: 15,
-      }
+        fontSize: 12,
+        formatter: function (value) {
+          return value.toFixed(0) + '%'; // 将数值转换为百分比并保留两位小数
+        }
+      },
+      name: '不良率 (%)',
+      nameLocation: 'end',
+      nameTextStyle: {
+        color: '#fff',
+        fontSize: 10,
+        padding: [0, 0, 10, 0]
+      },
     },
     series: [
       {
-        data: seriesData.value,
+        data: seriesData.value, // 使用不良率数据
         type: 'bar',
         itemStyle: {
-          color: '#3498db',
+          color: '#3498db', // 设置柱状图颜色
         },
         label: {
           show: true,
-          position: 'insideTop',
+          position: 'top', // 显示在柱子顶部
           color: '#fff',
           fontSize: 14,
           fontWeight: 'bold',
@@ -99,10 +112,10 @@ const updateChart = () => {
       },
     ],
     grid: {
-      top: '15%',  // 调整标题和图表的间距
-      left: '2%', // 让 Y 轴有更合适的边距
-      right: '10%', // 右侧留一点边距
-      bottom: '5%', // 减少底部空白，让柱状图向下填充
+      top: '15%', // 调整标题和图表的间距
+      left: '2%', // 左侧留出空间
+      right: '10%', // 右侧留出空间
+      bottom: '10%', // 底部留出空间
       containLabel: true // 让标签不会被裁剪
     },
   };
@@ -113,17 +126,19 @@ const updateChart = () => {
 // 7. 监听窗口变化，自适应图表
 const resizeChart = () => {
   if (chartInstance) {
-    chartInstance.resize();
+    chartInstance.resize();                 // 使图表自适应                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             
   }
 };
 
 // 8. 页面挂载时获取数据
 onMounted(() => {
   fetchData();
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 9. 组件卸载时移除监听事件并销毁图表
 onBeforeUnmount(() => {
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
   if (chartInstance) {
     chartInstance.dispose(); // 销毁图表实例
   }
