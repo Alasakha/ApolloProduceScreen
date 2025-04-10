@@ -48,14 +48,14 @@ const drawIndicators = () => {
 
 // 6. 图表更新
 const updateChart = () => {
-  const xData = Object.keys(rawData.value);  // 获取所有的键
-  // 转换 yData 的每个百分比字符串为数字
-const yData = Object.values(rawData.value).map(value => {
-  // 去掉百分号并转换为数字
-  return parseFloat(value.replace('%', '')) || 0; // 如果转换失败则使用 0
-});
 
+    // 将对象转化为键值对数组，并排序
+    const sortedEntries = Object.entries(rawData.value)  // 返回键值对数组
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));  // 按照键进行排序
 
+  // 分别提取排序后的键和值
+  const xData = sortedEntries.map(([key]) => key);
+  const yData = sortedEntries.map(([_, value]) => parseFloat(value.replace('%', '')) || 0);
   if (!chartInstance) return;
 
   const option = {
@@ -64,7 +64,7 @@ const yData = Object.values(rawData.value).map(value => {
       left: 'center',
       textStyle: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 25,
         fontWeight: 'bold'
       }
     },

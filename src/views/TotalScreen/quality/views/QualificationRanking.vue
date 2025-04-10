@@ -24,11 +24,15 @@ const handleData = ref([]); // 初始化数据
 
 // 图表绘制函数
 const drawcompletedIndicators = () => {
-  const dataX = Object.keys(handleData.value);  // 获取所有的键
-  const dataY = Object.values(handleData.value).map(value => {
-    // 去掉百分号并转换为数字
-    return parseFloat(value.replace('%', '')) || 0; // 如果转换失败则使用 0
-  });
+  // 将对象转化为键值对数组，并排序
+  const sortedEntries = Object.entries(handleData.value)  // 返回键值对数组
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));  // 按照键进行排序
+
+  // 分别提取排序后的键和值
+  const dataX = sortedEntries.map(([key]) => key);
+  const dataY = sortedEntries.map(([_, value]) => parseFloat(value.replace('%', '')) || 0);
+
+
   if (!completedIndicators.value) return;
   const rawData = toRaw(handleData.value); // 解包数据
   const completedIndicatorsElement = echarts.init(completedIndicators.value);

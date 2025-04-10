@@ -22,10 +22,14 @@ const drawcompletedIndicators = () => {
 
 const rawData = toRaw(handleData.value); // 解包响应式数据
 
-const xData = Object.keys(rawData); // ['04-03', '04-04', ...]
-const yData = Object.values(rawData).map(v => parseFloat(v)); // 把"80%" → 80
+const sortedEntries = Object.entries(rawData)  // 返回键值对数组
+    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));  // 按照键进行排序
 
 
+  // 分别提取排序后的键和值
+  const xData = sortedEntries.map(([key]) => key);
+  const yData = sortedEntries.map(([_, value]) => parseFloat(value.replace('%', '')) || 0);
+  
   const completedIndicatorsElement = echarts.init(rateIndicators.value);
   const option = {
     tooltip: {
