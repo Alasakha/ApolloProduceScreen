@@ -6,19 +6,19 @@
     
     <dv-scroll-board :config="config" style="width:45vw;height:19vh;"/>
   </div> 
-<</template>
+</template>
 <script lang="ts" setup>
 import { reactive, onMounted,onBeforeUnmount } from 'vue'
 import { getabnormalInfo } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
-// 初始化配置对象
+// 初始化 配置对象
 const config = reactive({
-  header: ['型号', '责任人', '当前状态'], // 表头
+  header: ['不良原因', '时间', '品名','品号','规格','责任部门'], // 表头
   data: [], // 数据
   index: true,
   align: ['start'],
   rowNum: 4,
-  columnWidth: [50, 140, 140, 100],
+  columnWidth: [50, 100, 170, 170,160,170,150],
   headerHeight: 20
 })
 
@@ -30,9 +30,12 @@ const fetchData = async () => {
     if (res && res.data) {
       // 转换数据格式以适应表格
       config.data = res.data.map(item => [
-        item.macNo, // 型号
-        item.dutyDeptName, // 责任人
-        item.isFinish === 'Y' ? '已结束' : item.isFinish === 'X' ? '已响应' : '未响应', // 当前状态
+        item.ngName, // 不良原因
+        item.createDate.slice(0,16), // 时间
+        item.mb002, // 责任人
+        item.ta006, // 责任人
+        item.mb003, // 责任人
+        item.admin_UNIT_NAME,
       ]);
     }
   } catch (error) {

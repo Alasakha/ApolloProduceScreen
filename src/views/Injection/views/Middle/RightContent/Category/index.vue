@@ -54,11 +54,11 @@ const drawBadCategoryIndicators = () => {
       },
       series: [
         {
-          name: '暂无数据',
+          name: '暂无异常',
           type: 'pie',
           radius: ['40%', '70%'], // 饼图的半径
           data: [
-            { value: 1, name: '暂无数据' }, // 设置一个默认数据
+            { value: 1, name: '暂无异常' }, // 设置一个默认数据
           ],
           itemStyle: {
             color: '#16a662', // 设置饼图为绿色
@@ -66,7 +66,7 @@ const drawBadCategoryIndicators = () => {
           label: {
             show: true,
             position: 'center', // 标签显示在中心
-            formatter: '暂无数据', // 显示“暂无数据”
+            formatter: '暂无异常', // 显示“暂无数据”
             fontSize: 20,
             fontWeight: 'bold',
             color: '#16a662', // 标签字体颜色为绿色
