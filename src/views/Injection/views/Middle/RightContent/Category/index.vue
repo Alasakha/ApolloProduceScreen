@@ -39,35 +39,75 @@ const drawBadCategoryIndicators = () => {
     }))
     .filter((item) => item.value > 0); // 只保留值大于 0 的数据
 
-  const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: '{a} <br/>{b}: {c} ({d}%)', // 显示名称、值和百分比
-    },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      textStyle: {
-        color: 'rgb(83, 234, 239)', // 设置图例的字体颜色为蓝色
-      },
-    },
-    series: [
-      {
-        name: '异常类型',
-        type: 'pie',
-        radius: ['40%', '70%'], // 饼图的半径
-        data: validData, // 使用过滤后的数据
+  let option;
 
-        itemStyle: {
-          color: (params) => guZhangTypeColors[params.name], // 根据类型设置颜色
+  if (validData.length === 0) {
+    // 当 validData 为空时，显示绿色饼图和“暂无数据”标签
+    option = {
+      title: {
+        text: '',
+        left: 'center',
+        top: 'center',
+      },
+      tooltip: {
+        show: false, // 不显示提示框
+      },
+      series: [
+        {
+          name: '暂无数据',
+          type: 'pie',
+          radius: ['40%', '70%'], // 饼图的半径
+          data: [
+            { value: 1, name: '暂无数据' }, // 设置一个默认数据
+          ],
+          itemStyle: {
+            color: '#16a662', // 设置饼图为绿色
+          },
+          label: {
+            show: true,
+            position: 'center', // 标签显示在中心
+            formatter: '暂无数据', // 显示“暂无数据”
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: '#16a662', // 标签字体颜色为绿色
+          },
         },
-        label: {
-          color: 'rgb(83, 234, 239)', // 设置标签的字体颜色为蓝色
-          formatter: (params) => `${params.seriesName}: ${params.value}`, // 显示名称: 数值%
+      ],
+    };
+  } else {
+    // 正常显示数据的配置
+    option = {
+      tooltip: {
+        trigger: 'item',
+        formatter: '{a} <br/>{b}: {c} ({d}%)', // 显示名称、值和百分比
+      },
+      legend: {
+        orient: 'vertical',
+        left: 'left',
+        textStyle: {
+          color: 'rgb(83, 234, 239)', // 设置图例的字体颜色为蓝色
         },
       },
-    ],
-  };
+      series: [
+        {
+          name: '异常类型分布',
+          type: 'pie',
+          radius: ['40%', '70%'], // 饼图的半径
+          data: validData, // 使用过滤后的数据
+          itemStyle: {
+            color: (params) => guZhangTypeColors[params.name], // 根据类型设置颜色
+          },
+          label: {
+            show: true,
+            position: 'outside', // 标签显示在外侧
+            formatter: '{b}:{c}', // 格式化标签内容，显示名称、数值和百分比
+            fontSize: 12, // 设置标签字体大小
+            color: '#fff', // 设置标签字体颜色
+          },
+        },
+      ],
+    };
+  }
 
   // 设置图表
   BadCategoryIndicatorsElement.setOption(option);
