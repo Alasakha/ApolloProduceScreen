@@ -159,7 +159,6 @@ const startRotation = () => {
       chunkedXAxis.value = props.chartData.axisData.slice(currentIndex, endIndex);
     }
 
-    console.log("当前轮播数据:", chunkedData.value); // **调试日志**
     loadChart();
 
     // **如果到达最后一组数据，下一次从头开始**

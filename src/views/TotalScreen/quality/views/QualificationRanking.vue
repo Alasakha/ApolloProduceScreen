@@ -11,16 +11,24 @@
 <script setup>
 import { ref, onMounted, nextTick ,onBeforeUnmount,toRaw} from 'vue';
 import * as echarts from 'echarts';
-import { getProductPlanCompleteRate } from '@/api/getInjection';
+import { getProductPassRateRank } from '@/api/getQuiltyinfo';
 import { eventBus } from '@/utils/eventbus';
+import { useRoute } from 'vue-router';
 
+const route = useRoute();
+const prodLine = route.query.prodLine; // 获取路由参数
 const completedIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-const handleData = ref({ dates: [], rates: [] }); // 初始化数据
+const handleData = ref([]); // 初始化数据
 
 // 图表绘制函数
 const drawcompletedIndicators = () => {
+  const dataX = Object.keys(handleData.value);  // 获取所有的键
+  const dataY = Object.values(handleData.value).map(value => {
+    // 去掉百分号并转换为数字
+    return parseFloat(value.replace('%', '')) || 0; // 如果转换失败则使用 0
+  });
   if (!completedIndicators.value) return;
   const rawData = toRaw(handleData.value); // 解包数据
   const completedIndicatorsElement = echarts.init(completedIndicators.value);
@@ -51,7 +59,7 @@ const drawcompletedIndicators = () => {
     },
     xAxis: {
       type: 'category',
-      data: rawData.dates,
+      data: dataX,
       axisLine: {
         lineStyle: {
           color: 'rgb(83, 234, 253)',  // X 轴线条颜色
@@ -81,7 +89,7 @@ const drawcompletedIndicators = () => {
       {
         name: '生产数据',
         type: 'bar',  // 设置为柱状图
-        data: rawData.values.map(item => parseFloat((item ?? '0').toString().replace('%', ''))),
+        data:dataY,
         label: {
           show: true,
           position: 'top',
@@ -91,13 +99,13 @@ const drawcompletedIndicators = () => {
           formatter: '{c}%' // 显示百分比
         },
         itemStyle: {
-          color: 'rgb(83, 234, 253)',
+          color: '#1370fb',
         },
       },
       {
         name: '合格率折线',
         type: 'line',  // 设置为折线图
-        data: rawData.values.map(item => parseFloat((item ?? '0').toString().replace('%', ''))),
+        data:dataY,
         lineStyle: {
           color: 'orange',  // 设置折线颜色
           width: 2,  // 设置折线宽度
@@ -117,8 +125,8 @@ const drawcompletedIndicators = () => {
 // 获取数据函数
 const fetchData = async () => {
   try {
-    const res = await getProductPlanCompleteRate();  // 调用接口获取数据
-    handleData.value = formatProductionRateData(res.data)
+    const res = await getProductPassRateRank(prodLine);  // 调用接口获取数据
+    handleData.value = res.data;  // 设置数据
     isLoading.value = false;
     nextTick(drawcompletedIndicators);  // 绘制图表
   } catch (error) {
