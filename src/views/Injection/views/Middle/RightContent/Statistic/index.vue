@@ -26,6 +26,13 @@ const guZhangTypeColors = {
   '质量异常': '#FFD700', // 黄色
 };
 const option = {
+  grid: {
+      top: '10%',  // 调整标题和图表的间距
+      left: '2%', // 让 Y 轴有更合适的边距
+      right: '2%', // 右侧留一点边距
+      bottom: '20%', // 减少底部空白，让柱状图向下填充
+      containLabel: true // 让标签不会被裁剪
+    },
   tooltip: {
     trigger: 'axis',
     axisPointer: {
@@ -40,7 +47,8 @@ const option = {
   yAxis: {
     type: 'value',
     axisLabel: { color: 'rgb(83, 234, 253)' },
-    minInterval: 20,
+    interval: 1, // 设置刻度间隔为 1
+    min: 0, // 设置最小值为 0
   },
   series: [
   {

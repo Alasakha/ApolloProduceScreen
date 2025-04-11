@@ -13,12 +13,12 @@ import { getabnormalInfo } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 // 初始化 配置对象
 const config = reactive({
-  header: ['不良原因', '时间', '品名','品号','规格','责任部门'], // 表头
+  header: ['工单单号','不良原因','责任部门', '责任人','时间', '品名','品号','规格',], // 表头
   data: [], // 数据
   index: true,
   align: ['start'],
   rowNum: 4,
-  columnWidth: [50, 100, 170, 170,160,170,150],
+  columnWidth: [50, 100, 100, 100,100,170,150],
   headerHeight: 20
 })
 
@@ -30,12 +30,17 @@ const fetchData = async () => {
     if (res && res.data) {
       // 转换数据格式以适应表格
       config.data = res.data.map(item => [
+        item.ta002,
         item.ngName, // 不良原因
+        item.admin_UNIT_NAME,
+        item.ngResponPeople,
+
         item.createDate.slice(0,16), // 时间
+        
         item.mb002, // 责任人
         item.ta006, // 责任人
         item.mb003, // 责任人
-        item.admin_UNIT_NAME,
+        
       ]);
     }
   } catch (error) {

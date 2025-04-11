@@ -89,7 +89,7 @@ const updateChart = () => {
           color:(params)=>{
             const value = seriesData.value[params.dataIndex];
             if (value >= 98) {
-              return '#2bc50c'; // 绿色
+              return '#0b874d'; // 绿色
             } else if (value >= 95) {
               return 'ffa500'; // 黄色
             } else {

@@ -15,7 +15,9 @@ const sortedData = computed(() =>
     .slice() // 复制原始数据
     .slice(0, 5) // 取前五个数据
 );
-const categories = computed(() => sortedData.value.map(item => item.supplierName)); 
+const categories = computed(() =>
+  sortedData.value.map(item => item.supplierName.replace(/有限公司/g, ''))
+);
 const seriesData = computed(() => sortedData.value.map(item => item.ratio ? parseFloat(parseFloat(item.ratio).toFixed(1)) : 0))
 
 // 3. 监听数据变化，确保获取数据后绘制
@@ -60,7 +62,7 @@ const updateChart = () => {
         fontWeight: 'bold'
       }
     },
-    xAxis: {
+    yAxis: {
       type: 'value',
       min: 0,  // 设置最小值为0
       max: 100, // 设置最大值为100
@@ -80,14 +82,14 @@ const updateChart = () => {
         padding: [15, 0, 0, 0]
       },
     },
-    yAxis: {
+    xAxis: {
       data: categories.value,
       type: 'category',
       axisLabel: {
         color: '#fff',
         fontSize: 10,
+        rotate: 45
       },
-      name: '供应商名称',
       nameLocation: 'end', // X轴单位位置调整到右侧
       nameTextStyle: {
         color: '#fff',
@@ -104,7 +106,7 @@ const updateChart = () => {
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'top',
           color: '#fff',
           fontSize: 1,
           fontWeight: 'bold',
@@ -115,7 +117,7 @@ const updateChart = () => {
     grid: {
       top: '15%',  // 调整标题和图表的间距
       left: '2%', // 让 Y 轴有更合适的边距
-      right: '15%', // 右侧留一点边距
+      right: '2%', // 右侧留一点边距
       bottom: '5%', // 减少底部空白，让柱状图向下填充
       containLabel: true // 让标签不会被裁剪
     },

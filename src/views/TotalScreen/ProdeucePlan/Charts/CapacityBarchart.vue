@@ -103,7 +103,26 @@ const updateChart = () => {
         color: '#fff', // 标签文字颜色
         fontSize: 14, // 字体大小
         fontWeight: 'bold' // 字体加粗
-      }
+      },
+      markLine: {
+          data: [
+            {
+              type: 'average', // 计算平均值  
+              name: '平均值',
+            },
+          ],
+          lineStyle: {
+            color: '#f5f598',
+            type: 'dashed', // 虚线样式
+          },
+          label: {
+            show: true,
+            position: 'end', // 标签显示在线的末端
+            formatter: '平均值: {c}', // 显示平均值
+            color: '#f5f598', // 标签文字颜色
+            fontSize: 12,
+          },
+        },
       },
       {
         data: values.value,

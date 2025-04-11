@@ -63,7 +63,7 @@ const updateChart = () => {
         fontWeight: 'bold'
       }
     },
-    xAxis: {
+    yAxis: {
       type: 'value',
       min: 0,  // 设置最小值为0
       max: 100, // 设置最大值为100
@@ -83,7 +83,7 @@ const updateChart = () => {
         }
       },
     },
-    yAxis: {
+    xAxis: {
       data: categories.value,
       type: 'category',
       axisLabel: {
@@ -107,7 +107,7 @@ const updateChart = () => {
         },
         label: {
           show: true,
-          position: 'right',
+          position: 'top',
           color: '#fff',
           fontSize: 10,
           fontWeight: 'bold',

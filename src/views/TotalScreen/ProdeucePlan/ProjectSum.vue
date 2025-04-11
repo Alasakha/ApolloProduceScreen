@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title title-main">{{ handleTitle(prodLine) }}生产计划管理看板</div>
+    <div class="title title-main">{{ handleTitle(prodLine) }}{{handleTitle2(prodLine)}}生产计划管理看板</div>
     <div class="title">
       本月生产计划总数：
       <span :style="{ color: '#00FFFF' }">{{ MonthlyData.plan }}</span>
@@ -21,6 +21,17 @@ const handleTitle = (prodLine) => {
     return '一课'
   } else if (/^2/.test(prodLine)) {
     return '二课'
+  } else {
+    return null
+  }
+};
+const handleTitle2 = (prodLine) => {
+  console.log('是否第四个字符是4:', /^.{3}4/.test(prodLine));
+
+  if ( /^.{3}4/.test(prodLine)) {
+    return '装配'
+  } else if ( /^.{3}5/.test(prodLine)) {
+    return '包装'
   } else {
     return null
   }
