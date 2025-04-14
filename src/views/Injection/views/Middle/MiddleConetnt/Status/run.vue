@@ -38,7 +38,7 @@ const drawhstatusIndicators = () => {
   const option: echarts.EChartsOption = {
   series: [
     {
-      max: Number(runvalue.value), // 让最大值动态等于 runvalue
+      max: Number(totalvalue.value), // 让最大值动态等于 runvalue
       type: 'gauge',
       progress: {
         show: true,
@@ -108,8 +108,8 @@ const drawhstatusIndicators = () => {
 const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
-    runvalue.value = res.data.deviceRun
-    totalvalue.value = res.data.deviceTotal
+    runvalue.value = res.data['加工中']
+    totalvalue.value = res.data['总数']
     nextTick(drawhstatusIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);

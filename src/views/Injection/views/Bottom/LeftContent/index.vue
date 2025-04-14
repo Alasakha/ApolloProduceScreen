@@ -14,12 +14,12 @@ import { getMaintanceInfo } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 // 初始化配置对象
 const config = reactive({
-  header: ['机器编号', '机器名称', '状态','责任人'], // 表头
+  header: ['机器编号', '机器名称', '状态','责任人','点检时间','二级保养时间','三级保养时间'], // 表头
   data: [], // 数据
   index: true,
   align: ['center'],
   rowNum: 4,
-  columnWidth: [50, 150, 150, 100],
+  columnWidth: [50, 150, 150, 100,70,150,110],
   headerHeight: 20
 })
 
@@ -33,8 +33,11 @@ const fetchData = async () => {
       config.data = res.data.map(item => [
         item.te011, // 型号
         item.te012, // 责任人
-        item.te019 === '0' ? '未保养' : item.te019 === '1' ? '已保养' : '未知', // 当前状态（添加默认值）
-        item.employee_name // 添加逗号
+        item.te019 === '0' ? '未保养' : item.te019 === '1' ? '已点检' : '未知', // 当前状态（添加默认值）
+        item.employee_name ,// 添加逗号
+        item.modi_DATE.slice(0,16), // 点检时间
+        item.lvTwoLastMaintenanceDay,
+        item.lvThreeLastMaintenanceDay,
       ]);
     }
   } catch (error) {

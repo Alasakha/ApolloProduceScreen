@@ -89,14 +89,14 @@ const loadChart = () => {
                         textStyle: {
                             color:'white',
                             verticalAlign: 'bottom',
-                            fontSize: 10,
+                            fontSize: 15,
                             align: 'left',
-                            padding: [0, 0, 10, 0]
+                            padding: [0, 0, 25, 0]
                         }
                     },
     },
     series: [{
-  barWidth: 100, // Increase the width of the bars
+  barWidth: 50, // Increase the width of the bars
   type: "bar",
   data: chunkedData.value.map((value) => ({
     value: value,
@@ -117,7 +117,6 @@ const loadChart = () => {
       }
     }
   })),
-  barWidth: 20,
   itemStyle: {
     barBorderRadius: [0, 5, 15, 0],
   }

@@ -1,8 +1,8 @@
 <template>
   <div class="container">
     <div class="title title-main">{{handleTitle(prodLine)}}质量管理看板</div>
-    <div class="title">合格率目标：{{ cumulativePassRate.target }}</div>
-    <div class="title">本月累计合格率：{{ cumulativePassRate.passPercent }}%</div>
+    <div class="title">直通率目标：{{ cumulativePassRate.target }}</div>
+    <div class="title">本月累计直通率：{{ cumulativePassRate.passPercent }}%</div>
   </div>
 </template>
 

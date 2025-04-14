@@ -14,6 +14,8 @@ import * as echarts from 'echarts';
 import { getProductPassRateRank } from '@/api/getQuiltyinfo';
 import { eventBus } from '@/utils/eventbus';
 import { useRoute } from 'vue-router';
+import { getBarColor } from './getcolor';
+
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 获取路由参数
@@ -38,7 +40,7 @@ const drawcompletedIndicators = () => {
   const completedIndicatorsElement = echarts.init(completedIndicators.value);
   const option = {  
     title: {
-      text: '合格率排行榜',
+      text: '直通率排行榜',
       left: 'center',
       textStyle: {
         color: '#fff',
@@ -103,9 +105,14 @@ const drawcompletedIndicators = () => {
           formatter: '{c}%' // 显示百分比
         },
         itemStyle: {
-          color: '#1370fb',
-        },
-      },
+  color: (params) => {
+    console.log(params.value); // 打印调试，确认值是数值类型
+    const value = params.value; // 直接使用数值
+    return getBarColor(prodLine, value); // 根据生产线和值动态设置颜色
+  },
+},
+},
+
       {
         name: '合格率折线',
         type: 'line',  // 设置为折线图

@@ -1,6 +1,7 @@
 <template>
   <!-- 数据加载完成且非空时显示图表 -->
   <div v-show="!isLoading" class="h-[100%] w-full">
+    <dv-decoration-10 style="width:90%;height:5px;" />
     <div ref="completedIndicators" class="h-[27vh] w-[25vw]"></div>
   </div>
 </template>
@@ -17,11 +18,22 @@ const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const handleData = ref({ dates: [], rates: [] }); // 初始化数据
 
+
+let completedIndicatorsInstance = null;
+
+const handleResize = () => {
+  if (completedIndicatorsInstance) {
+    completedIndicatorsInstance.resize();
+  }
+};
 // 图表绘制函数
 const drawcompletedIndicators = () => {
   if (!completedIndicators.value) return;
+  if (completedIndicatorsInstance) {
+  completedIndicatorsInstance.dispose();
+}
   const rawData = toRaw(handleData.value); // 解包数据
-  const completedIndicatorsElement = echarts.init(completedIndicators.value);
+  completedIndicatorsInstance = echarts.init(completedIndicators.value);
   const option = {  
     tooltip: { 
       trigger: 'axis',
@@ -29,21 +41,11 @@ const drawcompletedIndicators = () => {
         color: 'rgb(83, 234, 253)',  // 设置 tooltip 文字颜色
       },
     },
-    legend: {
-      data: ['生产数据'],  // 修改为适合的图例名称
-      textStyle: { 
-        color: 'rgb(83, 234, 253)',  // 修改文字颜色
-        fontSize: 10
-      },
-      top: '0%',
-      itemWidth: 15,
-      itemHeight: 10,
-    },
     grid: {
-      top: '25%',
+      top: '10%',
       left: '0%',
       right: '0%',
-      bottom: '0%',
+      bottom: '5%',
       containLabel: true
     },
     xAxis: {
@@ -88,7 +90,7 @@ const drawcompletedIndicators = () => {
           formatter: '{c}%' // 显示百分比
         },
         itemStyle: {
-          color: 'rgb(83, 234, 253)',
+          color: 'rgb(0, 186, 255)',
         },
       },
       {
@@ -105,7 +107,7 @@ const drawcompletedIndicators = () => {
     ],
   };
 
-  completedIndicatorsElement.setOption(option);
+  completedIndicatorsInstance.setOption(option);
 };
 
 // 获取数据函数
@@ -137,10 +139,12 @@ const formatProductionRateData = (data) => {
 onMounted(() => {
   fetchData(); // 组件挂载时先请求一次
   eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  window.addEventListener('resize', handleResize);
 });
   // 清理定时器，避免组件卸载后定时器继续执行
   onBeforeUnmount(() => {
     eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+    window.removeEventListener('resize', handleResize);
   });
 
 

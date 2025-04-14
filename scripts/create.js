@@ -15,21 +15,24 @@ if (!pageName) {
 }
 
 // 使用 path.join() 拼接路径
-const viewsDir = path.join(__dirname, '../src/views', pageName);
-const componentsDir = path.join(__dirname, '../src/components', pageName);
+const baseDir = path.join(__dirname, '../src', pageName);
+const viewsDir = path.join(baseDir, 'views');
+const componentsDir = path.join(baseDir, 'components');
 
 // 打印出拼接后的路径来检查
+console.log('baseDir:', baseDir);
 console.log('viewsDir:', viewsDir);
 console.log('componentsDir:', componentsDir);
 
-if (fs.existsSync(viewsDir) || fs.existsSync(componentsDir)) {
-  console.error('❌ 页面或组件已存在，请更换页面名');
+if (fs.existsSync(baseDir)) {
+  console.error('❌ 页面文件夹已存在，请更换页面名');
   process.exit(1);
 }
 
+// 创建文件夹
 fs.mkdirSync(viewsDir, { recursive: true });
 fs.mkdirSync(componentsDir, { recursive: true });
-console.log(`📁 创建文件夹：views/${pageName} 和 components/${pageName}`);
+console.log(`📁 创建文件夹：${pageName}/views 和 ${pageName}/components`);
 
 const vueTemplate = `<template>
   <div class="${pageName}">
@@ -47,7 +50,10 @@ const vueTemplate = `<template>
 </style>
 `;
 
+// 在 views 文件夹中创建 index.vue
 fs.writeFileSync(path.join(viewsDir, 'index.vue'), vueTemplate);
+
+// 在 components 文件夹中创建 index.vue
 fs.writeFileSync(path.join(componentsDir, 'index.vue'), vueTemplate);
 
-console.log('✅ 页面和组件 index.vue 生成完毕');
+console.log('✅ views 和 components 文件夹中的 index.vue 生成完毕');

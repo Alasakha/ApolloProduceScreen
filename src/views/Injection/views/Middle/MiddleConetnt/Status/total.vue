@@ -113,7 +113,7 @@ const resizeChart = () => {
 const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
-    totalvalue.value = res.data.deviceTotal
+    totalvalue.value = res.data["总数"]
     nextTick(drawhstatusIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);

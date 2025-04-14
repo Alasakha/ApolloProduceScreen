@@ -4,7 +4,7 @@
       <p class="tracking-widest">异常看板</p>
     </div>
     
-    <dv-scroll-board :config="config" style="width:45vw;height:19vh;"/>
+    <dv-scroll-board :config="config" style="width:47vw;height:19vh;" S/>
   </div> 
 </template>
 <script lang="ts" setup>
@@ -18,7 +18,7 @@ const config = reactive({
   index: true,
   align: ['start'],
   rowNum: 4,
-  columnWidth: [50, 100, 100, 100,100,170,150],
+  columnWidth: [40, 100, 90, 80,70,140,130,100],
   headerHeight: 20
 })
 

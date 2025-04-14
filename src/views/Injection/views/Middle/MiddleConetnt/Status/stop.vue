@@ -114,8 +114,8 @@ const resizeChart = () => {
 const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
-    shutdownvalue.value = res.data.deviceShutdown
-    totalvalue.value = res.data.deviceTotal
+    shutdownvalue.value = res.data['关机数']? res.data['关机数'] : 0; // 确保 shutdownvalue 有值
+    totalvalue.value = res.data['总数']
     nextTick(drawhstatusIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);

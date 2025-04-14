@@ -11,26 +11,37 @@ import * as echarts from 'echarts';
 import { getProductPassRate } from '@/api/getInjection';
 import { eventBus } from '@/utils/eventbus.ts';
 
+
+
+
+
 const rateIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const handleData = ref({ dates: [], rates: [] }); // 初始化数据
 
+let completedIndicatorsInstance = null;
+
+const handleResize = () => {
+  if (completedIndicatorsInstance) {
+    completedIndicatorsInstance.resize();
+  }
+};
+
 // 图表绘制函数
 const drawcompletedIndicators = () => {
   if (!rateIndicators.value) return;
 
-const rawData = toRaw(handleData.value); // 解包响应式数据
+if (completedIndicatorsInstance) {
+  completedIndicatorsInstance.dispose();
+}
 
-const sortedEntries = Object.entries(rawData)  // 返回键值对数组
-    .sort(([keyA], [keyB]) => keyA.localeCompare(keyB));  // 按照键进行排序
+const rawData = toRaw(handleData.value);
+const sortedEntries = Object.entries(rawData).sort(([a], [b]) => a.localeCompare(b));
+const xData = sortedEntries.map(([key]) => key);
+const yData = sortedEntries.map(([_, value]) => parseFloat(value.replace('%', '')) || 0);
 
-
-  // 分别提取排序后的键和值
-  const xData = sortedEntries.map(([key]) => key);
-  const yData = sortedEntries.map(([_, value]) => parseFloat(value.replace('%', '')) || 0);
-  
-  const completedIndicatorsElement = echarts.init(rateIndicators.value);
+completedIndicatorsInstance = echarts.init(rateIndicators.value);
   const option = {
     tooltip: {
       trigger: 'axis',
@@ -54,10 +65,10 @@ const sortedEntries = Object.entries(rawData)  // 返回键值对数组
       formatter: (name) => `${name} (%)`,  // 在图例中添加百分号
     },
     grid: {
-      top: '25%',
+      top: '15%',
       left: '0%',
       right: '0%',
-      bottom: '0%',
+      bottom: '5%',
       containLabel: true,
     },
     xAxis: {
@@ -102,7 +113,7 @@ const sortedEntries = Object.entries(rawData)  // 返回键值对数组
           formatter: (params) => `${params.value}%` // ✅ 顶部加百分号
         },
         itemStyle: {
-          color: 'rgb(83, 234, 253)',
+          color: 'rgb(0, 186, 255)',
         },
       },
       {
@@ -119,7 +130,10 @@ const sortedEntries = Object.entries(rawData)  // 返回键值对数组
     ],
   };
 
-  completedIndicatorsElement.setOption(option);
+  completedIndicatorsInstance = echarts.init(rateIndicators.value);
+completedIndicatorsInstance.setOption(option); // ✅ 用对变量名
+
+
 };
 
 
@@ -140,14 +154,22 @@ const fetchData = async () => {
   };
 
 
-onMounted(() => {
-  fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  onMounted(() => {
+  fetchData();
+  eventBus.on('refreshData', fetchData);
+  window.addEventListener('resize', handleResize); // 添加窗口变化监听
 });
   // 清理定时器，避免组件卸载后定时器继续执行
   onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-  });
+  eventBus.off('refreshData', fetchData);
+  window.removeEventListener('resize', handleResize); // 移除监听
+
+  // 清理图表实例
+  if (completedIndicatorsInstance) {
+    completedIndicatorsInstance.dispose();
+    completedIndicatorsInstance = null;
+  }
+});
 </script>
 
 <style scoped></style>

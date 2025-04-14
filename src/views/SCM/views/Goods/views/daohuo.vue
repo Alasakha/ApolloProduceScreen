@@ -97,8 +97,15 @@ const updateChart = () => {
         data: seriesData.value,
         type: 'bar',
         itemStyle: {
-          color: '#3498db',
-        },
+          color: (params)=>{
+            const value = seriesData.value[params.dataIndex];
+            if (value >= 75) {
+              return '#00FF00'; // 绿色
+            } else {
+              return 'orange'; // 橙色
+            }
+          }
+        },  
         label: {
           show: true,
           position: 'insideTop',
@@ -113,7 +120,7 @@ const updateChart = () => {
         data: seriesData.value,
         type: 'line',
         itemStyle: {
-          color: 'orange', // 折线颜色
+          color: 'rgb(52, 152, 219)', // 折线颜色
         },
         symbol: 'circle', // 数据点形状
         symbolSize: 8, // 数据点大小

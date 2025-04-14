@@ -14,17 +14,9 @@ import { eventBus } from '@/utils/eventbus';
 const StatisticIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-const Data = ref({ faultType: [] }); // 初始化数据
-const uniqueGuZhangTypeNames = ref([]); // 用于存储不重复的故障类型名称
-const total = ref([]); // 用于存储总数
+let chartInstance = null; // 保存 ECharts 实例
 
-// 预设所有可能的故障类型名称和对应的颜色
-const allGuZhangTypes = ['缺料异常', '设备异常', '质量异常'];
-const guZhangTypeColors = {
-  '缺料异常': '#FF6347', // 红色
-  '设备异常': '#FFA500', // 橙色
-  '质量异常': '#FFD700', // 黄色
-};
+
 const option = {
   grid: {
       top: '10%',  // 调整标题和图表的间距
@@ -42,7 +34,10 @@ const option = {
   xAxis: {
     type: 'category',
     data: [], // 这里会动态填充日期
-    axisLabel: { color: 'rgb(83, 234, 253)' } // 让字体变蓝色
+    axisLabel: { color: 'rgb(83, 234, 253)',
+    fontSize: 9, // 设置字体大小
+     } // 让字体变蓝色
+
   },
   yAxis: {
     type: 'value',
@@ -73,19 +68,33 @@ const option = {
 const drawStatisticIndicators = () => {
   if (!StatisticIndicators.value) return;
 
-  const StatisticIndicatorsElement = echarts.init(StatisticIndicators.value);
-  // 设置图表
-  StatisticIndicatorsElement.setOption(option);
+  if (!chartInstance) {
+    chartInstance = echarts.init(StatisticIndicators.value);
+  }
+
+  chartInstance.setOption(option);
 };
 
-
+// 窗口变化时重绘图表
+const resizeChart = () => {
+  if (chartInstance) {
+    chartInstance.resize();
+  }
+};
 
 const processData = (data) => {
   // 获取 x 轴的日期
-  const xData = data.faultSevenDay.map(item => item.guzhangDate);
+  const xbeforeData = data.faultSevenDay.map(item => item.guzhangDate);
+  const xData =  xbeforeData.map(item => {
+    const date = new Date(item);
+    const year = date.getFullYear();
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1
+    const day = String(date.getDate()).padStart(2, '0');
+    return `${month}-${day}`; // 格式化为 YYYY-MM-DD
+  });
   // 获取 y 轴的 duration
   const yData = data.faultSevenDay.map(item => item.duration);
-  console.log(data,xData,yData)
+
   return { xData, yData };
 };
 
@@ -93,6 +102,7 @@ const processData = (data) => {
 const fetchData = async () => {
   try {
     const res = await getBadCategory();
+    console.log(res.data); // 打印接口返回的数据
     isLoading.value = false;
 
     const { xData, yData } = processData(res.data);
@@ -110,15 +120,20 @@ const fetchData = async () => {
 
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
-  fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  fetchData();
+  window.addEventListener('resize', resizeChart); // 监听窗口大小变化
+  eventBus.on('refreshData', fetchData); // 监听全局刷新事件
 });
 
-
-  // 清理定时器，避免组件卸载后定时器继续执行
-  onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-  });
+// 清理资源
+onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose();
+    chartInstance = null;
+  }
+  window.removeEventListener('resize', resizeChart); // 移除窗口大小变化监听
+  eventBus.off('refreshData', fetchData); // 取消全局刷新事件监听
+});
 </script>
 
 <style scoped>
