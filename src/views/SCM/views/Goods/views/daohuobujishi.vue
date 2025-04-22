@@ -4,6 +4,8 @@ import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts';
 import { getTop5SuppliersDelayedDelivery } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
+import  ZZEK from './daohuobujishi/zzek.vue'; // 引入子组件
+import ZZYK from './daohuobujishi/zzyk.vue'; // 引入子组件
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -29,7 +31,7 @@ watch(rawData, () => {
 const fetchData = () => {
   getTop5SuppliersDelayedDelivery()
     .then(res => {
-      rawData.value = res.data;
+      rawData.value = res.data.zzyk;
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -153,7 +155,15 @@ onBeforeUnmount(() => {
   <div class="daohuobujishi">
     <dv-border-box8 :dur="5">
       <div class="dv-bg pt-2">
-        <div ref="qualityIndicators" class="chart-container"></div>
+        <el-carousel class="w-full" :interval=10000 >
+      <el-carousel-item>
+        <ZZYK></ZZYK>
+      </el-carousel-item>
+      <el-carousel-item>
+        <ZZEK></ZZEK>
+      </el-carousel-item>
+    </el-carousel>
+
       </div>
     </dv-border-box8>
   </div>

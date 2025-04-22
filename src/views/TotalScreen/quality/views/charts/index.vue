@@ -2,12 +2,13 @@
   <div class="charts-container">
     <dv-border-box8>
         <div class="charts-content">
+          <div class="charts2">
+          <dv-border-box10><MonthResponsityTop></MonthResponsityTop></dv-border-box10>
+        </div>
         <div class="charts1">
           <dv-border-box10><MonthChart></MonthChart></dv-border-box10>
         </div>
-        <div class="charts2">
-          <dv-border-box10><MonthResponsityTop></MonthResponsityTop></dv-border-box10>
-        </div>
+     
         <div class="charts3">
           <dv-border-box10><TodayChart></TodayChart></dv-border-box10>
         </div>

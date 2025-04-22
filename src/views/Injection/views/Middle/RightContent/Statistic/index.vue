@@ -40,6 +40,14 @@ const option = {
 
   },
   yAxis: {
+    name: '故障时长/分钟',
+    nameLocation: 'end', // 调整名称的位置，可选值为 'start' | 'middle' | 'end'
+    nameTextStyle: {
+      color: 'rgb(83, 234, 253)', // 设置名称颜色
+      fontSize: 12, // 设置名称字体大小
+      fontWeight: 'bold' ,// 加粗提高可读性
+      padding: [10, 0, 0, 30], // 调整名称与轴线的距离，格式为 [上, 右, 下, 左]
+    },
     type: 'value',
     axisLabel: { color: 'rgb(83, 234, 253)' },
     interval: 1, // 设置刻度间隔为 1

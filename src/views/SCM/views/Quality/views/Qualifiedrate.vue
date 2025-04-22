@@ -91,7 +91,7 @@ const updateChart = () => {
             if (value >= 98) {
               return '#0b874d'; // 绿色
             } else if (value >= 95) {
-              return 'ffa500'; // 黄色
+              return '#ffa500'; // 黄色
             } else {
               return '#FF0000'; // 红色
             }

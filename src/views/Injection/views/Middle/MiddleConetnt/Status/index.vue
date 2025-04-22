@@ -18,7 +18,7 @@
 
     <div class="flex flex-col justify-center items-center">
       <Stop></Stop>
-      <h2 class="text-xl text-cyan-300">关机数量</h2>
+      <h2 class="text-xl text-cyan-300">闲置数量</h2>
     </div>
   </div>
 

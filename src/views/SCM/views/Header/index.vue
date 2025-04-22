@@ -17,4 +17,5 @@ import Currenttime from './views/time.vue';
 </script>
 
 <style scoped>
+
 </style>

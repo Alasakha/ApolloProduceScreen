@@ -57,6 +57,8 @@ const lines = ref([
   { id: "2005", name: "2005质量检测",router:"Q" },
   { id: null, name: "注塑看板",router:"/injection" },
   { id: null, name: "供应链看板",router:"/scm" },
+  { id: null, name: "总仓看板",router:"/wms" },
+  { id: null, name: "金工看板",router:"/material" },
 ]);
 
 // 获取 lines 中指定范围的数据
@@ -174,7 +176,7 @@ body{
   width: 80%;
   height: 90%;
   position: relative;  /* 让 `.title` 绝对定位时相对于 `.center-box` */
-  display: flex;
+  display: flex;  
   flex-direction: column;
   align-items: flex-start; /* 左对齐 */
   justify-content: flex-start; /* 上对齐 */

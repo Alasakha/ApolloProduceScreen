@@ -1,7 +1,7 @@
 <template>
   <dv-border-box-9 class="box1">
     <div class="wrapper">
-      <h2>本月生产异常饼图</h2>
+      <h2>本月生产异常汇总</h2>
       
       <!-- 如果正在加载，显示 loading -->
       <div v-if="isLoading" class="loading-container">

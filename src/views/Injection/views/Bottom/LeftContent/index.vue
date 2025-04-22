@@ -33,9 +33,9 @@ const fetchData = async () => {
       config.data = res.data.map(item => [
         item.te011, // 型号
         item.te012, // 责任人
-        item.te019 === '0' ? '未保养' : item.te019 === '1' ? '已点检' : '未知', // 当前状态（添加默认值）
+        item.te019 === '0' ? '未点检' : item.te019 === '1' ? '已点检' : '未知', // 当前状态（添加默认值）
         item.employee_name ,// 添加逗号
-        item.modi_DATE.slice(0,16), // 点检时间
+        item.modi_DATE ? item.modi_DATE.slice(0, 16) : '--', // 点检时间
         item.lvTwoLastMaintenanceDay,
         item.lvThreeLastMaintenanceDay,
       ]);

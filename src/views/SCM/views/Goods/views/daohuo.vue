@@ -100,7 +100,7 @@ const updateChart = () => {
           color: (params)=>{
             const value = seriesData.value[params.dataIndex];
             if (value >= 75) {
-              return '#00FF00'; // 绿色
+              return '#0b874d'; // 绿色
             } else {
               return 'orange'; // 橙色
             }
@@ -109,7 +109,7 @@ const updateChart = () => {
         label: {
           show: true,
           position: 'insideTop',
-          color: '#fff',
+          color: '#fff',  
           fontSize: 10,
           fontWeight: 'bold',
           formatter: '{c}%'

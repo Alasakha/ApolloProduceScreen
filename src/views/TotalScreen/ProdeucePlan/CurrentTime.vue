@@ -99,6 +99,8 @@ img{
   height: 7vh;
 }
 .logo{
+  margin-right:3vw;
+  margin-bottom: 4vh;
   flex: 1;
   display: flex;
   justify-content: center;

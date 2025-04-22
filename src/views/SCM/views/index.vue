@@ -15,7 +15,7 @@ import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
 
     <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
 
-        <Header></Header>
+     <Header></Header>
      <Row class=""></Row>
      <Quality class="pl-4 pr-4"></Quality>
      <Goods class="pl-4 pr-4" ></Goods>

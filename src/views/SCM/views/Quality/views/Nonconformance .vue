@@ -15,8 +15,7 @@ const sortedData = computed(() =>
     .slice(0, 5) // 取前五个数据
 );
 const categories = computed(() => sortedData.value.map(item => item.supplierName)); 
-const seriesData = computed(() => sortedData.value.map(item => 100 - parseFloat(item.ratio))); // 取不合格率
-
+const seriesData = computed(() => sortedData.value.map(item => (100 - parseFloat(item.ratio)).toFixed(1))); // 保证四舍五入后为1位小数
 // 3. 监听数据变化，确保获取数据后绘制
 watch(rawData, () => {
   nextTick(() => drawIndicators()); 
@@ -119,7 +118,8 @@ const updateChart = () => {
       containLabel: true // 让标签不会被裁剪
     },
   };
-
+  console.log(categories.value);
+  console.log(seriesData.value);
   chartInstance.setOption(option);
 };
 

@@ -116,7 +116,6 @@ const initChart = () => {
 
 // 监听窗口大小变化
 const resizeChart = () => {
-  console.log('Resizing chart...');
   if (chartInstance) {
     chartInstance.resize();
   }

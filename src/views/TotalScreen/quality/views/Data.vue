@@ -5,7 +5,7 @@
       <DataCard title="今日下线数" :value="TodayData?.done ?? '无数据'" />
       <DataCard title="今日检验数" :value="passedInfo.checkTotal" />
       <DataCard title="今日合格数" :value="passedInfo.passTotal" />
-      <DataCard title="今日合格率" :value="passedInfo.passPercent" />
+      <DataCard title="今日直通率" :value="passedInfo.passPercent" />
     </div>
   </div>
 </dv-border-box10>

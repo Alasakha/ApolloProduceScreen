@@ -1,6 +1,6 @@
 <template>
   <div class="container">
-    <div class="title title-main">{{handleTitle(prodLine)}}质量管理看板</div>
+    <div class="title title-main">{{handleTitle(prodLine)}}{{handleTitle2(prodLine)}}质量管理看板</div>
     <div class="title">直通率目标：{{ cumulativePassRate.target }}</div>
     <div class="title">本月累计直通率：{{ cumulativePassRate.passPercent }}%</div>
   </div>
@@ -27,7 +27,6 @@ const fetchData = () => {
       target: data.target || 0,
     };
   });
-  console.log(cumulativePassRate.value);
 };
 
 const handleTitle = (prodLine) => {
@@ -35,6 +34,17 @@ const handleTitle = (prodLine) => {
     return '一课'
   } else if (/^2/.test(prodLine)) {
     return '二课'
+  } else {
+    return null
+  }
+};
+const handleTitle2 = (prodLine) => {
+  console.log('是否第四个字符是4:', /^.{3}4/.test(prodLine));
+
+  if ( /^.{3}4/.test(prodLine)) {
+    return '装配'
+  } else if ( /^.{3}5/.test(prodLine)) {
+    return '包装'
   } else {
     return null
   }
@@ -62,12 +72,12 @@ onMounted(() => {
 }
 
 .title {
-  font-size: 1.5vw;
+  font-size: 1.2vw;
   color: white;
 }
 
 .title-main {
-  font-size: 2vw; /* 设置标题行的字体更大 */
+  font-size: 1.8vw; /* 设置标题行的字体更大 */
   font-weight: bold; /* 设置标题为加粗 */
   letter-spacing: 0.5vw ; /* 增加字间距 */
 }

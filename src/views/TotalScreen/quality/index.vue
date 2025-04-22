@@ -13,7 +13,7 @@
                   <CurrentTime></CurrentTime>
                 </div>
                   <div class="logo">
-                  <img src="@/assets/APOLLO.png" alt="">
+                  <img src="@/assets/APOLLO.png" class="mb-4" alt="">
                 </div>
                 
                 <div class="title-section">

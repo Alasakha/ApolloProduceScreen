@@ -40,11 +40,11 @@ const drawcompletedIndicators = () => {
   const completedIndicatorsElement = echarts.init(completedIndicators.value);
   const option = {  
     title: {
-      text: '直通率排行榜',
+      text: '直通率趋势',
       left: 'center',
       textStyle: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 25,
         fontWeight: 'bold'
       }
     },

@@ -1,9 +1,9 @@
-<!-- 到货不及时TOP5 -->
 <script setup>
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
 import { getTop5PurchaserSignBackDelayed } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
+
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
@@ -11,26 +11,24 @@ let chartInstance = null;
 
 // 2. 计算属性 - 取前面5个数
 const sortedData = computed(() => {
-  
-  if (rawData.value.length === 0) {
-    return [];
-  }
-  const data = rawData.value.slice(0, 5).reverse(); // 取前五个数据并反转顺序
-
-  return data;
+  return rawData.value
+    .map(item => ({
+      name: item.purchaserName || '未知', // 你可以根据需要选择其他字段作为 name
+      value: item.whfs ? parseInt(item.whfs, 10) : 0 // 如果 whfs 存在，则转换为整数，否则为 0
+    }))
 });
 
-const categories = computed(() => sortedData.value.map(item => item.purchaserName)); 
-const seriesData = computed(() => sortedData.value.map(item => (parseFloat(item.ratio) * 100).toFixed(1)));
 // 3. 监听数据变化，确保获取数据后绘制
 watch(rawData, () => {
   nextTick(() => drawIndicators()); 
 }, { deep: true, immediate: true });
 
+// 4. 获取 API 数据
 const fetchData = () => {
   getTop5PurchaserSignBackDelayed()
     .then(res => {
-      rawData.value = res.data; // 确保 rawData 是后端返回的原始数据
+      rawData.value = res.data;
+      console.log(rawData.value)
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -55,75 +53,51 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '采购单回签不及时采购员TO5',
+      text: '进货不良问题',
       left: 'center',
       textStyle: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold'
+        color: '#ffffff' // 设置标题字体颜色为白色
       }
     },
-    yAxis: {
-      type: 'value',
-      min: 0,  // 设置最小值为0
-      max: 100, // 设置最大值为100
-      name: '合格率 (百分比)',
-      nameLocation: 'end', // X轴单位位置调整到右侧
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      },
-      axisLabel: {
-        interval: 0,
-        color: '#fff',
-        fontSize: 10,
-        formatter: function (value) {
-          return value.toFixed(0) + '%'; // 将数值转换为百分比并保留两位小数
-        }
-      },
+    tooltip: {
+      trigger: 'item',
+      textStyle: {
+        color: 'black' // 设置 tooltip 字体颜色为白色
+      }
     },
-    xAxis: {
-      data: categories.value,
-      type: 'category',
-      axisLabel: {
-        color: '#fff',
-        fontSize: 10,
-      },
-      name: '名字(采购员)',
-      nameLocation: 'end', // X轴单位位置调整到右侧
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      },
+    legend: {
+      orient: 'vertical',
+      left: 'left',
+      textStyle: {
+        color: '#ffffff' // 设置 legend 字体颜色为白色
+      }
     },
     series: [
       {
-        data: seriesData.value,
-        type: 'bar',
-        itemStyle: {
-          color: '#3498db',
-        },
+        name: '进货不良问题',
+        type: 'pie',
+        radius: '50%',
+        data: sortedData.value, // 使用计算出来的数据
         label: {
-          show: true,
-          position: 'top',
-          color: '#fff',
-          fontSize: 10,
-          fontWeight: 'bold',
-          formatter: '{c}%' // 显示百分比
-        }
+        show: true,
+        position: 'outside', // 标签显示在外侧
+        formatter: '{b}:{c}', // 格式化标签内容，显示名称、数值和百分比
+        fontSize: 12, // 设置标签字体大小
+        color: '#fff' // 设置标签字体颜色
       },
-    ],
-    grid: {
-      top: '15%',  // 调整标题和图表的间距
-      left: '2%', // 让 Y 轴有更合适的边距
-      right: '15%', // 右侧留一点边距
-      bottom: '5%', // 减少底部空白，让柱状图向下填充
-      containLabel: true // 让标签不会被裁剪
-    },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        }
+      }
+    ]
   };
 
+  console.log(sortedData.value)
+  // 设置图表选项
   chartInstance.setOption(option);
 };
 
@@ -142,7 +116,6 @@ onMounted(() => {
 
 // 9. 组件卸载时移除监听事件并销毁图表
 onBeforeUnmount(() => {
-  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
   if (chartInstance) {
     chartInstance.dispose(); // 销毁图表实例
   }
@@ -151,7 +124,7 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="daohuobujishi">
+  <div class="Nonconformance">
     <dv-border-box8 :dur="5">
       <div class="dv-bg pt-2">
         <div ref="qualityIndicators" class="chart-container"></div>
@@ -172,4 +145,4 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
 }
-</style>
+ </style> 

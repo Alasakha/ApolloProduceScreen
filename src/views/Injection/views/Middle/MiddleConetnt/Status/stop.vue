@@ -114,7 +114,7 @@ const resizeChart = () => {
 const fetchData = async () => {
   try {
     const res = await getDeviceStatus();
-    shutdownvalue.value = res.data['关机数']? res.data['关机数'] : 0; // 确保 shutdownvalue 有值
+    shutdownvalue.value = res.data['闲置']? res.data['闲置'] : 0; // 确保 shutdownvalue 有值
     totalvalue.value = res.data['总数']
     nextTick(drawhstatusIndicators);
   } catch (error) {

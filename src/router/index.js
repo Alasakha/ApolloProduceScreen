@@ -5,6 +5,8 @@ import Project from '../views/TotalScreen/ProdeucePlan/index.vue';
 import Quality from '../views/TotalScreen/quality/index.vue';
 import Injection from '@/views/Injection/views/index.vue'
 import SCM from '@/views/SCM/views/index.vue'
+import WMS from '@/views/WMS/index.vue'
+import Material from '@/views/Metalworking/index.vue' 
 const routes = [
   {
     path: '/',
@@ -46,6 +48,18 @@ const routes = [
     component: SCM,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
+  {
+    path: '/wms',
+    name: 'WMS',
+    component: WMS,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/material',
+    name: 'Material',
+    component: Material,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  }
 ];
 
 const router = createRouter({
