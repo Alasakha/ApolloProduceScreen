@@ -53,7 +53,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '进货不良问题',
+      text: '回签不及时',
       left: 'center',
       textStyle: {
         color: '#ffffff' // 设置标题字体颜色为白色

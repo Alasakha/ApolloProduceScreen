@@ -28,7 +28,7 @@ defineProps({
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 17%;
+  width: 15%;
   font-size: 1vw;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);

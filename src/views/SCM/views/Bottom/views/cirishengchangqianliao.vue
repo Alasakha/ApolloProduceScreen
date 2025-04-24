@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import { nextTick } from 'vue';
-import { getWarningNextDay1,getWarningNextDay2 } from '@/api/getScmInfo.js';
+import { getWarningNextDay } from '@/api/getScmInfo.js';
 import {getNextDay} from './nextday'
 import { eventBus } from '@/utils/eventbus';
 import * as echarts from 'echarts';
@@ -16,7 +16,7 @@ const config1 = reactive({
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[50, 120, 150, 200, 120, 140, 150, 100],
+  columnWidth:[50, 100, 150, 150, 120, 140, 150, 100],
 });
 
 const config2 = reactive({
@@ -27,7 +27,7 @@ const config2 = reactive({
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[50, 120, 150, 200, 120, 140, 150, 100],
+  columnWidth:[50, 120, 150, 150, 120, 140, 150, 100],
 });
 let chartInstance: any = null; // 图表实例
 const dialogVisible = ref(false);
@@ -46,39 +46,28 @@ const selectedItem = ref<any>({});
 
 // 获取数据并转换
 const fetchData = () => {
-  getWarningNextDay1()
+  getWarningNextDay()
     .then((res) => {
-      rawData.value[0] = res.data; // 保存原始数据
+      rawData.value[0] = res.data.zzyk; // 保存原始数据
+      rawData.value[1] = res.data.zzek; // 保存原始数据
       // 转换数据为二维数组
       const nextday = getNextDay()
       name.value[0] = rawData.value[0].map((item: any) => {
         // const totalNumber = parseFloat(item.total); // 确保转换为数字
         return [nextday,item.customerOrderNo, item.orderNo,item.supplierCode,item.itemNo,item.itemName,item.purchaserName	, Math.round(Number(item.purchaseQuantity))] // 转为数字并四舍五入]; // 保留整数部分
       });
-      // 将转换后的数据更新到 config1.data 中
-      config1.data = name.value[0]
-      console.log('config1',config1.data);
-      
-    })
-    .catch(() => {
-      console.log('数据获取失败');
-    });
-    getWarningNextDay2()
-    .then((res) => {
-      const nextday = getNextDay()
-      rawData.value[1] = res.data; // 保存原始数据
-      // 转换数据为二维数组
       name.value[1] = rawData.value[1].map((item: any) => {
         // const totalNumber = parseFloat(item.total); // 确保转换为数字
         return [nextday,item.customerOrderNo, item.orderNo,item.supplierCode,item.itemNo,item.itemName,item.purchaserName,Math.round(Number(item.purchaseQuantity))] // 转为数字并四舍五入]; // 保留整数部分
       });
       // 将转换后的数据更新到 config1.data 中
+      config1.data = name.value[0]
       config2.data = name.value[1]
-      console.log('config1',config2.data)
     })
     .catch(() => {
       console.log('数据获取失败');
     });
+    
 };
 
 

@@ -1,170 +1,170 @@
-
-
 <script setup>
-import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
-import * as echarts from 'echarts';
-import { getTop5PurchaseBad } from '@/api/getScmInfo.js';
-import { eventBus } from '@/utils/eventbus';
-// 1. 响应式数据
-const rawData = ref([]);
-const qualityIndicators = ref(null);
-let chartInstance = null;
+import { ref, watch, nextTick, onMounted } from 'vue'
+import * as echarts from 'echarts'
+import { getTop5PurchaseBad } from '@/api/getScmInfo.js'
 
-// 2. 计算属性 - 取前面5个数
-const sortedData = computed(() =>
-  rawData.value
-    .slice() // 复制原始数据
-    .slice(0, 5) // 取前五个数据
-    .reverse() // 反转数组
-);
-const categories = computed(() => sortedData.value.map(item => item.description)); 
-const seriesData = computed(() => sortedData.value.map(item => parseFloat(item.total)));
+const rawData = ref({ performance: [], appearance: [] })
+const chartPerformance = ref(null)
+const chartAppearance = ref(null)
 
-// 3. 监听数据变化，确保获取数据后绘制
-watch(rawData, () => {
-  nextTick(() => drawIndicators()); 
-}, { deep: true, immediate: true });
+const performanceList = ref([])
+const appearanceList = ref([])
+const marqueeVisible = ref(true)
+const scrollList = ref([])
+const drawBarChart = (el, data, title) => {
+  const myChart = echarts.init(el)
 
-// 4. 获取 API 数据
-const fetchData = () => {
-  getTop5PurchaseBad()
-    .then(res => {
-      rawData.value = res.data;
-    })
-    .catch(() => {
-      console.log('数据获取失败');
-    });
-};
-
-// 5. 初始化 ECharts
-const drawIndicators = () => {
-  if (!qualityIndicators.value) return;
-
-  // 确保 ECharts 初始化时父容器已有大小
-  chartInstance = echarts.init(qualityIndicators.value);
-  updateChart();
-
-  // 监听窗口大小变化，使图表自适应
-  window.addEventListener('resize', resizeChart);
-};
-
-// 6. 图表更新
-const updateChart = () => {
-  if (!chartInstance) return;
-
-  const option = {
+  myChart.setOption({
     title: {
-      text: '进货不良问题TOP5',
+      text: title,
       left: 'center',
-      textStyle: {
-        color: '#fff',
-        fontSize: 16,
-        fontWeight: 'bold'
-      }
+      textStyle: { color: '#fff', fontSize: 16 }
     },
+    tooltip: { trigger: 'axis' },
+    grid: { left: '5%', right: '5%', top: 30, bottom: 60 },
     xAxis: {
-      type: 'category', // 改为 category 类型
-      data: categories.value, // 使用问题描述作为 X 轴数据
-      axisLabel: {
-        interval: 0,
-        color: '#fff',
-        fontSize: 12
-      },
-      name: '问题描述',
-      nameLocation: 'end',
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      },
+      type: 'category',
+      data: data.map(i => i.description || '未知'),
+      axisLabel: { color: '#fff', rotate: 30 } // 可以加个旋转，避免文字重叠
     },
     yAxis: {
-      type: 'value', // 改为 value 类型
-      min: 0, // 设置最小值为 0
-      axisLabel: {
-        color: '#fff',
-        fontSize: 12,
-        formatter: function (value) {
-          return value.toFixed(0); // 显示整数值
-        }
-      },
-      name: '数量',
-      nameLocation: 'end',
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [0, 0, 10, 0]
-      },
+      type: 'value',
+      axisLabel: { color: '#fff' },
+      splitLine: { show: false }
     },
     series: [
       {
-        data: seriesData.value, // 使用不良问题数量数据
         type: 'bar',
-        itemStyle: {
-          color: '#3498db', // 设置柱状图颜色
-        },
+        data: data.map(i => +i.total),
+        itemStyle: { color: '#3399FF' },
         label: {
           show: true,
-          position: 'top', // 显示在柱子顶部
-          color: '#fff',
-          fontSize: 14,
-          fontWeight: 'bold',
+          position: 'top',
+          color: '#fff'
         }
-      },
-    ],
-    grid: {
-      top: '15%', // 调整标题和图表的间距
-      left: '5%', // 左侧留出空间
-      right: '10%', // 右侧留出空间
-      bottom: '10%', // 底部留出空间
-      containLabel: true // 让标签不会被裁剪
-    },
-  };
+      }
+    ]
+  })
 
-  chartInstance.setOption(option);
-};
-// 7. 监听窗口变化，自适应图表
-const resizeChart = () => {
-  if (chartInstance) {
-    chartInstance.resize();
-  }
-};
+  window.addEventListener('resize', () => {
+    myChart.resize()
+  })
+}
 
-// 8. 页面挂载时获取数据
+const fetchData = async () => {
+  const res = await getTop5PurchaseBad()
+  rawData.value = res.data
+
+  performanceList.value = res.data.performance.filter(i => i.total !== '0')
+  appearanceList.value = res.data.appearance.filter(i => i.total !== '0')
+
+  // 合并：加上 type 字段，标识是性能还是外观
+  scrollList.value = [
+    ...performanceList.value.map(item => ({ ...item, type: '性能' })),
+    ...appearanceList.value.map(item => ({ ...item, type: '外观' }))
+  ]
+
+  nextTick(() => {
+    if (chartPerformance.value) drawBarChart(chartPerformance.value, performanceList.value, '性能异常 TOP10')
+    if (chartAppearance.value) drawBarChart(chartAppearance.value, appearanceList.value, '外观异常 TOP10')
+  })
+}
+
 onMounted(() => {
-  fetchData();
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
-});
-
-// 9. 组件卸载时移除监听事件并销毁图表
-onBeforeUnmount(() => {
-  if (chartInstance) {
-    chartInstance.dispose(); // 销毁图表实例
-  }
-  window.removeEventListener('resize', resizeChart); // 移除监听器
-});
+  fetchData()
+})
 </script>
 
 <template>
   <div class="Nonconformance">
     <dv-border-box8 :dur="5">
-      <div class="dv-bg pt-2">
-        <div ref="qualityIndicators" class="chart-container"></div>
+      <div class="dv-bg">
+        <div class="chart-row">
+          <div ref="chartPerformance" class="chart-box"></div>
+          <div ref="chartAppearance" class="chart-box"></div>
+        </div>
+        <div class="bottom-scroll pl-4 flex items-center justify-between">
+          <div class="scroll-title ">异常类型：</div>
+          <Vue3Marquee
+  v-if="marqueeVisible"
+  :speed="40"
+  pauseOnHover
+  gradient
+  :gradient-color="[173, 216, 230]" 
+  gradient-length="5%"
+  class="h-full"
+>
+  <div
+    v-for="(data, index) in scrollList"
+    :key="index"
+    class="scroll-item mr-6"
+  >
+    <span class="font-bold text-sm text-white">{{ index + 1 }}.</span>
+    <span class="ml-2 text-white">[{{ data.type }}] {{ data.description }}：</span>
+    <span class="text-white">{{ data.total }}</span>
+  </div>
+</Vue3Marquee>
+
+        </div>
       </div>
     </dv-border-box8>
   </div>
 </template>
 
 <style scoped>
-/* dv-bg 作为父容器，确保它有大小 */
-.dv-bg {
+.Nonconformance {
   width: 100%;
-  height: 100%; /* 可调整 */
+  height: 100%; /* ⭐重点：确保父容器有高度 */
+  box-sizing: border-box;
+  overflow: hidden;
 }
 
-/* ECharts 图表容器 */
-.chart-container {
-  width: 100%;
+.dv-bg {
   height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 10px;
+  box-sizing: border-box;
+}
+
+.chart-row {
+  display: flex;
+  gap: 10px;
+  flex: 1;
+  min-height: 0; /* ⭐防止撑爆父容器 */
+}
+
+.chart-box {
+  flex: 1;
+  height: 100%;
+  min-height: 200px;
+}
+
+.bottom-scroll {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid #00ffff;
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+}
+
+.scroll-title {
+  font-weight: bold;
+  margin-bottom: 5px;
+  width: 3vw;
+}
+
+.scroll-item {
+  padding: 4px 0;
+  border-bottom: 1px dashed #444;
+}
+:deep(.vue3-marquee.horizontal) {
+  height: 100% !important;
+  align-items: center;
+}
+
+.scroll-item {
+  white-space: nowrap;
 }
 </style>

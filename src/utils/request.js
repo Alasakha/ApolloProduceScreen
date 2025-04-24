@@ -2,8 +2,10 @@ import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
 // 获取配置的 baseURL
-const baseURL = import.meta.env.VITE_API_BASE_URL || 'http://192.168.1.197:10999/apollo'; // 默认值可以设置为开发环境的地址
+const baseURL =  'http://192.168.1.197:10999/apollo'; // 默认值可以设置为开发环境的地址
 
+// http://192.168.1.197:10999/apollo
+// http://192.168.1.185:10999/apollo
 // 创建一个 axios 实例
 const service = axios.create({
   baseURL: baseURL, // 使用环境变量设置的 baseURL

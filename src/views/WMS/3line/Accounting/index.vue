@@ -10,7 +10,7 @@
         <DvLoading v-if="isLoading" :isLoading="isLoading" />
 
         <!-- 数据展示区 竖向布局，确保不超过父组件高度 -->
-        <div class="flex flex-col h-full p-1" v-else>
+        <div class="flex flex-col h-full p-1 justify-around"  v-else>
           <!-- 到货处理及时率卡片 -->
           <div class="flex-1 h-[30%] p-1" v-for="(item, index) in deliveryData" :key="index">
             <el-card class="custom-card" >
@@ -20,7 +20,7 @@
                   <div class="text-sm flex flex-row justify-around w-[60%]">
                       <div>总数: {{item.total}}</div>
                       <div>已处理数量: {{ item.jsNum }}</div>
-                      <div>处理率: {{ item.rate ? item.rate : '暂未生成' }}</div>
+                      <div>处理率: {{ item.rate ? item.rate + '%': '暂未生成' }}</div>
                     </div>
                 </div>
               </div>
@@ -87,7 +87,16 @@ const fetchData = async () => {
       jsNum: item.jsNum,
       rate: item.rate
     }));
-    console.log('到货处理及时率数据:', deliveryData.value);
+    // 处理到货处理及时率的数据，只保留“阿波罗【1】”
+deliveryData.value = 到货处理及时率
+  .filter(item => item.plantName === '阿波罗【1】')
+  .map(item => ({
+    plantName: item.plantName,
+    total: item.total,
+    jsNum: item.jsNum,
+    rate: item.rate
+  }));
+
     // 处理采购入库处理及时率的数据
     procurementData.total = 采购入库处理及时率.total;
     procurementData.jsNum = 采购入库处理及时率.jsNum;

@@ -6,11 +6,14 @@ import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import '@/style.css'
 import { createPinia } from 'pinia'
-
+import Vue3Marquee from 'vue3-marquee'
 
 createApp(App)
   .use(router)
   .use(createPinia()) // 注册 pinia
   .use(DataVVue3) // 注册 vue-router
   .use(ElementPlus)
+  .use(Vue3Marquee)
   .mount('#app');
+  
+

@@ -26,7 +26,7 @@
   // 将 targetTime 转换为 Date 类型
   const getTargetDate = () => {
     let targetDate: Date;
-    console.log(props.targetTime )
+
     if (props.targetTime instanceof Date) {
       targetDate = props.targetTime;
      

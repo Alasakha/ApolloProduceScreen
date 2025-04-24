@@ -1,6 +1,9 @@
 <template>
-    <div class="header">
-        <h1>header</h1>
+    <div class="rate">
+        <dv-border-box10>
+            <h1>rate</h1>
+    </dv-border-box10>
+        
     </div>
     
 </template>
@@ -10,7 +13,7 @@
 </script>
 
 <style scoped>
-.metalworking {
+.rate {
     /* Add your styles here */
 }
 </style>
