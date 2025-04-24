@@ -4,15 +4,13 @@
     <DashboardCard class="flex-1">
   <template #title>生产计划达成率</template>
   <!-- Ensure the parent div takes full height -->
-  <div >
     <PlanCompletedRate></PlanCompletedRate>
-  </div>
 </DashboardCard>
 
     <!-- 设备状态 -->
     <DashboardCard class="flex-1">
       <template #title>产品合格率</template>
-      <div><PassRate></PassRate></div>
+      <PassRate></PassRate>
     </DashboardCard>
 
   </div>

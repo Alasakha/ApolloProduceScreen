@@ -29,81 +29,125 @@ const dailyIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 
+// 模拟数据
+// const mockAbnormalData = [
+//   {
+//     guZhangTypeName: '缺料异常',
+//     guZhangTypeCount: 9,
+//     guZhangTypeDuration: 120, // 持续时间：分钟
+//     percent: '40.9%',
+//   },
+//   {
+//     guZhangTypeName: '质量异常',
+//     guZhangTypeCount: 13,
+//     guZhangTypeDuration: 180,
+//     percent: '59.1%',
+//   },
+//   {
+//     guZhangTypeName: '设备故障',
+//     guZhangTypeCount: 5,
+//     guZhangTypeDuration: 95,
+//     percent: '30.0%',
+//   },
+//   {
+//     guZhangTypeName: '人员操作',
+//     guZhangTypeCount: 4,
+//     guZhangTypeDuration: 80,
+//     percent: '20.0%',
+//   },
+// ];
+
+
+
+
+
 const drawDailyIndicators = (formattedData) => {
   const dailyIndicatorsElement = echarts.init(dailyIndicators.value);
   const option = {
-  tooltip: {
-    trigger: 'item'
-  },
-  legend: {
-    top: '0%',
-    left: 'center',
-    itemGap: 20,  // 设置图例项之间的间距
-    textStyle: {
-      color: '#fff', // 设置图例字体颜色为白色
-      fontSize: 13,  // 设置图例文字大小
+    tooltip: {
+      trigger: 'item',
+      formatter: (params) => {
+        const { name, value, percent, data } = params;
+        return `${name}<br/>数量：${value} 次<br/>占比：${percent}%<br/>时长：${data.duration || 0} 分钟`;
+      }
     },
-    itemWidth: 15,   // 设置图例标记的宽度
-    itemHeight: 10   // 设置图例标记的高度
-  },
-  series: [
-    {
-      name: '本日生产异常数量',
-      type: 'pie',
-      radius: ['40%', '70%'],
-      avoidLabelOverlap: false,
-      padAngle: 5,
-      itemStyle: {
-        borderRadius: 10
+    legend: {
+      top: '0%',
+      left: 'center',
+      itemGap: 20,
+      textStyle: {
+        color: '#fff',
+        fontSize: 13,
       },
-      label: {
-        show: true,
-        position: 'outside', // 标签显示在外侧
-        formatter: '{b}:{c}', // 格式化标签内容，显示名称、数值和百分比
-        fontSize: 12, // 设置标签字体大小
-        color: '#fff' // 设置标签字体颜色
-      },
-      emphasis: {
+      itemWidth: 15,
+      itemHeight: 10
+    },
+    series: [
+      {
+        name: '本日生产异常数量',
+        type: 'pie',
+        radius: ['40%', '70%'],
+        avoidLabelOverlap: false,
+        padAngle: 5,
+        itemStyle: {
+          borderRadius: 10
+        },
         label: {
           show: true,
-          fontSize: 10,
-          fontWeight: 'bold'
-        }
-      },
-      labelLine: {
-        show: true,      // 使线条显示
-        length: 8,      // 设置线条的第一段长度
-        length2: 4,     // 设置线条的第二段长度
-        lineStyle: {
-          color: '#fff', // 设置线条颜色
-          width: 1,      // 设置线条宽度
-          type: 'solid'  // 设置线条类型
-        }
-      },
-      data: formattedData // 使用传递过来的数据
-    }
-  ]
-};
-
+          position: 'outside',
+          formatter: (params) => {
+            const duration = params.data.duration || 0;
+            return `${params.name}: ${params.value}次\n(${duration}分钟)`;
+          },
+          fontSize: 12,
+          color: '#fff'
+        },
+        emphasis: {
+          label: {
+            show: true,
+            fontSize: 10,
+            fontWeight: 'bold'
+          }
+        },
+        labelLine: {
+          show: true,
+          length: 8,
+          length2: 4,
+          lineStyle: {
+            color: '#fff',
+            width: 1,
+            type: 'solid'
+          }
+        },
+        data: formattedData
+      }
+    ]
+  };
 
   dailyIndicatorsElement.setOption(option);
 };
 
 const processData = (data) => {
   let formattedData = formatPieChartData(data, 'guZhangTypeName', 'guZhangTypeCount');
-  console.log(formattedData);
   if (formattedData.length === 0) {
     isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
     formattedData = [{ value: 0, name: '暂无异常', itemStyle: { color: '#009966' } }]; // 设置一个绿色的数据点
   } else {
     isDataEmpty.value = false;
   }
+
    // 为每个数据项设置颜色
    formattedData.forEach(item => {
-      item.itemStyle = {
-        color: getColorByType(item.name)  // 根据名称设置颜色
-      };
-    });
+  item.itemStyle = {
+    color: getColorByType(item.name)
+  };
+  // 增加 duration 数据到 item 中，方便 label 使用
+  const matched = data.find(d => d.guZhangTypeName === item.name);
+  if (matched) {
+    item.duration = matched.guZhangTypeDuration; // 添加 duration 字段
+  }
+});
+
   nextTick(() => {
     if (dailyIndicators.value) {
       drawDailyIndicators(formattedData);
@@ -117,7 +161,6 @@ const fetchData = () => {
     .then(res => {
       isLoading.value = false;   // 加载完成，关闭 loading 状态
       processData(res.data);  // 处理数据
-      console.log(isDataEmpty.value);
     })
     .catch(() => {
       isLoading.value = false;

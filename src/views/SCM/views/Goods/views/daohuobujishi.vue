@@ -1,6 +1,6 @@
 <template>
   <dv-border-box8 :dur="5">
-    <div class="header flex justify-center items-center text-white h-[10%]">
+    <div class="header flex justify-center items-center text-white h-[10%] ">
       <h1 class="text-2xl font-bold">到货不及时供应商 - 总装一课</h1>
     </div>
 
@@ -12,7 +12,7 @@
         gradient
         :gradient-color="[173, 216, 230]" 
         gradient-length="5%"
-        class="h-full"
+       class="h-full w-full overflow-hidden"
       >
         <!-- 内容 -->
         <el-card
@@ -98,5 +98,8 @@ onBeforeUnmount(() => {
  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* 渐变背景 */
  color: aliceblue;
 }
-
+.marquee-wrapper {
+  width: 40vw;
+  overflow: hidden;  /* 隐藏溢出部分 */
+}
 </style> 

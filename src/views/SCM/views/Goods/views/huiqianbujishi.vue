@@ -34,7 +34,7 @@
 </template>
 
 
-<<script setup>
+<script setup>
 import { ref, nextTick, onMounted, onBeforeUnmount } from 'vue';
 import { getTop5SuppliersDelayedDelivery } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
@@ -97,5 +97,9 @@ onBeforeUnmount(() => {
 .marquee-card{
  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%); /* 渐变背景 */
  color: aliceblue;
+}
+.marquee-wrapper {
+  width: 40vw;
+  overflow: hidden;  /* 隐藏溢出部分 */
 }
 </style> 

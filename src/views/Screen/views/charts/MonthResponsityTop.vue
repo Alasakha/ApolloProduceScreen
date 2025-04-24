@@ -1,7 +1,7 @@
 <template>
 
   <div class="box1"> 
-        <h1>今日不良TOP5问题</h1>
+        <h1>今日功能性问题</h1>
         <dv-scroll-ranking-board :config="config" style="width:90%;height:100%" />
   </div>
   </template>
@@ -73,9 +73,9 @@ if (formattedData.length === 0) {
 
   }
   h1{
-    font-size: 1.5vw;
+    font-size: 1vw;
     color:aliceblue;
-    letter-spacing: 0.5vw;
+    font-weight: bold;
   }
   :deep(.inside-column) {
   height: 2vh !important; /* 这里改成你想要的宽度 */

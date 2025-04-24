@@ -4,7 +4,7 @@ import * as echarts from 'echarts';
 import { getFivedayRate } from '@/api/getQuiltyinfo.js';
 import { eventBus } from '@/utils/eventbus';
 import { useRoute } from 'vue-router';
-
+import {getBarColor} from './getcolor'
 const route = useRoute();
 const prodLine = route.query.prodLine;
 // 1. 响应式数据
@@ -60,7 +60,7 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '近五日合格率',
+      text: '直通率趋势图',
       left: 'center',
       textStyle: {
         color: '#fff',
@@ -105,11 +105,13 @@ const updateChart = () => {
     },
     series: [
       {
-        data: yData, // 使用不良率数据
+        data: yData.map(value => ({
+          value,
+          itemStyle: {
+            color: getBarColor(prodLine,value), // 动态设置每个柱子的颜色
+          }
+        })),
         type: 'bar',
-        itemStyle: {
-          color: '#3498db', // 设置柱状图颜色
-        },
         label: {
           show: true,
           position: 'top', // 显示在柱子顶部

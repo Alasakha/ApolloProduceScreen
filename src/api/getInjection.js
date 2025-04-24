@@ -43,3 +43,14 @@ export const getMaintanceInfo = () => {
     method: 'get',
   })
 }
+
+
+// /planAchievementRateToday
+// 生产计划达成率
+// 改为:每台机，当日排产数、已完成数、达成率
+export const getplanAchievementRateToday = () => {
+  return request({
+    url: '/injection/planAchievementRateToday',
+    method: 'get',
+  })
+}

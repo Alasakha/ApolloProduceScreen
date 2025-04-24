@@ -5,7 +5,8 @@ export const formatPieChartData = (data, valuename, value) => {
   }
 
   return data.map(item => ({
-    value: item[value],  // 动态获取值，使用传入的 `value` 字段
-    name: item[valuename] // 动态获取 name，使用传入的 `valuename` 字段
+    value: item[value],
+    name: item[valuename],
+    duration: item.guZhangTypeDuration || 0  // ➕ 添加 duration 字段
   }));
 };
