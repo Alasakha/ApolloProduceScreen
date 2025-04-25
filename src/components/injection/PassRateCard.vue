@@ -5,10 +5,10 @@
       </div>
       <div class="progress-info">
         <div class="progress-item">
-          <strong>当日检验数：</strong> <span>{{ spc }} 个</span>
+          <strong>当日检验数：</strong> <span>{{ spc? spc + '个' : '暂无数据' }} </span>
         </div>
         <div class="progress-item">
-          <strong>合格数：</strong> <span>{{ completed }} 个</span>
+          <strong>合格数：</strong> <span>{{ completed? completed + '个' : '暂无数据' }} </span>
         </div>
         <div class="progress-item">
           <strong>达成率：</strong> 

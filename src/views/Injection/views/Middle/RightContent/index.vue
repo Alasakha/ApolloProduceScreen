@@ -3,12 +3,12 @@
 
         <!-- 点检统计分析 -->
         <DashboardCard class="flex-1">
-      <template #title>故障时长统计分析</template>
+      <template #title>停机时长统计</template>
       <Statistic/>
     </DashboardCard>
        <!-- 设备状态 -->
        <DashboardCard class="flex-1">
-      <template #title>故障类型统计</template>
+      <template #title>当日异常次数和占比</template>
       <div><Category/></div>
     </DashboardCard>
 

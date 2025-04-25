@@ -43,13 +43,13 @@ const option = {
     name: '故障时长/分钟',
     nameLocation: 'end', // 调整名称的位置，可选值为 'start' | 'middle' | 'end'
     nameTextStyle: {
-      color: 'rgb(83, 234, 253)', // 设置名称颜色
+      color: 'rgb(255,255,255)', // 设置名称颜色
       fontSize: 12, // 设置名称字体大小
       fontWeight: 'bold' ,// 加粗提高可读性
-      padding: [10, 0, 0, 30], // 调整名称与轴线的距离，格式为 [上, 右, 下, 左]
+      padding: [10, 0, 0, 60], // 调整名称与轴线的距离，格式为 [上, 右, 下, 左]
     },
     type: 'value',
-    axisLabel: { color: 'rgb(83, 234, 253)' },
+    axisLabel: { color:'rgb(0,0,0)' },
     interval: 1, // 设置刻度间隔为 1
     min: 0, // 设置最小值为 0
   },
@@ -59,14 +59,17 @@ const option = {
       type: 'bar',
       data: [], // 这里会动态填充数值
       itemStyle: {
-        color: 'rgb(83, 234, 253)' // 设定柱状图颜色
+        color: 'rgb(63, 80, 234)' // 设定柱状图颜色
       },
       label: {
         show: true, // 显示数值
         position: 'top', // 让数值显示在柱子顶部
         color: 'rgb(83, 234, 253)', // 让数值颜色与柱子一致
         fontSize: 14, // 设置字体大小
-        fontWeight: 'bold' // 加粗提高可读性
+        fontWeight: 'bold' ,// 加粗提高可读性
+        formatter: (params) => {
+          return `${params.value}分钟`; // 显示数值和单位
+        }
       }
     }
   ],
@@ -92,14 +95,8 @@ const resizeChart = () => {
 
 const processData = (data) => {
   // 获取 x 轴的日期
-  const xbeforeData = data.faultSevenDay.map(item => item.guzhangDate);
-  const xData =  xbeforeData.map(item => {
-    const date = new Date(item);
-    const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0'); // 月份从0开始，所以加1
-    const day = String(date.getDate()).padStart(2, '0');
-    return `${month}-${day}`; // 格式化为 YYYY-MM-DD
-  });
+  const xData = data.faultSevenDay.map(item => item.macNo);
+
   // 获取 y 轴的 duration
   const yData = data.faultSevenDay.map(item => item.duration);
 

@@ -1,7 +1,7 @@
 <template>
   <div class='pl-5 pt-1'>
     <div class='flex justify-center items-center text-lg text-cyan-300 '>
-      <p class="tracking-widest" >保养看板</p>
+      <p class="tracking-widest" >设备点检</p>
     </div>
     
     <dv-scroll-board :config="config" style="width:45vw;height:19vh;"/>
