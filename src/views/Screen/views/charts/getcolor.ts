@@ -10,39 +10,35 @@ const intervalcolor3 = '#FF0000'; // 红色（低区间）
 
 
 export const getBarColor = (prodLine: string, value: number): string => {
-    switch (prodLine) {
-      case '1004A':
-        if (value >= 75) {
+  const prodLinePrefix = prodLine.slice(0, 4); // 获取生产线前四个字符
+ 
+    switch (prodLinePrefix) {
+      case '1004':
+        if (value >= 80) {
           return intervalcolor1; // 深蓝色（高区间）
-        } else if (value >= 70) {
-          return intervalcolor2; // 浅蓝色（中区间）
         } else {
-          return intervalcolor3; // 橙色（低区间）
+          return intervalcolor2; // 浅橙色（中区间）
         }
-        case '2005':
-            if (value >= 98.5) {
-              return intervalcolor1; // 深蓝色（高区间）
-            } else if (value >= 95) {
-              return intervalcolor2; // 浅蓝色（中区间）
-            } else {
-              return intervalcolor3; // 橙色（低区间）
-            }
+       
+        case '1005':
+          if (value >= 98.5) {
+            return intervalcolor1; // 深蓝色（高区间）
+          } else {
+            return intervalcolor2; // 浅橙色（中区间）
+          }
+         
        case '2004':
            if (value >= 92) {
              return intervalcolor1; // 深蓝色（高区间）
-           } else if (value >= 80) {
-             return intervalcolor2; // 浅蓝色（中区间）
            } else {
-             return intervalcolor3; // 橙色（低区间）
-           }
-           case '1005':
+            return intervalcolor2; // 浅橙色（中区间）
+          }
+           case '2005':
             if (value >= 98.5) {
               return intervalcolor1; // 深蓝色（高区间）
-            } else if (value >= 95) {
-              return intervalcolor2; // 浅蓝色（中区间）
             } else {
-              return intervalcolor3; // 橙色（低区间）
-            }  
+             return intervalcolor2; // 浅橙色（中区间）
+           }
       default:
         if (value >= 90) {
           return intervalcolor1; // 深绿色（高区间）

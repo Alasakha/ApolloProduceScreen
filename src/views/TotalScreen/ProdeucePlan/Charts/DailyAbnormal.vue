@@ -24,7 +24,7 @@ import { eventBus } from '@/utils/eventbus';
 import { getColorByType } from '@/utils/color';
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数
-const dailyIndicators = ref(null);
+const dailyIndicators = ref(null);  
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
 const isDataEmpty = ref(false);

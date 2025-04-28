@@ -9,8 +9,8 @@ import huiqianbujishi from './views/huiqianbujishi.vue';
 <template>
   <div class="flex h-[25vh] w-full mt-3 " >
 <daohuo class="flex-1"></daohuo>
-<daohuobujishi class="flex-1"></daohuobujishi>
-<huiqianbujishi class="flex-1"></huiqianbujishi>
+<!-- <daohuobujishi class="flex-1"></daohuobujishi> -->
+<!-- <huiqianbujishi class="flex-1"></huiqianbujishi> -->
 <caigoudanhuiqianbujishi class="flex-1"></caigoudanhuiqianbujishi>
 </div>
 

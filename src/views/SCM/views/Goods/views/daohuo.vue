@@ -1,23 +1,14 @@
 <script setup>
 import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
-import { getDeliveryRate5Day } from '@/api/getScmInfo.js';
+import { getGoodsRate } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
 let chartInstance = null;
 
-// 2. 计算属性 - 处理排序
-const sortedData = computed(() =>
-  rawData.value.slice().sort((a, b) => new Date(a.statisticalDate) - new Date(b.statisticalDate))
-);
-const categories = computed(() => sortedData.value.map(item => item.statisticalDate)); 
-const seriesData = computed(() => 
-  sortedData.value.map(item => 
-    item.ratio ? parseFloat(parseFloat(item.ratio).toFixed(1)) : 0
-  )
-);
+
 
 // 3. 监听数据变化，确保获取数据后绘制
 watch(rawData, () => {
@@ -26,7 +17,7 @@ watch(rawData, () => {
 
 // 4. 获取 API 数据
 const fetchData = () => {
-  getDeliveryRate5Day()
+  getGoodsRate()
     .then(res => {
       rawData.value = res.data;
     })
@@ -52,94 +43,88 @@ const updateChart = () => {
   if (!chartInstance) return;
 
   const option = {
-    title: {
-      text: '到货及时率',
-      left: 'center',
-      textStyle: {
-        color: '#fff',
-        fontSize: 16,
+    grid: {
+      left: '3%',
+      bottom: '3%',
+      containLabel: true
+    },
+  color: ['#8F87F1', '#C68EFD'], // 不同颜色的条形
+  title: {
+    text: '到货及时率',
+    top: '2%',
+    left: '2%',
+    textStyle: {
+      color: '#ffffff',
+      fontSize: 25,
+      fontWeight: 'bold',
+      fontFamily: 'Microsoft YaHei',
+      letterSpacing: 2
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
+    },
+    formatter: (params) => {
+      return `${params[0].name}<br>应到: ${params[0].value} 件<br>实到: ${params[1].value} 件<br>及时率: ${params[0].value > 0 ? (params[1].value / params[0].value * 100).toFixed(2) + '%' : 'N/A'}`;
+    }
+  },
+  legend: {
+    data: ['应到数量', '实到数量'],
+    top: '10%',
+    left: 'center',
+    textStyle: {
+      color: '#ffffff'
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: rawData.value.map(item => item.purchaserName),
+    axisLabel: {
+      color: '#ffffff'
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLabel: {
+      color: '#ffffff'
+    }
+  },
+  series: [
+  {
+      name: '实到数量',
+      type: 'bar',
+      data: rawData.value.map(item => Number(item.total) - Number(item.bjsNum) || 0),
+      barWidth: '35%',
+      label: {
+        show: true,
+        position: 'top', // 放置在柱子顶部
+        color: '#ffffff',
+        fontSize: 12,
         fontWeight: 'bold'
       }
     },
-    xAxis: {
-      type: 'category',
-      data: categories.value,
-      axisLabel: {
-        interval: 0,
-        color: '#fff',
-        fontSize: 10
-      },
-      name: '时间 (日期)',
-      nameLocation: 'end', // X轴单位位置调整到右侧
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      },
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        color: '#fff',
-        fontSize: 10,
-        formatter: value => value + '%' // Y轴单位加 "%"
-      },
-      name: '及时率 (百分比)',
-      nameLocation: 'end', // X轴单位位置调整到右侧
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      },
-    },
-    series: [
-      {
-        data: seriesData.value,
-        type: 'bar',
-        itemStyle: {
-          color: (params)=>{
-            const value = seriesData.value[params.dataIndex];
-            if (value >= 75) {
-              return '#0b874d'; // 绿色
-            } else {
-              return 'orange'; // 橙色
-            }
-          }
-        },  
-        label: {
-          show: true,
-          position: 'insideTop',
-          color: '#fff',  
-          fontSize: 10,
-          fontWeight: 'bold',
-          formatter: '{c}%'
-        }
-      },
-      {
-        name: '到货及时率近5天柱状图', // 新增折线图
-        data: seriesData.value,
-        type: 'line',
-        itemStyle: {
-          color: 'rgb(52, 152, 219)', // 折线颜色
-        },
-        symbol: 'circle', // 数据点形状
-        symbolSize: 8, // 数据点大小
-        lineStyle: {
-          width: 2 // 线条粗细
-        },
+    {
+      name: '应到数量',
+      type: 'bar',
+      data: rawData.value.map(item => item.total),
+      barWidth: '35%',
+      label: {
+        show: true,
+        position: 'top', // 放置在柱子顶部
+        color: '#ffffff',
+        fontSize: 12,
+        fontWeight: 'bold'
       }
-  
-    ],
-    grid: {
-      top: '15%',  // 调整标题和图表的间距
-      left: '2%', // 让 Y 轴有更合适的边距
-      right: '15%', // 右侧留一点边距
-      bottom: '5%', // 减少底部空白，让柱状图向下填充
-      containLabel: true // 让标签不会被裁剪
     },
-  };
 
-  chartInstance.setOption(option);
+  ]
+};
+
+chartInstance.setOption(option);
+
+
 };
 
 // 7. 监听窗口变化，自适应图表
@@ -166,9 +151,26 @@ onBeforeUnmount(() => {
 <template>
   <div class="Qualifiedrate">
     <dv-border-box8 :dur="5">
-      <div class="dv-bg pt-2">
+      <div class="dv-bg pt-2 flex">
          
-        <div ref="qualityIndicators" class="chart-container"></div>
+        <div ref="qualityIndicators" class="chart-container flex-5 "></div>
+                  <!-- 数值展示区域 -->
+        <div class="flex-2 pr-8">
+          <div v-if="rawData.length" class="data-list flex flex-col justify-around h-full">
+            <div v-for="(item, index) in rawData" :key="index" class="data-item bg-[#8f88f7]  rounded-lg flex h-[10%] flex items-center pl-1">
+              <div class="data-title text-white text-sm font-semibold flex-1">{{ item.purchaserName }}:</div>
+              <div class="data-detail   text-white text-sm flex-4 flex justify-around flex">
+                <span>应到: <span class="font-semibold flex-1">{{ item.total }} 件</span></span>
+                <span>实到: <span class="font-semibold flex-1">{{ Number(item.total) - Number(item.bjsNum) }} 件</span></span>
+                <span>及时率: <span class="font-semibold flex-1 text-cyan-300">{{ 100-item.ratio }}%</span></span>
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <p class="text-white">暂无数据</p>
+          </div>
+        </div>
+        
       </div>
     </dv-border-box8>
   </div>
@@ -187,4 +189,15 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
 }
+.Qualifiedrate {
+  width: 100%;
+  height: 100%;
+}
+
+.dv-bg {
+  display: flex;
+  height: 100%;
+}
+
+
 </style>

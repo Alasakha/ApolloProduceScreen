@@ -1,4 +1,4 @@
-<!-- getResponsityDepartmentRank -->
+<!-- getResponsityRank -->
 
 <template>
 
@@ -17,7 +17,7 @@ import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import * as echarts from 'echarts';
-
+const reasonType = 2
 
   const route = useRoute();
 const prodLine = route.query.prodLine;
@@ -68,13 +68,13 @@ const processData = (data) => {
     '#3A59D1',  // 柔和紫蓝
   '#3D90D7',  // 主色偏紫
   '#7AC6D2',  // 淡紫蓝
-  '#B5FCCD',  // 淡紫
+  '#B5FCCD',  // 淡紫   
   '#5F6DF8',  // 深蓝紫
   '#B6A0FF',  // 淡一点的粉紫
   '#493DF5'   // 饱和偏深的紫蓝
 ] , // 淡蓝紫, // ✅ 扇区配色放这里
 title: {
-  text: '今日其他不良',
+  text: '今日其他不良责任',
   top: '2%',
   left: 'center',
   textStyle: {
@@ -170,7 +170,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeChart); // 移除监听器
 });
   const fetchData = () => {
-    getResponsityDepartmentRank(prodLine).then(res => {
+    getResponsityDepartmentRank(prodLine,reasonType).then(res => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
     processData(res.data);
   }).catch(() => {

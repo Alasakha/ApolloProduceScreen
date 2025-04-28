@@ -1,7 +1,7 @@
 <template>
   <dv-border-box-9 class="box1">
-    <div class="wrapper">
-      <h2>本月生产异常汇总</h2>
+    <div class="wrapper flex flex-col items-center justify-center h-full">
+      <h2 class="h-[10%]">设备点检模块</h2>
       
       <!-- 如果正在加载，显示 loading -->
       <div v-if="isLoading" class="loading-container">
@@ -14,15 +14,26 @@
       </div>
       
       <!-- 数据加载完成且非空时显示图表 -->
-        <div v-if="!isLoading && !isDataEmpty" ref="monthlyIndicators"  style="margin-top: 5vh;"></div>
+        <div v-if="!isLoading && !isDataEmpty" class="h-[90%] flex flex-col items-center justify-center w-full">
+          <div class="card">
+      <div class="card-content w-full h-full">
+          <p> 应点检设备数：{{ maintenanceInfo.total }}台<br>
+              实际点检数：{{ maintenanceInfo.done }}台<br>
+
+            </p>
+    </div>
+  </div>
+  <p class="text-[#29d6d9]">点检及时率</p>
+  <dv-water-level-pond :config="config" style="width:200px;height:200px" />
+        </div>
     </div>
   </dv-border-box-9>
 </template>
 
 <script setup>
-import { ref, onMounted ,nextTick,onBeforeUnmount} from 'vue';
+import { ref, onMounted ,nextTick,onBeforeUnmount,reactive} from 'vue';
 import * as echarts from 'echarts';
-import { getabnormalProductionMonthInfo } from '@/api/getProduceinfo';
+import { getMaintenanceInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { formatPieChartData } from '@/utils/map';
 import { eventBus } from '@/utils/eventbus';
@@ -35,6 +46,16 @@ const monthlyIndicators = ref(null);
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
+const maintenanceInfo = reactive({
+  done: null,  // 初始为空
+  rate: null,  // 初始为空
+  total: null  // 初始为空
+});
+
+const config = reactive({
+  data: [],
+  shape: 'round',
+})
 
 const drawMonthlyIndicators = (formattedData) => {
   const monthlyIndicatorsElement = echarts.init(monthlyIndicators.value);
@@ -120,10 +141,15 @@ const processData = (data) => {
   }
 };
 const fetchData = () => {
-    getabnormalProductionMonthInfo(prodLine)
+  getMaintenanceInfo(prodLine)
     .then(res => {
       isLoading.value = false;   // 加载完成，关闭 loading 状态
-      processData(res.data);  // 处理数据
+      const response = res.data;
+      maintenanceInfo.done = response.done;
+    maintenanceInfo.rate = response.rate;
+    maintenanceInfo.total = response.total;
+    console.log('设备点检模块数据', Number((maintenanceInfo.rate*100).toFixed(0)));
+    config.data[0] = Number((maintenanceInfo.rate*100).toFixed(0)); // 更新 config 的数据
     })
     .catch(() => {
       isLoading.value = false;
@@ -145,7 +171,6 @@ onMounted(() => {
 
 <style scoped>
 .box1 {
-  position: relative;
   width: 35%;
   height: 85%;
   display: flex;
@@ -157,7 +182,6 @@ onMounted(() => {
 }
 
 h2 {
-  position: absolute;
   top: 0.5vh;
   left: 1vw;
   margin: 0;
@@ -165,22 +189,9 @@ h2 {
   font-weight: bold;
 }
 
-.wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
 
-.wrapper div {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
+
+
 
 /* 加载中的样式 */
 .loading-container {
@@ -202,6 +213,32 @@ h2 {
   letter-spacing: 0.2vw;
 }
 
+.card {
+  width: 20vw;
+  height: 10vh;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 阴影效果 */
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  color: white;  /* 设置文字颜色为白色，确保在渐变背景上清晰可见 */
+}
 
+.card-content {
+  text-align: center;
+}
+
+.card h2 {
+  font-size: 24px;
+  margin-bottom: 10px;
+}
+
+.card p {
+  font-size: 16px;
+  line-height: 1.5;
+}
 
 </style>

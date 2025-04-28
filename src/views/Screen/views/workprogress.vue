@@ -39,7 +39,7 @@ const processData = (data) => {
     axisData: data.map(item => item.gd), // 工单号
     seriesData: data.map(item => item.doneRate) // 进度
   };
-  console.log(chartData.value);
+
 };
 
 // 请求数据
@@ -117,60 +117,15 @@ const initChart = () => {
       type: 'bar',
       color: '#4CAF50',  // 设置柱状图颜色
 
-      label: {
-        show: true,
-        position: 'right',
-        formatter: '{c}%' , // 显示百分比
-        valueAnimation: true,
-        color: 'white' // 设置标签字体颜色为白色
-      },
+        label: {
+          show: true,
+          position: 'insideLeft',
+          formatter: '{c}%' , // 显示百分比
+          valueAnimation: true,
+          color: 'white' // 设置标签字体颜色为白色
+        },
 
-      markLine: {
-              data: [
-              {
-              name: '区间1', xAxis: 75, 
-              lineStyle: {
-              color: '#FF9800', // 橙色
-              type: 'line',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '75%',
-              color: '#FF9800',
-            }
-          },
-          {
-            xAxis: 80, // 80% 区间
-            lineStyle: {
-              color: '#FFEB3B', // 黄色
-              type: 'solid',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '80%',
-              color: '#FFEB3B',
-            }
-          },
-          {
-            xAxis: 90, // 90% 区间
-            lineStyle: {
-              color: '#4CAF50', // 绿色
-              type: 'solid',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '90%',
-              color: '#4CAF50',
-            }
-          }
-        ],
-      }
+      
     }
   ],
   animationDuration: 0,

@@ -27,21 +27,22 @@ export const getProductPassRateRank = (prodLine) => {
   })
 }
 
-//每日责任类目排行
-export const getResponsityRank = (prodLine) => {
+
+// 每日责任类别
+export const getResponsityRank = (prodLine, reasonType) => {
   return request({
     url: '/quality/topDayCategory',
     method: 'get',
-    params: { prodLine } // 传递 prodLine 参数
+    params: { prodLine, reasonType } // 传递 prodLine 和 reasonType 参数
   })
 }
 
 //每日责任部门排行
-export const getResponsityDepartmentRank = (prodLine) => {
+export const getResponsityDepartmentRank = (prodLine,reasonType) => {
   return request({
     url: '/quality/topDayDept',
-    method: 'get',
-    params: { prodLine } // 传递 prodLine 参数
+    method: 'get', 
+    params: { prodLine,reasonType } // 传递 prodLine 参数
   })
 }
 
@@ -70,3 +71,4 @@ export const getFivedayRate = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }  
+// getProductPassRateRank

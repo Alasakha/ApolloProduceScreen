@@ -6,8 +6,8 @@
       v-for="machine in machineData"
       :key="machine.ty009"
       :machineName="machine.ty009"
-      :spc="machine.spc"
-      :completed="machine.ty004"
+      :spc="machine.ty004"
+      :completed="machine.spc"
       :rate="machine.rate"
     />
   </div>
@@ -18,7 +18,7 @@ import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { getplanAchievementRateToday } from '@/api/getInjection';
 import { eventBus } from '@/utils/eventbus.ts';
 import MachineProgress from '@/components/injection/PassPlanCard.vue';  // 引入MachineProgress组件
-
+  
 // 存储获取到的数据
 const machineData = ref([]);  // 存储每台机器的数据
 

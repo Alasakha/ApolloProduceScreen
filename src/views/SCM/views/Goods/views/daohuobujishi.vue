@@ -31,6 +31,7 @@
       </Vue3Marquee>
     </div>
   </dv-border-box8>
+
 </template>
 
 <script setup>

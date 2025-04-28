@@ -11,14 +11,14 @@
   
 <script setup>
 import { ref, onMounted, onBeforeUnmount, reactive, computed,watch,nextTick } from 'vue';
-import { getResponsityRank } from '../../../../../api/getQuiltyinfo';
+import { getResponsityRank } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import * as echarts from 'echarts';
 
 
-  const route = useRoute();
+const route = useRoute();
 const prodLine = route.query.prodLine;
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
@@ -26,7 +26,7 @@ const isDataEmpty = ref(false);
 let chartInstance = null;
 const qualityIndicators = ref(null);
 const rawData = ref([]);
-
+const reasonType = 2
 // 5. 初始化 ECharts
 const drawIndicators = () => {
   if (!qualityIndicators.value) return;
@@ -169,8 +169,9 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeChart); // 移除监听器
 });
   const fetchData = () => {
-    getResponsityRank(prodLine).then(res => {
+    getResponsityRank(prodLine, reasonType).then(res => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
+    console.log(res.data);
     processData(res.data);
   }).catch(() => {
       isLoading.value = false;

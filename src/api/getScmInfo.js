@@ -23,7 +23,7 @@ export const getTop5PurchaseBad = () => {
   })
 }
 
-//到货及时率
+//到货及时率1
 export const getDeliveryRate5Day = () => {
   return request({
     url: '/SCM/deliveryRate5Day',
@@ -47,13 +47,7 @@ export const getTop5SuppliersDelayedSignature = () => {
 }
 
 
-// 采购单回签不及时采购员TOP5
-export const getTop5PurchaserSignBackDelayed = () => {
-  return request({
-    url: '/SCM/top5PurchaserSignBackDelayed',
-    method: 'get',
-  })
-}
+
 
 // 次日生产欠料
 export const getWarningNextDay = () => {
@@ -81,20 +75,22 @@ export const getWeather = () => {
 }
 
 
-///SCM/warningNextDay1 次日生产欠料预警 总装一课
-
-export const getWarningNextDay1  = () => {
+//到货及时率2
+export const getGoodsRate = () => {
   return request({
-    url: '/SCM/warningNextDay1',
+    url: '/SCM/deliveryRate',
     method: 'get',
   })
 }
 
-///SCM/warningNextDay1 次日生产欠料预警 总装二课
 
-export const getWarningNextDay2  = () => {
+
+//采购单回签不及时统计
+// :top5PurchaserSignBackDelayed
+
+export const getTop5PurchaserSignBackDelayed = () => {
   return request({
-    url: '/SCM/warningNextDay2',
+    url: '/SCM/top5PurchaserSignBackDelayed',
     method: 'get',
   })
 }

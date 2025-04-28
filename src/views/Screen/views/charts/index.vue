@@ -1,6 +1,5 @@
 <template>
   <div class="charts-container">
-
         <div class="charts-content">
         <div class="charts1">
          <dv-border-box10><MonthChart></MonthChart></dv-border-box10>
@@ -9,7 +8,7 @@
           <dv-border-box10><MonthResponsityTop></MonthResponsityTop></dv-border-box10>
         </div>
         <div class="charts4">
-         <dv-border-box10>><TodayResponsityTop/></dv-border-box10>
+         <dv-border-box10><TodayResponsityTop/></dv-border-box10>
         </div>
         
       </div>

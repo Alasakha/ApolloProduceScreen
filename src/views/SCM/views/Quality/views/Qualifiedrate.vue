@@ -12,7 +12,14 @@ let chartInstance = null;
 const sortedData = computed(() =>
   rawData.value.slice().sort((a, b) => new Date(a.checkDate) - new Date(b.checkDate))
 );
-const categories = computed(() => sortedData.value.map(item => item.checkDate)); 
+const categories = computed(() => 
+  sortedData.value.map(item => {
+    // 假设 checkDate 是 '2023-04-25' 格式的日期字符串
+    const date = new Date(item.checkDate); 
+    // 提取 'MM-DD' 格式的日期，去掉年份
+    return `${date.getMonth() + 1}-${date.getDate()}`; 
+  })
+);
 const seriesData = computed(() => sortedData.value.map(item => parseFloat(item.ratio)));
 
 // 3. 监听数据变化，确保获取数据后绘制
@@ -49,11 +56,13 @@ const updateChart = () => {
 
   const option = {
     title: {
-      text: '供方来料合格率',
-      left: 'center',
+      text: '来料合格率趋势图',
+      left: 'left',
+      top: '2%',
+      left: '1%',
       textStyle: {
         color: '#fff',
-        fontSize: 16,
+        fontSize: 22,
         fontWeight: 'bold'
       }
     },

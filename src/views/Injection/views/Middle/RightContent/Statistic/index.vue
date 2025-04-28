@@ -1,10 +1,19 @@
 <template>
   <div class="h-full w-100px">
-  <!-- 数据加载完成且非空时显示图表 -->
-    <div ref="StatisticIndicators" style="height:32vh;width: 30vw; ; "></div>
+    <!-- 数据加载完成且非空时显示图表 -->
+    <div v-if="!isDataEmpty && !isLoading" ref="StatisticIndicators" style="height:32vh;width: 30vw;"></div>
+
+    <!-- 数据加载中显示加载状态 -->
+    <div v-if="isLoading" class="loading">
+      <p>加载中...</p>
+    </div>
+
+    <!-- 数据为空时显示提示 -->
+    <div v-if="isDataEmpty" class="no-data text-white text-3xl flex justify-center items-center h-full">  
+      <p>暂无数据</p>
+    </div>
   </div>
 </template>
-
 <script setup> 
 import { ref, onMounted, nextTick,onBeforeUnmount } from 'vue';
 import * as echarts from 'echarts';
@@ -107,21 +116,26 @@ const processData = (data) => {
 const fetchData = async () => {
   try {
     const res = await getBadCategory();
-    console.log(res.data); // 打印接口返回的数据
+
+    if (res.data.faultSevenDay.length === 0) {
+      isDataEmpty.value = true; // 数据为空
+    } else {
+      isDataEmpty.value = false;
+      const { xData, yData } = processData(res.data);
+      option.xAxis.data = xData;
+      option.series[0].data = yData;
+    }
+
     isLoading.value = false;
-
-    const { xData, yData } = processData(res.data);
-
-    option.xAxis.data = xData;
-    option.series[0].data = yData;
-
+    console.log(isDataEmpty.value, '数据为空');
     nextTick(drawStatisticIndicators);
   } catch (error) {
     console.error('数据获取失败:', error);
     isLoading.value = false;
-    isDataEmpty.value = true;
+    isDataEmpty.value = true; // 数据为空
   }
 };
+
 
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
@@ -143,4 +157,13 @@ onBeforeUnmount(() => {
 
 <style scoped>
 /* 添加样式 */
+/* "暂无数据" 提示样式 */
+
+/* 加载中样式 */
+.loading {
+  text-align: center;
+  color: rgb(200, 200, 200);
+  font-size: 16px;
+  margin-top: 20px;
+}
 </style>

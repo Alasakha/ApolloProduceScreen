@@ -59,3 +59,12 @@ export const getEfficiencyInfo = (prodLine) => {
 }
 
 
+// /production/maintenance
+//设备点检
+export const getMaintenanceInfo = (prodLine) => {
+  return request({
+    url: '/production/maintenance',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}

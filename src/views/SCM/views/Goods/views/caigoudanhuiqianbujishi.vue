@@ -3,20 +3,12 @@ import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts';
 import { getTop5PurchaserSignBackDelayed } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
-
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
 let chartInstance = null;
 
-// 2. 计算属性 - 取前面5个数
-const sortedData = computed(() => {
-  return rawData.value
-    .map(item => ({
-      name: item.purchaserName || '未知', // 你可以根据需要选择其他字段作为 name
-      value: item.whfs ? parseInt(item.whfs, 10) : 0 // 如果 whfs 存在，则转换为整数，否则为 0
-    }))
-});
+
 
 // 3. 监听数据变化，确保获取数据后绘制
 watch(rawData, () => {
@@ -28,7 +20,6 @@ const fetchData = () => {
   getTop5PurchaserSignBackDelayed()
     .then(res => {
       rawData.value = res.data;
-      console.log(rawData.value)
     })
     .catch(() => {
       console.log('数据获取失败');
@@ -52,53 +43,88 @@ const updateChart = () => {
   if (!chartInstance) return;
 
   const option = {
-    title: {
-      text: '回签不及时',
-      left: 'center',
-      textStyle: {
-        color: '#ffffff' // 设置标题字体颜色为白色
-      }
+    grid: {
+      left: '3%',
+      bottom: '3%',
+      containLabel: true
     },
-    tooltip: {
-      trigger: 'item',
-      textStyle: {
-        color: 'black' // 设置 tooltip 字体颜色为白色
-      }
+  color: ['#8F87F1', '#C68EFD'], // 不同颜色的条形
+  title: {
+    text: '采购单回签不及时统计',
+    top: '2%',
+    left: '2%',
+    textStyle: {
+      color: '#ffffff',
+      fontSize: 25,
+      fontWeight: 'bold',
+      fontFamily: 'Microsoft YaHei',
+      letterSpacing: 2
+    }
+  },
+  tooltip: {
+    trigger: 'axis',
+    axisPointer: {
+      type: 'shadow'
     },
-    legend: {
-      orient: 'vertical',
-      left: 'left',
-      textStyle: {
-        color: '#ffffff' // 设置 legend 字体颜色为白色
-      }
-    },
-    series: [
-      {
-        name: '进货不良问题',
-        type: 'pie',
-        radius: '50%',
-        data: sortedData.value, // 使用计算出来的数据
-        label: {
+    formatter: (params) => {
+      return `${params[0].name}<br>总数: ${params[0].value} 件<br>及时回复数: ${params[1].value} 件<br>及时率: ${params[0].value > 0 ? (params[1].value / params[0].value * 100).toFixed(2) + '%' : 'N/A'}`;
+    }
+  },
+  legend: {
+    data: ['总数', '及时回复数'],
+    top: '10%',
+    left: 'center',
+    textStyle: {
+      color: '#ffffff'
+    }
+  },
+  xAxis: {
+    type: 'category',
+    data: rawData.value.map(item => item.purchaserName),
+    axisLabel: {
+      color: '#ffffff'
+    }
+  },
+  yAxis: {
+    type: 'value',
+    axisLabel: {
+      color: '#ffffff'
+    }
+  },
+  series: [
+  {
+      name: '总数',
+      type: 'bar',
+      data: rawData.value.map(item => Number(item.zs)  || 0),
+      barWidth: '35%',
+      label: {
         show: true,
-        position: 'outside', // 标签显示在外侧
-        formatter: '{b}:{c}', // 格式化标签内容，显示名称、数值和百分比
-        fontSize: 12, // 设置标签字体大小
-        color: '#fff' // 设置标签字体颜色
-      },
-        emphasis: {
-          itemStyle: {
-            shadowBlur: 10,
-            shadowOffsetX: 0,
-            shadowColor: 'rgba(0, 0, 0, 0.5)'
-          }
-        }
+        position: 'top', // 放置在柱子顶部
+        color: '#ffffff',
+        fontSize: 12,
+        fontWeight: 'bold'
       }
-    ]
-  };
+    },
+    {
+      name: '及时回复数',
+      type: 'bar',
+      data: rawData.value.map(item => Number(item.jshfs) || 0),
+      barWidth: '35%',
+      label: {
+        show: true,
+        position: 'top', // 放置在柱子顶部
+        color: '#ffffff',
+        fontSize: 12,
+        fontWeight: 'bold'
+      }
+    },
 
-  console.log(sortedData.value)
-  // 设置图表选项
-  chartInstance.setOption(option);
+  ]
+};
+
+chartInstance.setOption(option);
+
+
 };
 
 // 7. 监听窗口变化，自适应图表
@@ -114,20 +140,37 @@ onMounted(() => {
   eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
-// 9. 组件卸载时移除监听事件并销毁图表
+// 9. 组件卸载时移除监听事件
 onBeforeUnmount(() => {
-  if (chartInstance) {
-    chartInstance.dispose(); // 销毁图表实例
-  }
-  window.removeEventListener('resize', resizeChart); // 移除监听器
+  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+  window.removeEventListener('resize', resizeChart);
+  
 });
 </script>
 
 <template>
-  <div class="Nonconformance">
+  <div class="Qualifiedrate">
     <dv-border-box8 :dur="5">
-      <div class="dv-bg pt-2">
-        <div ref="qualityIndicators" class="chart-container"></div>
+      <div class="dv-bg pt-2 flex">
+         
+        <div ref="qualityIndicators" class="chart-container flex-5 "></div>
+                  <!-- 数值展示区域 -->
+        <div class="flex-2 pr-8">
+          <div v-if="rawData.length" class="data-list flex flex-col justify-around h-full">
+            <div v-for="(item, index) in rawData" :key="index" class="data-item bg-[#8f88f7]  rounded-lg flex h-[10%] flex items-center pl-1">
+              <div class="data-title text-white text-sm font-semibold flex-1">{{ item.purchaserName }}:</div>
+              <div class="data-detail   text-white text-sm flex-4 flex justify-around flex">
+                <span>总数: <span class="font-semibold flex-1">{{ item.zs }} 件</span></span>
+                <span>及时回复数: <span class="font-semibold flex-1">{{ Number(item.jshfs) }} 件</span></span>
+                <span>及时率: <span class="font-semibold flex-1 text-cyan-300">{{ (item.ratio*100).toFixed(1) }}%</span></span>
+              </div>
+            </div>
+          </div>
+          <div v-else>
+            <p class="text-white">暂无数据</p>
+          </div>
+        </div>
+        
       </div>
     </dv-border-box8>
   </div>
@@ -138,6 +181,7 @@ onBeforeUnmount(() => {
 .dv-bg {
   width: 100%;
   height: 100%; /* 可调整 */
+
 }
 
 /* ECharts 图表容器 */
@@ -145,4 +189,15 @@ onBeforeUnmount(() => {
   width: 100%;
   height: 100%;
 }
- </style> 
+.Qualifiedrate {
+  width: 100%;
+  height: 100%;
+}
+
+.dv-bg {
+  display: flex;
+  height: 100%;
+}
+
+
+</style>

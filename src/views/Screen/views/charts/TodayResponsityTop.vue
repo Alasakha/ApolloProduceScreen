@@ -1,63 +1,63 @@
 <template>
-  <div class="box1"> 
-        <h1>今日不良TOP5责任</h1>
-        <dv-scroll-ranking-board :config="config" style="width:90%;height:100%" />
+  <div class="box1">
+    <h1>其他问题</h1>
+    <dv-scroll-ranking-board :config="otherconfig" style="width:90%;height:100%" />
   </div>
   </template>
   
   <script setup>
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue';
-import { getResponsityDepartmentRank } from '../../../../api/getQuiltyinfo';
+import { getResponsityRank } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
-import { eventBus } from '../../../../utils/eventbus';
-import { formatPieChartData } from '../../../../utils/map';
+import { eventBus } from '@/utils/eventbus';
+import { formatPieChartData } from '@/utils/map';
 
 const route = useRoute();
 const prodLine = route.query.prodLine;
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-
-  const config = reactive({
+const otherreasonType = 2
+const otherconfig = reactive({
     waitTime:5000,
     fontSize:15,
     data: [],
     unit: '个',
   })
 
-const processData = (data) => {
+  const processData = (data, targetConfig) => {
+  const formattedData = formatPieChartData(data, 'ngName', 'total');
 
-const formattedData = formatPieChartData(data, 'md002', 'total');
-console.log(formattedData);
-if (formattedData.length === 0) {
-
-  isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
-} else {  
-
-  isDataEmpty.value = false;
-  config.data = formattedData;  // 这里赋值给 config.data
-}
+  if (formattedData.length === 0) {
+    isDataEmpty.value = true;  // 没数据，置空
+  } else {
+    isDataEmpty.value = false;
+    targetConfig.data = formattedData;  // 这里赋值给指定的 config
+  }
 };
 
+
+const fetchotherData = () => {
+  getResponsityRank(prodLine, otherreasonType).then(res => {
+    console.log('责任性问题数据', res.data);
+    isLoading.value = false;
+    processData(res.data, otherconfig); // 传入 otherconfig
+  }).catch(() => {
+    isLoading.value = false;
+    isDataEmpty.value = true;
+  });
+};
   onMounted(() => {
-    fetchData(); // 组件挂载时先请求一次
-    eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+    fetchotherData()
+    eventBus.on("refreshData", fetchotherData); // 监听全局刷新事件
     });
 
  // 清理定时器，避免组件卸载后定时器继续执行
  onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+    eventBus.off("refreshData", fetchotherData); // 组件销毁时取消监听
   });
   
-  const fetchData = () => {
-    getResponsityDepartmentRank(prodLine).then(res => {
-    isLoading.value = false;   // 加载完成，关闭 loading 状态
-    processData(res.data);
-  }).catch(() => {
-      isLoading.value = false;
-      isDataEmpty.value = true;  // 如果请求失败，设置为空数据状态
-    });
-  }
+
   </script>
   
   
@@ -73,13 +73,11 @@ if (formattedData.length === 0) {
 
   }
   h1{
-  margin-top: 0;
-  margin-bottom: 0;
-    font-size: 1.5vw;
+    font-size: 1vw;
     color:aliceblue;
-    letter-spacing: 0.5vw;
+    font-weight: bold;
   }
   :deep(.inside-column) {
-  height: 2vh !important; /* 这里改成你想要的宽度 */
+  height: 0.8vh !important; /* 这里改成你想要的宽度 */
 }
 </style>

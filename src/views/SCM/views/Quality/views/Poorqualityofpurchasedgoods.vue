@@ -1,78 +1,160 @@
 <script setup>
-import { ref, watch, nextTick, onMounted } from 'vue'
+import { ref, watch, nextTick, onMounted ,onBeforeUnmount} from 'vue'
 import * as echarts from 'echarts'
 import { getTop5PurchaseBad } from '@/api/getScmInfo.js'
-
+import {formatPieChartData} from '@/utils/map'
+import { eventBus } from '@/utils/eventbus'
+import Hualun from './hualun.vue'
 const rawData = ref({ performance: [], appearance: [] })
-const chartPerformance = ref(null)
-const chartAppearance = ref(null)
 
+const chartAppearance = ref(null)
+let chartInstance = null;
 const performanceList = ref([])
 const appearanceList = ref([])
 const marqueeVisible = ref(true)
 const scrollList = ref([])
-const drawBarChart = (el, data, title) => {
-  const myChart = echarts.init(el)
+const showData = ref([])
 
-  myChart.setOption({
-    title: {
-      text: title,
-      left: 'center',
-      textStyle: { color: '#fff', fontSize: 16 }
+// 3. 监听数据变化，确保获取数据后绘制
+watch(appearanceList, () => {
+  nextTick(() => drawIndicators()); 
+}, { deep: true, immediate: true });
+
+
+// 5. 初始化 ECharts
+const drawIndicators = () => {
+  if (!chartAppearance.value) return;
+
+  // 确保 ECharts 初始化时父容器已有大小
+  chartInstance = echarts.init(chartAppearance.value);
+  updateChart();
+
+  // 监听窗口大小变化，使图表自适应
+  window.addEventListener('resize', resizeChart);
+};
+
+// 7. 监听窗口变化，自适应图表
+const resizeChart = () => {
+  if (chartInstance) {
+    chartInstance.resize();
+  }
+};
+
+const updateChart = () => {
+  if (!chartInstance) return;
+
+  const option = {
+    color: [  
+    '#8F87F1',  // 柔和紫蓝
+  '#C68EFD',  // 主色偏紫
+  '#E9A5F1',  // 淡紫蓝
+  '#FED2E2',  // 淡紫
+  '#5F6DF8',  // 深蓝紫
+  '#B6A0FF',  // 淡一点的粉紫
+  '#493DF5'   // 饱和偏深的紫蓝
+] , // 淡蓝紫, // ✅ 扇区配色放这里
+title: {
+  text: '今日其他类问题不良',
+  top: '2%',
+  left: 'left',
+  textStyle: {
+    color: '#ffffff',     // 标题颜色
+    fontSize: 25,         // 字号（推荐 16～24 大屏用 18+）
+    fontWeight: 'bold',   // 字体粗细：normal / bold / bolder / lighter
+    fontFamily: 'Microsoft YaHei', // 可指定字体
+    letterSpacing: 2      // 字间距（单位 px）
+  }
+},
+    tooltip: {
+      trigger: 'item',
+      textStyle: {
+        color: 'black' // 设置 tooltip 字体颜色为黑色
+      }
     },
-    tooltip: { trigger: 'axis' },
-    grid: { left: '5%', right: '5%', top: 30, bottom: 60 },
-    xAxis: {
-      type: 'category',
-      data: data.map(i => i.description || '未知'),
-      axisLabel: { color: '#fff', rotate: 30 } // 可以加个旋转，避免文字重叠
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: { color: '#fff' },
-      splitLine: { show: false }
+    legend: {
+      orient: 'horizontal',  // ✅ 横向排列
+      top: '10%',          // ✅ 放在图表下方
+      left: 'center',         // ✅ 水平居中
+      textStyle: {
+        color: '#ffffff'
+      }
     },
     series: [
       {
-        type: 'bar',
-        data: data.map(i => +i.total),
-        itemStyle: { color: '#3399FF' },
+        type: 'pie',
+        radius: '50%',
+        data: appearanceList.value , // 使用计算出来的数据
         label: {
-          show: true,
-          position: 'top',
-          color: '#fff'
-        }
+            show: true,
+            position: 'outside',
+            formatter: (params) => {
+              return `{name|${params.name}}\n{value|${params.value} 件}  {percent|${params.percent}%}`;
+            },
+            rich: {
+              name: {
+                fontSize: 14,
+                fontWeight: '',
+                color: '#fff',
+                lineHeight: 22
+              },
+              value: {
+                fontSize: 12,
+                color: '#aaa'
+              },
+              percent: {
+                fontSize: 12,
+                color: '#66ccff'
+              }
+            }
+          },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 10,
+            shadowOffsetX: 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        },
       }
     ]
-  })
+  };
 
-  window.addEventListener('resize', () => {
-    myChart.resize()
-  })
-}
+  // 设置图表选项
+  chartInstance.setOption(option);
+};
+
+
+
+
+
 
 const fetchData = async () => {
   const res = await getTop5PurchaseBad()
   rawData.value = res.data
 
-  performanceList.value = res.data.performance.filter(i => i.total !== '0')
-  appearanceList.value = res.data.appearance.filter(i => i.total !== '0')
+// 格式化数据放入饼图
+  appearanceList.value = formatPieChartData(rawData.value.appearance, 'description', 'total')
+  appearanceList.value  = appearanceList.value.map(item => ({
+  name: item.name || '未知',
+  value: item.value ? parseInt(item.value, 10) : 0
+}));
+  console.log(appearanceList.value)
 
-  // 合并：加上 type 字段，标识是性能还是外观
-  scrollList.value = [
-    ...performanceList.value.map(item => ({ ...item, type: '性能' })),
-    ...appearanceList.value.map(item => ({ ...item, type: '外观' }))
-  ]
 
-  nextTick(() => {
-    if (chartPerformance.value) drawBarChart(chartPerformance.value, performanceList.value, '性能异常 TOP10')
-    if (chartAppearance.value) drawBarChart(chartAppearance.value, appearanceList.value, '外观异常 TOP10')
-  })
 }
+
 
 onMounted(() => {
   fetchData()
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 })
+
+// 9. 组件卸载时移除监听事件并销毁图表
+onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose(); // 销毁图表实例
+  }
+  window.removeEventListener('resize', resizeChart); // 移除监听器
+});
 </script>
 
 <template>
@@ -80,32 +162,10 @@ onMounted(() => {
     <dv-border-box8 :dur="5">
       <div class="dv-bg">
         <div class="chart-row">
-          <div ref="chartPerformance" class="chart-box"></div>
+   
           <div ref="chartAppearance" class="chart-box"></div>
         </div>
-        <div class="bottom-scroll pl-4 flex items-center justify-between">
-          <div class="scroll-title ">异常类型：</div>
-          <Vue3Marquee
-  v-if="marqueeVisible"
-  :speed="40"
-  pauseOnHover
-  gradient
-  :gradient-color="[173, 216, 230]" 
-  gradient-length="5%"
-  class="h-full"
->
-  <div
-    v-for="(data, index) in scrollList"
-    :key="index"
-    class="scroll-item mr-6"
-  >
-    <span class="font-bold text-sm text-white">{{ index + 1 }}.</span>
-    <span class="ml-2 text-white">[{{ data.type }}] {{ data.description }}：</span>
-    <span class="text-white">{{ data.total }}</span>
-  </div>
-</Vue3Marquee>
-
-        </div>
+        <Hualun></Hualun>
       </div>
     </dv-border-box8>
   </div>

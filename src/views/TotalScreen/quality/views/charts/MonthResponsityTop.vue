@@ -10,12 +10,12 @@
   
 <script setup>
 import { ref, onMounted, onBeforeUnmount, reactive, computed,watch,nextTick } from 'vue';
-import { getResponsityCategoryRank } from '../../../../../api/getQuiltyinfo';
+import { getResponsityRank } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import * as echarts from 'echarts';
-
+const reasonType = 1
 
   const route = useRoute();
 const prodLine = route.query.prodLine;
@@ -168,7 +168,7 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeChart); // 移除监听器
 });
   const fetchData = () => {
-    getResponsityCategoryRank(prodLine).then(res => {
+    getResponsityRank(prodLine,reasonType).then(res => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
     processData(res.data);
   }).catch(() => {
