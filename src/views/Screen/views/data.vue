@@ -25,7 +25,11 @@
           <DataCard title="今日总排产" :value="TodayData?.pcTotal ?? '无数据'" style="margin-left: 4vw;"/> 
           <DataCard title="今日已完成"  :value=" TodayData?.done?? '无数据'"  style="margin-left: 4vw;"/>
           <DataCard title="今日待生产" :value="TodayData?.unProduce ??  '无数据'" style="margin-left: 3vw;"/>
-          <DataCard title="今日产量达成率" :value="TodayData?.rate ??  '无数据'" style="margin-left: 8vw;"/>
+          <DataCard
+            title="今日产量达成率"
+            :value="formatRate(TodayData?.rate)"
+            style="margin-left: 8vw;"
+          />
         </div>
       </div>
     </div>
@@ -57,6 +61,13 @@ const fetchData = () => {
   getEfficiencyInfo(prodLine).then(res => {
     KnowledgeEfficiencyData.value = res.data
   })
+}
+
+function formatRate(rate) {
+  if (!rate) return '无数据';
+  const num = parseFloat(rate);
+  if (isNaN(num)) return '无数据';
+  return Math.round(num) + '%';
 }
 
 // 在组件挂载时启动定时获取数据

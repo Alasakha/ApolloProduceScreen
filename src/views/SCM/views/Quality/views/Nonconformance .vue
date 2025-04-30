@@ -54,7 +54,7 @@ const updateChart = () => {
   '#493DF5'   // 饱和偏深的紫蓝
 ] , // 淡蓝紫, // ✅ 扇区配色放这里
 title: {
-  text: '今日其他类问题不良',
+  text: '今日功性能问题',
   top: '2%',
   left: 'left',
   textStyle: {

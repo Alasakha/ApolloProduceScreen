@@ -117,7 +117,7 @@ const initChart = () => {
       type: 'bar',
       color: '#4CAF50',  // 设置柱状图颜色
 
-        label: {
+        label: {  
           show: true,
           position: 'insideLeft',
           formatter: '{c}%' , // 显示百分比

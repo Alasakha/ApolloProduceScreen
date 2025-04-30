@@ -14,17 +14,18 @@
       </div>
       
       <!-- 数据加载完成且非空时显示图表 -->
-        <div v-if="!isLoading && !isDataEmpty" class="h-[90%] flex flex-col items-center justify-center w-full">
-          <div class="card">
-      <div class="card-content w-full h-full">
-          <p> 应点检设备数：{{ maintenanceInfo.total }}台<br>
-              实际点检数：{{ maintenanceInfo.done }}台<br>
-
-            </p>
-    </div>
-  </div>
-  <p class="text-[#29d6d9]">点检及时率</p>
-  <dv-water-level-pond :config="config" style="width:200px;height:200px" />
+        <div v-if="!isLoading && !isDataEmpty" class="h-[90%] flex flex-col items-center justify-start w-full ">
+          <div class="card w-full h-[50%]">
+              <div class="card-content w-full h-full flex">
+                <div ref="Indicators1" class="w-full h-[100%]"></div>
+                <div ref="Indicators2" class="w-full h-[100%]"></div>
+            </div>
+          </div>
+          <div class="flex flex-col items-center justify-center w-full h-[50%]">
+            <div ref="Indicators3" class="w-full h-[100%]"></div>
+            </div>
+  <!-- <p class="text-[#29d6d9]">点检及时率</p>
+  <dv-water-level-pond :config="config" style="width:200px;height:200px" /> -->
         </div>
     </div>
   </dv-border-box-9>
@@ -38,11 +39,13 @@ import { useRoute } from 'vue-router';
 import { formatPieChartData } from '@/utils/map';
 import { eventBus } from '@/utils/eventbus';
 import { getColorByType } from '@/utils/color';
+import { createGaugeOption } from './gaugeChart';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数
-const monthlyIndicators = ref(null);
-
+const Indicators1 = ref(null);
+const Indicators2 = ref(null);
+const Indicators3 = ref(null);
 // Loading 和 数据为空的状态
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
@@ -52,68 +55,30 @@ const maintenanceInfo = reactive({
   total: null  // 初始为空
 });
 
-const config = reactive({
-  data: [],
-  shape: 'round',
-})
 
 const drawMonthlyIndicators = (formattedData) => {
-  const monthlyIndicatorsElement = echarts.init(monthlyIndicators.value);
-  const option = {
-    tooltip: {
-      trigger: 'item'
-    },
-    legend: {
-      itemGap: 20,  // 设置图例项之间的间距
-      left: 'center',
-      textStyle: {
-        color: '#fff', // 设置图例字体颜色为白色
-        fontSize: 13,  // 设置图例文字大小
-      },
-      itemWidth: 15,   // 设置图例标记的宽度
-      itemHeight: 10   // 设置图例标记的高度
-        },
-    series: [
-      {
-        name: '本月生产异常',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        padAngle: 5,
-        itemStyle: {
-          borderRadius: 10
-        },
-        label: {
-        show: true,
-        position: 'outside', // 标签显示在外侧
-        formatter: params => `${params.name}: ${params.percent.toFixed(1)}%`, // 格式化标签内容，只显示一个小数
-        fontSize: 12, // 设置标签字体大小
-        color: '#fff' // 设置标签字体颜色
-      },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 40,
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-        top:10,
-        show: true,      // 使线条显示
-        length: 8,      // 设置线条的第一段长度
-        length2: 8,     // 设置线条的第二段长度
-        lineStyle: {
-          color: '#fff', // 设置线条颜色
-          width: 1,      // 设置线条宽度
-          type: 'solid'  // 设置线条类型
-        }
-      },
-        data: formattedData // 使用传递过来的数据
-      }
-    ]
-  };
-
-  monthlyIndicatorsElement.setOption(option);
+  const Indicators1Element = echarts.init(Indicators1.value);
+  const Indicators1Element2 = echarts.init(Indicators2.value);
+  const Indicators1Element3 = echarts.init(Indicators3.value);
+  const option = createGaugeOption({
+  text: "应点检设备数",
+  data:  maintenanceInfo.total,
+  max: maintenanceInfo.total
+});
+  const option3 = createGaugeOption({
+  text: "点检及时率",
+  data: maintenanceInfo.rate * 100,
+  max: maintenanceInfo.done/maintenanceInfo.total
+});
+  
+const option2 = createGaugeOption({
+  text: "实际点检数",
+  data: maintenanceInfo.done,
+  max: maintenanceInfo.total
+});
+  Indicators1Element.setOption(option);
+  Indicators1Element2.setOption(option2);
+  Indicators1Element3.setOption(option3);
 };
 
 const processData = (data) => {
@@ -142,19 +107,19 @@ const processData = (data) => {
 };
 const fetchData = () => {
   getMaintenanceInfo(prodLine)
-    .then(res => {
-      isLoading.value = false;   // 加载完成，关闭 loading 状态
-      const response = res.data;
-      maintenanceInfo.done = response.done;
-    maintenanceInfo.rate = response.rate;
-    maintenanceInfo.total = response.total;
-    console.log('设备点检模块数据', Number((maintenanceInfo.rate*100).toFixed(0)));
-    config.data[0] = Number((maintenanceInfo.rate*100).toFixed(0)); // 更新 config 的数据
-    })
-    .catch(() => {
-      isLoading.value = false;
-      isDataEmpty.value = true;  // 如果请求失败，设置为空数据状态
-    });
+  .then(res => {
+  isLoading.value = false;
+  const response = res.data;
+  maintenanceInfo.done = response.done;
+  maintenanceInfo.rate = response.rate;
+  maintenanceInfo.total = response.total;
+
+  config.data[0] = Number((maintenanceInfo.rate * 100).toFixed(0));
+
+  nextTick(() => {
+    drawMonthlyIndicators(); // 拉完数据后渲染图表
+  });
+})
 }
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
@@ -214,17 +179,7 @@ h2 {
 }
 
 .card {
-  width: 20vw;
-  height: 10vh;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* 阴影效果 */
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  color: white;  /* 设置文字颜色为白色，确保在渐变背景上清晰可见 */
+
 }
 
 .card-content {

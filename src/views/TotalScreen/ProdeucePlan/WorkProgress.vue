@@ -90,9 +90,10 @@ const initChart = () => {
     type: 'category',
     data: chartData.value.axisData,
     axisLabel: {
-      interval: 0,  // 显示所有标签
-      rotate: 0,   // 标签不倾斜
-      color: 'white' // 设置字体颜色为白色
+      interval: 0,   // 显示所有标签
+      color: 'white', // 设置字体颜色为白色
+      align: 'right', // 设置标签的水平对齐方式
+      verticalAlign: 'middle', // 设置标签的垂直对齐方式
     },
     inverse: true,
     min: 0  // 设置 yAxis 的最小值为 0，确保 Y 轴标签不会被遮挡
@@ -119,58 +120,11 @@ const initChart = () => {
 
       label: {
         show: true,
-        position: 'right',
+        position: 'insideLeft',
         formatter: '{c}%' , // 显示百分比
         valueAnimation: true,
         color: 'white' // 设置标签字体颜色为白色
       },
-
-      markLine: {
-              data: [
-              {
-              name: '区间1', xAxis: 75, 
-              lineStyle: {
-              color: '#FF9800', // 橙色
-              type: 'line',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '75%',
-              color: '#FF9800',
-            }
-          },
-          {
-            xAxis: 80, // 80% 区间
-            lineStyle: {
-              color: '#FFEB3B', // 黄色
-              type: 'solid',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '80%',
-              color: '#FFEB3B',
-            }
-          },
-          {
-            xAxis: 90, // 90% 区间
-            lineStyle: {
-              color: '#4CAF50', // 绿色
-              type: 'solid',
-              width: 2,
-            },
-            label: {
-              show: true,
-              position: 'top',
-              formatter: '90%',
-              color: '#4CAF50',
-            }
-          }
-        ],
-      }
     }
   ],
   animationDuration: 0,
