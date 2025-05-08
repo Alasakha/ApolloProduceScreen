@@ -1,18 +1,6 @@
-<template>
-  <div class="line-box">
-    <!-- 小图表的外边框组件 -->
-    <dv-border-box-1 class="box1">
-      <div class="dateTime">
-        <div class="date">{{ dateStr }}</div>
-        <div class="time-text">{{ timeStr }}</div>
-      </div>
-    </dv-border-box-1>
-
-  </div>
-</template>
-
 <script setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
+
 
 const dateStr = ref('');
 const timeStr = ref('');
@@ -64,80 +52,35 @@ onBeforeUnmount(() => {
     clearInterval(timeTrim);
   }
 });
-
 </script>
 
+
+<template>
+<dv-border-box-1 class="box1">
+
+  <div class="dateTime flex flex-col justify-center items-center h-full w-full">
+      <div class="date">{{dateStr}}</div>
+      <div class="time-text">{{timeStr}}</div>
+    </div>
+
+
+</dv-border-box-1>
+
+</template>
+
 <style scoped>
-.line-box {
-  height: 90%;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  margin-top: 1vh;
-}
-
-.box1 {
-  display: flex;
-}
-
-.currentTime {
-  flex: 1;
-  font-size: 1vw;
-  color: aliceblue;
-}
-
-img {
-  margin-left: 3vw;
-  width: 13vw;
-  height: 7vh;
-}
-
-.logo {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.title {
-  margin-top: 1vh;
-  flex: 2.5;
-  margin-right: 5vw;
-}
-
-.time {
-  width: 100%;
-  /* 使用固定宽度替代vw */
-  height: 100%;
-  /* 使用固定高度替代vh */
-  position: relative;
-}
-
-.dateTime {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-  font-family: 'LedFont';
-  letter-spacing: 3px;
-  color: #FEFEFE;
-  width: 90%;
-  /* 确保内容不会超出边框 */
-}
-
 .date {
   font-size: 1vw;
-  white-space: nowrap;
-  /* 防止文字换行 */
+  white-space: nowrap;  /* 防止文字换行 */
+  color: #FEFEFE;
+  font-family: 'LedFont';
+  gap: 8px;
 }
 
 .time-text {
   font-size: 2vw;
   font-weight: bold;
   color: #40a9ff;
+  letter-spacing: 3px;
 }
 </style>

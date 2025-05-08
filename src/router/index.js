@@ -7,6 +7,7 @@ import Injection from '@/views/Injection/views/index.vue'
 import SCM from '@/views/SCM/views/index.vue'
 import WMS from '@/views/WMS/index.vue'
 import Material from '@/views/Metalworking/index.vue' 
+import  NEWSCM from '@/views/NewSCM/index.vue' // 这里是新 SCM 的路径
 const routes = [
   {
     path: '/',
@@ -58,6 +59,12 @@ const routes = [
     path: '/material',
     name: 'Material',
     component: Material,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/newscm',
+    name: 'NEWSCM',
+    component: NEWSCM,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   }
 ];

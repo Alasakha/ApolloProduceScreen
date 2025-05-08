@@ -125,7 +125,6 @@ onBeforeUnmount(() => {
 
 
 const clickHandler = (row: any) => {
-  console.log('点击了行数据:', row.row);
   selectedItem.value = row.row; // 直接保存整行
   dialogVisible.value = true;
 };

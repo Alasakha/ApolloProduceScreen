@@ -2,50 +2,18 @@
   <dv-full-screen-container class="box">
   <body>
     <dv-border-box13 class="dv-border-box13">
-      <div class="content">
-        <div class="top_box">
-       
-       <div class="top_box_left">
-
-          <div class="top_box_left_top">
-             <div class="top_box_left_top_left">
-               <div class="time_box">
-                 <Time></Time>
-               </div>
-               <div class="logo_box">
-                 <Logo></Logo>
-               </div>
-             </div>
-             <div class="top_box_left_top_right">
-               <Header></Header>
-             </div>
-          </div>
-
-          <div class="top_box_left_bottom">
-            <Data></Data>   
-          </div>
- 
-       </div>
-       <div class="top_box_right">
-        <WorkProgress></WorkProgress>
-       </div>
-       </div>
-       <div class="box-bottom">
-        <Charts></Charts>
-      </div>
-      </div>
+        <Header></Header>
+        <Line2></Line2>
+        <Line3></Line3>
     </dv-border-box13>
   </body>
 </dv-full-screen-container>
 </template>
 
 <script setup >  
-import Time from './views/time.vue';
-import Logo from './views/logo.vue';
-import Header from './views/header.vue';
-import Data from './views/data.vue';
-import WorkProgress from './views/workprogress.vue';
-import Charts from './views/charts/index.vue';
+import Header from './views/Header/index.vue'
+import Line2 from './views/Line2/index.vue'
+import Line3 from './views/Line3/index.vue'
 </script>
 
 

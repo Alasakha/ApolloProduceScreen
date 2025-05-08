@@ -7,13 +7,16 @@ import 'element-plus/dist/index.css';
 import '@/style.css'
 import { createPinia } from 'pinia'
 import Vue3Marquee from 'vue3-marquee'
+import Title from './components/title.vue'
 
-createApp(App)
+const app = createApp(App);
+
+app.component('GlobalTitle', Title) // 注册全局组件（名字你可以改）
+
+app
   .use(router)
-  .use(createPinia()) // 注册 pinia
-  .use(DataVVue3) // 注册 vue-router
+  .use(createPinia())
+  .use(DataVVue3)
   .use(ElementPlus)
   .use(Vue3Marquee)
   .mount('#app');
-  
-

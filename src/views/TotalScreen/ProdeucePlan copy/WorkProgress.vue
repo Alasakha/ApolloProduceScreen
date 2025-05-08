@@ -39,7 +39,7 @@ const processData = (data) => {
     axisData: data.map(item => item.gd), // 工单号
     seriesData: data.map(item => item.doneRate) // 进度
   };
-
+  console.log(chartData.value);
 };
 
 // 请求数据
@@ -76,7 +76,7 @@ const initChart = () => {
       }
     },
     grid: {
-      left: '2%',
+      left: '6%',
       right: '4%',
       bottom: '5%',
       top: '10%',
@@ -90,9 +90,10 @@ const initChart = () => {
     type: 'category',
     data: chartData.value.axisData,
     axisLabel: {
-      interval: 0,  // 显示所有标签
-      rotate: 0,   // 标签不倾斜
-      color: 'white' // 设置字体颜色为白色
+      interval: 0,   // 显示所有标签
+      color: 'white', // 设置字体颜色为白色
+      align: 'right', // 设置标签的水平对齐方式
+      verticalAlign: 'middle', // 设置标签的垂直对齐方式
     },
     inverse: true,
     min: 0  // 设置 yAxis 的最小值为 0，确保 Y 轴标签不会被遮挡
@@ -117,15 +118,13 @@ const initChart = () => {
       type: 'bar',
       color: '#4CAF50',  // 设置柱状图颜色
 
-        label: {  
-          show: true,
-          position: 'insideLeft',
-          formatter: '{c}%' , // 显示百分比
-          valueAnimation: true,
-          color: 'white' // 设置标签字体颜色为白色
-        },
-
-      
+      label: {
+        show: true,
+        position: 'insideLeft',
+        formatter: '{c}%' , // 显示百分比
+        valueAnimation: true,
+        color: 'white' // 设置标签字体颜色为白色
+      },
     }
   ],
   animationDuration: 0,

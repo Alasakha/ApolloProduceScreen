@@ -1,173 +1,85 @@
 <template>
-  <dv-border-box-9 class="box1">
-    <div class="wrapper">
-      <h2>当日生产异常统计</h2>
-      
-      <!-- 如果正在加载，显示 loading -->
-      <div v-if="isLoading" class="loading-container">
-        <dv-loading>Loading...</dv-loading>
+  
+  <dv-border-box-9 class="box1 w-full h-full">
+    <div class="wrapper flex flex-col h-full">
+     <h2>工单异常</h2>
+          
+     <!-- 如果没有数据，显示暂无数据 -->
+     <div v-if="!isLoading && isDataEmpty" class="empty-container">
+       暂无数据
+     </div>
+     
+     <!-- 数据加载完成且非空时显示图表 -->
+      <div class="tablebox w-full h-[90%]">
+         <!-- 如果正在加载，显示 loading -->
+       <dv-loading v-if="isLoading">Loading...</dv-loading>
+
+        <dv-scroll-board v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
       </div>
-      
-      <!-- 数据加载完成且非空时显示图表 -->
-      <div v-show="!isLoading" ref="dailyIndicators" class="charts" style="margin-top: 5vh;"></div>
     </div>
   </dv-border-box-9>
+
+  <!-- 弹窗部分 -->
+<el-dialog v-model="dialogVisible" title="详细信息" width="50%">
+  <div v-for="(label, index) in config.header" :key="index" class="mb-2" :z-index="99999999">
+    <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
+  </div>
+</el-dialog>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
 import * as echarts from 'echarts';
-import { getabnormalProductionDaliyInfo } from '@/api/getProduceinfo';
+import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
-import { formatPieChartData } from '@/utils/map';
 import { eventBus } from '@/utils/eventbus';
-import { getColorByType } from '@/utils/color';
+const dialogVisible = ref(false);//弹窗控制
+const selectedItem = ref({});
 const route = useRoute();
-const prodLine = route.query.prodLine; // 通过 query 获取参数
-const dailyIndicators = ref(null);  
-// Loading 和 数据为空的状态
+const prodLine = route.query.prodLine;
+const monthlyIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
+const categories = ref([]); // X 轴数据
+const values = ref([]); // Y 轴数据
+let chartInstance = null;
+const config = reactive({
+  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','责任部门'],
+  data: [
+    ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+  ],
+  index: true,
+  columnWidth: [50,100,170,170,250,100,110,100,220],
+  align: ['center','center','center','center','center','center','center','center'],
+  rowNum:7
+})
 
-// 模拟数据
-// const mockAbnormalData = [
-//   {
-//     guZhangTypeName: '缺料异常',
-//     guZhangTypeCount: 9,
-//     guZhangTypeDuration: 120, // 持续时间：分钟
-//     percent: '40.9%',
-//   },
-//   {
-//     guZhangTypeName: '质量异常',
-//     guZhangTypeCount: 13,
-//     guZhangTypeDuration: 180,
-//     percent: '59.1%',
-//   },
-//   {
-//     guZhangTypeName: '设备故障',
-//     guZhangTypeCount: 5,
-//     guZhangTypeDuration: 95,
-//     percent: '30.0%',
-//   },
-//   {
-//     guZhangTypeName: '人员操作',
-//     guZhangTypeCount: 4,
-//     guZhangTypeDuration: 80,
-//     percent: '20.0%',
-//   },
-// ];
-
-
-
-
-
-const drawDailyIndicators = (formattedData) => {
-  const dailyIndicatorsElement = echarts.init(dailyIndicators.value);
-  const option = {
-    tooltip: {
-      trigger: 'item',
-      formatter: (params) => {
-        const { name, value, percent, data } = params;
-        return `${name}<br/>数量：${value} 次<br/>占比：${percent}%<br/>时长：${data.duration || 0} 分钟`;
-      }
-    },
-    legend: {
-      top: '0%',
-      left: 'center',
-      itemGap: 20,
-      textStyle: {
-        color: '#fff',
-        fontSize: 13,
-      },
-      itemWidth: 15,
-      itemHeight: 10
-    },
-    series: [
-      {
-        name: '本日生产异常数量',
-        type: 'pie',
-        radius: ['40%', '70%'],
-        avoidLabelOverlap: false,
-        padAngle: 5,
-        itemStyle: {
-          borderRadius: 10
-        },
-        label: {
-          show: true,
-          position: 'outside',
-          formatter: (params) => {
-            const duration = params.data.duration || 0;
-            return `${params.name}: ${params.value}次\n(${duration}分钟)`;
-          },
-          fontSize: 12,
-          color: '#fff'
-        },
-        emphasis: {
-          label: {
-            show: true,
-            fontSize: 10,
-            fontWeight: 'bold'
-          }
-        },
-        labelLine: {
-          show: true,
-          length: 8,
-          length2: 4,
-          lineStyle: {
-            color: '#fff',
-            width: 1,
-            type: 'solid'
-          }
-        },
-        data: formattedData
-      }
-    ]
-  };
-
-  dailyIndicatorsElement.setOption(option);
-};
-
-const processData = (data) => {
-  let formattedData = formatPieChartData(data, 'guZhangTypeName', 'guZhangTypeCount');
-  if (formattedData.length === 0) {
-    isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
-    formattedData = [{ value: 0, name: '暂无异常', itemStyle: { color: '#009966' } }]; // 设置一个绿色的数据点
-  } else {
-    isDataEmpty.value = false;
-  }
-
-   // 为每个数据项设置颜色
-   formattedData.forEach(item => {
-  item.itemStyle = {
-    color: getColorByType(item.name)
-  };
-  // 增加 duration 数据到 item 中，方便 label 使用
-  const matched = data.find(d => d.guZhangTypeName === item.name);
-  if (matched) {
-    item.duration = matched.guZhangTypeDuration; // 添加 duration 字段
-  }
-});
-
-  nextTick(() => {
-    if (dailyIndicators.value) {
-      drawDailyIndicators(formattedData);
-    } else {
-    }
-  });
-};
 
 const fetchData = () => {
-  getabnormalProductionDaliyInfo(prodLine)
-    .then(res => {
-      isLoading.value = false;   // 加载完成，关闭 loading 状态
-      processData(res.data);  // 处理数据
+  fetchClosingRateData(prodLine)
+    .then((res) => {
+      if (res && res.length > 0) {
+        config.data = res.map(item => [
+          '未完工',
+          item.number ?? '无',
+          item.workNo ?? '无',
+          item.specifications ?? '无',
+          Number(item.productionQuantity) ?? '无',
+          item.dateTime  ?? '无',
+          Number(item.productionQuantity)-Number(item.inboundQuantity),
+          item.workCenter ??'无'
+        ])
+        isDataEmpty.value = false;
+      } 
     })
-    .catch(() => {
-      isLoading.value = false;
-      isDataEmpty.value = true;  // 如果请求失败，设置为空数据状态
-      processData([]); // 处理空数据
+    .catch((error) => {
+      console.error('Error fetching data:', error);  // 错误回调
+      isDataEmpty.value = true; // 如果发生错误，显示暂无数据
+    })
+    .finally(() => {
+      isLoading.value = false;  // 无论成功失败，都结束加载
     });
-}
+};
 
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
@@ -175,17 +87,21 @@ onMounted(() => {
   eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
-// 清理定时器，避免组件卸载后定时器继续执行
-onBeforeUnmount(() => {
-  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-});
+  // 清理定时器，避免组件卸载后定时器继续执行
+  onBeforeUnmount(() => {
+    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+  });
+
+
+  const clickHandler = (row) => {
+  selectedItem.value = row.row; // 直接保存整行
+  dialogVisible.value = true;
+};
 </script>
+
 
 <style scoped>
 .box1 {
-  position: relative;
-  width: 35%;
-  height: 85%;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -195,7 +111,6 @@ onBeforeUnmount(() => {
 }
 
 h2 {
-  position: absolute;
   top: 0.5vh;
   left: 1vw;
   margin: 0;
@@ -204,31 +119,7 @@ h2 {
   margin-bottom: 10px;
 }
 
-.wrapper {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-direction: column; /* 让 h2 和图表上下排列 */
-  align-items: center;
-  justify-content: center; /* 居中饼图 */
-}
 
-.wrapper div {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
 
-.loading-container,
-.empty-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  width: 100%;
-  height: 100%; 
-  font-size: 2vw; 
-  letter-spacing: 0.2vw;
-}
 </style>
+ 

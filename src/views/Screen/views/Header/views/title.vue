@@ -1,16 +1,8 @@
-<template>
-  <div class="container">
-    <div class="title title-main">{{ decideName(prodLine) }}线管理看板</div>
-    <!-- 次要标题 -->
-    <div class="title title-sub">本月生产计划总数：<span style="color:rgb(4, 248, 250)">{{ cumulativePassRate.plan }}</span></div> 
-  </div>
-</template> 
-
-<script setup>  
+<script setup>
 import { ref, onMounted ,onBeforeUnmount} from 'vue';
 import { useRoute } from 'vue-router';
-import { eventBus } from '../../../utils/eventbus';
-import { getMonthTotalInfo } from '../../../api/getProduceinfo';
+import { eventBus } from '@/utils/eventbus';
+import { getMonthTotalInfo } from '@/api/getProduceinfo';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数
@@ -53,32 +45,30 @@ const decideName = (prodLine) => {
   }).catch(() => {
     });
   }
+
 </script>
 
-<style scoped>
-.container {
-  display: flex;
-  flex-direction: column; /* 纵向排列 */  
-  align-items: center; /* 默认左对齐，你也可以选择 center 来居中对齐 */
-  justify-content: center; /* 垂直居中 */
-}
+<template>
+  <div class="flex flex-col">
+    <div class="title title-main flex justify-center items-center">{{ decideName(prodLine) }}线管理看板</div>
+<!-- 次要标题 -->
+<div class="title title-sub flex justify-center items-center">本月生产计划总数：<span style="color:rgb(4, 248, 250)">{{ cumulativePassRate.plan }}</span></div> 
+  </div>
+</template>
 
+<style scoped>
 .title {
-  margin-bottom: 10px; /* 控制行与行之间的间距 */
   font-size: 1.5vw;
   color: white;
 }
 
 .title-main {
-  font-size: 3vw; /* 设置标题行的字体更大 */
+  font-size: 2vw; /* 设置标题行的字体更大 */
   font-weight: bold; /* 设置标题为加粗 */
   letter-spacing: 0.5vw ; /* 增加字间距 */
-  font-family:'Microsoft YaHei';
 }
-
 .title-sub{
-  margin-top: 1vh;
-  font-size: 2vw;
+  font-size: 1.5vw;
   color: aliceblue;
   letter-spacing: 0.2vw;
 }

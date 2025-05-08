@@ -68,3 +68,34 @@ export const getMaintenanceInfo = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }
+
+//当日人时效率
+// /production/efficiencyToday
+export const getEfficiencyToday = (prodLine) => {
+  return request({
+    url: '/production/efficiencyToday',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}
+
+// /production/abnormalList
+export const getAbnormalList = (prodLine) => {
+  return request({
+    url: '/production/abnormalList',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}
+
+// 修改请求方式，使用 form-data 格式
+export const getAbnormalUnfinishedList = (formData) => {
+  return request({
+    url: '/production/abnormalUnfinishedList', // 请求的 URL
+    method: 'post',
+    data: formData,  // 直接将 formData 作为请求体
+    headers: {
+      'Content-Type': 'multipart/form-data', // 明确设置为 form-data 格式
+    }
+  })
+}

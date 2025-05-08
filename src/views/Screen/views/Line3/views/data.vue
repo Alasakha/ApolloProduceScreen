@@ -1,0 +1,112 @@
+<template>
+    <div class="data w-[25%]">
+        <dv-border-box12>
+            <div class="box1"> 
+    <div class="w-full h-full">
+        <div ref="qualityIndicators" class="chart-container w-full h-[90%]"></div>
+        <dv-button class="w-30 pl-4"  :bg="false" @click="dialogTableVisible = true">详细数据</dv-button>
+      </div>
+  </div>
+        </dv-border-box12>
+    </div>
+    
+<!-- 弹窗 -->
+    <TableDialog
+    v-model="dialogTableVisible"
+    :title= title
+    width="800px"
+    :tableData="gridData"
+    :columns="gridColumns"
+  />
+  </template>
+  
+  <script setup>
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
+import { getResponsityRank } from '@/api/getQuiltyinfo';
+import { useRoute } from 'vue-router';
+import { eventBus } from '@/utils/eventbus';
+import { formatPieChartData } from '@/utils/map';
+import TableDialog from '../components/dialog.vue';
+import { createChartOption } from './data.ts';
+import { useEcharts } from '@/utils/useEcharts'; // 引入封装
+
+const dialogTableVisible = ref(false);
+const title = '今日功性能不良';
+const reasonType = 1;
+
+const qualityIndicators = ref(null);
+const rawData = ref([]);
+const isLoading = ref(true);
+const isDataEmpty = ref(false);
+const route = useRoute();
+const prodLine = route.query.prodLine;
+
+const { initChart, setOption, resizeChart } = useEcharts(qualityIndicators); // 使用封装的逻辑
+
+const gridData = ref([]);
+const gridColumns = [
+  { prop: 'ngName', label: '不良问题' },
+  { prop: 'total', label: '数量' },
+];
+
+const fetchData = () => {
+  getResponsityRank(prodLine, reasonType)
+    .then(res => {
+      gridData.value = res.data;
+      isLoading.value = false;
+      processData(res.data);
+    })
+    .catch(() => {
+      isLoading.value = false;
+      isDataEmpty.value = true;
+    });
+};
+
+const processData = (data) => {
+  const formatted = formatPieChartData(data, 'ngName', 'total');
+  rawData.value = formatted.map(item => ({
+    name: item.name || '未知',
+    value: item.value ? parseInt(item.value, 10) : 0
+  }));
+  isDataEmpty.value = rawData.value.length === 0;
+};
+
+watch(rawData, () => {
+  nextTick(() => {
+    initChart();
+    const option = createChartOption(title, rawData.value);
+    setOption(option);
+  });
+}, { deep: true, immediate: true });
+
+onMounted(() => {
+  fetchData();
+  eventBus.on("refreshData", fetchData);
+});
+
+onBeforeUnmount(() => {
+  eventBus.off("refreshData", fetchData); // 避免内存泄漏
+});
+  </script>
+  
+  
+  <style scoped>
+  .box1{
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    height: 100%;
+    align-items: center;
+    justify-content: start;
+    color:aliceblue;
+
+  }
+  h1{
+    font-size: 1.5vw;
+    color:aliceblue;
+    letter-spacing: 0.5vw;
+  }
+  :deep(.inside-column) {
+  height: 2vh !important; /* 这里改成你想要的宽度 */
+}
+</style>
