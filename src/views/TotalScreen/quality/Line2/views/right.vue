@@ -1,16 +1,15 @@
 <template>
-    <div class="data w-[25%]">
-        <dv-border-box12>
-            <div class="box1"> 
-          <div class="w-full h-full">
-              <div ref="qualityIndicators" class="chart-container w-full h-[90%]"></div>
-              <dv-button class="w-30 pl-4"  :bg="false" @click="() => opendialog(prodLine)">详细数据</dv-button>
+    <dv-border-box10>
+        <div class="box1"> 
+            <div class="w-full h-full">
+                <div ref="qualityIndicators" class="chart-container w-full h-[90%]"></div>
+                <dv-button class="w-30 pl-4"  :bg="false" @click="() => opendialog(prodLine)">详细数据</dv-button>
             </div>
         </div>
-        </dv-border-box12>
-    </div>
-    
-<!-- 弹窗 -->
+    </dv-border-box10>
+    <!-- getAtopDayInspector -->
+
+     <!-- 弹窗 -->
     <TableDialog
     v-model="dialogTableVisible"
     :title= title
@@ -18,21 +17,22 @@
     :tableData="gridData"
     :columns="gridColumns"
   />
-  </template>
-  
-  <script setup>
+</template>
+
+
+<script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { getResponsityRank,getAbnormalDetail } from '@/api/getQuiltyinfo';
+import { getAtopDayInspector,getAbnormalDetail } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
-import { createChartOption } from './data.ts';
+import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = '今日功性能不良';
-const reasonType = 1;
+const title = '今日其他类责任';
+const reasonType = 2;
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
@@ -46,7 +46,7 @@ const { initChart, setOption, resizeChart } = useEcharts(qualityIndicators); // 
 const gridData = ref([]);
 const gridColumns = [
   { prop: 'ngName', label: '不良问题' },
-  { prop: 'createDate', label: '发现时间' },
+  { prop: 'createDate', label: '发行时间' },
   { prop: 'ta002', label: '工单单号' },
   { prop: 'ta006', label: '品号' },
   { prop: 'mb002', label: '车型' },
@@ -66,7 +66,7 @@ const opendialog = (prodLine) => {
 
 
 const fetchData = () => {
-  getResponsityRank(prodLine, reasonType)
+    getAtopDayInspector(prodLine, reasonType)
     .then(res => {
       
       isLoading.value = false;
@@ -75,11 +75,11 @@ const fetchData = () => {
     .catch(() => {
       isLoading.value = false;
       isDataEmpty.value = true;
-    });
+    });     
 };
 
 const processData = (data) => {
-  const formatted = formatPieChartData(data, 'ngName', 'total');
+  const formatted = formatPieChartData(data, 'peopleName', 'total');
   rawData.value = formatted.map(item => ({
     name: item.name || '未知',
     value: item.value ? parseInt(item.value, 10) : 0
@@ -97,6 +97,7 @@ watch(rawData, () => {
 
 onMounted(() => {
   fetchData();
+  resizeChart()
   eventBus.on("refreshData", fetchData);
 });
 
@@ -126,3 +127,5 @@ onBeforeUnmount(() => {
   height: 2vh !important; /* 这里改成你想要的宽度 */
 }
 </style>
+
+

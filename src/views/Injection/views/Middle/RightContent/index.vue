@@ -1,16 +1,16 @@
 <template>
-  <div class="grid grid-rows-2 gap-4 h-full">
+  <div class="grid  h-full">
 
         <!-- 点检统计分析 -->
-        <DashboardCard class="flex-1">
-      <template #title>停机时长统计</template>
+        <DashboardCard class="flex-1 h-full">
+      <template #title>关键参数监控</template>
       <Statistic/>
     </DashboardCard>
        <!-- 设备状态 -->
-       <DashboardCard class="flex-1">
+       <!-- <DashboardCard class="flex-1">
       <template #title>当日异常次数和占比</template>
       <div><Category/></div>
-    </DashboardCard>
+    </DashboardCard> -->
 
 
  

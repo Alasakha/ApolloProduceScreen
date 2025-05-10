@@ -45,18 +45,13 @@
           />  -->
         <DataCard title="今日计划" :value="TodayData?.pcTotal ?? '无数据'" /> 
         <DataCard title="今日已完成数"  :value=" TodayData?.done ?? '无数据'"  />
-        <DataCard  
-          title="待生产数" 
-          :value="TodayData?.unProduce ??  '无数据'" 
-          /> 
-        <DataCard title="今日达成率"    
-        :value="TodayData?.rate ??  '无数据'"></DataCard>
+        <DataCard title="待生产数" :value="TodayData?.unProduce ??  '无数据'" /> 
+        <DataCard title="今日达成率" :value="formatPercent(TodayData?.rate) ??  '无数据'"></DataCard>
       </div>
       <div class="row flex-1 flex gap-[3vw] justify-around">
         <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'" /> 
         <DataCard title="今日合格数"  :value=" passedInfo?.passTotal ?? '无数据'"  />
-        <DataCard title="今日直通率" 
-        :value="formatPercent(passedInfo?.passPercent)"/>
+        <DataCard title="今日直通率" :value="formatPercent(passedInfo?.passPercent)  ?? '无数据'"/>
       </div>
       <!-- <div class="production-data">
         <div class="row" >
@@ -93,7 +88,7 @@
   
 
   <script setup>
-  import { ref, onMounted,onBeforeUnmount } from 'vue';
+  import { ref, onMounted,onBeforeUnmount ,nextTick } from 'vue';
   import DataCard from "@/components/DataCard.vue"; // 导入封装组件
   import { getMonthTotalInfo ,getTodayProductionInfo,getEfficiencyInfo,} from '@/api/getProduceinfo';
   import { getPaassedInfo } from '@/api/getQuiltyinfo';
@@ -136,6 +131,11 @@
   // 在组件挂载时启动定时获取数据
   onMounted(() => {
     fetchData(); // 组件挂载时先请求一次
+    nextTick(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 100); // 延迟一点点，确保 DOM 全挂载完成
+  });
     eventBus.on("refreshData", fetchData); // 监听全局刷新事件
   });
   

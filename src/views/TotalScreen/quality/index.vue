@@ -1,51 +1,25 @@
-<template>
+/<template>
   <dv-full-screen-container>
     <body>
 
     <dv-border-box11 :titleWidth=350 title="浙江阿波罗运动科技股份有限公司">
       <div class="box">
-          <div class="box-content">
-            <!-- 左侧部分：包含时间、标题和数据展示 -->
-            <div class="left-content">
-              <!-- 上方时间和标题 -->
-              <div class="top-row">
-                <div class="time-section">
-                  <CurrentTime></CurrentTime>
-                </div>
-                  <div class="logo">
-                  <img src="@/assets/APOLLO.png" class="mb-4" alt="">
-                </div>
-                
-                <div class="title-section">
-                  <HeaderCenter></HeaderCenter>
-                </div>
-              </div>
-              <!-- 下方数据展示 -->
-              <div class="data-section">
-                <Data></Data>
-              </div>
-            </div>
-            
-            <!-- 右侧排行榜：跨越整个高度 -->
-            <div class="ranking-section">
-              <QualificationRanking></QualificationRanking>
-            </div>
-          </div>
-            <Charts></Charts>
+        <Header></Header>
+        <Line2></Line2>
+        <Line3></Line3>
       </div>
 
     </dv-border-box11>
           
-  </body>
+  </body> 
   </dv-full-screen-container>
 </template>
 
 <script setup>
-import CurrentTime from './views/Currenttime.vue'
-import HeaderCenter from './views/HeaderCenter.vue'
-import QualificationRanking from './views/QualificationRanking.vue'
-import Data from './views/Data.vue'
-import Charts from './views/charts/index.vue'
+import Header from './Header/index.vue'
+import Line2 from './Line2/index.vue'
+import Line3 from './Line3/index.vue'
+
 
 </script>
 

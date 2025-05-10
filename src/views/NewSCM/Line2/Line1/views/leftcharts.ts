@@ -8,20 +8,14 @@ export function createChartOption(data) {
         trigger: 'item',
         formatter: '{b}: {c} ({d}%)'
       },
-      legend: {
-        top: '5%',
-        left: 'center',
-        textStyle: {
-          color: '#fff'
-        }
-      },
+      legend: undefined, // 或直接删除整个 legend 配置
       
       series: [
         {
           name: '来源',
           type: 'pie',
           radius: ['40%', '70%'],
-          center: ['50%', '95%'],
+          center: ['50%', '80%'], // 居中
           startAngle: 180,
           endAngle: 360,
           itemStyle: {

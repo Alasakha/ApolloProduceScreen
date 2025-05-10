@@ -53,3 +53,17 @@ export const getplanAchievementRateToday = () => {
     method: 'get',
   })
 }
+
+export const getInvokeDeviceList = () => {
+  return request({
+    url: '/injection/invokeDeviceList',
+    method: 'get',
+  })
+}
+
+export const getrawMaterialMonitoring = () => {
+  return request({
+    url: '/injection/rawMaterialMonitoring',
+    method: 'get',
+  })
+}

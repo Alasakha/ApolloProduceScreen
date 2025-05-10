@@ -32,21 +32,19 @@ const isDataEmpty = ref(false);
 const { initChart, setOption, resizeChart } = useEcharts(stopIndicators); // 使用封装的逻辑
 const store = useDeviceStatusStore();
 
-const shutdown = computed(() => store.data['故障数'] || 0);
+const shutdown = computed(() => store.data['关机'] || 0);
 const max  = computed(() => store.data['总数'] || 0);
-
 
 
 watch(() => store.data, (val) => {
   if (val && Object.keys(val).length > 0) {
     nextTick(() => {
       initChart();
-      const option = createChartOption(shutdown.value, max.value, 'red');
+      const option = createChartOption(shutdown.value, max.value, 'rgb(169,169,169)');
       setOption(option);
     });
   }
 }, { deep: true, immediate: true });
-
 
 // 组件挂载时初始化图表
 onMounted(() => {

@@ -22,109 +22,151 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick } from 'vue';
+import { ref, onMounted, watch, nextTick ,onBeforeUnmount} from 'vue';
+import * as echarts from 'echarts';
 import { getColumnarHourInfo } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
-import { useEcharts } from '@/composables/useEcharts';
+import { eventBus } from '@/utils/eventbus';
 
 const route = useRoute();
 const prodLine = route.query.prodLine;
+const monthlyIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
+const categories = ref([]); // X 轴数据
+const values = ref([]); // Y 轴数据
+let chartInstance = null;
 
-const monthlyIndicators = ref(null);
-const categories = ref([]);
-const values = ref([]);
+// 处理数据
+const processData = (data) => {
 
-const { initChart, setOption } = useEcharts(monthlyIndicators);
+  if (Object.keys(data).length === 0) { // 修正数据为空的判断
+    isDataEmpty.value = true;
+  } else {
+    isDataEmpty.value = false;
+    categories.value = Object.keys(data); // X 轴
+    values.value = Object.values(data);  // Y 轴
+  }
+};
 
-const drawChart = () => {
+// 初始化 ECharts
+const drawhourlyIndicators = () => {
+  if (!monthlyIndicators.value) return;
+  chartInstance = echarts.init(monthlyIndicators.value);
+  updateChart();
+};
+
+// 更新 ECharts 数据
+const updateChart = () => {
+  if (!chartInstance) return;
+
   const option = {
     xAxis: {
       type: 'category',
       data: categories.value,
       axisLabel: {
-        interval: 0,
-        color: '#fff',
-        fontSize: 12
+        interval: 0, // 显示所有标签
+        color:'#fff',
+        fontSize: 12,
       },
-      name: '时间 (小时)',
-      nameLocation: 'middle',
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      }
+      name: '时间 (小时)', // 设置 X 轴的总单位
+    nameLocation: 'middle', // 设置单位的位置在 X 轴末尾
+    nameTextStyle: {
+      color: '#fff', // 设置单位文字颜色
+      fontSize: 10,  // 设置单位文字大小
+      padding: [15, 0, 0, 0] // 调整单位文字的间距
+    },
     },
     yAxis: {
-      type: 'value',
+      type: 'value', 
       axisLabel: {
-        color: '#fff',
-        fontSize: 15
+        color:'#fff',
+        fontSize: 15,
       },
+
       lineStyle: {
-        color: '#33ccff',
-        width: 20,
-        type: 'dashed'
-      }
+      color: '#33ccff', // 设置横线颜色（红色）
+      width: 20, // 线条宽度
+      type: 'dashed' // 线条样式：'solid'（实线）, 'dashed'（虚线）, 'dotted'（点线）
+    }
     },
     series: [
       {
         data: values.value,
         type: 'bar',
         itemStyle: {
-          color: '#3498db'
-        },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#fff',
-          fontSize: 14,
-          fontWeight: 'bold'
-        }
+      color: '#3498db', // 修改柱子颜色
+    },
+    label: {
+        show: true, // 显示标签
+        position: 'top', // 标签显示的位置（可以是 'top', 'inside', 'insideTop', 'insideBottom' 等）
+        color: '#fff', // 标签文字颜色
+        fontSize: 14, // 字体大小
+        fontWeight: 'bold' // 字体加粗
+      },
+      // markLine: {
+      //     data: [
+      //       {
+      //         type: 'average', // 计算平均值  
+      //         name: '平均值',
+      //       },
+      //     ],
+      //     lineStyle: {
+      //       color: '#f5f598',
+      //       type: 'dashed', // 虚线样式
+      //     },
+      //     label: {
+      //       show: true,
+      //       position: 'end', // 标签显示在线的末端
+      //       formatter: '平均值: {c}', // 显示平均值
+      //       color: '#f5f598', // 标签文字颜色
+      //       fontSize: 12,
+      //     },
+      //   },
       },
       {
         data: values.value,
         type: 'line',
         itemStyle: {
-          color: 'orange'
-        },
-        label: {
-          show: false
-        }
+      color: 'orange', // 修改柱子颜色
+    },
+    label: {
+        show: false, // 显示标签
+        position: 'top', // 标签显示的位置（可以是 'top', 'inside', 'insideTop', 'insideBottom' 等）
+        color: '#fff', // 标签文字颜色
+        fontSize: 14, // 字体大小
+        fontWeight: 'bold' // 字体加粗
+      }
       }
     ]
   };
 
-  setOption(option);
+  chartInstance.setOption(option);
 };
 
 const fetchData = () => {
   getColumnarHourInfo(prodLine)
     .then(res => {
       isLoading.value = false;
-      const data = res.data;
-      if (Object.keys(data).length === 0) {
-        isDataEmpty.value = true;
-      } else {
-        isDataEmpty.value = false;
-        categories.value = Object.keys(data);
-        values.value = Object.values(data);
-        nextTick(() => {
-          initChart();
-          drawChart();
-        });
-      }
+      processData(res.data);
+      nextTick(() => drawhourlyIndicators());
     })
     .catch(() => {
       isLoading.value = false;
       isDataEmpty.value = true;
     });
-};
+}
 
+// 在组件挂载时启动定时获取数据
 onMounted(() => {
-  fetchData();
+  fetchData(); // 组件挂载时先请求一次
+  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
+
+  // 清理定时器，避免组件卸载后定时器继续执行
+  onBeforeUnmount(() => {
+    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+  });
 </script>
 
 

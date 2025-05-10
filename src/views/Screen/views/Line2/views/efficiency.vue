@@ -56,6 +56,23 @@ import { useEcharts } from '@/utils/useEcharts';
 const config = reactive({
   value: 66,
 })
+const diffrentLine = (prodLine) => {
+  const prefix = prodLine.slice(0, 4); // 取前4位
+
+  switch (prefix) {
+    case '1004':
+      return 53;
+    case '2004':
+      return 27;
+    case '1005':
+      return 20;
+    case '2005':
+      return 13;
+    default:
+      return null; // 未匹配时返回 null 或默认值
+  }
+};
+
 
 const EfficentData = reactive({
   standardEfficiency: { value: 0 },
@@ -79,14 +96,14 @@ const chart2 = useEcharts(Indicators2);
 const drawChart = () => {
   const option1 = createGaugeOption({
     text: "配置人数",
-    data: EfficentData.clTotal,
-    max: EfficentData.clTotal
+    data: diffrentLine(prodLine),
+    max: diffrentLine(prodLine)
   });
 
   const option2 = createGaugeOption({
     text: "出勤人数",
     data: EfficentData.scanNum,
-    max: EfficentData.clTotal
+    max: diffrentLine(prodLine)
   });
 
   chart1.setOption(option1);

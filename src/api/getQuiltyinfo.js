@@ -71,4 +71,30 @@ export const getFivedayRate = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }  
-// getProductPassRateRank
+
+// 详细功性能详细内容
+export const getAbnormalDetail = (prodLine) => {
+  return request({
+    url: '/quality/abnormalDetail',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}  
+
+// 今日功性能不良
+export const getAtopDayInspector = (prodLine,reasonType ) => {
+  return request({
+    url: '/quality/topDayInspector',
+    method: 'get',
+    params: { prodLine,reasonType } // 传递 prodLine 参数
+  })
+}  
+
+// 来料检验及时率
+export const getIncomingInspection = (prodLine ) => {
+  return request({
+    url: '/quality/incomingInspection',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}  

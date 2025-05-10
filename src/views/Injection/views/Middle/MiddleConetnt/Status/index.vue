@@ -18,8 +18,14 @@
 
     <div class="flex flex-col justify-center items-center">
       <Stop></Stop>
-      <h2 class="text-xl text-cyan-300">闲置数量</h2>
+      <h2 class="text-xl text-cyan-300">待机</h2>
     </div>
+
+        <div class="flex flex-col justify-center items-center">
+      <Guanji></Guanji>
+      <h2 class="text-xl text-cyan-300">关机</h2>
+    </div>
+
   </div>
 
 
@@ -30,6 +36,7 @@ import Total from './total.vue';
 import Stop from './stop.vue'
 import Bad from './bad.vue'
 import Run from './run.vue'
+import Guanji from './guanji.vue'
 </script>   
 
 
