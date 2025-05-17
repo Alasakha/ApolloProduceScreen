@@ -10,7 +10,7 @@ export function createChartOption({
   value2: number[]
 }) {
   return {
-    grid:{bottom:30},
+    grid:{bottom:30,},
     title: {
     show: category.length == 0,   // 没数据才显示
     extStyle: {

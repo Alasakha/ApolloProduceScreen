@@ -14,14 +14,7 @@
 
         <!-- 走马灯第 1 组：前 5 个 -->
           <div class="small  h-[30vh] flex items-center gap-4 flex flex-wrap pl-4 ">
-            <button
-              v-for="line in getRange(0, 5)"
-              :key="line.id"
-              class="custom-btn btn-5 "
-              @click="selectLine(line)"
-            >
-              {{ line.name }}
-            </button>
+
 
         <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
      

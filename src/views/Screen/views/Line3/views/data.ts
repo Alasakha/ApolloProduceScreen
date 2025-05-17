@@ -37,7 +37,7 @@ export function createChartOption(title: string, rawData: any) {
       },
       legend: {
         orient: 'horizontal',
-        top: '10%',
+        bottom: '0%',
         left: 'center',
         textStyle: {
           color: '#ffffff',

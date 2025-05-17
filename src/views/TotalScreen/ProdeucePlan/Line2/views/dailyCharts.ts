@@ -1,3 +1,5 @@
+
+const size = window.devicePixelRatio ;
 export function createChartOption({
   category,
   value1 = [],
@@ -7,36 +9,32 @@ export function createChartOption({
   value1?: number[],
   value2: number[]
 }) {
-  const upperSeries: number[] = [];
-  const lowerSeries: number[] = [];
-  const upperLabel: string[] = [];
-  const lowerLabel: string[] = [];
-
-  const planColor = '#00BFFF'; // 实际产能：天蓝
-  const  actualColor= '#32CD32';   // 计划产能：浅绿
-
-  value1.forEach((v1, i) => {
-    const v2 = value2[i] ?? 0;
-    if (v1 <= v2) {
-      upperSeries.push(v1);
-      lowerSeries.push(v2);
-      upperLabel.push('实际产能');
-      lowerLabel.push('计划产能');
-    } else {
-      upperSeries.push(v2);
-      lowerSeries.push(v1);
-      upperLabel.push('计划产能');
-      lowerLabel.push('实际产能');
-    }
-  });
-
   return {
+    grid:{bottom:30,top:30},
+    title: {
+    show: category.length == 0,   // 没数据才显示
+    extStyle: {
+        color: "grey",
+        fontSize: 20
+    },
+    text: "暂无数据",
+    left: "center",
+    top: "center"
+},
     tooltip: {
       trigger: 'axis'
     },
     legend: {
-      data: ['实际产能', '计划产能'],
-      textStyle: { color: '#fff' }
+      orient: 'horizontal',       // 图例的排列方向：'horizontal'（水平）或 'vertical'（垂直）
+      top: '2%',                 // 距离容器顶部位置，也可用 'top', 'bottom', 'center'，或具体数值如 '50px'
+      left: 'center',             // 水平位置：'left', 'center', 'right' 或数值（如 '20%'）
+      itemGap: 20,                // 图例项之间的间距，单位是像素
+ // 图例内边距：上、右、下、左
+      textStyle: {
+        color: '#fff',
+        fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12            // 图例文字颜色
+      },
+      data: ['计划产能', '实际产能']
     },
     xAxis: {
       type: 'category',
@@ -44,62 +42,68 @@ export function createChartOption({
       axisLabel: {
         interval: 0,
         color: '#fff',
-        fontSize: 12
+        fontSize: size>=2 ? 5   :size>=1.5? 7 : 12,
       },
       name: '时间 (小时)',
       nameLocation: 'middle',
       nameTextStyle: {
         color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
+        fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12,
+        padding: [1, 0, 0, 0]
       }
     },
     yAxis: {
       type: 'value',
       axisLabel: {
         color: '#fff',
-        fontSize: 15
+        fontSize: size>=2 ? 5   :size>=1.5? 7 : 12,
       },
-      lineStyle: {
-        color: '#33ccff',
-        width: 20,
-        type: 'dashed'
+      splitLine: {
+        lineStyle: {
+          color: '#33ccff',
+          type: 'dashed'
+        }
       }
     },
     series: [
       {
         name: '计划产能',
-        type: 'bar',
-        data: lowerSeries,
-        barWidth: '40%',
-        barGap: '-100%',
+        type: 'line',
+        data: value1,
+        barWidth: '30%',
         itemStyle: {
-          color: (params) =>
-            lowerLabel[params.dataIndex] === '实际产能' ? actualColor : planColor
+          color: 'orange'
         },
         label: {
           show: true,
           position: 'top',
-          color: '#fff'
-        },
-        z: 2
+         
+          color: 'orange',
+          fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
+        }
       },
       {
         name: '实际产能',
         type: 'bar',
-        data: upperSeries,
-        barWidth: '40%',
+        data: value2,
+        barWidth: '30%',
         itemStyle: {
-          color: (params) =>
-            upperLabel[params.dataIndex] === '实际产能' ? actualColor : planColor
+          color: '#3A5FCD'
         },
         label: {
           show: true,
-          position: 'top',
-          color: '#fff'
-        },
-        z: 3
-      }
+          position: 'insideBottom',
+           offset: [0, -10], // [水平偏移, 垂直偏移] 
+          color: '#fff',
+          fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
+        }
+      },
+      // {
+      //   name: '实际产能',
+      //   type: 'line',
+      //   data: value2,
+      //    color: '#fff'
+      // }
     ]
   };
 }
