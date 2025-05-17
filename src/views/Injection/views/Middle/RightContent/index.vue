@@ -20,6 +20,6 @@
 
 <script setup lang="ts">
 import DashboardCard from "@/components/DashboardCard.vue";
-import Category from './Category/index.vue'
+
 import Statistic from './Statistic/index.vue'
 </script>

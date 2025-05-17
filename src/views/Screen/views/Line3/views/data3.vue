@@ -2,8 +2,8 @@
     <div class="efficency w-[25%]">
       <dv-border-box12>
         <div class="w-full h-full">
-          <div ref="qualityIndicators" class="chart-container w-full  h-[90%]"></div>
-          <dv-button class="w-30 pl-4"  :bg="false" @click="dialogTableVisible = true">详细数据</dv-button>
+          <div ref="qualityIndicators" class="chart-container w-full  h-[80%]"></div>
+          <dv-button class="w-[11vw] pl-4"  :color="'#23a7dc'" :bg="false" @click="() => opendialog(prodLine)">详细数据</dv-button>
         </div>
         </dv-border-box12>
     </div>
@@ -20,7 +20,7 @@
   
   <script setup>
   import { ref, onMounted, onBeforeUnmount, reactive, computed,watch,nextTick } from 'vue';
-  import { getResponsityRank } from '@/api/getQuiltyinfo';
+  import { getResponsityRank ,getAbnormalDetail} from '@/api/getQuiltyinfo';
   import { useRoute } from 'vue-router';
   import { eventBus } from '@/utils/eventbus';
   import { formatPieChartData } from '@/utils/map';
@@ -30,7 +30,9 @@
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
   const reasonType = 2
   const dialogTableVisible = ref(false)
-  const title = '今日其他功性能不良'
+
+  const title = ref('今日其他不良'); // 改为 ref
+
     const route = useRoute();
   const prodLine = route.query.prodLine;
   // Loading 和 数据为空的状态
@@ -40,14 +42,29 @@ import { useEcharts } from '@/utils/useEcharts'; // 引入封装
   const qualityIndicators = ref(null);
   const rawData = ref([]);
   
-  const { initChart, setOption, resizeChart } = useEcharts(qualityIndicators); // 使用封装的逻辑
-
+const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
   const gridData = ref([]);
 
-  const gridColumns = [
-    { prop: 'ngName', label: '不良问题',  },
-    { prop: 'total', label: '数量',  },
-  ]
+const gridColumns = [
+  { prop: 'ngName', label: '不良问题' },
+  { prop: 'createDate', label: '发现时间' },
+  { prop: 'ta002', label: '工单单号' },
+  { prop: 'ta006', label: '品号' },
+  { prop: 'mb002', label: '车型' },
+  { prop: 'peopleName', label: '发现人' },
+  { prop: 'admin_UNIT_NAME', label: '责任部门'},
+];
+
+
+
+const opendialog = () => {
+  dialogTableVisible.value = true;
+  getAbnormalDetail(prodLine,reasonType)
+    .then(res => {
+      gridData.value = res.data;
+    });
+};
+
   const fetchData = () => {
     getResponsityRank(prodLine, reasonType)
     .then(res => {
@@ -68,14 +85,23 @@ import { useEcharts } from '@/utils/useEcharts'; // 引入封装
   }));
 }
 
-  
+const handleChartClick = (params) => {
+  const clickedName = params.name;
+  title.value = `${clickedName} 的详细数据`;
+  dialogTableVisible.value = true;
 
+  getAbnormalDetail(prodLine, reasonType, clickedName) // 假设 API 接口第三个参数是问题名
+    .then(res => {
+      gridData.value = res.data;
+    });
+};
 
-  watch(rawData, () => {
+watch(rawData, () => {
   nextTick(() => {
     initChart();
-    const option = createChartOption(title, rawData.value);
+    const option = createChartOption(title.value, rawData.value);
     setOption(option);
+    onClick(handleChartClick); // ✅ 恢复点击事件绑定
   });
 }, { deep: true, immediate: true });
 

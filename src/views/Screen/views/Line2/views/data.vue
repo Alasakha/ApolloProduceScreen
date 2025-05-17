@@ -6,31 +6,24 @@
         <DataCard  
           title="月计划" 
           :value="MonthlyData?.plan ??  '无数据'" 
-          :backgroundcolor1="'#9333ea'"
-          :backgroundcolor2="'#a855f7'"
-          :color="'RGB(192,132,252)'"
           /> 
+                    <!-- :backgroundcolor1="'#9333ea'" 
+          :backgroundcolor2="'#a855f7'" -->
+          <!-- :color="'RGB(192,132,252)'" -->
           <DataCard  
           title="本月已完成数" 
           :value="MonthlyData?.done ??  '无数据'"
-          :backgroundcolor1="'#9333ea'"
-          :backgroundcolor2="'#a855f7'"
-          :color="'#c084fc'" 
           /> 
           <DataCard  
           title="待生产数" 
           :value="MonthlyData?.incomplete ??  '无数据'"
-          :backgroundcolor1="'#9333ea'"
-          :backgroundcolor2="'#a855f7'"
-          :color="'#c084fc'" 
+  
           /> 
           <DataCard  title="本月达成率" 
           :value="MonthlyData?.done != null && MonthlyData?.plan
          !=null ? ((MonthlyData.done / MonthlyData.plan) * 100).toFixed(0) + '%'
           : '无数据'"
-            :backgroundcolor1="'#9333ea'"
-          :backgroundcolor2="'#a855f7'"
-          :color="'#c084fc'"
+          
           />
       </div> 
       <div class="row flex-1 flex gap-[3vw] justify-around">
@@ -90,7 +83,7 @@
   <script setup>
   import { ref, onMounted,onBeforeUnmount ,nextTick } from 'vue';
   import DataCard from "@/components/DataCard.vue"; // 导入封装组件
-  import { getMonthTotalInfo ,getTodayProductionInfo,getEfficiencyInfo,} from '@/api/getProduceinfo';
+  import { getMonthTotalInfo ,getTodayProductionInfo,} from '@/api/getProduceinfo';
   import { getPaassedInfo } from '@/api/getQuiltyinfo';
   import { useRoute } from 'vue-router';
   import { eventBus } from '@/utils/eventbus';
@@ -117,9 +110,6 @@
     }),
     getTodayProductionInfo(prodLine).then(res => {
       TodayData.value = res.data
-    }),
-    getEfficiencyInfo(prodLine).then(res => {
-      KnowledgeEfficiencyData.value = res.data
     }),
     getPaassedInfo(prodLine).then(res => {
       passedInfo.value = res.data

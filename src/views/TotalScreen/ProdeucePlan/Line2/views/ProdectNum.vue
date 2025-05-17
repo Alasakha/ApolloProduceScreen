@@ -1,182 +1,96 @@
 <template>
   <dv-border-box-1 class="box1">
-        
-      <GlobalTitle title="当日小时产能"/>
-     
-     <!-- 如果正在加载，显示 loading -->
-     <div v-if="isLoading" class="loading-container w-full h-full">
-       <dv-loading>Loading...</dv-loading>
-     </div>
-     
+    <GlobalTitle title="当日小时产能" />
+    
 
+    <!-- 图表区域 -->
+   <div  ref="monthlyIndicators" class="w-full h-[90%]"></div>
 
-             <!-- 数据加载完成且非空时显示图表 -->
-      <div v-if="!isLoading" ref="monthlyIndicators" class="w-full h-[90%]"></div>
-
-
-
-    </dv-border-box-1>
+  </dv-border-box-1>
 </template>
 
-
 <script setup>
-import { ref, onMounted, nextTick,onBeforeUnmount,watch  } from 'vue';
-import { getColumnarHourInfo } from '@/api/getProduceinfo';
-import { getEfficiencyToday} from '@/api/getProduceinfo';
+import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
 import { useRoute } from 'vue-router';
+import { getColumnarHourInfo, getEfficiencyHour } from '@/api/getProduceinfo';
 import { useEcharts } from '@/utils/useEcharts';
 import { eventBus } from '@/utils/eventbus';
+import { createChartOption } from './dailyCharts';
+
 const route = useRoute();
 const prodLine = route.query.prodLine;
-const isLoading = ref(true);
-const isDataEmpty = ref(false);
-const standard = ref(0)
+
+
 const monthlyIndicators = ref(null);
 const categories = ref([]);
 const values = ref([]);
+const standard = ref([]);
 
+// 引入 echarts 封装逻辑
+const { initChart, setOption, resizeChart } = useEcharts(monthlyIndicators);
 
-
-const  diffrentLine = (prodLine) => {
-  if (prodLine === '1004') {
-    return 63;
-  } else if (prodLine === '2004') {
-    return 27;
-  }else if (prodLine === '1005') {
-    return 20;
-  }else if (prodLine === '2005') {
-    return 13;
-  }
-  }
-const { initChart, setOption } = useEcharts(monthlyIndicators);
-const drawChart = () => {
-  const option = {
-    xAxis: {
-      type: 'category',
-      data: categories.value,
-      axisLabel: {
-        interval: 0,
-        color: '#fff',
-        fontSize: 12
-      },
-      name: '时间 (小时)',
-      nameLocation: 'middle',
-      nameTextStyle: {
-        color: '#fff',
-        fontSize: 10,
-        padding: [15, 0, 0, 0]
-      }
-    },
-    yAxis: {
-      type: 'value',
-      axisLabel: {
-        color: '#fff',
-        fontSize: 15
-      },
-      lineStyle: {
-        color: '#33ccff',
-        width: 20,
-        type: 'dashed'
-      }
-    },
-    series: [
-      {
-        data: values.value,
-        type: 'bar',
-        itemStyle: {
-          color: '#3498db'
-        },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#fff',
-          fontSize: 14,
-          fontWeight: 'bold'
-        }
-      },
-      {
-        data: values.value,
-        type: 'line',
-        itemStyle: {
-          color: 'orange'
-        },
-        label: {
-          show: false
-        },
-        markLine: {
-          symbol: ['none', 'none'],
-          lineStyle: {
-            color: 'yellow',
-            type: 'solid',
-            width: 2
-          },
-          label: {
-            show: true,
-            formatter: '标准小时产能: {c}',
-            color: 'yellow',
-            fontSize: 12,
-            fontWeight: 'bold',
-            position: 'middle', // 可设为 'start' / 'middle' / 'end'
-          },
-          data: [
-            {
-              yAxis:  standard.value,
-              name: '标准小时产能'
-            }
-          ]
-        }
-      }
-    ]
-  };
-
-  setOption(option);
-};
-
+// 请求数据 & 渲染图表
 const fetchData = () => {
-  getColumnarHourInfo(prodLine)
-    .then(res => {
-  
-      const data = res.data;
-      if (Object.keys(data).length === 0) {
-        isDataEmpty.value = true;
-      } else {
-        isDataEmpty.value = false;
-        categories.value = Object.keys(data);
-        values.value = Object.values(data);
 
-        nextTick(() => {
-       
-          getEfficiencyToday(prodLine).then(res => {
-          standard.value = Math.round(res.data.standardEfficiency * diffrentLine(prodLine)) || 0;
-          initChart();
-          drawChart();
-        });
-        isLoading.value = false;
-        });
+
+  Promise.all([
+    getColumnarHourInfo(prodLine),
+    getEfficiencyHour(prodLine)
+  ])
+    .then(([hourRes, efficiencyRes]) => {
+      const hourData = hourRes.data;
+      const efficiencyData = efficiencyRes.data;
+
+      if (!hourData || Object.keys(hourData).length === 0) {
+
+        return;
       }
-    })
-    .catch(() => {
-      isLoading.value = false;
-      isDataEmpty.value = true;
-    });
-  // 获取标准小时产能
 
+      // 设置图表数据
+      categories.value = Object.keys(hourData);
+      values.value = Object.values(hourData);
+      standard.value = Object.values(efficiencyData);
+      console.log('hourData', hourData);
+      console.log('efficiencyData', efficiencyData);
+
+      // 等待 DOM 渲染后初始化图表
+        nextTick(() => {
+          initChart();
+                console.log('categories', categories.value);
+      console.log('values', values.value);
+      console.log('standard', standard.value);
+          const option = createChartOption({
+            category: categories.value,
+            value1: values.value,
+            value2: standard.value,
+          });
+          console.log('option', option);
+          setOption(option);
+
+          // 延迟 resize 等 DOM 宽高完全生效
+          setTimeout(() => {
+            resizeChart();
+          }, 1000); // 100ms 足够处理 v-show 的样式切换
+
+        });
+    })
+    .catch((err) => {
+      console.error('数据请求失败：', err);
+
+    });
 };
 
-// 在组件挂载时启动定时获取数据
+// 监听刷新事件
 onMounted(() => {
-  fetchData(); // 组件挂载时先请求一次
- 
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  fetchData();
+  eventBus.on('refreshData', fetchData);
 });
 
-
-  // 清理定时器，避免组件卸载后定时器继续执行
-  onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-  });
+// 清理事件监听
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', fetchData);
+});
 </script>
-
 
 <style scoped>
 .box1 {
@@ -187,31 +101,9 @@ onMounted(() => {
   font-size: 18px;
   color: aliceblue;
 }
-
-.content {
+.loading-container {
   display: flex;
-  justify-content: space-between;
-  height: 90%;
-  margin-top: 2vh;
+  align-items: center;
+  justify-content: center;
 }
-
-.production-data {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-content: space-around;
-  font-size: 30px;
-  padding: 10px 0; /* 上下增加一些 padding */
-}
-
-.row {
-  display: flex;
-  justify-content: start; /* 让内容分散一点 */
-  height: 60%;
-  /* gap: 30px; 增大间距 */
-  /* margin-bottom: 2vh; 让两行之间间隔更大 */
-}
-
-
-
 </style>

@@ -23,7 +23,7 @@ body {
   height: 100vh;
   background: 
     linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-    url('../../assets/screen1.png') no-repeat center center;
+    url('@/assets/background.jpg') no-repeat center center;
   background-size: cover;
   transform-origin: center center;
   position: relative;

@@ -1,10 +1,10 @@
 <template>
 <div class="w-screen h-[62vh] pl-[2vw] pr-[2vw] pt-[1vw] flex">
-    <div class="h-[100%] flex-3"><Left></Left></div>
+    <div class="h-[100%] flex-4"><Left></Left></div>
 
-    <div class="h-[100%] flex-4"><Middle></Middle></div>
+    <div class="h-[100%] flex-3"><Middle></Middle></div>
 
-    <div class="h-[100%] flex-3"><Right></Right></div>
+    <div class="h-[100%] flex-4"><Right></Right></div>
 
 </div>
 </template>

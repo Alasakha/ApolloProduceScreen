@@ -49,16 +49,6 @@ export const getTodayOrderProgressInfo = (prodLine) => {
   })
 }
 
-//认识效率
-export const getEfficiencyInfo = (prodLine) => {
-  return request({
-    url: '/production/workerEfficiency',
-    method: 'get',
-    params: { prodLine } // 传递 prodLine 参数
-  })
-}
-
-
 // /production/maintenance
 //设备点检
 export const getMaintenanceInfo = (prodLine) => {
@@ -97,5 +87,14 @@ export const getAbnormalUnfinishedList = (formData) => {
     headers: {
       'Content-Type': 'multipart/form-data', // 明确设置为 form-data 格式
     }
+  })
+}
+
+// /production/abnormalList
+export const getEfficiencyHour = (prodLine) => {
+  return request({
+    url: '/production/efficiencyHour',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
   })
 }

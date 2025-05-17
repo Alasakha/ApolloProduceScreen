@@ -1,7 +1,8 @@
 
 <template>
 <dv-border-box8 :dur="5">
-  <GlobalTitle title="来料合格率"/>
+<GlobalTitle title="来料合格率" :size="1" />
+
   
       <!-- 图表容器 -->
       <div class="chartsbox w-full h-full">
@@ -42,7 +43,6 @@ const Indicators1 = ref(null);
 // 渲染图表的函数
 const drawMonthlyIndicators = (formattedData) => {
   nextTick(() => {
-    console.log('准备初始化图表', Indicators1.value);
     const Indicators1Element = echarts.init(Indicators1.value);
     const option = createChartOption( formattedData ); // 先用写死的，不传 formattedData
     Indicators1Element.setOption(option);
@@ -52,7 +52,7 @@ const drawMonthlyIndicators = (formattedData) => {
 // 处理数据
 const processData = (data) => {
  const formattedData = formatPieChartData(data, 'purchaserName','ratio');
-
+  console.log('formattedData', formattedData);
   if (formattedData.length == 0) {
     isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
   } else {

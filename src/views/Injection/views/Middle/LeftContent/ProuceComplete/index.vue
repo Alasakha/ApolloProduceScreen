@@ -9,6 +9,7 @@
       :spc="machine.ty004"
       :completed="machine.spc"
       :rate="machine.rate"
+      danwei="达成率"
     />
   </div>
 </template>

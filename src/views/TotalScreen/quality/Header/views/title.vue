@@ -58,9 +58,9 @@ onMounted(() => {
 
 <template>
   <div class="container flex flex-col items-center">
-    <div class="title title-main">{{handleTitle(prodLine)}}{{handleTitle2(prodLine)}}质量管理看板</div>
-    <div class="title">直通率目标：{{ cumulativePassRate.target }}</div>
-    <div class="title">本月累计直通率：{{ cumulativePassRate.passPercent }}%</div>
+    <div class="title title-main">
+      <!-- {{handleTitle(prodLine)}}{{handleTitle2(prodLine)}} -->
+      质量管理看板</div>
   </div>
 </template>
 

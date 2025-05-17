@@ -49,7 +49,7 @@ const config = reactive({
     ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
   ],
   index: true,
-  columnWidth: [50,120,250,150,200,100,110,120,220,150],
+  columnWidth: [50,120,130,130,130,100,100,100],
   align: ['center','center','center','center','center','center','center','center','center'],
   rowNum:7
 })
@@ -65,8 +65,8 @@ const fetchData = () => {
     config.data = list.map(item => [
       item.guZhangTypeName ?? '无',
       item.startRemark ?? '无',
-      item.startTime ?? '无',
-      item.endTime ?? '无',
+      item.startTime.slice(5,16) ?? '无',
+      item.endTime.slice(5,16)  ?? '无',
       item.guZhangTypeDuration,
       item.dutyPeopleName ?? '无',
       item.endPeopleName ?? '无'

@@ -8,8 +8,8 @@ const formattedData = formatPieChartData(data, 'ngName', 'total');
   <div class="efficency w-[25%]">
     <dv-border-box12>
       <div class="w-full h-full">
-        <div ref="qualityIndicators" class="chart-container w-full  h-[90%]"></div>
-        <dv-button class="w-30 pl-4"  :bg="false" @click="dialogTableVisible = true">详细数据</dv-button>
+        <div ref="qualityIndicators" class="chart-container w-full  h-[80%]"></div>
+        <dv-button class="w-[11vw] pl-4" :color="'#23a7dc'" :bg="false" @click="dialogTableVisible = true">详细数据</dv-button>
       </div>
       </dv-border-box12>
   </div>

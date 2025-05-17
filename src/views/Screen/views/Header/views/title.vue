@@ -1,75 +1,103 @@
+
+
+
 <script setup>
 import { ref, onMounted ,onBeforeUnmount} from 'vue';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import { getMonthTotalInfo } from '@/api/getProduceinfo';
+import { getMonthTotalInfo   } from '@/api/getProduceinfo';
 
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数
 
 const cumulativePassRate = ref({})
 const prodLineName = ref('')
+const zoomClass = ref('');
 
+const fetchData = () => {
+  getMonthTotalInfo(prodLine).then(res => {
+    cumulativePassRate.value = res.data;
+    console.log('cumulativePassRate', cumulativePassRate.value);
+  }).catch(() => {});
+};
+
+// 根据生产线决定名称
 const decideName = (prodLine) => {
   if (prodLine === '1004A') {
     return '装配A';
   } else if (prodLine === '1004B') {
     return '装配B';
-  }else if (prodLine === '1004C') {
+  } else if (prodLine === '1004C') {
     return '装配C';
-  }else if (prodLine === '1005A') {
+  } else if (prodLine === '1005A') {
     return '包装A';
-  }else if (prodLine === '1005B') {
+  } else if (prodLine === '1005B') {
     return '包装B';
   }
-}
+};
 
-
-
-
-
-
-  onMounted(() => {
-    fetchData(); // 组件挂载时先请求一次
-    eventBus.on("refreshData", fetchData); // 监听全局刷新事件
-    });
-
- // 清理定时器，避免组件卸载后定时器继续执行
- onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
-  });
+// 判断缩放比并更新 zoomClass
+const updateZoomClass = () => {
+  const bodyClass = document.body.classList;
   
-  const fetchData = () => {
-    getMonthTotalInfo(prodLine).then(res => {
-      cumulativePassRate.value = res.data
-  }).catch(() => {
-    });
+  if (bodyClass.contains('zoom-75')) {
+    zoomClass.value = 'zoom-75';
+  } else if (bodyClass.contains('zoom-100')) {
+    zoomClass.value = 'zoom-100';
+  } else if (bodyClass.contains('zoom-125')) {
+    zoomClass.value = 'zoom-125';
+  } else if (bodyClass.contains('zoom-150')) {
+    zoomClass.value = 'zoom-150';
+  } else if (bodyClass.contains('zoom-200')) {
+    zoomClass.value = 'zoom-200';
   }
+};
 
+onMounted(() => {
+  updateZoomClass(); // 页面加载时先设置一次缩放类
+  fetchData()
+  window.addEventListener('resize', updateZoomClass); // 监听窗口缩放变化
+});
+
+// 组件卸载时清除事件监听
+onBeforeUnmount(() => {
+  window.removeEventListener('resize', updateZoomClass);
+});
 </script>
 
 <template>
-  <div class="flex flex-col">
-    <div class="title title-main flex justify-center items-center">{{ decideName(prodLine) }}线管理看板</div>
-<!-- 次要标题 -->
-<div class="title title-sub flex justify-center items-center">本月生产计划总数：<span style="color:rgb(4, 248, 250)">{{ cumulativePassRate.plan }}</span></div> 
+  <div class="flex flex-col justify-center items-center">
+    <div :class="zoomClass">
+      <div
+        class="text-white font-bold tracking-wider flex "
+        :class="{
+          'text-[3.1vw]': zoomClass === 'zoom-75',
+          'text-[2.41vw]': zoomClass === 'zoom-100',
+          'text-[2.9vw]': zoomClass === 'zoom-125',
+          'text-[2.7vw]': zoomClass === 'zoom-150',
+          'text-[3vw]': zoomClass === 'zoom-200'
+        }"
+      >
+        {{ decideName(prodLine) }}线管理看板
+      </div>
+
+      <div
+        class="text-white tracking-wide mt-2"
+        :class="{
+          'text-[3vw]': zoomClass === 'zoom-75',
+          'text-[1.5vw]': zoomClass === 'zoom-100',
+          'text-[1.8vw]': zoomClass === 'zoom-125',
+          'text-[1.7vw]': zoomClass === 'zoom-150',
+          'text-[2vw]': zoomClass === 'zoom-200'
+        }"
+      >
+        本月生产计划总数：
+        <span class="text-cyan-400">{{ cumulativePassRate.plan }}</span>
+      </div>
+    </div>
   </div>
 </template>
 
 <style scoped>
-.title {
-  font-size: 1.5vw;
-  color: white;
-}
-
-.title-main {
-  font-size: 2vw; /* 设置标题行的字体更大 */
-  font-weight: bold; /* 设置标题为加粗 */
-  letter-spacing: 0.5vw ; /* 增加字间距 */
-}
-.title-sub{
-  font-size: 1.5vw;
-  color: aliceblue;
-  letter-spacing: 0.2vw;
-}
+/* 可以根据需要进一步调整样式 */
 </style>

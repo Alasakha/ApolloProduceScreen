@@ -5,8 +5,9 @@
   <GlobalTitle title="到货及时率"/>
 
   <!-- 图表容器 -->
-  <div class="chartsbox w-full h-full">
-    <div ref="Indicators1" class="w-full h-[100%]"></div>
+  <div class="chartsbox w-full h-full ">
+    <div v-if="!isDataEmpty" ref="Indicators1" class="w-full h-[100%]"></div>
+    <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl"> 今日暂无数据</div>
    </div>  
 
 
@@ -66,7 +67,6 @@ const processData = (data) => {
 const fetchData = () => {
   getDeliveryRat(queryDate).then(res => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
-    console.log('来料合格率数据', res.data);
     processData(res.data);  // 处理数据并渲染图表
   }).catch(() => {
     isLoading.value = false;

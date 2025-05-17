@@ -5,10 +5,10 @@
       </div>
       <div class="progress-info">
         <div class="progress-item">
-          <strong>当日排产数：</strong> <span>{{ spc? spc + '个' : '暂无数据' }} </span>
+          <strong>当日排产数：</strong> <span>{{ spc!== null && spc!== undefined ? spc + '个' : '暂无数据' }} </span>
         </div>
         <div class="progress-item">
-          <strong>已完成数：</strong> <span>{{ completed? completed + '个' : '暂无数据' }} </span>
+         <strong>达成数：</strong><span>{{ completed !== null && completed !== undefined ? completed + '个' : '暂无数据' }}</span>
         </div>
         <div class="progress-item">
           <strong>达成率：</strong> 

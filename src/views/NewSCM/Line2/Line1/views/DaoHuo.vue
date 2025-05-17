@@ -56,12 +56,13 @@
     <div class="content w-full h-full">
         <dv-border-box8 :dur="5">
             <!-- 标题 -->
-            <GlobalTitle title="到货不及时各采购员占比" size="xl"/>
-  
+            <GlobalTitle title="到货不及时各采购员占比" :size="1"/>
+
   
   <!-- 图表容器 -->
   <div class="chartsbox w-full h-[15vh] mt-4">
-    <div ref="Indicators1" class="w-full h-full"></div>
+    <div v-if="!isDataEmpty" ref="Indicators1" class="w-full h-full"></div>
+      <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl"> 今日暂无数据</div>
    </div>  
   </dv-border-box8>
   

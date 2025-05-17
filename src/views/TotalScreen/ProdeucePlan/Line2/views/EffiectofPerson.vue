@@ -52,17 +52,23 @@ import BigScreenTitle from '@/components/title.vue'
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
 // 定义数据
-const  diffrentLine = (prodLine) => {
-  if (prodLine === '1004') {
-    return 63;
-  } else if (prodLine === '2004') {
-    return 27;
-  }else if (prodLine === '1005') {
-    return 20;
-  }else if (prodLine === '2005') {
-    return 13;
+const diffrentLine = (prodLine) => {
+  const prefix = prodLine.slice(0, 4); // 取前4位
+
+  switch (prefix) {
+    case '1004':
+      return 52;
+    case '2004':
+      return 30;
+    case '1005':
+      return 18;
+    case '2005':
+      return 13;
+    default:
+      return null; // 未匹配时返回 null 或默认值
   }
-  }
+};
+
 
 
 

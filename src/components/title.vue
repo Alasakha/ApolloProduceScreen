@@ -1,24 +1,27 @@
+<!-- GlobalTitle.vue -->
 <template>
-  <div class="relative w-full h-[12%]">
+  <div class="relative w-full h-[2vh]">
     <h1
-      class="absolute top-4 left-4 text-white font-bold tracking-widest drop-shadow-lg"
-      :class="`text-${size}`"
+      class="absolute top-[1.2vh] left-[1vw] text-white font-bold tracking-widest drop-shadow-lg"
+      :style="{ fontSize: computedFontSize }"
     >
       {{ title }}
     </h1>
-    <dv-decoration-10 style="width:96%;height:5px;" class="absolute top-13 left-4 "/>
+    <dv-decoration-10
+      class="absolute left-[1vw] top-[4vh]"
+      style="width: 92%; height: 0.5vh;"
+    />
   </div>
 </template>
 
 <script setup>
-defineProps({
-  title: {
-    type: String,
-    required: true
-  },
+const props = defineProps({
+  title: String,
   size: {
-    type: String,
-    default: '2xl' // Tailwind 字号类，如 text-xl、text-2xl
-  }
+    type: Number,
+    default: 1,
+  },
 })
+
+const computedFontSize = `${props.size}vw`
 </script>

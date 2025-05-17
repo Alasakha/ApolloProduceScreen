@@ -3,7 +3,8 @@
     <GlobalTitle title="回签及时率"/>
           <!-- 图表容器 -->
           <div class="chartsbox w-full h-full">
-          <div ref="Indicators1" class="w-full h-[100%]"></div>
+          <div v-if="!isDataEmpty" ref="Indicators1" class="w-full h-[100%]"></div>
+          <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl"> 今日暂无数据</div>
          </div>
     </dv-border-box8>
   </template> 

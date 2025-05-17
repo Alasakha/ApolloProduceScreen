@@ -8,8 +8,8 @@
         <dv-loading>Loading...</dv-loading>
       </div>
     <!-- 数量 -->
-    <div v-if="!isLoading" class="w-full h-[85%] p-4 pt-5 flex flex-col gap-4">
-    <div class="line flex-1 flex">
+    <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col  justify-start">
+    <div class="line flex-2 flex">
       <!-- 配置人数 -->
       <div class="peizhi flex-1">
         <div ref="Indicators1" class="w-full h-[100%]"></div>
@@ -61,11 +61,11 @@ const diffrentLine = (prodLine) => {
 
   switch (prefix) {
     case '1004':
-      return 53;
+      return 52;
     case '2004':
-      return 27;
+      return 30;
     case '1005':
-      return 20;
+      return 18;
     case '2005':
       return 13;
     default:
@@ -158,7 +158,7 @@ onMounted(() => {
 
 .eff-card {
   /* @apply flex flex-col justify-center items-center rounded-xl p-4 shadow-lg; */
-  background: linear-gradient(135deg, #0ae7f6 0%,#2ff0d2 70%,#62fd9e 100%);
+  background: linear-gradient(135deg, #520096 0%,#5c00f0 70%,#0417bd 100%);
   color: #fff;
   flex: 1;
 }

@@ -18,7 +18,7 @@ const config = reactive({
   index: true,
   align: ['start'],
   rowNum: 4,
-  columnWidth: [40, 100, 90, 80,70,140,130,100],
+  columnWidth: [40, 100, 90, 90,100,100,100,100,100],
   headerHeight: 20
 })
 
@@ -62,3 +62,17 @@ onMounted(() => {
   fetchData();
 });
 </script>
+
+<style scoped>
+:deep(.dv-scroll-board .header) {
+  display: flex;
+  flex-direction: row;
+  font-size: 0.8vw;
+
+}
+
+:deep(.dv-scroll-board .rows .row-item){
+  font-size: 0.7vw;
+}
+
+</style>

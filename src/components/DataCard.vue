@@ -1,6 +1,6 @@
 <template>
   <div class="data-card">
-    <div class="title h-[20%]">{{ title }}</div>
+    <div class="title h-[20%]  text-white">{{ title }}</div>
     <div class="square-box">
       <dv-decoration-9 class="w-full h-full"
       :color="[backgroundcolor1, backgroundcolor2]">
@@ -13,7 +13,7 @@
 </template>
 
 <script setup>
-
+import { onMounted ,nextTick} from 'vue';
 
 defineProps({
   title: String,  // 标题
@@ -22,6 +22,19 @@ defineProps({
   backgroundcolor1:{ type :String, default: '#23A7DC'},
   backgroundcolor2:{ type :String, default: '#0a8ebd'},
   color:{ type :String, default: '#00FFFF	'},
+});
+
+
+
+onMounted(() => {
+  nextTick(() => {
+    let count = 0;
+    const interval = setInterval(() => {
+      window.dispatchEvent(new Event('resize'));
+      count++;
+      if (count > 5) clearInterval(interval);
+    }, 200); // 每 200ms 触发一次，总共 5 次
+  });
 });
 </script>
 
@@ -49,7 +62,7 @@ defineProps({
 }
 
 .content {
-  font-size: 1.5vw;
+  font-size: 1.2vw;
   text-shadow: 0 0 3px #7acaec;
   z-index: 10000;
   width: 100%;

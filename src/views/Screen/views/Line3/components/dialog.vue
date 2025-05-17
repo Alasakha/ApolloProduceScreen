@@ -8,7 +8,7 @@
     @close="emit('close')"
   >
     <div class="table-wrapper">
-      <el-table :data="tableData" height="100%" style="width: 100%">
+      <el-table :data="paginatedData" height="100%" style="width: 100%">
         <el-table-column
           v-for="col in columns"
           :key="col.prop"
@@ -17,12 +17,27 @@
           :width="col.width"
         />
       </el-table>
+
+      <!-- 总数 & 分页 -->
+      <div class="pagination-wrapper">
+        <div>共 {{ tableData.length }} 条</div>
+        <el-pagination
+          layout="total, sizes, prev, pager, next, jumper"
+          :total="tableData.length"
+          v-model:current-page="currentPage"
+          v-model:page-size="pageSize"
+          :page-sizes="[10, 20, 50, 100]"
+          size="small"
+        />
+      </div>
     </div>
   </el-dialog>
 </template>
 
 <script setup lang="ts">
-defineProps<{
+import { ref, computed } from 'vue'
+
+const props = defineProps<{
   modelValue: boolean
   title: string
   width?: string
@@ -36,33 +51,45 @@ defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'close'])
 
-// 设置大屏下更宽的默认宽度
 const dialogWidth = '90%'
+
+// 分页状态
+const currentPage = ref(1)
+const pageSize = ref(10)
+
+// 计算当前页数据
+const paginatedData = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  return props.tableData.slice(start, start + pageSize.value)
+})
 </script>
 
 <style scoped>
 .custom-dialog {
-  /* 让对话框高度尽量占满大屏 */
   max-height: 90vh;
   display: flex;
   flex-direction: column;
-
 }
 
-/* 包裹表格容器，使其撑满对话框剩余空间 */
-/* .table-wrapper {
+.table-wrapper {
   flex: 1;
   overflow: auto;
-  max-height: 70vh; /* 避免对话框溢出屏幕 */
-/* } */ 
+  max-height: 70vh;
+  display: flex;
+  flex-direction: column;
+}
 
-/* .custom-dialog { */
-    /*scoped 模式下  background-color 不生效 直接写到style*/
-    /* color: white;
-    background-color: rgb(26, 57, 116) !important;
-    border-radius: 10px;
-    
-} */
+.pagination-wrapper {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  font-size: 16px; /* 默认字体大小加大 */
+}
 
-
+/* 可选：分页组件字体大小更大一些 */
+::v-deep(.el-pagination) {
+  font-size: 16px;
+}
 </style>
+

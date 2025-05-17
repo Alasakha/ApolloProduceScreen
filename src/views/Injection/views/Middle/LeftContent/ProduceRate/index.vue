@@ -9,6 +9,7 @@
       :spc="machine.spc"
       :completed="machine.ty004"
       :rate="machine.rate"
+      danwei="合格率"
     />
   </div>
 </template>
@@ -33,9 +34,9 @@ const fetchData = async () => {
     if (res.code === 200) {
       // 将接口返回的机器数据存入 `machineData`
       machineData.value = res.data.map(item => ({
-  ty009: item.prodLine?.trim() || '',         // 去除多余空格
-  spc: Number(item.checkTotal),                   // 转为数字
-  ty004: Math.floor(Number(item.firstHgTotal)),   // 已完成数转整数
+  ty009: item.macNo?.trim() || '',         // 去除多余空格
+  spc: Number(item.total_count),                   // 转为数字
+  ty004: Math.floor(Number(item.ok_count)),   // 已完成数转整数
   rate: typeof item.rate === 'string' && item.rate.includes('%')
   ? Number(item.rate.replace('%', '')).toFixed(1)
   : null

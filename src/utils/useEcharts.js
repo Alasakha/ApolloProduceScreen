@@ -1,4 +1,3 @@
-// src/composables/useEcharts.js
 import * as echarts from 'echarts';
 import { onBeforeUnmount } from 'vue';
 
@@ -6,23 +5,26 @@ export function useEcharts(chartRef) {
   let chartInstance = null;
 
   const initChart = () => {
-    if (!chartRef.value) return;
+    if (!chartRef.value || chartInstance) return;
     chartInstance = echarts.init(chartRef.value);
+    window.addEventListener('resize', resizeChart);
   };
 
   const setOption = (option) => {
-    if (chartInstance) {
-      chartInstance.setOption(option);
-    }
+    chartInstance?.setOption(option);
   };
 
   const resizeChart = () => {
-    if (chartInstance) {
-      chartInstance.resize();
-    }
+    chartInstance?.resize();
   };
 
-  window.addEventListener('resize', resizeChart);
+  const onClick = (handler) => {
+    chartInstance?.on('click', handler);
+  };
+
+  const offClick = (handler) => {
+    chartInstance?.off('click', handler);
+  };
 
   onBeforeUnmount(() => {
     window.removeEventListener('resize', resizeChart);
@@ -35,6 +37,8 @@ export function useEcharts(chartRef) {
   return {
     initChart,
     setOption,
-    resizeChart
+    resizeChart,
+    onClick,
+    offClick,
   };
 }

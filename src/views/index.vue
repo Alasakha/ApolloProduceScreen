@@ -13,14 +13,22 @@
 
 
         <!-- 走马灯第 1 组：前 5 个 -->
-          <div class="small  h-[200px] flex items-center gap-4 flex flex-wrap">
+          <div class="small  h-[30vh] flex items-center gap-4 flex flex-wrap pl-4 ">
+            <button
+              v-for="line in getRange(0, 5)"
+              :key="line.id"
+              class="custom-btn btn-5 "
+              @click="selectLine(line)"
+            >
+              {{ line.name }}
+            </button>
 
         <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
      
             <button
               v-for="line in lines"
               :key="line.id"
-              class="custom-btn btn-5 w-[120px] h-[50px]"
+              class="custom-btn btn-5  "
               @click="selectLine(line)"
             >
               {{ line.name }}
@@ -92,11 +100,10 @@ body{
   align-items: center;
 }
 .custom-btn {
-  width: 130px;
-  height: 40px;
+  width: 10vw;
+  height: 10vh;
   color: #fff;
   border-radius: 5px;
-  padding: 10px 25px;
   font-family: 'Lato', sans-serif;
   font-weight: 500;
   background: transparent;
@@ -212,7 +219,6 @@ h2{
   background-color: aliceblue;
   color: black;
   border: 2px solid black;
-  padding: 10px 20px;
   cursor: pointer;
   font-size: 1rem;
   font-weight: bold;

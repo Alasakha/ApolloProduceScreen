@@ -43,24 +43,24 @@ export function createChartOption(data) {
           type: 'bar',
           itemStyle: {
             normal: {
-              color: {
-                type: 'linear',
-                x: 0,
-                x2: 0,
-                y: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: '#00b0ff'
-                  },
-                  {
-                    offset: 0.8,
-                    color: '#7052f4'
-                  }
-                ],
-                global: false, // 缺省为 false
-              },
+              // color: {
+              //   type: 'linear',
+              //   x: 0,
+              //   x2: 0,
+              //   y: 0,
+              //   y2: 1,
+              //   colorStops: [
+              //     {
+              //       offset: 0,
+              //       color: '#00b0ff'
+              //     },
+              //     {
+              //       offset: 0.8,
+              //       color: '#7052f4'
+              //     }
+              //   ],
+              //   global: false, // 缺省为 false
+              // },
             },
           },
           data: data.map(item => item.value),

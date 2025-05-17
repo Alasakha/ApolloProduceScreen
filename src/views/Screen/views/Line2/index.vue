@@ -1,5 +1,5 @@
 <template>
-    <div class="line2 flex h-[35%] w-full p-4 gap-4">
+    <div class="line2 flex h-[40%] w-full p-4 gap-4">
       <Eourly></Eourly>
         <Data></Data>
         <Efficency></Efficency>  

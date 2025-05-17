@@ -2,7 +2,8 @@ import { defineStore } from 'pinia';
 import { ref } from 'vue';
 import { getDeviceStatus } from '@/api/getInjection';
 
-let timer: NodeJS.Timeout | null = null;
+let timer: ReturnType<typeof setInterval> | null = null;
+
 
 export const useDeviceStatusStore = defineStore('deviceStatus', () => {
   const data = ref<Record<string, number>>({});

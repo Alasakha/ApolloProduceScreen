@@ -1,5 +1,5 @@
 <template>
-    <div class="line2 flex h-[50%] w-full p-4 gap-4">
+    <div class="line2 flex h-[47%] w-full p-4 gap-2">
         <Data1></Data1>
         <Data2></Data2>
         <Data3></Data3>

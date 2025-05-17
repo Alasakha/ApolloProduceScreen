@@ -49,9 +49,10 @@ const config = reactive({
     ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
   ],
   index: true,
-  columnWidth: [50,100,170,170,250,100,110,100,220],
+columnWidth: [50, 100, null, null, null, null, null, 10],
   align: ['center','center','center','center','center','center','center','center'],
-  rowNum:7
+  rowNum:6,
+  columnWidth: [50, 100, 100, 120,120,70,100,80,140],
 })
 
 

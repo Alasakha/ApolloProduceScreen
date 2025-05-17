@@ -41,7 +41,7 @@
 import { ref, onMounted,onBeforeUnmount } from 'vue';
 import DataCard from "../../../components/DataCard.vue"; // 导入封装组件
 import EffiectCard from "../../../components/EffiectCard.vue"; // 导入封装组件
-import { getMonthTotalInfo ,getTodayProductionInfo,getEfficiencyInfo} from '../../../api/getProduceinfo';
+import { getMonthTotalInfo ,getTodayProductionInfo} from '../../../api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 // 定义数据
@@ -57,9 +57,6 @@ const fetchData = () => {
   }),
   getTodayProductionInfo(prodLine).then(res => {
     TodayData.value = res.data
-  }),
-  getEfficiencyInfo(prodLine).then(res => {
-    KnowledgeEfficiencyData.value = res.data
   })
 }
 

@@ -1,22 +1,14 @@
-<script setup>
-import { ref, reactive, computed, watch } from 'vue';
-
-
-</script>
-
 <template>
-<div class="title title-main flex justify-center items-center">供应链管理系统</div>
+  <div
+    class="flex justify-center items-center
+           text-white font-bold tracking-[0.5vw]
+           text-[4.5vw] hd:text-[2.8vw] fullhd:text-[3vw] 2k:text-[2.4vw] 2k-plus:text-[3vw] 4k:text-[2vw]"
+  >
+    供应链管理系统
+  </div>
 </template>
 
-<style scoped>
-.title {
-  font-size: 1.5vw;
-  color: white;
-}
+<script setup>
+// 这里不用写任何东西
+</script>
 
-.title-main {
-  font-size: 2vw; /* 设置标题行的字体更大 */
-  font-weight: bold; /* 设置标题为加粗 */
-  letter-spacing: 0.5vw ; /* 增加字间距 */
-}
-</style>

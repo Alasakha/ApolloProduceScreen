@@ -1,3 +1,7 @@
+
+const size = window.devicePixelRatio ;
+const getFontSize = () =>size>=2? 10 : size >= 1.5 ? 15 : 22;  
+
 // createChartOption.ts
 export function createChartOption(title: string, rawData: any) {
     const isEmpty = !rawData || rawData.length === 0;
@@ -7,17 +11,18 @@ export function createChartOption(title: string, rawData: any) {
       : rawData;
   
     return {
-      color: [
-        '#8F87F1', '#C68EFD', '#E9A5F1', '#FED2E2',
-        '#5F6DF8', '#B6A0FF', '#493DF5'
-      ],
+      // color: [
+      //   '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
+      //   '#FF1654'
+      // ],
+      grid:{},
       title: {
         text: title,
         top: '2%',
         left: 'center',
         textStyle: {
           color: '#ffffff',
-          fontSize: 25,
+          fontSize: getFontSize(),
           fontWeight: 'bold',
           fontFamily: 'Microsoft YaHei',
           letterSpacing: 2
@@ -35,7 +40,8 @@ export function createChartOption(title: string, rawData: any) {
         top: '10%',
         left: 'center',
         textStyle: {
-          color: '#ffffff'
+          color: '#ffffff',
+           fontSize:size>=2? 6 : size >= 1.5 ? 10 : 15,
         }
       },
       series: [
@@ -46,22 +52,23 @@ export function createChartOption(title: string, rawData: any) {
           label: {
             show: true,
             position: 'outside',
+            
             formatter: (params: any) => {
                 if (isEmpty) return `{name|暂无异常}`;
                 return `{name|${params.name}}\n{value|${params.value} 件}  {percent|${params.percent}%}`;
               },
             rich: {
               name: {
-                fontSize: 14,
-                color: '#fff',
-                lineHeight: 22
+                fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
+                  color: '#fff',
+                  lineHeight: 15
               },
               value: {
-                fontSize: 12,
+                fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
                 color: '#aaa'
               },
               percent: {
-                fontSize: 12,
+                fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
                 color: '#66ccff'
               }
             }

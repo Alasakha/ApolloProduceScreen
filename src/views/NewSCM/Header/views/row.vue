@@ -6,7 +6,7 @@
           当日优秀采购员
         </div>
         <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
-          <div class="text-6xl animate-bounce-slow mr-4">👑</div>
+          <div class="text-6xl animate-bounce-slow mr-4">👍</div>
           {{ top }}
         </div>
       </div>
@@ -14,7 +14,7 @@
       <!-- 待努力采购员 -->
       <div class="flex flex-col items-center justify-start h-full">
         <div class="text-white text-2xl font-semibold tracking-wide mb-2 drop-shadow">
-          当日待努力采购员
+          当日待加油采购员
         </div>
         <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
           <div class="text-6xl animate-bounce-slow mr-4">✊</div>
@@ -43,7 +43,6 @@
         top.value = res.data[0].purchaserName
         Bottom.value = res.data[res.data.length-1].purchaserName
       }).catch(() => {
-
       });
     };
    

@@ -34,17 +34,18 @@ const store = useDeviceStatusStore();
 
 const shutdown = computed(() => store.data['闲置'] || 0);
 const max  = computed(() => store.data['总数'] || 0);
-console.log('闲置数',shutdown.value)
-console.log('总数',max.value)
 
 
-watch(shutdown, () => {
-  nextTick(() => {
-    initChart();
-    const option = createChartOption(shutdown.value ,max.value,'yellow'); // ✅ 这里要加 .value
-    setOption(option);
-  });
-}, { immediate: true });
+
+watch(() => store.data, (val) => {
+  if (val && Object.keys(val).length > 0) {
+    nextTick(() => {
+      initChart();
+      const option = createChartOption(shutdown.value, max.value, 'yellow');
+      setOption(option);
+    });
+  }
+}, { deep: true, immediate: true });
 
 
 // 组件挂载时初始化图表

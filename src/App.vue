@@ -2,12 +2,14 @@
 import { onMounted, onUnmounted, nextTick } from 'vue'
 import { eventBus } from './utils/eventbus'
 import { useDeviceStatusStore } from '@/store/deviceStatus';
-
+import { useZoomClass } from '@/composables/useZoomClass'
+ useZoomClass()
 const store = useDeviceStatusStore();
 let intervalId:any = null;
 
 
 onMounted(async () => {
+ 
   await nextTick(); // 确保 `#app` 已经挂载
   store.startPolling();
   // 避免 `intervalId` 被多次创建

@@ -77,7 +77,7 @@
 <script setup>
 import { ref, onMounted,onBeforeUnmount } from 'vue';
 import DataCard from "@/components/DataCard.vue"; // 导入封装组件
-import { getMonthTotalInfo ,getTodayProductionInfo,getEfficiencyInfo,} from '@/api/getProduceinfo';
+import { getMonthTotalInfo ,getTodayProductionInfo,} from '@/api/getProduceinfo';
 import { getPaassedInfo } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
@@ -104,9 +104,6 @@ const fetchData = () => {
   }),
   getTodayProductionInfo(prodLine).then(res => {
     TodayData.value = res.data
-  }),
-  getEfficiencyInfo(prodLine).then(res => {
-    KnowledgeEfficiencyData.value = res.data
   }),
   getPaassedInfo(prodLine).then(res => {
     passedInfo.value = res.data

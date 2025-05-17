@@ -28,14 +28,15 @@ import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
 
 <style scoped>
 body{
- width: 100vw;
- height: 100vh;
- background: 
- linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
-   url('@/assets/background.jpg') no-repeat center center;
- background-size: cover;
- transform-origin: center center;
- position: relative;
- transition: transform 0.3s ease-in-out;
+ 
+  width: 100vw;
+  height: 100vh;
+  background: 
+    linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+    url('./assets/background.jpg') no-repeat center center;
+  background-size: cover;
+  transform-origin: center center;
+  position: relative;
+  transition: transform 0.3s ease-in-out;
 }
 </style>

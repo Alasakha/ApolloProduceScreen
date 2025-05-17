@@ -5,7 +5,7 @@ export const formatPieChartData = (data, valuename, value) => {
   }
 
   return data.map(item => ({
-    value: Math.round(Number(item[value])),
+    value: Number(item[value]),
     name: item[valuename],
     duration: item.guZhangTypeDuration || 0  // ➕ 添加 duration 字段
   }));

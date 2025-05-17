@@ -73,11 +73,11 @@ export const getFivedayRate = (prodLine) => {
 }  
 
 // 详细功性能详细内容
-export const getAbnormalDetail = (prodLine) => {
+export const getAbnormalDetail = (prodLine,reasonType, ngName) => {
   return request({
     url: '/quality/abnormalDetail',
     method: 'get',
-    params: { prodLine } // 传递 prodLine 参数
+    params: { prodLine,reasonType,ngName } // 传递 prodLine 参数
   })
 }  
 
@@ -94,6 +94,23 @@ export const getAtopDayInspector = (prodLine,reasonType ) => {
 export const getIncomingInspection = (prodLine ) => {
   return request({
     url: '/quality/incomingInspection',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}  
+
+export const getIncomingInspection2 = (prodLine ) => {
+  return request({
+    url: '/quality/incomingInspection2',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}  
+
+//错漏检累计次数
+export const getMistakesAndOmissions = (prodLine ) => {
+  return request({
+    url: '/quality/mistakesAndOmissions',
     method: 'get',
     params: { prodLine } // 传递 prodLine 参数
   })

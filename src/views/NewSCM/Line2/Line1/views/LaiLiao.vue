@@ -2,7 +2,7 @@
     <div class="content w-full h-full">
         <dv-border-box8 :dur="5">
             <!-- 标题 -->
-            <GlobalTitle title="来料不合格各采购员占比" size="xl" />
+            <GlobalTitle title="来料不合格各采购员占比"  />
 
 
   <!-- 图表容器 -->

@@ -1,7 +1,7 @@
 
     <template>
         <dv-border-box10>
-        <GlobalTitle title="来料合格率"/>
+        <GlobalTitle title="来料检验及时率"/>
         
             <!-- 图表容器 -->
             <div class="chartsbox w-full h-[90%]">

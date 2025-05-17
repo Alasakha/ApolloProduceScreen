@@ -28,10 +28,10 @@ export function createChartOption(data) {
             formatter: function (params) {
               // 假设 params.value 是“不合格数”，params.percent 是占比
               const roundedPercent = Math.round(params.percent);  // 四舍五入占比
-              return `${params.name}\n${params.value}个 (${roundedPercent}%)`;
+              return `${params.name} ${params.value}个 (${roundedPercent}%)`;
             }
           },
-          labelLine: {
+          labelLine: {  
             length: 50,     // 第一段（连接扇区）
             length2: 40,    // 第二段（水平线）
             lineStyle: {
