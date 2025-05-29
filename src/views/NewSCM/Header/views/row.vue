@@ -6,7 +6,7 @@
           当日优秀采购员
         </div>
         <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
-          <div class="text-6xl animate-bounce-slow mr-4">👍</div>
+          <div class="text-5xl animate-bounce-slow mr-4">👍</div>
           {{ top }}
         </div>
       </div>
@@ -17,7 +17,7 @@
           当日待加油采购员
         </div>
         <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
-          <div class="text-6xl animate-bounce-slow mr-4">✊</div>
+          <div class="text-5xl animate-bounce-slow mr-4">✊</div>
           {{ Bottom }}
         </div>
       </div>

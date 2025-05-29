@@ -32,9 +32,9 @@
           <DataCard title="今日计划数" :value="TodayData?.pcTotal ?? '无数据'" /> 
         <DataCard title="今日已完成"  :value=" TodayData?.done ?? '无数据'"  />
         <DataCard title="今日达成率"    
-        :value="TodayData?.pcTotal != null && TodayData?.done != null
-  ? ((TodayData.done / TodayData.pcTotal) * 100).toFixed(0) + '%'
-  : '无数据'"></DataCard>
+              :value="TodayData?.pcTotal != null && TodayData?.done != null
+        ? ((TodayData.done / TodayData.pcTotal) * 100).toFixed(0) + '%'
+        : '无数据'"></DataCard>
       </div>
       <div class="row flex-1 flex gap-[3vw] justify-around">
         <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'" /> 

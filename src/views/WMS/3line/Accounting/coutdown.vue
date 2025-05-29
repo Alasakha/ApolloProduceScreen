@@ -62,7 +62,7 @@
   };
   
   // 每秒更新倒计时
-  let countdownInterval: number;
+  let countdownInterval: ReturnType<typeof setInterval>;
   onMounted(() => {
     countdownInterval = setInterval(updateCountdown, 1000); // 每秒更新倒计时
     updateCountdown(); // 初始化时立刻更新一次

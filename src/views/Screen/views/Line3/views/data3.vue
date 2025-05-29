@@ -53,6 +53,7 @@ const gridColumns = [
   { prop: 'mb002', label: '车型' },
   { prop: 'peopleName', label: '发现人' },
   { prop: 'admin_UNIT_NAME', label: '责任部门'},
+  { prop: 'ngResponPeople', label: '责任人'}
 ];
 
 

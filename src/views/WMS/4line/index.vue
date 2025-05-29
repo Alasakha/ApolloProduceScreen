@@ -9,14 +9,14 @@ import * as echarts from 'echarts';
 const rawData = ref([[], []]);  // 使用一个数组来保存两份数据
 const name = ref<any[]>([[], []]);  // 使用二维数组
 const config1 = reactive({
-  header: ['排产时间', '客户单号','工单单号','供应商代号','品号','品名','采购员','欠料数量'],
+  header: ['排产时间', '客户单号','供应商代号','品号','品名','采购员','欠料数量'],
   data: [],
   index: true,
-  align: ['center'],
+  align: [],
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[100, 250, 200, 200, 200, 200, 250, 150,200],
+  columnWidth:[],
 });
 
 
@@ -26,7 +26,6 @@ const selectedItem = ref<any>({});
   const detailHeaders = [
   '排产时间',
   '客户单号',
-  '工单单号',
   '供应商代号',
   '品号',
   '品名',
@@ -37,26 +36,38 @@ const selectedItem = ref<any>({});
 
 // 获取数据并转换
 const fetchData = () => {
+
   getWarningNextDay()
     .then((res) => {
-      rawData.value[0] = res.data.zzyk; // 保存原始数据
-      rawData.value[1] = res.data.zzek; // 保存原始数据
-      // 转换数据为二维数组
-      const nextday = getNextDay()
-      name.value[0] = rawData.value[0].map((item: any) => {
-        // const totalNumber = parseFloat(item.total); // 确保转换为数字
-        return [nextday,item.customerOrderNo, item.orderNo,item.supplierCode,item.itemNo,item.itemName,item.purchaserName	, Math.round(Number(item.purchaseQuantity))] // 转为数字并四舍五入]; // 保留整数部分
-      });
-     
-      // 将转换后的数据更新到 config1.data 中
-      config1.data = name.value[0]
+      rawData.value[0] = res.data.zzyk || [];
+      rawData.value[1] = res.data.zzek || [];
+
+      const nextday = getNextDay();
+      name.value[0] = rawData.value[0].map((item: any) => [
+        nextday,
+        item.customerOrderNo,
+
+        item.supplierCode,
+        item.itemNo,
+        item.itemName,
+        item.purchaserName,
+        Math.round(Number(item.purchaseQuantity))
+      ]);
+
+      config1.data = name.value[0];
+
+      // ✅ 加占位
+      if (config1.data.length === 0) {
+        config1.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+      }
     })
     .catch(() => {
       console.log('数据获取失败');
+    })
+    .finally(() => {
+      
     });
-    
 };
-
 
 // 初始化图表
 const initChart = () => {
@@ -142,7 +153,7 @@ const clickHandler = (row: any) => {
       
       <div class="flex">
       <div class='w-full'>        
-        <dv-scroll-board
+        <ScrollBoard
           class="pl-4 pr-4 pt-2"
           :config="config1"
           style="width:100%;height:16vh"

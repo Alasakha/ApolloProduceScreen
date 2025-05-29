@@ -43,7 +43,7 @@ const tableCellStyle = {
 };
 
 </script> -->
-
+<!-- 
 <style scoped>
 .el-table {
   --el-table-row-hover-bg-color: rgba(14, 95, 255, 0.5);
@@ -60,7 +60,7 @@ const tableCellStyle = {
 }
 
 
-</style>
+</style> -->
 <template>
   <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
     <div class="table_container" style="flex: 1; position: relative;">
@@ -76,7 +76,7 @@ const tableCellStyle = {
       >
         <!-- 这里写大于等于1.5的表格结构和样式 -->
         <el-table-column :label="tableTitle">
-          <el-table-column :prop="'name'" :label="productLabel" />
+          <el-table-column :prop="'name'" label="工艺参数" />
           <el-table-column prop="real" label="实际值" />
         </el-table-column>
       </el-table>
@@ -93,7 +93,7 @@ const tableCellStyle = {
       >
         <!-- 这里写大于等于1且小于1.5的表格样式 -->
         <el-table-column :label="tableTitle">
-          <el-table-column :prop="'name'" :label="productLabel" />
+          <el-table-column :prop="'name'" label="供应参数" />
           <el-table-column prop="real" label="实际值" />
         </el-table-column>
       </el-table>
@@ -138,10 +138,7 @@ onUnmounted(() => {
 
 // 你现有的props和样式配置
 
-const tableCellStyle = () => ({
-  fontSize: `${16 / size.value}px`,
-  textAlign: 'center',
-});
+
 
 const rowStyle = () => ({
   height: `${32 / size.value}px`,
@@ -149,7 +146,7 @@ const rowStyle = () => ({
 
 // 低缩放比的样式，你可以调小字体、行高或者做别的定制
 const tableCellStyleLower = () => ({
-  fontSize: `${18 / size.value}px`,
+  fontSize: `${13 / size.value}px`,
   textAlign: 'center',
 });
 
@@ -158,24 +155,26 @@ const rowStyleLower = () => ({
 });
 
 const tableHeaderStyle = {
-  background: 'linear-gradient(to right, #611ed1, #0e5fff)',
-  color: '#b8e6fe',
+  background: '#2575fc',
+  color: 'white',
   fontSize: '0.5vw',
   textAlign: 'center',
 };
 
 const tableHeaderStyleLower = {
-  background: 'linear-gradient(to right, #4225b9, #234fff)',
-  color: '#b0d6ff',
-  fontSize: '0.8vw',
+  background: '#2575fc',
+  color: 'white',
+  fontSize: '0.7vw',
   textAlign: 'center',
 };
+
+
 </script>
 
 
 <style scoped>
 .el-table {
-  --el-table-row-hover-bg-color: rgba(14, 95, 255, 0.5);
+  --el-table-row-hover-bg-color:#2575fc;
   background-color: transparent;
   --el-table-tr-bg-color: transparent;
   --el-table-border: 1px solid rgb(83, 234, 253);
@@ -183,5 +182,8 @@ const tableHeaderStyleLower = {
   --el-table-border-color: rgb(83, 234, 253);
 }
 
-
+:deep(.el-table th),
+:deep(.el-table td) {
+  padding: 0;
+}
 </style>

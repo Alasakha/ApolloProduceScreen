@@ -45,7 +45,7 @@
                 setOption(option)
                 resizeChart() // 关键点：初始化后立即触发一次 resize
             })
-            }, { deep: true, immediate: true })
+        }, { deep: true, immediate: true })
 
             
         const fetchData = () => {

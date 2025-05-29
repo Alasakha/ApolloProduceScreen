@@ -8,13 +8,13 @@ export function createChartOption(title: string, rawData: any) {
   
     return {
       color: [
-        '#8F87F1', '#C68EFD', '#E9A5F1', '#FED2E2',
-        '#5F6DF8', '#B6A0FF', '#493DF5'
+        '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
+        '#FF1654'
       ],
       title: {
         text: title,
-        top: '2%',
-        left: 'center',
+        top: '4%',
+        left: 'left',
         textStyle: {
           color: '#ffffff',
           fontSize: 25,
@@ -32,7 +32,7 @@ export function createChartOption(title: string, rawData: any) {
       },
       legend: {
         orient: 'horizontal',
-        top: '10%',
+        bottom: '0%',
         left: 'center',
         textStyle: {
           color: '#ffffff'
@@ -41,7 +41,7 @@ export function createChartOption(title: string, rawData: any) {
       series: [
         {
           type: 'pie',
-          radius: '50%',
+          radius: ['40%', '70%'],  // 修改为环形
           data,
           label: {
             show: true,

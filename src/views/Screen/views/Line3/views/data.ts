@@ -7,14 +7,18 @@ export function createChartOption(title: string, rawData: any) {
     const isEmpty = !rawData || rawData.length === 0;
   
     const data = isEmpty
-      ? [{ name: '暂无异常', value: 1, itemStyle: { color: '#7E8AA2	' } }]
+      ? [{ name: '暂无异常', value: 1, itemStyle: { color: 'green 	' } }]
       : rawData;
   
     return {
-      // color: [
-      //   '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-      //   '#FF1654'
-      // ],
+//       color: [
+//         '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
+//         '#247BA0',  // 深海蓝
+// '#70C1B3',  // 湖水绿
+// '#B2DBBF', // 薄荷绿
+// '#F3FFBD',  // 柠檬黄
+// '#FF1654'  // 活力红
+//       ],
       grid:{},
       title: {
         text: title,
@@ -47,7 +51,7 @@ export function createChartOption(title: string, rawData: any) {
       series: [
         {
           type: 'pie',
-          radius: '50%',
+          radius: ['30%', '60%'],  // 修改为环形
           data,
           label: {
             show: true,

@@ -37,13 +37,12 @@ const formatData = (deviceData) => {
   };
 
   return [
+    {name: '品号',real: deviceData.ta006 } ,// 👈 品号项单独一行 & 不显示标题  ];
     { name: '温度', real: formatValue(deviceData.et1)  },
     { name: '压力', real: formatValue(deviceData.esipp) },
     { name: '最大射速', real: formatValue(deviceData.eivm) },
     { name: '保压时间', real: formatValue(deviceData.esipt) },
- 
-  ];
-};
+]};
 
 // 获取并处理数据
 const fetchData = async () => {

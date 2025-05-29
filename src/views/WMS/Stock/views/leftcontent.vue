@@ -1,19 +1,16 @@
 <template>
   <div class="left-content h-full w-[65%]">
     <dv-border-box10>
-      <div class="production-data text-white w-full h-full  flex justify-around flex-col">
+<div class="production-data text-white w-full h-full  flex justify-around  flex-col p-4">
 
-<div class="row flex justify-around items-centers  " >
-  <DataCard title="库存金额" :value="warehouseData[0]?.amt ?? '无数据'" />
-  <DataCard title="库存数量" :value="warehouseData[0]?.kc ?? '无数据'" />
-<DataCard title="库存周转天数" :value="warehouseData[0]?.turnoverDays ?? '无数据'" />
-</div>
-<div class="row flex justify-around items-centers" >
+<div class="row flex justify-around items-center gap-16 ">
+
   <DataCard title="总库位" :value="warehouseData[0]?.total ?? '无数据'" />
-<DataCard title="已用库位" :value="warehouseData[0]?.usedTotal ?? '无数据'" />
+  <DataCard title="已用库位" :value="warehouseData[0]?.usedTotal ?? '无数据'" />
 <DataCard title="库位利用率" :value="warehouseData[0]?.percent ?? '无数据'" />
-
 </div>
+
+
 </div>
       
     </dv-border-box10>
@@ -46,7 +43,7 @@ const warehouseData = ref<WarehouseInfo[]>([])
   await store.fetchData(); // 等待数据加载
 
   const res = store.combinedData;
-    console.log(res, '库存数据')
+
   warehouseData.value = res.map((item: any) => {
     return {
       amt: item.amt ? parseFloat(parseFloat(item.amt).toFixed(1)) : null,
@@ -57,7 +54,7 @@ const warehouseData = ref<WarehouseInfo[]>([])
       percent: item.percent  ?  item.percent: null,
     };
   });
-  console.log(warehouseData.value, '库存数据')
+
 }
 
 

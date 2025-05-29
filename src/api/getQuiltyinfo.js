@@ -73,13 +73,18 @@ export const getFivedayRate = (prodLine) => {
 }  
 
 // 详细功性能详细内容
-export const getAbnormalDetail = (prodLine,reasonType, ngName) => {
-  return request({
+export const getAbnormalDetail = (prodLine,reasonType, ngName, peopleName,admin_unit_name) => {
+  const params = { reasonType };
+  if (prodLine) params.prodLine = prodLine;
+  if (ngName) params.ngName = ngName;
+  if (peopleName) params.peopleName = peopleName;
+   if (admin_unit_name) params.admin_unit_name = admin_unit_name;
+  return request({  
     url: '/quality/abnormalDetail',
     method: 'get',
-    params: { prodLine,reasonType,ngName } // 传递 prodLine 参数
-  })
-}  
+    params
+  });
+};
 
 // 今日功性能不良
 export const getAtopDayInspector = (prodLine,reasonType ) => {

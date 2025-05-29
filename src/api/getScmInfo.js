@@ -94,3 +94,31 @@ export const getTop5PurchaserSignBackDelayed = () => {
     method: 'get',
   })
 }
+
+
+// /SCM/purchasePassRateDetail 来料合格率
+export const getPurchasePassRateDetail = (purchaserName ) => {
+  return request({
+    url: '/SCM/purchasePassRateDetail',
+    method: 'get',
+    params: { purchaserName }
+  })
+}
+
+// /SCM/purchaseDeliveryRateDetail 到货及时率
+export const getPurchaseDeliveryRateDetail = (queryDate ,purchaseName ) => {
+  return request({
+    url: '/SCM/purchaseDeliveryRateDetail',
+    method: 'get',
+    params: { queryDate ,purchaseName  }
+  })
+}
+
+// /SCM/purchaseSigningRateDetail 回签及时率
+export const getPurchaseSigningRateDetail = (purchaseName ) => {
+  return request({
+    url: '/SCM/purchaseSigningRateDetail',
+    method: 'get',
+    params: { purchaseName  }
+  })
+}

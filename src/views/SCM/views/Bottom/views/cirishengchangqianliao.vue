@@ -156,7 +156,7 @@ const clickHandler = (row: any) => {
       
       <div class="flex">
       <div class='w-[49vw]'>        
-        <dv-scroll-board
+        <ScrollBoard
           class="pl-4 pr-4 pt-2"
           :config="config1"
           style="width:100%;height:16vh"
@@ -165,7 +165,7 @@ const clickHandler = (row: any) => {
 </div>
 
 <div class='w-[50vw]'>        
-  <dv-scroll-board
+  <ScrollBoard
   class="pl-4 pr-4 pt-2"
   :config="config2"
   style="width:100%;height:16vh"

@@ -3,7 +3,8 @@
 <template>
     <dv-border-box8 :dur="5">
       <GlobalTitle title="当日来料质量异常问题统计"/>
-        <dv-scroll-board  class="pt-6 pb-1"
+        <div class='h-[3vh]'></div>     
+        <ScrollBoard  class=" pb-1"
         :config="config" style="width: 94%; height:75%;  margin-left: 1vw;" />
     
       </dv-border-box8>
@@ -26,7 +27,7 @@
     const queryDate = getYesterday(); // 昨天的日期
     // 表格配置
     const config = reactive({
-      header: ['采购内勤', '供应商','客户单号','品名', '品号','不合格数量','检验日期', '问题点', '判断结果' ,'最终检验合格时间','处理时长',],
+      header: ['采购内勤', '供应商','到货单号','品名', '品号','不合格数量','检验日期', '问题点', '判断结果' ,'最终检验合格时间','处理时长',],
       data: [],
       index: true,
       columnWidth: [50, 150, 150, 170, 150,150,150,150,150,150,150,150],  
@@ -34,7 +35,8 @@
       rowNum: 5,
       headerHeight:25,
       carousel:'page',
-      waitTime:4000
+      waitTime:6000,
+      showTooltip:true,
     })
     
     function formatDate(dateStr?: string): string {

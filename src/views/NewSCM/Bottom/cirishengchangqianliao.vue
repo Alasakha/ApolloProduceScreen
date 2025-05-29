@@ -12,30 +12,34 @@ const config1 = reactive({
   header: ['排产时间', '客户单号','供应商代号','品号','品名','采购员','欠料数量'],
   data: [],
   index: true,
-  align: ['center'],
+  align: ['center','center','center','center','center','center','center'],
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[50, 100, 150, 150, 120, 140, 150, 100],
+  columnWidth:[],
+  rowNum: 7,
+  showTooltip:true,
 });
 
 const config2 = reactive({
-  header: ['排产时间', '客户单号','工单单号','供应商代号','品号','品名','采购员','欠料数量'],
+  header: ['排产时间', '客户单号','供应商代号','品号','品名','采购员','欠料数量'],
   data: [],
   index: true,
-  align: ['center','center','center','center,'],
+  align: ['center','center','center','center','center','center','center'],
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[50, 120, 150, 150, 120, 140, 150, 100],
+  columnWidth:[],
+  rowNum: 5,
+  showTooltip:true,
 });
+
 let chartInstance: any = null; // 图表实例
 const dialogVisible = ref(false);
 const selectedItem = ref<any>({});
   const detailHeaders = [
   '排产时间',
   '客户单号',
-  '工单单号',
   '供应商代号',
   '品号',
   '品名',
@@ -48,59 +52,126 @@ const selectedItem = ref<any>({});
 const fetchData = () => {
   getWarningNextDay()
     .then((res) => {
-      rawData.value[0] = res.data.zzyk; // 保存原始数据
-      rawData.value[1] = res.data.zzek; // 保存原始数据
-      // 转换数据为二维数组
-      const nextday = getNextDay()
-      name.value[0] = rawData.value[0].map((item: any) => {
-        // const totalNumber = parseFloat(item.total); // 确保转换为数字
-        return [nextday,item.customerOrderNo, item.supplierCode,item.itemNo,item.itemName,item.purchaserName	, Math.round(Number(item.purchaseQuantity))] // 转为数字并四舍五入]; // 保留整数部分
+      const zzyk = res.data.zzyk || [];
+      const zzek = res.data.zzek || [];
+
+      rawData.value[0] = zzyk;
+      rawData.value[1] = zzek;
+
+      const nextday = getNextDay();
+
+      // 总装一课
+      name.value[0] = zzyk.map((item: any) => {
+        return [
+          nextday,
+          item.customerOrderNo,
+          item.supplierCode,
+          item.itemNo,
+          item.itemName,
+          item.purchaserName,
+          Math.round(Number(item.purchaseQuantity))
+        ];
       });
-      name.value[1] = rawData.value[1].map((item: any) => {
-        // const totalNumber = parseFloat(item.total); // 确保转换为数字
-        return [nextday,item.customerOrderNo, item.orderNo,item.supplierCode,item.itemNo,item.itemName,item.purchaserName,Math.round(Number(item.purchaseQuantity))] // 转为数字并四舍五入]; // 保留整数部分
+
+      // 总装二课
+      name.value[1] = zzek.map((item: any) => {
+        return [
+          nextday,
+          item.customerOrderNo,
+          item.supplierCode,
+          item.itemNo,
+          item.itemName,
+          item.purchaserName,
+          Math.round(Number(item.purchaseQuantity))
+        ];
       });
-      // 将转换后的数据更新到 config1.data 中
-      config1.data = name.value[0]
-      config2.data = name.value[1]
+
+      // 设置 config 数据，若为空则添加提示
+      config1.data = name.value[0].length
+        ? name.value[0]
+        : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+
+      config2.data = name.value[1].length
+        ? name.value[1]
+        : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
     })
     .catch(() => {
       console.log('数据获取失败');
+      config1.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+      config2.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
     });
-    
 };
 
 
 // 初始化图表
 const initChart = () => {
-  const chartContainer = document.querySelector('.chart-container') as HTMLElement; // 类型断言为 HTMLElement
-  if (chartContainer) {
-    chartInstance = echarts.init(chartContainer);
-    // 配置图表的初始选项（根据需求调整）
-    const option = {
-      title: {
-        text: '供应商欠料情况',
-        left: 'center',
-      },
-      tooltip: {},
-      xAxis: {
-        type: 'category',
-        data: name.value.map((item: any) => item[0]), // 使用供应商名称
-      },
-      yAxis: {
-        type: 'value',
-      },
-      series: [
-        {
-          data: name.value.map((item: any) => item[3]), // 使用欠料数量
-          type: 'bar',
-        },
-      ],
-    };
-    chartInstance.setOption(option);
-  } else {
+  const chartContainer = document.querySelector('.chart-container') as HTMLDivElement;
+  if (!chartContainer) {
     console.error('chart-container 元素未找到');
+    return;
   }
+
+  // 确保有数据
+  if (!name.value || !name.value[0] || !name.value[0].length) {
+    console.warn('暂无图表数据');
+    return;
+  }
+
+  chartInstance = echarts.init(chartContainer);
+  
+  // 配置图表的初始选项
+  const option = {
+    title: {
+      text: '供应商欠料情况',
+      left: 'center',
+      textStyle: {
+        color: '#fff'
+      }
+    },
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
+      }
+    },
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '3%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: name.value[0].map((item: any) => item[2]), // 使用供应商代号
+      axisLabel: {
+        color: '#fff',
+        interval: 0,
+        rotate: 45
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        color: '#fff'
+      }
+    },
+    series: [
+      {
+        name: '欠料数量',
+        data: name.value[0].map((item: any) => item[6]), // 使用欠料数量
+        type: 'bar',
+        itemStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: '#83bff6' },
+            { offset: 0.5, color: '#188df0' },
+            { offset: 1, color: '#188df0' }
+          ])
+        }
+      }
+    ]
+  };
+
+  chartInstance.setOption(option);
 };
 
 // 监听窗口大小变化
@@ -148,49 +219,55 @@ const clickHandler = (row: any) => {
   <div class="qianliao h-[20vh] pl-4 pr-4">
     <dv-border-box12 >
       <!-- 标题行 -->
-    <div class="flex justify-around items-center">
-      <h2 class="text-white font-bold text-sm pt-4 flex justify-center items-center">总装一课</h2>
-      <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">次日生产欠料预警</h2>
-      <h2 class="text-white font-bold text-sm pt-4 flex justify-center items-center">总装二课</h2>
-    </div>
+      <div class="flex justify-around items-center">
+        <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">总装一课</h2>
+        <h2 class="text-white font-bold text-2xl pt-4 flex justify-center items-center">次日生产欠料预警</h2>
+        <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">总装二课</h2>
+      </div>
       
-      <div class="flex w-full">
-      <div class='w-full'>        
-        <dv-scroll-board
-          class="pl-4 pr-4 pt-2"
-          :config="config1"
-          style="width:100%;height:16vh"
-          @click="clickHandler"
-        />
-</div>
+      <div class="box flex w-full max-w-full">
+        <div class="w-1/2 px-2 box-border">
+          <ScrollBoard
+            class="pt-2"
+            :config="config1"
+            style="width: 100%; height: 16vh"
+            @click="clickHandler"
+          />
+        </div>
 
-<div class='w-full'>        
-  <dv-scroll-board
-  class="pl-4 pr-4 pt-2"
-  :config="config2"
-  style="width:100%;height:16vh"
-  @click="clickHandler"
-/>
-</div>
-</div>
-
-      
-     
+        <div class="w-1/2 px-2 box-border">
+          <ScrollBoard
+            class="pt-2"
+            :config="config2"
+            style="width: 100%; height: 16vh"
+            @click="clickHandler"
+          />
+        </div>
+      </div>
     </dv-border-box12>
+
+    <!-- 添加图表容器 -->
+    <div class="chart-container mt-4" style="height: 300px;"></div>
   </div>
 
-
-<!-- 弹窗部分 -->
-<el-dialog v-model="dialogVisible" title="详细信息" width="50%">
-  <div v-for="(label, index) in detailHeaders" :key="index" class="mb-2">
-    <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
-  </div>
-</el-dialog>
+  <!-- 弹窗部分 -->
+  <el-dialog v-model="dialogVisible" title="详细信息" width="50%">
+    <div v-for="(label, index) in detailHeaders" :key="index" class="mb-2">
+      <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
+    </div>
+  </el-dialog>
 </template>
 
 <style scoped>
 .chart-container {
   width: 100%;
-  height: 100%;
+  background-color: rgba(0, 0, 0, 0.3);
+  border-radius: 4px;
+  padding: 1rem;
+}
+
+.qianliao {
+  display: flex;
+  flex-direction: column;
 }
 </style>

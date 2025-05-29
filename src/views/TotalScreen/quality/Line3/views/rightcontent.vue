@@ -8,7 +8,7 @@
       
 
       <div class="flex justify-center items-center h-[80%]">
-         <dv-scroll-board :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
+         <ScrollBoard :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
       </div>
 </div>
    
@@ -32,7 +32,7 @@ const config = reactive({
   index: true,
   align: ['center','center','center','center','center','center','center','center'],
   rowNum: 6,
-  columnWidth: [40, 100, 120, 80,120,140,100],
+  columnWidth: [50],
   headerHeight: 20
 })
 

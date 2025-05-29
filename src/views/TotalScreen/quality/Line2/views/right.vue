@@ -2,8 +2,8 @@
     <dv-border-box10>
         <div class="box1"> 
             <div class="w-full h-full">
-                <div ref="qualityIndicators" class="chart-container w-full h-[90%]"></div>
-                <dv-button class="w-30 pl-4"  :bg="false" @click="() => opendialog(prodLine)">详细数据</dv-button>
+                <div ref="qualityIndicators" class="chart-container w-full h-[85%]"></div>
+              <dv-button class=" w-[6vw] pl-4" :color="'#23a7dc'"  :bg="false" @click="() => opendialog()">详细数据</dv-button>
             </div>
         </div>
     </dv-border-box10>
@@ -31,7 +31,7 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = '今日其他类责任';
+const title = ref('今日其他类责任');
 const reasonType = 2;
 
 const qualityIndicators = ref(null);
@@ -41,7 +41,7 @@ const isDataEmpty = ref(false);
 const route = useRoute();
 const prodLine = route.query.prodLine;
 
-const { initChart, setOption, resizeChart } = useEcharts(qualityIndicators); // 使用封装的逻辑
+const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
 const gridData = ref([]);
 const gridColumns = [
@@ -51,14 +51,15 @@ const gridColumns = [
   { prop: 'ta006', label: '品号' },
   { prop: 'mb002', label: '车型' },
   { prop: 'peopleName', label: '发现人' },
-  { prop: 'admin_UNIT_NANE', label: '责任部门'}
+  { prop: 'admin_UNIT_NAME', label: '责任部门'},
+  { prop: 'ngResponPeople', label: '责任人'}
 ];
 
 
 
-const opendialog = (prodLine) => {
+const opendialog = () => {
   dialogTableVisible.value = true;
-  getAbnormalDetail(prodLine)
+  getAbnormalDetail(undefined,reasonType,undefined,undefined)
     .then(res => {
       gridData.value = res.data;
     });
@@ -78,6 +79,19 @@ const fetchData = () => {
     });     
 };
 
+// 点击饼图区域，弹出对应信息
+const handleChartClick = (params) => {
+  const clickedName = params.name;
+  title.value = `${clickedName}的详细数据`;
+  dialogTableVisible.value = true;
+
+  getAbnormalDetail(undefined,reasonType,undefined,clickedName) // 假设 API 接口第三个参数是问题名
+    .then(res => {
+      gridData.value = res.data;
+    });
+};
+
+
 const processData = (data) => {
   const formatted = formatPieChartData(data, 'peopleName', 'total');
   rawData.value = formatted.map(item => ({
@@ -90,8 +104,9 @@ const processData = (data) => {
 watch(rawData, () => {
   nextTick(() => {
     initChart();
-    const option = createChartOption(title, rawData.value);
+    const option = createChartOption(title.value, rawData.value);
     setOption(option);
+    onClick(handleChartClick); // ✅ 恢复点击事件绑定
   });
 }, { deep: true, immediate: true });
 

@@ -13,7 +13,8 @@
       "@/*": [
         "./src/*"
       ]
-    }
+    },
+    "types": ["node"]
   },
   "include": [
     "src/**/*.ts",
@@ -22,6 +23,6 @@
     "src/main.js",
     "src/utils/eventbus.ts",
     "src/router/index.js",
-    "src/router/index.js"
+    "src/types/**/*.ts"
   ]
 }

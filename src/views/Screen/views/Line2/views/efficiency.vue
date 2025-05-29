@@ -1,44 +1,47 @@
 <template>
-    <div class="efficency w-[25%]">
-      <dv-border-box12>
-    <!-- 标题 -->
-    <GlobalTitle title="当日人时效率"/>
-        <!-- 如果正在加载，显示 loading -->
-        <div v-if="isLoading" class="w-full h-[85%]">
+  <div class="efficency w-[25%]">
+    <dv-border-box12>
+      <GlobalTitle title="当日人时效率"/>
+      <!-- 如果正在加载，显示 loading -->
+      <div v-if="isLoading" class="w-full h-[85%] text-white">
         <dv-loading>Loading...</dv-loading>
       </div>
-    <!-- 数量 -->
-    <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col  justify-start">
-    <div class="line flex-2 flex">
-      <!-- 配置人数 -->
-      <div class="peizhi flex-1">
-        <div ref="Indicators1" class="w-full h-[100%]"></div>
+      <!-- 数量 -->
+      <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col justify-start">
+        <div class="line flex-2 flex">
+          <!-- 配置人数 -->
+          <div class="peizhi flex-1">
+            <div ref="Indicators1" class="w-full h-[100%]"></div>
+          </div>
+          <!-- 出勤人数 -->
+          <div class="chuchai flex-1">
+            <div ref="Indicators2" class="w-full h-[100%]"></div>
+          </div>
+        </div>
+
+        <div class="line flex-1 flex gap-8 w-full h-full justify-center items-center">
+          <!-- 标准人效 -->
+          <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
+            <div class="title text-lg font-bold">标准人效</div>
+            <div class="value">{{ EfficentData.standardEfficiency.value }}</div>
+          </div>
+
+          <!-- 实际人效 -->
+          <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
+            <div class="title text-lg font-bold">实际人效</div>
+            <div class="value">{{ EfficentData.efficiency.value }}</div>
+          </div>
+        </div>
+
       </div>
-      <!-- 出勤人数 -->
-      <div class="chuchai flex-1">
-        <div ref="Indicators2" class="w-full h-[100%]"></div>
-      </div>
-    </div>
+    </dv-border-box12>
 
-    <div class="line flex-1 flex  gap-8 w-full h-full  justify-center items-center">
-    <!-- 标准人效 -->
-    <div class="eff-card  flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
-      <div class="title  text-lg font-bold">标准人效</div>
-      <div class="value">{{ EfficentData.standardEfficiency.value }}</div>
-    </div>
 
-    <!-- 实际人效 -->
-    <div class="eff-card  flex flex-col justify-center items-center rounded-xl p-2 shadow-lg ">
-      <div class="title  text-lg font-bold">实际人效</div>
-      <div class="value">{{ EfficentData.efficiency.value }}</div>
-    </div>
+
+
   </div>
-  </div>
+</template>
 
-        </dv-border-box12>
-    </div>
-  </template>
-  
   <script setup>
   
   import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, } from 'vue';
@@ -52,6 +55,7 @@ import { eventBus } from '@/utils/eventbus';
 import BigScreenTitle from '@/components/title.vue'
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
+
 // 定义数据
 const config = reactive({
   value: 66,
@@ -108,6 +112,7 @@ const drawChart = () => {
 
   chart1.setOption(option1);
   chart2.setOption(option2);
+
 };
 
 const fetchData = async () => {
@@ -158,7 +163,7 @@ onMounted(() => {
 
 .eff-card {
   /* @apply flex flex-col justify-center items-center rounded-xl p-4 shadow-lg; */
-  background: linear-gradient(135deg, #520096 0%,#5c00f0 70%,#0417bd 100%);
+  background: linear-gradient(135deg, #2563eb 0%,#38bdf8 100%);
   color: #fff;
   flex: 1;
 }
@@ -168,4 +173,6 @@ onMounted(() => {
   font-size: 1.8rem;
   font-weight: bold;
 }
+
+
 </style>

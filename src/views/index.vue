@@ -43,7 +43,6 @@ import { useRouter } from "vue-router";
 const router = useRouter();
 
 const lines = ref([
-  { id: null, name: "总装看板",router:"S" },
   { id: "1004A", name: "生产线1004A",router:"S" },
   { id: "1004B", name: "生产线1004B",router:"S" },
   { id: "1004C", name: "生产线1004C",router:"S" },
@@ -58,10 +57,11 @@ const lines = ref([
   { id: "2004", name: "2004质量检测",router:"Q" },
   { id: "2005", name: "2005质量检测",router:"Q" },
   { id: null, name: "注塑看板",router:"/injection" },
-  // { id: null, name: "供应链看板",router:"/scm" },
   { id: null, name: "总仓看板",router:"/wms" },
   { id: null, name: "金工看板",router:"/material" },
   { id: null, name: "供应链看板",router:"/newscm" },
+  { id: null, name: "生产计划看板",router:"/produceplan" },
+  { id: null, name: "PLM看板",router:"/plm" },
 ]);
 
 // 获取 lines 中指定范围的数据

@@ -3,11 +3,14 @@
 <dv-full-screen-container>
 
   <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
-    <div class="w-full h-[4vh] " ></div>
-    <Header></Header>
-    <Stock></Stock>
-    <Line3></Line3>
-    <Line4> </Line4>
+    <div class="w-full h-full flex flex-col pl-4 pr-4">
+      <div class="w-full h-[4vh] " ></div>
+      <Header></Header>
+      <Stock></Stock>
+      <Line3></Line3>
+      <Line4> </Line4>
+    </div>
+
   </dv-border-box11>
 </dv-full-screen-container>
 </body>
@@ -25,7 +28,6 @@ import Line4 from './4line/index.vue'
 
 
 <style scoped>
-
 body{
 width: 100vw;
 height: 100vh;

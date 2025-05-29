@@ -36,7 +36,9 @@ export function createChartOption(data) {
         show: true,
         position: 'top', // 显示在柱子顶部
         color: '#fff',   // 文字颜色
-        formatter: '{c}%' // 加上百分号
+        formatter: (params) => {
+          return `${(params.value ).toFixed(0)}%`
+        }
       },
       series: [
         {

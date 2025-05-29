@@ -54,11 +54,38 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="text-white text-3xl flex flex-row items-center justify-around">
-    {{ icon }}{{ weatherData.condition }} {{ temperature }}°C
+  <div
+    class="weather-bar flex items-center px-2 w-[50%] py-2 rounded-xl justify-center  "
+    style="
+      background: linear-gradient(90deg, rgba(79,142,247,0.7) 0%, rgba(30,60,114,0.7) 100%);
+      min-width: 320px;
+      box-shadow: 0 0 16px 2px rgba(79,142,247,0.4);
+      border: 1.5px solid rgba(79,142,247,0.3);
+      backdrop-filter: blur(2px);
+      color: #fff;
+    "
+  >
+    <span class="text-5xl mr-4 drop-shadow">{{ icon }}</span>
+    <div class="flex flex-col mr-6">
+      <span class="text-3xl font-bold leading-tight flex items-center">
+        {{ temperature }}°C
+        <span class="ml-3 text-lg font-normal">{{ weatherData.condition }}</span>
+      </span>
+      <span class="text-sm opacity-80 mt-1 flex items-center">
+        <span>{{ weatherData.city || '未知城市' }}</span>
+        <span v-if="weatherData.time" class="ml-4">{{ weatherData.time }}</span>
+      </span>
+    </div>
   </div>
 </template>
 
 <style scoped>
-/* 自定义样式，如果需要的话 */
+.weather-bar {
+  font-family: 'Source Han Sans', 'Microsoft YaHei', Arial, sans-serif;
+  letter-spacing: 1px;
+  transition: box-shadow 0.3s;
+}
+.weather-bar:hover {
+  box-shadow: 0 0 24px 4px rgba(79,142,247,0.6);
+}
 </style>

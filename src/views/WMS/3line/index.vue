@@ -1,13 +1,8 @@
 <template>
-<div class="h-[30vh] bg-red=300 w-full flex">
-    <!-- 账务处理及时率柱状图(取各仓位应出入库单据和实际) -->
-    <Accounting class="flex-1"></Accounting>
-
-    <!-- 仓库呆滞物料预警前置15天 -->
-    <Store class="flex-3"></Store>
-    
-    <!-- 呆滞金额按各仓位取值 -->
-    <DeadMoney class="flex-0.5"> </DeadMoney>
+<div class="h-[40vh] bg-red=300 w-full flex">
+<Accounting class="basis-[30%]"></Accounting>
+<Store class="basis-[55%]"></Store>
+<DeadMoney class="basis-[25%]"></DeadMoney>
 </div>
 
 </template>

@@ -91,8 +91,7 @@ onBeforeUnmount(() => {
           'text-[2vw]': zoomClass === 'zoom-200'
         }"
       >
-        本月生产计划总数：
-        <span class="text-cyan-400">{{ cumulativePassRate.plan }}</span>
+
       </div>
     </div>
   </div>

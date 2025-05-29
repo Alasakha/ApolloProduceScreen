@@ -6,7 +6,7 @@
       </div>
 
       <div class="flex justify-center items-center h-[80%]">
-         <dv-scroll-board :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
+         <ScrollBoard :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
       </div>
    
 </div>
@@ -22,13 +22,14 @@ import { getIncomingInspection2 } from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus';
 // 初始化 配置对象
 const config = reactive({
-  header: ['到货单号','供应商','品号', '品名','到货时间', '规格','检验人员','审核时间',], // 表头
+  header: ['到货单号','供应商','品号', '品名','到货时间', '规格','检验人员','审核时间','到货数'], // 表头
   data: ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据'], // 数据
   index: true,
-  align: ['center','center','center','center','center','center','center','center','center'],
+  align: ['center','center','center','center','center','center','center','center','center','center','center'],
   rowNum: 6,
-  columnWidth: [50, 100, 100, 120,120,120,100,80,140],
-  headerHeight: 10
+  // columnWidth: [50, 100, 100, 100,120,120,100,80,120,100],
+  columnWidth:[50],
+  headerHeight: 20
 })
 
 // 获取数据
@@ -43,10 +44,11 @@ const fetchData = async () => {
         item.supplier_full_name || '暂无数据', // 不良原因
         item.item_code || '暂无数据',
         item.itemDescription || '暂无数据',
-        item.arrivalTime ? item.arrivalTime.slice(0,16) : '暂无数据', // 时间
+        item.arrivalTime ? item.arrivalTime.slice(5,16) : '暂无数据', // 时间
         item.item_specification || '暂无数据',
         item.user_name || '暂无数据',
-        item.checkTime ? item.checkTime.slice(5) : '暂无数据'
+        item.checkTime ? item.checkTime.slice(5,16) : '暂无数据',
+        item.arriveNum -item.jsNum
 
       ]);
     }else {

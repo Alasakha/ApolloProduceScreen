@@ -1,5 +1,8 @@
 
 const size = window.devicePixelRatio ;
+
+
+
 export function createChartOption({
   category,
   value1 = [],
@@ -21,9 +24,19 @@ export function createChartOption({
     left: "center",
     top: "center"
 },
-    tooltip: {
-      trigger: 'axis'
-    },
+tooltip: {
+  trigger: 'axis',
+  formatter: function(params) {
+    // params 是一个数组，包含当前 x 轴下所有系列的数据
+    const hour = params[0].axisValue; // x 轴的时段
+    let str = `时段${hour-1}-${hour}时 产能<br/>`;
+    params.forEach(item => {
+      // 圆点+系列名+值
+      str += `${item.marker}${item.seriesName}：${item.value}<br/>`;
+    });
+    return str;
+  }
+},
     legend: {
       orient: 'horizontal',       // 图例的排列方向：'horizontal'（水平）或 'vertical'（垂直）
       top: '2%',                 // 距离容器顶部位置，也可用 'top', 'bottom', 'center'，或具体数值如 '50px'
@@ -69,7 +82,7 @@ export function createChartOption({
       {
         name: '计划产能',
         type: 'line',
-        data: value1,
+        data: value2,
         barWidth: '30%',
         itemStyle: {
           color: 'orange'
@@ -77,7 +90,6 @@ export function createChartOption({
         label: {
           show: true,
           position: 'top',
-         
           color: 'orange',
           fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
         }
@@ -85,7 +97,7 @@ export function createChartOption({
       {
         name: '实际产能',
         type: 'bar',
-        data: value2,
+        data: value1,
         barWidth: '30%',
         itemStyle: {
           color: '#3A5FCD'

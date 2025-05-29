@@ -48,3 +48,30 @@ export const getstagnantAmount= () => {
       method: 'get',
     })
   }
+
+  // /WMS/deliveryTimelinessRat 出库
+    export const getdeliveryTimelinessRat= () => {
+    return request({
+      url: '/WMS/deliveryTimelinessRate',
+      method: 'get',
+    })
+  }
+
+
+  // /WMS/deliveryTimelinessRateDetail 
+    export const getdeliveryTimelinessRateDetail= () => {
+    return request({
+      url: '/WMS/deliveryTimelinessRateDetail',
+      method: 'get',
+    })
+  }
+
+      export const gettimelyAccountingRateDetail= () => {
+    return request({
+      url: '/WMS/timelyAccountingRateDetail',
+      method: 'get',
+    })
+  }
+
+
+

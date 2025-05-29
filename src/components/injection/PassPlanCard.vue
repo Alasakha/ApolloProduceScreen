@@ -5,10 +5,11 @@
       </div>
       <div class="progress-info">
         <div class="progress-item">
-          <strong>当日排产数：</strong> <span>{{ spc!== null && spc!== undefined ? spc + '个' : '暂无数据' }} </span>
+          <!-- 取消+ '个' -->
+          <strong>当日排产数：</strong> <span>{{ spc!== null && spc!== undefined ? spc  : '暂无数据' }} </span>
         </div>
         <div class="progress-item">
-         <strong>达成数：</strong><span>{{ completed !== null && completed !== undefined ? completed + '个' : '暂无数据' }}</span>
+         <strong>达成数：</strong><span>{{ completed !== null && completed !== undefined ? completed  : '暂无数据' }}</span>
         </div>
         <div class="progress-item">
           <strong>达成率：</strong> 
@@ -43,7 +44,7 @@
   <style scoped>
   .machine-progress {
   padding: 0.5vh 1vw;
-  background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+  background: #2575fc ;
   border-radius: 1vw;
   box-shadow: 0 0.2vw 0.4vw rgba(0, 0, 0, 0.2);
   width: 10vw;
@@ -84,7 +85,7 @@ strong {
 .progress-bar {
   height: 100%;
   border-radius: 1vh;
-  background: linear-gradient(to right, #b621fe, #1fd1f9);
+  background: goldenrod
 }
 span{
     font-size: 0.6vw;

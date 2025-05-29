@@ -8,6 +8,10 @@ import SCM from '@/views/SCM/views/index.vue'
 import WMS from '@/views/WMS/index.vue'
 import Material from '@/views/Metalworking/index.vue' 
 import  NEWSCM from '@/views/NewSCM/index.vue' // 这里是新 SCM 的路径
+import ProducePlan from '@/views/ProducePlan/index.vue'
+import PLM from '@/views/PLM/index.vue'
+import MaterialManagement from '@/views/MaterialsManagement/index.vue'
+
 const routes = [
   {
     path: '/',
@@ -65,6 +69,24 @@ const routes = [
     path: '/newscm',
     name: 'NEWSCM',
     component: NEWSCM,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/produceplan',
+    name: 'ProducePlan',
+    component: ProducePlan,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/plm',
+    name: 'PLM',
+    component: PLM,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+    {
+    path: '/materialmanagement',
+    name: 'MaterialManagement',
+    component: MaterialManagement,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   }
 ];

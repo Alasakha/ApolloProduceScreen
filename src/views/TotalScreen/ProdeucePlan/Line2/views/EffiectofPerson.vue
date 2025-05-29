@@ -106,6 +106,9 @@ const drawChart = () => {
 
   chart1.setOption(option1);
   chart2.setOption(option2);
+
+  console.log('drawChart data:', EfficentData.scanNum, diffrentLine(prodLine));
+
 };
 
 const fetchData = async () => {
@@ -156,7 +159,7 @@ onMounted(() => {
 
 .eff-card {
   /* @apply flex flex-col justify-center items-center rounded-xl p-4 shadow-lg; */
-  background: linear-gradient(135deg, #520096 0%,#5c00f0 70%,#0417bd 100%);
+  background: linear-gradient(135deg, #2563eb 0%,#38bdf8 100%);
   color: #fff;
   flex: 1;
 }

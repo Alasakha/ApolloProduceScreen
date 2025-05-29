@@ -67,7 +67,7 @@ const updateChart = () => {
       type: 'shadow'
     },
     formatter: (params) => {
-      return `${params[0].name}<br>应到: ${params[0].value} 件<br>实到: ${params[1].value} 件<br>及时率: ${params[0].value > 0 ? (params[1].value / params[0].value * 100).toFixed(2) + '%' : 'N/A'}`;
+      return `${params.name}: ${(params.value * 100).toFixed(2)}%`
     }
   },
   legend: {
@@ -102,7 +102,8 @@ const updateChart = () => {
         position: 'top', // 放置在柱子顶部
         color: '#ffffff',
         fontSize: 12,
-        fontWeight: 'bold'
+        fontWeight: 'bold',
+
       }
     },
     {

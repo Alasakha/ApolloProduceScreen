@@ -74,7 +74,6 @@ const updateChart = () => {
         color: '#fff',
         fontSize: 12
       },
-      name: '供应商',
       nameLocation: 'end',
       nameTextStyle: {
         color: '#fff',
@@ -93,7 +92,6 @@ const updateChart = () => {
           return value.toFixed(0) + '%'; // 将数值转换为百分比并保留两位小数
         }
       },
-      name: '不良率 (%)',
       nameLocation: 'end',
       nameTextStyle: {
         color: '#fff',

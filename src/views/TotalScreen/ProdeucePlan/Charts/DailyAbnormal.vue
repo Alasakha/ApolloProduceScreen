@@ -14,7 +14,7 @@
          <!-- 如果正在加载，显示 loading -->
        <dv-loading v-if="isLoading">Loading...</dv-loading>
 
-        <dv-scroll-board v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
+        <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
       </div>
     </div>
   </dv-border-box-9>
@@ -29,10 +29,12 @@
 
 <script setup>
 import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
+import ScrollBoard from '@/components/datav/ScrollBoard.vue'
 import * as echarts from 'echarts';
 import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
+
 const dialogVisible = ref(false);//弹窗控制
 const selectedItem = ref({});
 const route = useRoute();
@@ -43,16 +45,18 @@ const isDataEmpty = ref(false);
 const categories = ref([]); // X 轴数据
 const values = ref([]); // Y 轴数据
 let chartInstance = null;
+const scrollBoardRef = ref(null);
 const config = reactive({
-  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','责任部门'],
+  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长'],
   data: [
     ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
   ],
   index: true,
-columnWidth: [50, 100, null, null, null, null, null, 10],
-  align: ['center','center','center','center','center','center','center','center'],
+columnWidth: [50],
+  align: [],
   rowNum:6,
-  columnWidth: [50, 100, 100, 120,120,70,100,80,140],
+    // showTooltip: true,
+    showTooltip: true,
 })
 
 
@@ -68,7 +72,7 @@ const fetchData = () => {
           Number(item.productionQuantity) ?? '无',
           item.dateTime  ?? '无',
           Number(item.productionQuantity)-Number(item.inboundQuantity),
-          item.workCenter ??'无'
+          item.daysBetween+'天' ??'无'
         ])
         isDataEmpty.value = false;
       } 

@@ -1,10 +1,10 @@
 <template>
   <div class='pl-5 pt-1'>
-    <div class='flex justify-center items-center text-lg text-cyan-300 '>
-      <p class="tracking-widest" >原材料监控</p>
-    </div>
+<div class="flex justify-center items-center text-lg text-white font-bold">
+  <p class="tracking-widest text-xl ">原材料监控</p>
+</div>
     
-    <dv-scroll-board :config="config" style="width:45vw;height:19vh;"/>
+    <ScrollBoard :config="config" style="width:45vw;height:19vh;"/>
   </div>
 </template>
 
@@ -14,12 +14,12 @@ import { getrawMaterialMonitoring } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 // 初始化配置对象
 const config = reactive({
-  header: ['机台号','计划产出数','计划用量','实际产出数','需领用量', '已领用量','未领用量'], // 表头
+  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际损耗量','原材料利用率'], // 表头
   data: [], // 数据
   index: true,
   align: ['center','center','center','center','center','center','center','center'],
   rowNum: 5,
-  columnWidth: [50, 150, 100, 100,100,100,100,100],
+  columnWidth: [50],
   headerHeight: 20
 })
 
@@ -31,13 +31,13 @@ const fetchData = async () => {
     if (res && res.data) {
       // 转换数据格式以适应表格
 config.data = res.data.map(item => [
-  item.ty009, // 假设这个字段无须处理
+  item.ty009, // 机台号
     item.planOutput,
-  parseFloat(item.expectedUsage).toFixed(0), // 确保是数字并去掉小数点
-  item.actualOutput,
-  parseFloat(item.requiredUsage).toFixed(0) ,
-  parseFloat(item.receivedUsage).toFixed(0), // 去掉小数点
-  parseFloat(item.unclaimedUsage).toFixed(0) // 去掉小数点
+    '--',
+    '--',
+    item.actualOutput,
+    '--',
+    '--'
 ]);
     }
   } catch (error) {
@@ -59,15 +59,15 @@ onMounted(() => {
 </script>
 
 <style scoped>
-:deep(.dv-scroll-board .header) {
+:deep(.ScrollBoard .header) {
   display: flex;
   flex-direction: row;
-  font-size: 0.8vw;
+  font-size: 0.6vw;
 
 }
 
-:deep(.dv-scroll-board .rows .row-item){
-  font-size: 0.7vw;
+:deep(.ScrollBoard .rows .row-item){
+  font-size: 0.5vw;
 }
 
 </style>

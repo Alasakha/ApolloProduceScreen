@@ -4,7 +4,8 @@
     
 
     <!-- 图表区域 -->
-   <div  ref="monthlyIndicators" class="w-full h-[90%]"></div>
+     <div class="h-[6%]"></div>
+   <div  ref="monthlyIndicators" class="w-full h-[85%]"></div>
 
   </dv-border-box-1>
 </template>

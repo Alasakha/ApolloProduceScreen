@@ -1,10 +1,12 @@
 // gaugeChart.ts
+const size = window.devicePixelRatio;
 export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { text?: string; data: number; max: number }) {
     return {
       title: {
         text: text,
         textStyle: {
           color: '#fff', // ← 加这一行，外面统一白色
+          fontSize: size >= 2 ? 10 : size >= 1.5 ? 16 : 24,
           rich: {
             title: {
               fontSize: 14,
@@ -30,8 +32,9 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
           detail: {
             show: true,
             color: "#fff",
-            offsetCenter: [0, 30],
-            fontSize: 18,
+            // offsetCenter: [0, 15],
+            offsetCenter: size >= 2 ? [0, 15] : size >= 1.5 ? [0, 20] : [0, 35],
+            fontSize: size >= 2 ? 12 : size >= 1.5 ? 16 : 24,
             formatter: () => {
               // 判断标题是否是 'xx'，如果是加百分号
               if (text === '点检及时率') {
@@ -62,8 +65,10 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
                     x1: 0,
                     y1: 0,
                     colorStops: [
-                      { offset: 1, color: 'rgba(0, 228, 255, 1)' },
-                      { offset: 0, color: 'rgba(105, 255, 151, 1)' },
+                      // { offset: 1, color: 'rgba(0, 228, 255, 1)' },
+                      // { offset: 0, color: 'rgba(105, 255, 151, 1)' },
+                       { offset: 1, color: '#2563eb' },
+                      { offset: 0, color: '#38bdf8' },
                     ],
                   },
                 ],
@@ -78,7 +83,8 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
             splitNumber: 1,
             distance: -15,
             lineStyle: {
-              color: 'rgb(5, 160, 187)', //刻度线颜色
+              // color: 'rgb(5, 160, 187)', //刻度线颜色
+              color: 'rgb(157, 214, 224)', //刻度线颜色
               width: 2,
             },
             length: 15,
@@ -92,7 +98,6 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
           hoverAnimation: false,
           clockwise: false,
           startAngle: 90,//起始角度
-         
           labelLine: { show: false },
           label: { position: 'center' },
           data: [
@@ -101,7 +106,7 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
               itemStyle: {
                 shadowBlur: 0,
                 shadowColor: '#fff',
-                color: 'rgba(58, 131, 102, 1)',
+                color: '#38bdf8',
               },
             },
             {
@@ -117,7 +122,7 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
         },
         {
           type: 'gauge',
-          // max: max, // ← 关键就是补这一行
+          max: max,
           z: 5,
           clockwise: false,
           startAngle: -269.99,
@@ -134,14 +139,14 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
             height: 14,
             offsetCenter: [0, '-100%'],
             itemStyle: {
-              color: 'rgba(74, 234, 174, 1)',
+              color:'rgb(255, 255, 255)'
             },
           },
           detail: { show: false },
           title: { show: false },
           data: [
-            { value: data },
-            { value: 0 },
+            { value: data }, // 实时移动的小圆点
+            { value: 0 },    // 固定在起始位置的小圆点
           ],
         },
       ],
