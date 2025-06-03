@@ -82,10 +82,14 @@ const currentRequestId = ref(0); // 添加请求标识符
 
 // 表格列配置
 const tableColumns = [
-    { label: '到货日期', prop: 'udf021' },
+    { label: '客户单号', prop: 'udf021' },
     { label: '供应商', prop: 'supplier_full_name' },
     { label: '采购员', prop: 'employee_name' },
-    
+    { label: '采购单号', prop: 'doc_no' },
+    { label: '品号', prop: 'item_code' },
+    { label: '品名', prop: 'item_description' },
+    { label: '规格', prop: 'item_specification' },
+    { label: '预到货日', prop: 'plan_arrival_date' },
 ];
 
 // 处理饼图点击事件

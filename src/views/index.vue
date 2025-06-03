@@ -62,6 +62,8 @@ const lines = ref([
   { id: null, name: "供应链看板",router:"/newscm" },
   { id: null, name: "生产计划看板",router:"/produceplan" },
   { id: null, name: "PLM看板",router:"/plm" },
+  { id: "CY", name: "冲压生产管理看板",router:"/stampmanagement" },
+  { id: "HJ", name: "焊接生产管理看板",router:"/stampmanagement" },
 ]);
 
 // 获取 lines 中指定范围的数据
@@ -77,10 +79,11 @@ const selectLine = (line) => {
     router.push({ path: "/project", query: { prodLine: line.id } });
   }else if(line.router == 'Q'){
     router.push({ path: "/quality", query: { prodLine: line.id } });
+  }else if(line.router == '/stampmanagement'){
+    router.push({ path: "/stampmanagement", query: { prodLine: line.id } });
   }else{
     router.push({ path: line.router, query: { prodLine: line.id } });
   }
- 
 };
 
 </script>

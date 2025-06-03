@@ -25,30 +25,35 @@ const formatDate = (dateStr) => {
 }
 
 // 配置轮播表格
-const scrollConfig = computed(() => ({
-    header: ['项目编号', '项目名称', '任务名称', '计划完成时间', '变更完成时间'],
-    data: overdueList.value.map(item => [
-        item.pno,
-        item.projName,
-        item.taskName,
-        formatDate(item.expectTime),
-        formatDate(item.changeTime) || '--'
-    ]),
-    index: true,  // 显示序号列
-    indexHeader: '序号',
-    columnWidth: [50],  // 列宽
-    align: ['center'],  // 对齐方式
-    rowNum: 5,  // 显示行数
-    headerBGC: '#0f2749',  // 表头背景色
-    oddRowBGC: '#003666',  // 奇数行背景色
-    evenRowBGC: '#0a1f3d',  // 偶数行背景色
-    waitTime: 2000,  // 轮播时间间隔
-    headerHeight: 35,  // 表头高度
-    columnHeight: 35,  // 行高
-    hoverPause: true,  // 鼠标悬停暂停轮播
-    headerFontSize: 14,  // 表头字体大小
-    bodyFontSize: 14    // 内容字体大小
-}))
+const scrollConfig = computed(() => {
+    const defaultRow = ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+    return {
+        header: ['项目编号', '项目名称', '任务名称', '计划完成时间', '变更完成时间'],
+        data: overdueList.value.length > 0 
+            ? overdueList.value.map(item => [
+                item.pno,
+                item.projName,
+                item.taskName,
+                formatDate(item.expectTime),
+                formatDate(item.changeTime) || '--'
+            ])
+            : [defaultRow],
+        index: true,  // 显示序号列
+        indexHeader: '序号',
+        columnWidth: [50],  // 列宽
+        align: ['center'],  // 对齐方式
+        rowNum: 5,  // 显示行数
+        headerBGC: '#0f2749',  // 表头背景色
+        oddRowBGC: '#003666',  // 奇数行背景色
+        evenRowBGC: '#0a1f3d',  // 偶数行背景色
+        waitTime: 2000,  // 轮播时间间隔
+        headerHeight: 35,  // 表头高度
+        columnHeight: 35,  // 行高
+        hoverPause: true,  // 鼠标悬停暂停轮播
+        headerFontSize: 14,  // 表头字体大小
+        bodyFontSize: 14    // 内容字体大小
+    }
+})
 
 // 点击事件处理
 const handleClick = ({ row, ceil, rowIndex, columnIndex }) => {

@@ -246,7 +246,8 @@ const clickHandler = (row: any) => {
       </div>
     </dv-border-box12>
 
-
+    <!-- 添加图表容器 -->
+    <!-- <div class="chart-container mt-4" style="height: 300px;"></div> -->
   </div>
 
   <!-- 弹窗部分 -->

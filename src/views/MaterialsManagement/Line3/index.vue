@@ -11,7 +11,5 @@ import right from './views/right.vue';
 </script>
 
 <style scoped>
-.line3 {
 
-}
 </style>

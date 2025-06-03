@@ -33,7 +33,7 @@ const fetchData = async () => {
 config.data = res.data.map(item => [
   item.ty009, // 机台号
     item.planOutput,
-    '--',
+    Math.round(item.expectedUsage),
     '--',
     item.actualOutput,
     '--',

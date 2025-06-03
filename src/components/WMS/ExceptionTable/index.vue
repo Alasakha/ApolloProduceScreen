@@ -32,8 +32,12 @@
     <el-dialog
       v-model="dialogVisible"
       :title="dialogTitle"
-      width="80%"
+      :width="dialogWidth"
       :destroy-on-close="true"
+      :fullscreen="false"
+      :modal-append-to-body="false"
+      :append-to-body="true"
+      class="custom-dialog"
     >
       <div class="detail-table">
         <div class="dialog-toolbar">
@@ -51,14 +55,64 @@
           :data="paginatedData" 
           border 
           style="width: 100%"
+          height="670"
         >
           <el-table-column 
-            v-for="header in config.header" 
+            v-for="(header, index) in config.header" 
             :key="header" 
             :prop="header" 
             :label="header" 
+            :fixed="index === 0"
           />
+          <el-table-column prop="source_id_roid" v-if="false" />
+          <el-table-column label="操作" width="150" fixed="right">
+            <template #default="{ row }">
+              <el-button 
+                type="primary" 
+                size="small" 
+                @click="openHandleResultDialog(row)"
+              >
+                修改处理结果
+              </el-button>
+            </template>
+          </el-table-column>
         </el-table>
+        
+        <!-- 处理结果输入对话框 -->
+        <el-dialog
+          v-model="handleResultVisible"
+          title="处理结果"
+          width="30%"
+          append-to-body
+        >
+          <el-input
+            v-model="handleResult"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入处理结果"
+          />
+          <template #footer>
+            <span class="dialog-footer">
+              <el-button @click="handleResultVisible = false">取消</el-button>
+              <template v-if="!hasHandleResult">
+                <el-button 
+                  type="primary" 
+                  @click="handleAddResult"
+                >
+                  添加
+                </el-button>
+              </template>
+              <template v-else>
+                <el-button 
+                  type="success" 
+                  @click="handleUpdateResult"
+                >
+                  修改
+                </el-button>
+              </template>
+            </span>
+          </template>
+        </el-dialog>
         
         <div class="pagination-container">
           <el-pagination
@@ -80,10 +134,13 @@
   import type { PropType } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import * as XLSX from 'xlsx'
+  import { useRoute } from 'vue-router'
+  import { getAbnormalQualityReasonAdd, getAbnormalQualityReasonUpdate } from '@/api/getPmcinfo'
   
   interface TableConfig {
     header: string[];
     data: any[][];
+    rawData?: any[];
     index: boolean;
     columnWidth: number[];
     align: string[];
@@ -117,6 +174,10 @@
     exportFileName: {
       type: String,
       required: true
+    },
+    dialogWidth: {
+      type: String,
+      default: '90%'
     }
   })
   
@@ -129,6 +190,21 @@
   const pageSize = ref(10)
   const total = ref(0)
   const detailData = ref([])
+  const handleResult = ref('')
+  const currentItemCode = ref('')
+  const handleResultVisible = ref(false)
+  
+  const route = useRoute()
+  const prodLine = computed(() => route.query.prodLine as string)
+  
+  const dialogTitle = computed(() => {
+    if (prodLine.value === 'HJ') {
+      return '焊接生产管理看板'
+    } else if (prodLine.value === 'CY') {
+      return '冲压生成管理系统'
+    }
+    return '生产管理系统'
+  })
   
   // 分页数据处理
   const paginatedData = computed(() => {
@@ -156,11 +232,15 @@
     
     tableLoading.value = true
     try {
-      detailData.value = props.config.data.map((row: any[]) => {
+      detailData.value = props.config.data.map((row: any[], index: number) => {
         const obj: any = {}
         props.config.header.forEach((header: string, index: number) => {
           obj[header] = row[index]
         })
+        // 使用rawData中的source_id_roid
+        if (props.config.rawData && props.config.rawData[index]) {
+          obj.source_id_roid = props.config.rawData[index].source_id_roid
+        }
         return obj
       })
       total.value = detailData.value.length
@@ -209,6 +289,66 @@
       ElMessage.error('导出失败，请重试！')
     }
   }
+  
+  // 添加处理结果
+  const handleAddResult = async () => {
+    if (!handleResult.value) {
+      ElMessage.warning('请输入处理结果')
+      return
+    }
+    try {
+      await getAbnormalQualityReasonAdd(currentItemCode.value, handleResult.value)
+      console.log
+      ElMessage.success('添加成功')
+      handleResultVisible.value = false
+      // 更新当前行的处理结果
+      const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
+      if (currentRow) {
+        currentRow['处理结果'] = handleResult.value
+        // 强制更新表格数据
+        detailData.value = [...detailData.value]
+      }
+      emit('refresh')
+    } catch (error) {
+      ElMessage.error('添加失败')
+    }
+  }
+  
+  // 修改处理结果
+  const handleUpdateResult = async () => {
+    if (!handleResult.value) {
+      ElMessage.warning('请输入处理结果')
+      return
+    }
+    try {
+      await getAbnormalQualityReasonUpdate(currentItemCode.value, handleResult.value)
+      ElMessage.success('修改成功')
+      handleResultVisible.value = false
+      // 更新当前行的处理结果
+      const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
+      if (currentRow) {
+        currentRow['处理结果'] = handleResult.value
+        // 强制更新表格数据
+        detailData.value = [...detailData.value]
+      }
+      emit('refresh')
+    } catch (error) {
+      ElMessage.error('修改失败')
+    }
+  }
+  
+  // 打开处理结果输入框
+  const openHandleResultDialog = (row) => {
+    currentItemCode.value = row.source_id_roid
+    handleResult.value = row['处理结果'] || '--'
+    handleResultVisible.value = true
+  }
+  
+  // 判断是否有处理结果
+  const hasHandleResult = computed(() => {
+    const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
+    return currentRow && currentRow['处理结果'] && currentRow['处理结果'] !== '--'
+  })
   </script>
   
   <style scoped>
@@ -287,7 +427,7 @@
   
   :deep(.el-table th) {
     background-color: #0d47a1;
-    color: #fff;
+    /* color: #fff; */
   }
   
   :deep(.el-table tr) {
@@ -312,5 +452,40 @@
     align-items: center;
     justify-content: center;
     background: transparent;
+  }
+  
+  :deep(.custom-dialog) {
+    display: flex;
+    flex-direction: column;
+    margin: 0 !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    max-height: 90vh;
+  }
+  
+  :deep(.custom-dialog .el-dialog__body) {
+    flex: 1;
+    overflow: auto;
+    padding: 20px;
+  }
+  
+  :deep(.custom-dialog .el-dialog__header) {
+    padding: 20px;
+    margin: 0;
+    border-bottom: 1px solid #dcdfe6;
+  }
+  
+  :deep(.custom-dialog .el-dialog__footer) {
+    padding: 20px;
+    margin: 0;
+    border-top: 1px solid #dcdfe6;
+  }
+  
+  .dialog-footer {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
   }
   </style>

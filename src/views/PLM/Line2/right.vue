@@ -98,7 +98,13 @@
     const option = {
       color: ['#e7141b', '#4CAF50'],
       series: [
-        {
+        { 
+          grid: {
+            left: '3%',
+            right: '4%',
+            bottom: '5%',
+            containLabel: true
+          },
           type: 'pie',
           radius: ['60%', '80%'],
           avoidLabelOverlap: false,

@@ -104,12 +104,12 @@ const handleCurrentChange = (val) => {
 
 // 表格列配置
 const tableColumns = [
-    { label: '检验日期', prop: 'checkDate' },
-    { label: '到货单号', prop: 'dhdh' },
-    { label: '供应商', prop: 'gys' },
-    { label: '品号', prop: 'ph' },
-    { label: '规格', prop: 'item_specification' },
-    { label: '描述', prop: 'item_description' },
+    { prop: 'checkDate', label: '检验日期', width: 120 },
+    { prop: 'dhdh', label: '到货单号', width: 150 },
+    { prop: 'gys', label: '供应商', width: 200 },
+    { prop: 'ph', label: '品号', width: 120 },
+    { prop: 'item_specification', label: '规格', width: 200 },
+    { prop: 'item_description', label: '描述', width: 300 }
 ]
 
 // 处理饼图点击事件

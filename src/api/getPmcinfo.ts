@@ -54,3 +54,52 @@ export const getAbnormalUnfinished = () => {
 
     })
   }
+  // /PMC/inRate
+  export const getInRate = () => {
+    return request({
+      url: '/PMC/inRate',
+      method: 'get',
+
+    })
+  }
+
+  // /PMC/deliveryRate
+  export const getDeliveryRate = () => {
+    return request({
+      url: '/PMC/deliveryRate',
+      method: 'get',
+
+  })
+}
+  
+// /PMC/outRate
+export const getOutRate = () => {
+  return request({
+    url: '/PMC/outRate',
+    method: 'get',
+
+  })
+}
+
+// /SCM/abnormalQualityReasonAdd
+// params : item_code, reason
+// 单日来料质量异常问题原因记录
+export const getAbnormalQualityReasonAdd = (item_code, reason) => {
+  return request({
+    url: '/SCM/abnormalQualityReasonAdd',
+    method: 'get',
+    params: { item_code, reason }
+  })
+}
+
+
+// /SCM/abnormalQualityReasonUpdate
+// params : item_code , reason
+// 单日来料质量异常问题原因记录更新
+export const getAbnormalQualityReasonUpdate = (item_code, reason) => {
+  return request({
+    url: '/SCM/abnormalQualityReasonUpdate',
+    method: 'get',
+    params: { item_code, reason }
+  })
+}

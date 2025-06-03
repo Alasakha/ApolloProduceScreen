@@ -8,7 +8,7 @@ import huiqian from './huiqianRate/index.vue';
 </script>
 
 <template>
-  <div class="flex h-[25vh] w-full mt-3 p-4" >
+  <div class="flex h-[25vh] w-full  p-4 pt-2" >
 <lailiao class="flex-1"></lailiao>
 <daohuo class="flex-1"></daohuo> 
 <huiqian class="flex-1"></huiqian>

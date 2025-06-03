@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import Header from './Header/index.vue'
-import Line2 from './Line2/index.vue'
+import Line2 from './Line2/left.vue'
 import Line3 from './Line3/index.vue'
 </script>
 

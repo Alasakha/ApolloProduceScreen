@@ -20,8 +20,8 @@ const config = reactive({
   header: [ '仓位','仓管员','需领用量','已领用量','品名','规格','工单号','客户单号'],
   data: [], // 初始为空
   index: true,
-  columnWidth: [50,80,80],
-  align: [],
+  columnWidth: [50,80,80,80,80,],
+  align: ['center','center','center','center','center','center','center','center'],
   rowNum: 4,
   headerHeight: 35,
   headerBGC: '#0d47a1',

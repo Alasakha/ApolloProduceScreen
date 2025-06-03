@@ -1,23 +1,23 @@
 <template>
     <div class="content w-full h-full flex items-center justify-around">
       <!-- 优秀采购员 -->
-      <div class="flex flex-col items-center justify-start h-full">
-        <div class="text-white text-2xl font-semibold tracking-wide mb-2 drop-shadow">
+      <div class="flex flex-col items-center justify-end h-full">
+        <div class="text-white text-xl font-semibold tracking-wide pt-2 drop-shadow">
           当日优秀采购员
         </div>
-        <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
-          <div class="text-5xl animate-bounce-slow mr-4">👍</div>
+        <div class="mt-1 text-center text-white text-2xl font-bold w-full h-full flex justify-center items-center">
+          <div class="text-3xl animate-bounce-slow mr-4">👍</div>
           {{ top }}
         </div>
       </div>
   
       <!-- 待努力采购员 -->
-      <div class="flex flex-col items-center justify-start h-full">
-        <div class="text-white text-2xl font-semibold tracking-wide mb-2 drop-shadow">
+      <div class="flex flex-col items-center justify-end h-full">
+        <div class="text-white text-xl font-semibold tracking-wide pt-2 drop-shadow">
           当日待加油采购员
         </div>
-        <div class="mt-6 text-center text-white text-4xl font-bold w-full h-full flex justify-center items-center">
-          <div class="text-5xl animate-bounce-slow mr-4">✊</div>
+        <div class="mt-1 text-center text-white text-2xl font-bold w-full h-full flex justify-center items-center">
+          <div class="text-3xl animate-bounce-slow mr-4">✊</div>
           {{ Bottom }}
         </div>
       </div>

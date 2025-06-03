@@ -20,42 +20,33 @@ import { eventBus } from '@/utils/eventbus';
 const isLoading = ref(true);
 const rawData = ref([]);
 const config = reactive({
-  header: ['仓库名称', '呆滞金额', '计划金额', '实际金额','达成率'],
+  header: ['仓位', '呆滞金额'],
   data: [],
   index: true,
-  columnWidth: [50],
-  align: ['center', 'center', 'center', 'center', 'center'],
+  columnWidth: [],
+  align: [],
   rowNum: 7,
   headerHeight: 35,
   headerBGC: '#0d47a1',
   oddRowBGC: '#1565c0',
   evenRowBGC: '#1976d2',
   waitTime: 3000,
-  carousel: 'single',
-  showTooltip: true
+  carousel: 'single'
 });
 
 const fetchData = async () => {
   try {
     isLoading.value = true;
     const res = await getstagnantAmount();
-    if (res.data && Array.isArray(res.data)) {
-      const transformed = res.data.map(item => [
-        item.warehouse_name +'-' + item.warehouseKeeper || '暂无数据',
-        item.amt ? Math.round(Number(item.amt)) : '暂无数据',
-        item.planAmt ? Math.round(Number(item.planAmt)) : '暂无数据',
-        item.actualAmt ? Math.round(Number(item.actualAmt)) : '暂无数据',
-        item.planAmt && item.actualAmt ? Math.round((item.actualAmt / item.planAmt) * 100) + '%' : '暂无数据'
-      ]);
-      rawData.value = transformed;
-      config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
-    } else {
-      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
-    }
+    const transformed = Object.entries(res.data as Record<string, string | number>).map(([key, value]) => [
+      key,
+      parseFloat(value.toString()).toFixed(2),
+    ]);
+    rawData.value = transformed;
+    config.data = transformed;
     isLoading.value = false;
   } catch (e) {
     console.log('数据获取失败');
-    config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
     isLoading.value = false;
   }
 };

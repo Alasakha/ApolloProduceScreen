@@ -157,6 +157,7 @@ const queryDate = getYesterday(); // 昨天的日期
     // 请求数据x
     const fetchData = () => {
         getPurchaseSigningRate(queryDate).then(res => {
+            console.log(res);
         isLoading.value = false;   // 加载完成，关闭 loading 状态
         processData(res.data);  // 处理数据并渲染图表
       }).catch(() => {

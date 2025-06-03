@@ -11,7 +11,7 @@ import  NEWSCM from '@/views/NewSCM/index.vue' // 这里是新 SCM 的路径
 import ProducePlan from '@/views/ProducePlan/index.vue'
 import PLM from '@/views/PLM/index.vue'
 import MaterialManagement from '@/views/MaterialsManagement/index.vue'
-
+import StampManagement from '@/views/Stamp/management/index.vue'
 const routes = [
   {
     path: '/',
@@ -87,6 +87,12 @@ const routes = [
     path: '/materialmanagement',
     name: 'MaterialManagement',
     component: MaterialManagement,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/stampmanagement',
+    name: 'StampManagement',
+    component: StampManagement,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   }
 ];
