@@ -44,7 +44,17 @@ export const getExellentPerson = () => {
   return request({
     url: '/SCM/top3PurchaserToday',
     method: 'get',
-
-
   })
 }
+
+// /SCM/purchaseDeliveryRate
+export const getPurchaseDeliveryRate = (type ) => {
+  return request({
+    url: '/SCM/purchaseDeliveryRate2',
+    method: 'get',
+    params: { type} // 传递 prodLine 参数
+  })
+}
+
+
+

@@ -20,7 +20,7 @@
    
       <div class="flex-1 flex justify-center items-center justify-around
       text-3xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
-      tracking-wide w-full h-full pl-4 pr-4 ">
+      tracking-wide w-[300px] h-full pl-4 pr-4 ">
       <dv-border-box1 >
         <div class="text-xl flex justify-around  item-center text-white flex-col w-full h-full">
          

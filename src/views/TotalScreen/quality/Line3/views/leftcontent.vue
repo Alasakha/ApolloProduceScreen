@@ -1,12 +1,12 @@
 <template>
 <dv-border-box10>
-    <div class="content w-full h-full">
+    <div class="content w-[98%] h-full mx-auto">
       <div class="h-[15%]">
             <GlobalTitle title="检验不及时处理进度"/>
       </div>
 
-      <div class="flex justify-center items-center h-[80%]">
-         <ScrollBoard :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
+      <div class="flex justify-center items-center h-[80%] w-full">
+         <ScrollBoard :config="config" class="w-full h-full"/>
       </div>
     </div>
 
@@ -84,9 +84,9 @@ const detailData = ref([])
 // 初始化 配置对象
 const config = reactive({
   header: ['到货单号','供应商','品号', '品名','到货时间', '规格','检验人员','审核时间','到货数'],
-  data: ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据'],
+  data: [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']] as string[][],
   index: true,
-  align: ['center','center','center','center','center','center','center','center','center','center','center'],
+  align: [],
   rowNum: 6,
   columnWidth:[50],
   headerHeight: 20
@@ -136,7 +136,8 @@ const handleDetail = () => {
 const fetchData = async () => {
   try {
     const res = await getIncomingInspection2()
-    if (res && res.data) {
+    console.log(res,'res',res.data,'res.data')
+    if (res.data.length > 0) {
       config.data = res.data.map(item => [  
         item.doc_no || '暂无数据',
         item.supplier_full_name || '暂无数据',
@@ -149,7 +150,7 @@ const fetchData = async () => {
         item.arriveNum - item.jsNum
       ])
     } else {
-      config.data = ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+      config.data = [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']];
     }
   } catch (error) {
     console.error('数据获取失败:', error)

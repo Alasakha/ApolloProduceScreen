@@ -21,8 +21,8 @@ const config = reactive({
     header: ['工作中心', '故障类型', '申报时间', '客户单号', '规格', '故障描述', '申请人'],
     data: [],
     index: true,
-    columnWidth: [80, 80, 120, 120, 120, 300, 80],
-    align: ['center', 'center', 'center', 'center', 'center', 'left', 'center'],
+    columnWidth: [80, 80, 120, 120, 120, 300, ],
+    align: [],
     rowNum: 6,
     headerBGC: '#0d47a1',
     oddRowBGC: '#1565c0',
@@ -33,6 +33,7 @@ const config = reactive({
 
 const fetchData = async () => {
     const res = await getAbnormalUnfinished()
+    if (res.code === 200 && res.data.length > 0) {
     config.data = (res.data || []).map(item => [
         item.md002 ?? '--',
         item.guZhangTypeName ?? '--',
@@ -42,6 +43,9 @@ const fetchData = async () => {
         item.startRemark ?? '--',
         item.startPeopleName ?? '--'
     ])
+    }else{
+        config.data = [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']]
+    }
 }
 
 onMounted(fetchData)

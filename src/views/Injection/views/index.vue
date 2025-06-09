@@ -6,6 +6,7 @@
         <div class="w-full h-[5vh]"></div>
         <Header></Header>
         <Middle></Middle>
+        <Line2></Line2>
         <Bottom></Bottom>
       </div>
     </dv-border-box11>
@@ -16,6 +17,7 @@
 import Header from'@/views/Injection/views/Header/index.vue'
 import Middle from '@/views/Injection/views/Middle/index.vue'
 import Bottom from '@/views/Injection/views/Bottom/index.vue'
+import Line2 from './Line2/index.vue'
 </script>
 
 

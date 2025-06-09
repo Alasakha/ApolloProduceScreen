@@ -1,6 +1,6 @@
 <template>
     <div class="line3 flex w-full gap-4 ">
-        <left class="flex-1"></left>
+        <left class="flex-1 "></left>
         <right class="flex-1"></right>
     </div>
 </template>

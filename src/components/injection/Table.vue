@@ -65,46 +65,25 @@ const tableCellStyle = {
   <div style="display: flex; flex-direction: column; height: 100%; width: 100%;">
     <div class="table_container" style="flex: 1; position: relative;">
       <el-table
-        v-if="size >= 1.5"
         :data="tableData"
         border
         style="position: absolute; height: 100%; width: 100%; overflow-y: auto;"
-        :row-style="rowStyle"
-        :cell-style="tableCellStyle"
-        :header-cell-style="tableHeaderStyle"
+        :row-style="getRowStyle"
+        :cell-style="getCellStyle"
+        :header-cell-style="getHeaderStyle"
         height="100%"
       >
-        <!-- 这里写大于等于1.5的表格结构和样式 -->
         <el-table-column :label="tableTitle">
           <el-table-column :prop="'name'" label="工艺参数" />
           <el-table-column prop="real" label="实际值" />
         </el-table-column>
       </el-table>
-
-      <el-table
-        v-else-if="size >= 1 && size < 1.5"
-        :data="tableData"
-        border
-        style="position: absolute; height: 100%; width: 100%; overflow-y: auto;"
-        :row-style="rowStyleLower"
-        :cell-style="tableCellStyleLower"
-        :header-cell-style="tableHeaderStyleLower"
-        height="100%"
-      >
-        <!-- 这里写大于等于1且小于1.5的表格样式 -->
-        <el-table-column :label="tableTitle">
-          <el-table-column :prop="'name'" label="供应参数" />
-          <el-table-column prop="real" label="实际值" />
-        </el-table-column>
-      </el-table>
-
-      <!-- 如果还要处理更低缩放比，可以用 v-else -->
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted,defineProps } from 'vue';
+import { ref, onMounted, onUnmounted, defineProps, computed } from 'vue';
 
 const size = ref(window.devicePixelRatio);
 
@@ -115,15 +94,13 @@ const props = defineProps({
   },
   tableTitle: {
     type: String,
-    default: 'XX机台' // 默认值
+    default: 'XX机台'
   },
-    productLabel: {
+  productLabel: {
     type: String,
-    default: '加工品号' // 默认值
+    default: '加工品号'
   }
 });
-
-
 
 function updateSize() {
   size.value = window.devicePixelRatio;
@@ -132,49 +109,39 @@ function updateSize() {
 onMounted(() => {
   window.addEventListener('resize', updateSize);
 });
+
 onUnmounted(() => {
   window.removeEventListener('resize', updateSize);
 });
 
-// 你现有的props和样式配置
-
-
-
-const rowStyle = () => ({
-  height: `${32 / size.value}px`,
+const getRowStyle = computed(() => {
+  return () => ({
+    height: size.value >= 1.5 ? '32px' : '35px'
+  });
 });
 
-// 低缩放比的样式，你可以调小字体、行高或者做别的定制
-const tableCellStyleLower = () => ({
-  fontSize: `${13 / size.value}px`,
-  textAlign: 'center',
+const getCellStyle = computed(() => {
+  return () => ({
+    fontSize: size.value >= 1.5 ? '14px' : '13px',
+    textAlign: 'center',
+    padding: '8px'
+  });
 });
 
-const rowStyleLower = () => ({
-  height: `${35 / size.value}px`,
+const getHeaderStyle = computed(() => {
+  return {
+    background: '#2575fc',
+    color: 'white',
+    fontSize: size.value >= 1.5 ? '16px' : '14px',
+    textAlign: 'center',
+    padding: '8px'
+  };
 });
-
-const tableHeaderStyle = {
-  background: '#2575fc',
-  color: 'white',
-  fontSize: '0.5vw',
-  textAlign: 'center',
-};
-
-const tableHeaderStyleLower = {
-  background: '#2575fc',
-  color: 'white',
-  fontSize: '0.7vw',
-  textAlign: 'center',
-};
-
-
 </script>
-
 
 <style scoped>
 .el-table {
-  --el-table-row-hover-bg-color:#2575fc;
+  --el-table-row-hover-bg-color: #2575fc;
   background-color: transparent;
   --el-table-tr-bg-color: transparent;
   --el-table-border: 1px solid rgb(83, 234, 253);
@@ -184,6 +151,14 @@ const tableHeaderStyleLower = {
 
 :deep(.el-table th),
 :deep(.el-table td) {
-  padding: 0;
+  padding: 8px;
+}
+
+:deep(.el-table--border) {
+  border: 1px solid rgb(83, 234, 253);
+}
+
+:deep(.el-table__inner-wrapper::before) {
+  display: none;
 }
 </style>

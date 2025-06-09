@@ -27,6 +27,7 @@ const config = reactive({
   align: ['center', 'center', 'center', 'center', 'center'],
   rowNum: 7,
   headerHeight: 35,
+  headerFontSize: 14,
   headerBGC: '#0d47a1',
   oddRowBGC: '#1565c0',
   evenRowBGC: '#1976d2',
@@ -106,4 +107,10 @@ align-items: center;
 justify-content: center;
 background: transparent;
 }
+
+::v-deep .ScrollBoard .header {
+  font-size: 0.5vw !important;
+
+}
+
 </style>

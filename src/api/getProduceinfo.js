@@ -79,17 +79,13 @@ export const getAbnormalList = (prodLine) => {
 }
 
 // 修改请求方式，使用 form-data 格式
-export const getAbnormalUnfinishedList = (formData) => {
+export const getAbnormalUnfinishedList = (workCenter,dateTimeStart,dateTimeStop) => {
   return request({
     url: '/production/abnormalUnfinishedList', // 请求的 URL
-    method: 'post',
-    data: formData,  // 直接将 formData 作为请求体
-    headers: {
-      'Content-Type': 'multipart/form-data', // 明确设置为 form-data 格式
-    }
-  })
+    method: 'get',
+    params: { workCenter, dateTimeStart, dateTimeStop }
+})
 }
-
 // /production/abnormalList
 export const getEfficiencyHour = (prodLine) => {
   return request({

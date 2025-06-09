@@ -3,9 +3,10 @@
         <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
             <div class="metalworking">
                 <LineOne />
-                <LineTwo />
-                <LineThree />
+                
+                <Daohuo />
                 <LineFour />
+                <LineTwo />
             </div>
         </dv-border-box11>
 
@@ -18,7 +19,7 @@
 // Add your script logic here
 import LineOne from './LineOne/index.vue'
 import LineTwo from './LineTwo/index.vue'
-import LineThree from './LineThree/index.vue'
+import Daohuo from './Daohuo/index.vue'
 import LineFour from './LineFour/index.vue'
 </script>
 
@@ -30,7 +31,7 @@ body{
  width: 100vw;
  height: 100vh;
  background: 
- linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3)), 
+ linear-gradient(rgba(0, 0, 0, 0.5), rgba(0, 0, 0, 0.5)), 
    url('@/assets/background.jpg') no-repeat center center;
  background-size: cover;
  transform-origin: center center;

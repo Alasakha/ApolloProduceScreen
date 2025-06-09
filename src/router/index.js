@@ -6,7 +6,7 @@ import Quality from '../views/TotalScreen/quality/index.vue';
 import Injection from '@/views/Injection/views/index.vue'
 import SCM from '@/views/SCM/views/index.vue'
 import WMS from '@/views/WMS/index.vue'
-import Material from '@/views/Metalworking/index.vue' 
+import InComing from '@/views/Metalworking/index.vue' 
 import  NEWSCM from '@/views/NewSCM/index.vue' // 这里是新 SCM 的路径
 import ProducePlan from '@/views/ProducePlan/index.vue'
 import PLM from '@/views/PLM/index.vue'
@@ -60,9 +60,9 @@ const routes = [
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
   {
-    path: '/material',
-    name: 'Material',
-    component: Material,
+    path: '/incoming',
+    name: 'InComing',
+    component: InComing,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
   {

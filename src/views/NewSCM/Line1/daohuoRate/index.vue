@@ -1,4 +1,3 @@
-
 <template>
 <dv-border-box8 :dur="5">
 
@@ -18,10 +17,9 @@
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { getDeliveryRat } from '@/api/getnewInjection';
+import { getPurchaseDeliveryRate } from '@/api/getnewInjection';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import { formatPieChartData } from '@/utils/map';
 import * as echarts from 'echarts';
 import { createChartOption } from './charts';
 
@@ -39,48 +37,80 @@ const queryDate = getYesterday(); // 昨天的日期
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const Indicators1 = ref(null);
-
+let chart = null;
 
 // 渲染图表的函数
-const drawMonthlyIndicators = (formattedData) => {
+const drawMonthlyIndicators = (data) => {
   nextTick(() => {
+    if (chart) {
+      chart.dispose();
+    }
+    chart = echarts.init(Indicators1.value);
+    const option = createChartOption(data);
+    chart.setOption(option);
     
-    const Indicators1Element = echarts.init(Indicators1.value);
-    const option = createChartOption( formattedData ); // 先用写死的，不传 formattedData
-    Indicators1Element.setOption(option);
+    // 添加窗口大小改变时的自适应
+    window.addEventListener('resize', () => {
+      chart && chart.resize();
+    });
   });
-};
-
-// 处理数据
-const processData = (data) => {
- const formattedData = formatPieChartData(data, 'purchaserName','ratio');
-
-  if (formattedData.length == 0) {
-    isDataEmpty.value = true;  // 如果没有数据，设置为空数据状态
-  } else {
-    isDataEmpty.value = false;
-    drawMonthlyIndicators(formattedData);  // 直接渲染图表
-  }
 };
 
 // 请求数据
-const fetchData = () => {
-  getDeliveryRat(queryDate).then(res => {
-    isLoading.value = false;   // 加载完成，关闭 loading 状态
-    processData(res.data);  // 处理数据并渲染图表
-  }).catch(() => {
+const fetchData = async () => {
+  try {
+    isLoading.value = true;
+    // 获取交货日数据
+    const deliveryRes = await getPurchaseDeliveryRate(1);
+    // 获取排产日期数据
+    const productionRes = await getPurchaseDeliveryRate(2);
+    
     isLoading.value = false;
-    isDataEmpty.value = true;  // 如果请求失败，设置为空数据状态
-  });
+    
+    if (deliveryRes.data && productionRes.data && 
+        deliveryRes.data.length > 0 && productionRes.data.length > 0) {
+      isDataEmpty.value = false;
+      
+      // 合并两组数据
+      const combinedData = deliveryRes.data.map(delivery => {
+        const production = productionRes.data.find(
+          p => p.purchaserName === delivery.purchaserName
+        ) || { rate: 0 };
+        
+        return {
+          purchaserName: delivery.purchaserName,
+          deliveryRate: delivery.rate,
+          productionRate: production.rate
+        };
+      });
+      
+      drawMonthlyIndicators(combinedData);
+    } else {
+      isDataEmpty.value = true;
+    }
+  } catch (error) {
+    console.error('数据获取失败:', error);
+    isLoading.value = false;
+    isDataEmpty.value = true;
+  }
 };
 
 onMounted(() => {
-  fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  fetchData();
+  eventBus.on("refreshData", fetchData);
 });
 
 onBeforeUnmount(() => {
-  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+  eventBus.off("refreshData", fetchData);
+  // 清理图表实例
+  if (chart) {
+    chart.dispose();
+    chart = null;
+  }
+  // 移除窗口大小改变的监听
+  window.removeEventListener('resize', () => {
+    chart && chart.resize();
+  });
 });
 </script>
 
@@ -88,5 +118,7 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-
+.chartsbox {
+  padding: 20px;
+}
 </style>

@@ -7,14 +7,18 @@
         <div class="legend">
           <div class="legend-item">
             <div class="legend-color bg-green"></div>
-            <span>正常完成</span>
+            <span>已完成</span>
+          </div>
+          <div class="legend-item">
+            <div class="legend-color bg-blue"></div>
+            <span>进行中</span>
           </div>
           <div class="legend-item">
             <div class="legend-color bg-red"></div>
             <span>逾期</span>
           </div>
           <div class="legend-item">
-            <div class="legend-color bg-[#444040]"></div>
+            <div class="legend-color bg-gray"></div>
             <span>里程碑计划</span>
           </div>
         </div>
@@ -48,6 +52,10 @@
               {{ stage.name }}
             </div>
           </div>
+          <!-- 已完成率 -->
+          <div class="completed-rate" style="width:80px;text-align:right;">
+            已完成率：<span style="color:#67C23A">{{ project.completedRate }}%</span>
+          </div>
         </div>
       </div>
     </dv-border-box12>
@@ -77,9 +85,9 @@ const getStageWidth = (stage, totalStages) => {
 
 // 处理状态映射
 const STATE_MAP = {
-  'C': 'completed',  // 正常完成
-  'P': 'in-progress', // 进行中
-  'E': 'overdue',    // 逾期
+  'C': 'completed',  // 完成
+  'E': 'in-progress',    // 进行中（可能会变为逾期）
+  'P': 'not-started' // 未下达
 }
 
 // 处理接口数据
@@ -98,11 +106,20 @@ const processData = (data) => {
     }
     
     const project = projectMap.get(item.pno)
+    const endTime = new Date(item.etime)
+    const now = new Date()
+    let status = STATE_MAP[item.tstate] || 'not-issued'
+    
+    // E状态需要根据etime判断是否逾期
+    if (item.tstate === 'E') {
+      status = endTime < now ? 'overdue' : 'in-progress'
+    }
+    
     project.stages.push({
       name: item.pname,
-      status: STATE_MAP[item.tstate] || 'not-started',
+      status: status,
       startTime: new Date(item.stime),
-      endTime: new Date(item.etime),
+      endTime: endTime,
       duration: 0 // 将在后面计算
     })
   })
@@ -127,6 +144,10 @@ const processData = (data) => {
 
     // 按开始时间排序
     project.stages.sort((a, b) => a.startTime - b.startTime)
+
+    // 计算已完成率
+    const completedCount = project.stages.filter(s => s.status === 'completed').length
+    project.completedRate = project.stages.length > 0 ? Math.round(completedCount / project.stages.length * 100) : 0
   })
 
   return Array.from(projectMap.values())
@@ -151,11 +172,12 @@ const getStageClass = (status) => {
   switch (status) {
     case 'completed':
       return 'stage-completed'
+    case 'in-progress':
+      return 'stage-in-progress'
+    case 'not-started':
+      return 'stage-not-started'
     case 'overdue':
       return 'stage-overdue'
-    case 'in-progress':
-    case 'not-started':
-      return 'stage-in-progress'
     default:
       return 'stage-in-progress'
   }
@@ -206,12 +228,16 @@ const getStageClass = (status) => {
   background-color: #67C23A;
 }
 
+.bg-blue {
+  background-color: #008cff;
+}
+
 .bg-red {
   background-color: #e7141b;
 }
 
-.bg-blue {
-  background-color: #409EFF;
+.bg-gray {
+  background-color: #444040;
 }
 
 .mode-switch {
@@ -287,9 +313,11 @@ const getStageClass = (status) => {
 }
 
 .stage-in-progress {
-  background: #444040  ;  /* 进行中/未开始-灰色 */
+  background: #2e90d1;  /* 里程碑计划-灰色 */
 }
-
+.stage-not-started {
+  background: #444040;  /* 里程碑计划-灰色 */
+}
 /* 鼠标悬停效果 */
 .stage-block:hover {
   filter: brightness(1.2);

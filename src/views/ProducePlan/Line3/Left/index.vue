@@ -102,8 +102,8 @@
           type: 'bar',
           barWidth: '40%',
           data: [
-            monthData.value.plan ?? 0,
-            monthData.value.done ?? 0
+            monthData.value.total ?? 0,
+            monthData.value.completeNum ?? 0
           ],
           label: {
             show: true,
@@ -141,8 +141,8 @@
           type: 'bar',
           barWidth: '40%',
           data: [
-            todayData.value.plan ?? 0,
-            todayData.value.done ?? 0
+            todayData.value.total ?? 0,
+            todayData.value.completeNum ?? 0
           ],
           label: {
             show: true,

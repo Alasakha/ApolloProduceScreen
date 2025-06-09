@@ -65,6 +65,7 @@
             :fixed="index === 0"
           />
           <el-table-column prop="source_id_roid" v-if="false" />
+          <el-table-column prop="po_arrival_inspection_d_id" v-if="false" />
           <el-table-column label="操作" width="150" fixed="right">
             <template #default="{ row }">
               <el-button 
@@ -94,22 +95,12 @@
           <template #footer>
             <span class="dialog-footer">
               <el-button @click="handleResultVisible = false">取消</el-button>
-              <template v-if="!hasHandleResult">
-                <el-button 
-                  type="primary" 
-                  @click="handleAddResult"
-                >
-                  添加
-                </el-button>
-              </template>
-              <template v-else>
-                <el-button 
-                  type="success" 
-                  @click="handleUpdateResult"
-                >
-                  修改
-                </el-button>
-              </template>
+              <el-button 
+                type="primary" 
+                @click="handleAddResult"
+              >
+                确定
+              </el-button>
             </span>
           </template>
         </el-dialog>
@@ -134,12 +125,18 @@
   import type { PropType } from 'vue'
   import { ElMessage, ElMessageBox } from 'element-plus'
   import * as XLSX from 'xlsx'
-  import { useRoute } from 'vue-router'
-  import { getAbnormalQualityReasonAdd, getAbnormalQualityReasonUpdate } from '@/api/getPmcinfo'
+  import { getdeliveryTimelinessRateAdd } from '@/api/getWMSinfo'
+  import ScrollBoard from '@/components/datav/ScrollBoard.vue'
+  
+  interface RowData {
+    [key: string]: any;
+    mo_d_id: string | number;
+  }
   
   interface TableConfig {
     header: string[];
     data: any[][];
+    tableData?: any[][];
     rawData?: any[];
     index: boolean;
     columnWidth: number[];
@@ -169,7 +166,22 @@
     },
     config: {
       type: Object as PropType<TableConfig>,
-      required: true
+      required: true,
+      default: () => ({
+        header: [],
+        data: [],
+        index: true,
+        columnWidth: [],
+        align: ['center'],
+        rowNum: 5,
+        headerHeight: 35,
+        headerBGC: '#0d47a1',
+        oddRowBGC: '#1565c0',
+        evenRowBGC: '#1976d2',
+        waitTime: 2000,
+        carousel: 'single',
+        showTooltip: true
+      })
     },
     exportFileName: {
       type: String,
@@ -189,28 +201,19 @@
   const currentPage = ref(1)
   const pageSize = ref(10)
   const total = ref(0)
-  const detailData = ref([])
+  const tableData = ref<RowData[]>([])
   const handleResult = ref('')
-  const currentItemCode = ref('')
   const handleResultVisible = ref(false)
-  
-  const route = useRoute()
-  const prodLine = computed(() => route.query.prodLine as string)
-  
-  const dialogTitle = computed(() => {
-    if (prodLine.value === 'HJ') {
-      return '焊接生产管理看板'
-    } else if (prodLine.value === 'CY') {
-      return '冲压生成管理系统'
-    }
-    return '生产管理系统'
-  })
+  const mo_d_id = ref('')
+  // const route = useRoute()
+  // const prodLine = computed(() => route.query.prodLine as string)
+
   
   // 分页数据处理
   const paginatedData = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value
     const end = start + pageSize.value
-    return detailData.value.slice(start, end)
+    return tableData.value.slice(start, end)
   })
   
   // 处理分页
@@ -232,18 +235,18 @@
     
     tableLoading.value = true
     try {
-      detailData.value = props.config.data.map((row: any[], index: number) => {
-        const obj: any = {}
-        props.config.header.forEach((header: string, index: number) => {
-          obj[header] = row[index]
-        })
-        // 使用rawData中的source_id_roid
-        if (props.config.rawData && props.config.rawData[index]) {
-          obj.source_id_roid = props.config.rawData[index].source_id_roid
+      // 使用 tableData 而不是 data
+      const sourceData = props.config.tableData || props.config.data
+      tableData.value = sourceData.map((row) => {
+        const rowData: RowData = {
+          mo_d_id: row[row.length - 1]
         }
-        return obj
+        props.config.header.forEach((header, index) => {
+          rowData[header] = row[index]
+        })
+        return rowData
       })
-      total.value = detailData.value.length
+      total.value = tableData.value.length
     } finally {
       tableLoading.value = false
       dialogVisible.value = true
@@ -297,58 +300,34 @@
       return
     }
     try {
-      await getAbnormalQualityReasonAdd(currentItemCode.value, handleResult.value)
-      console.log
-      ElMessage.success('添加成功')
+      console.log('mo_d_id:', mo_d_id.value,handleResult.value)
+      await getdeliveryTimelinessRateAdd(mo_d_id.value, handleResult.value)
+      ElMessage.success('操作成功')
       handleResultVisible.value = false
+
       // 更新当前行的处理结果
-      const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
-      if (currentRow) {
-        currentRow['处理结果'] = handleResult.value
+      const index = tableData.value.findIndex(item => item.mo_d_id === mo_d_id.value)
+      if (index !== -1) {
+        tableData.value[index]['处理结果'] = handleResult.value
         // 强制更新表格数据
-        detailData.value = [...detailData.value]
+        tableData.value = [...tableData.value]
       }
+      
       emit('refresh')
     } catch (error) {
-      ElMessage.error('添加失败')
-    }
-  }
-  
-  // 修改处理结果
-  const handleUpdateResult = async () => {
-    if (!handleResult.value) {
-      ElMessage.warning('请输入处理结果')
-      return
-    }
-    try {
-      await getAbnormalQualityReasonUpdate(currentItemCode.value, handleResult.value)
-      ElMessage.success('修改成功')
-      handleResultVisible.value = false
-      // 更新当前行的处理结果
-      const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
-      if (currentRow) {
-        currentRow['处理结果'] = handleResult.value
-        // 强制更新表格数据
-        detailData.value = [...detailData.value]
-      }
-      emit('refresh')
-    } catch (error) {
-      ElMessage.error('修改失败')
+      console.error('操作失败:', error)
+      ElMessage.error('操作失败')
     }
   }
   
   // 打开处理结果输入框
   const openHandleResultDialog = (row) => {
-    currentItemCode.value = row.source_id_roid
-    handleResult.value = row['处理结果'] || '--'
+    console.log('选中的行数据:', row)
+    mo_d_id.value = row.mo_d_id
+    
+    handleResult.value = row['处理结果'] === '--' ? '' : (row['处理结果'] || '')
     handleResultVisible.value = true
   }
-  
-  // 判断是否有处理结果
-  const hasHandleResult = computed(() => {
-    const currentRow = detailData.value.find(item => item.source_id_roid === currentItemCode.value)
-    return currentRow && currentRow['处理结果'] && currentRow['处理结果'] !== '--'
-  })
   </script>
   
   <style scoped>

@@ -4,11 +4,14 @@ export const formatPieChartData = (data, valuename, value) => {
     return [];
   }
 
-  return data.map(item => ({
-    value: Number(item[value]),
-    name: item[valuename],
-    duration: item.guZhangTypeDuration || 0  // ➕ 添加 duration 字段
-  }));
+  return data.map(item => {
+    // 检查并打印每个item的内容
+    return {
+      value: Number(item[value] || 0),
+      name: item[valuename] || '未知',
+      duration: item.guZhangTypeDuration || 0
+    };
+  });
 };
 
 

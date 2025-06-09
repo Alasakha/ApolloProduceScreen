@@ -1,12 +1,12 @@
 <template>
 <dv-border-box10>
-  <div class="content w-full h-full">
+  <div class="content w-[98%] h-full mx-auto">
       <div class="h-[15%]">
         <GlobalTitle title="错漏检累计次数"/>
       </div>
 
-      <div class="flex justify-center items-center h-[80%]">
-         <ScrollBoard :config="config" class="w-full h-[10%] pl-4 pr-6 pt-2"/>
+      <div class="flex justify-center items-center h-[80%] w-full">
+         <ScrollBoard :config="config" class="w-full h-full"/>
       </div>
   </div>
 
@@ -88,7 +88,7 @@ const detailData = ref([])
 // 初始化 配置对象
 const config = reactive({
   header: ['车间','故障时间','故障原因', '原因分析','责任单位', '错漏检责任人'],
-  data: ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据'],
+  data: [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']] as string[][],
   index: true,
   align: [],
   rowNum: 6,
@@ -123,7 +123,7 @@ const handleDetail = () => {
   tableLoading.value = true
   try {
     detailData.value = config.data.map((row: any[]) => {
-      const obj: any = {}
+      const obj: Record<string, any> = {}
       config.header.forEach((header: string, index: number) => {
         obj[header] = row[index]
       })
@@ -152,7 +152,7 @@ const fetchData = async () => {
         item.udf03, // 责任人
       ]);
     }else {
-      config.data = ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据'];
+      config.data = [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']];
     }
   } catch (error) {
     console.error('数据获取失败:', error);

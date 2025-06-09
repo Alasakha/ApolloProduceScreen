@@ -12,13 +12,19 @@ const service = axios.create({
   timeout: 120000,
 });
 
-// 请求拦截器
 service.interceptors.request.use(
   config => {
+    // 默认设置 Content-Type 为 application/json（如果未手动指定）
+    if (!config.headers['Content-Type']) {
+      config.headers['Content-Type'] = 'application/json;charset=UTF-8';
+    }
+
+    // 自动附加 token
     const token = localStorage.getItem('token');
     if (token) {
       config.headers['Authorization'] = `Bearer ${token}`;
     }
+
     return config;
   },
   error => {
@@ -26,6 +32,7 @@ service.interceptors.request.use(
     return Promise.reject(error);
   }
 );
+
 
 // 响应拦截器
 service.interceptors.response.use(

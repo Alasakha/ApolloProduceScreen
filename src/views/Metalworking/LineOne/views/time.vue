@@ -56,7 +56,7 @@ onBeforeUnmount(() => {
 
 
 <template>
-<dv-border-box-1 class="box1">
+<dv-border-box-3 class="box1">
 
   <div class="dateTime flex flex-col justify-center items-center h-full w-full">
       <div class="date">{{dateStr}}</div>
@@ -64,7 +64,7 @@ onBeforeUnmount(() => {
     </div>
 
 
-</dv-border-box-1>
+</dv-border-box-3>
 
 </template>
 

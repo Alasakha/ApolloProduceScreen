@@ -1,9 +1,9 @@
 <template>
-    <div class="w-[40%] h-full">
-      <dv-border-box12>
+    <div class="w-[30%] h-[35vh]">
+      <dv-border-box12 >  
         <div class="content-wrapper">
           <!-- 标题 -->
-          <div class="title">今日任务完成情况</div>
+          <div class="title mb-4">今日任务完成情况</div>
           
           <!-- 饼图和按钮区域 -->
           <div class="chart-container">
@@ -165,18 +165,22 @@
     height: 100%;
     padding: 16px;
     position: relative;
+    display: flex;
+    flex-direction: column;
   }
   
   .title {
     font-size: 1.6rem;
     color: #00eaff;
     text-align: center;
+    flex: none;
   }
   
   .chart-container {
     position: relative;
     width: 100%;
-    height: calc(100% - 60px);
+    flex: 1;
+    min-height: 0;
   }
   
   .chart {
@@ -188,14 +192,13 @@
     position: absolute;
     right: 20px;
     top: 20px;
+    z-index: 1;
   }
   
   .detail-btn {
     font-size: 14px;
   }
-  </style>
-  
-  <style>
+
   /* 精简对话框样式，主要保留必要的大屏风格 */
   .task-dialog .el-dialog {
     border-radius: 8px;

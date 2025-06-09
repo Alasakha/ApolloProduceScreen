@@ -54,8 +54,14 @@ onBeforeUnmount(() => {
 </script>
 
 <template>
-  <div class="text-white text-3xl flex flex-row items-center justify-around">
-    {{ icon }}{{ weatherData.condition }} {{ temperature }}°C
+  <div class="text-white text-5xl flex flex-row items-center items-center w-[40%] h-[90%] pr-4">
+  <dv-border-box-3 >
+    <div class="flex justify-center items-center w-full h-full">
+          {{ icon }}{{ weatherData.condition }} {{ temperature }}°C
+
+    </div>
+
+  </dv-border-box-3>
   </div>
 </template>
 

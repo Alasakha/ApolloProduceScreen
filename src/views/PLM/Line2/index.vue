@@ -1,5 +1,5 @@
 <template>
-    <div class="h-[35%] flex">
+    <div class=" flex">
         <Left></Left>
         <Right></Right>
     </div>

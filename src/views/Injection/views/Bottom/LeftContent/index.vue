@@ -4,7 +4,7 @@
   <p class="tracking-widest text-xl ">原材料监控</p>
 </div>
     
-    <ScrollBoard :config="config" style="width:45vw;height:19vh;"/>
+    <ScrollBoard :config="config" style="width:47vw;height:19vh;"/>
   </div>
 </template>
 
@@ -14,7 +14,7 @@ import { getrawMaterialMonitoring } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 // 初始化配置对象
 const config = reactive({
-  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际损耗量','原材料利用率'], // 表头
+  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料利用率'], // 表头
   data: [], // 数据
   index: true,
   align: ['center','center','center','center','center','center','center','center'],
@@ -33,9 +33,10 @@ const fetchData = async () => {
 config.data = res.data.map(item => [
   item.ty009, // 机台号
     item.planOutput,
-    Math.round(item.expectedUsage),
+    Math.round(item.expectedUsage)+'kg',
     '--',
     item.actualOutput,
+    Math.round(item.receivedUsage)+'kg',
     '--',
     '--'
 ]);
@@ -63,7 +64,6 @@ onMounted(() => {
   display: flex;
   flex-direction: row;
   font-size: 0.6vw;
-
 }
 
 :deep(.ScrollBoard .rows .row-item){

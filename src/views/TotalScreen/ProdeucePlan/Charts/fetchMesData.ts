@@ -15,13 +15,13 @@ export async function fetchClosingRateData(prodLine: string | number) {
   console.log('Requesting data with parameters: ', dateTimeStart, dateTimeStop, workCenter);
 
   try {
-    const formData = new FormData();
-    formData.append('dateTimeStart', dateTimeStart);
-    formData.append('dateTimeStop', dateTimeStop);
-    formData.append('workCenter', workCenter);
+    // const formData = new FormData();
+    // formData.append('dateTimeStart', dateTimeStart);
+    // formData.append('dateTimeStop', dateTimeStop);
+    // formData.append('workCenter', workCenter);
 
     // 调用封装的接口
-    const response = await getAbnormalUnfinishedList(formData);
+    const response = await getAbnormalUnfinishedList(workCenter,dateTimeStart,dateTimeStop);
     return response.data;  // 返回响应数据
   } catch (error) {
     console.error('Error fetching closing rate data:', error);  // 错误处理

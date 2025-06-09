@@ -17,11 +17,12 @@ import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
 const outStoreLoading = ref(true)
 
 const config = reactive({
-  header: [ '仓位','仓管员','需领用量','已领用量','品名','规格','工单号','客户单号'],
+  header: [ '仓位','仓管员','需领用量','已领用量','品名','规格','工单号','客户单号','处理结果'],
   data: [], // 初始为空
+  tableData: [],
   index: true,
   columnWidth: [50,80,80,80,80,],
-  align: ['center','center','center','center','center','center','center','center'],
+  align: ['center','center','center','center','center','center','center','center','center'],
   rowNum: 4,
   headerHeight: 35,
   headerBGC: '#0d47a1',
@@ -45,16 +46,31 @@ const fetchData = async () => {
 
     const transformed = list.map(item => [
       item.warehouse_name || '暂无数据',
-      item.warehouse_keeper || '暂无数据',
+      item.warehouseKeeper || '暂无数据',
       Number(item.required_qty).toFixed(0) || '暂无数据',
       Number(item.issued_qty).toFixed(0) || '暂无数据',
       item.itemDescription || '暂无数据',
       item.itemSpecification || '暂无数据',
       item.docNo || '暂无数据',
-      item.udf021 || '暂无数据'
+      item.udf021 || '暂无数据',
+      item.udf026 || '--',
+      item.mo_d_id // 保留 mo_d_id 但不显示
     ])
 
-    config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+    const showtransformed = list.map(item => [
+      item.warehouse_name || '暂无数据',
+      item.warehouseKeeper || '暂无数据',
+      Number(item.required_qty).toFixed(0) || '暂无数据',
+      Number(item.issued_qty).toFixed(0) || '暂无数据',
+      item.itemDescription || '暂无数据',
+      item.itemSpecification || '暂无数据',
+      item.docNo || '暂无数据',
+      item.udf021 || '暂无数据',
+      item.udf026 || '--'
+    ])
+
+    config.data = showtransformed.length > 0 ? showtransformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+    config.tableData = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
   } catch (e) {
     console.error('数据获取失败', e)
     config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]

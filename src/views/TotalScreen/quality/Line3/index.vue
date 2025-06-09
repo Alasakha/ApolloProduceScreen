@@ -2,8 +2,8 @@
     <!-- 留出标题的高度 -->
      <!-- <div class="h-[3vh] w-full flex justify-center items-center"></div> -->
     <div class="h-[37vh] w-full flex justify-center items-center pl-1 mt-8 gap-4">
-        <LeftContent></LeftContent>
-        <RightContent></RightContent>
+        <LeftContent class="flex-1"></LeftContent>
+        <RightContent class="flex-1"></RightContent>
     </div>
   </template>
   

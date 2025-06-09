@@ -1,8 +1,8 @@
 <template>
     <dv-border-box8 :dur="5">
       <ExceptionTable
-        title="当日来料质量异常问题统计"
-        dialog-title="当日来料质量异常问题统计详细"
+        title="来料质量异常问题统计"
+        dialog-title="来料质量异常问题统计详细"
         :loading="inStoreLoading"
         :config="config"
         export-file-name="入库异常处理数据"
@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import { reactive, onMounted, ref } from 'vue'
 import { getAbnormalQualityToday } from '@/api/getnewInjection'
-import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
+import ExceptionTable from '@/components/SCM/ExceptionTable/index.vue'
 
 const inStoreLoading = ref(false)
 
@@ -34,6 +34,7 @@ const config = reactive({
   header: ['采购内勤', '供应商','到货单号','品名', '品号','不合格数量','检验日期', '问题点', '判断结果' ,'最终检验合格时间','处理时长','处理结果'],
   data: [],
   rawData: [],
+  detailData: [], // 添加用于详细信息显示的数据
   index: true,
   columnWidth: [50, 150, 150, 170, 150,150,150,150,150,150,150,150],  
   align: ['center','center','center','center','center','center','center','center','center'],
@@ -107,15 +108,22 @@ const refreshData = async () => {
       item.reason || '--' // 处理结果
     ])
 
+    //过滤无处理结果的数据用于轮播图显示
+    const displayguolvData = displayData.filter(item => item[11] === '--' || item[11] === null || item[11] === undefined
+      || item[11] === ''
+    )
+    
     // 将source_id_roid作为额外属性存储
     const dataWithId = rawData.map((item) => ({
       ...item,
-      source_id_roid: item.source_id_roid
+      source_id_roid: item.source_id_roid,
+      po_arrival_inspection_d_id: item.po_arrival_inspection_d_id
     }))
-
-    config.data = displayData
-    // 将带ID的数据传递给组件
+    console.log(dataWithId[0],'dataWithId')
+    config.data = displayguolvData  // 轮播图显示无处理结果的数据
+    config.detailData = displayData // 详细信息显示所有数据
     config.rawData = dataWithId
+    console.log(config.data,'config.data')
   } catch (error) {
     console.error('获取异常数据失败', error)
   } finally {

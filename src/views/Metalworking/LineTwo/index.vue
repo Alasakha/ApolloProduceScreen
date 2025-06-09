@@ -1,40 +1,51 @@
 <template>
-    <div class="metalworking h-[30vh] p-4">
-        <dv-border-box-10 >
-        <div class="production-data text-white w-full h-full  flex justify-center flex-col">
+    <div class="metalworking h-[27vh] p-4 flex gap-2">
+        <div class="h-full w-full" >
+          <div class="content w-full h-full flex">
+            <Charts2 />
+            <Charts />
+  
+          </div>
+        </div>
 
-        <div class="row flex justify-around items-centers  " >
-        <DataCard  
-          title="本月已完成数" 
-          :value="MonthlyData?.done ??  '无数据'" 
-          /> 
-          <DataCard  
-          title="本月已完成数" 
-          :value="MonthlyData?.done ??  '无数据'" 
-        /> 
-          <DataCard  title="本月待生产数" 
-          :value="MonthlyData?.incomplete ??  '无数据'" 
-          />
-        </div>
-        <div class="row flex justify-around items-centers" >
-          <DataCard title="今日总排产" :value="TodayData?.pcTotal ?? '无数据'" /> 
-          <DataCard title="今日已完成"  :value=" TodayData?.done ?? '无数据'" />
-          <DataCard title="今日待生产" :value="TodayData?.unProduce ??  '无数据'" />
-          <DataCard title="今日产量达成率" :value="TodayData?.rate ??  '无数据'"/>
-        </div>
-      </div>
-    </dv-border-box-10>
+        <dv-border-box-8 class="h-full" :dur="12">
+          <div class="content w-full h-full">
+              <div class="title text-white text-2xl bold h-[10%] w-full flex justify-between items-center ">
+                <div class="ml-4"><span>入库信息</span> <span class="text-sm text-gray-100 mr-3">Inventory information </span></div>
+                <el-button type="primary" size="small" @click="dialogVisible = true">查看详细</el-button>
+              </div>
+              <div class="h-[90%] w-full relative">
+                <Scroll_Board />
+              </div>
+              <DialogDetail v-model:visible="dialogVisible" :table-data="tableData" :headers="headers" />
+          </div>
+        </dv-border-box-8>
     </div>
-    
 </template>
 
 <script setup>
-// Add your script logic here
+import Charts from './views/charts/charts.vue'
+import { ref, computed } from 'vue';
 import DataCard from '@/components/DataCard.vue';
+import Scroll_Board from './views/scrollboard.vue'
+import DialogDetail from './views/dialog-detail.vue'
+import { useScrollBoardData } from './views/scrollboardDataHook'
+import Charts2 from './views/charts/charts2.vue'
+
+const dialogVisible = ref(false)
+// 获取表格数据和表头
+const { tableData, headers } = useScrollBoardData()
 </script>
 
 <style scoped>
-.metalworking {
+.content {
     /* Add your styles here */
+    /* background-color: #15A3EF80; */
+    border-radius: 12px;
 }
-</style>x
+.title{
+  background-color: #1c4f8d;
+  margin-left: 2px;
+  margin-right: 2px;
+}
+</style>

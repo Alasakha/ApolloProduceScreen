@@ -17,7 +17,7 @@ const config1 = reactive({
   waitTime: 5000,
   headerHeight: 25,
   columnWidth:[],
-  rowNum: 7,
+  rowNum: 5,
   showTooltip:true,
 });
 

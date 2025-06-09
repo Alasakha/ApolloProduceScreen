@@ -1,5 +1,5 @@
 <template>
-   <div class="w-[70%]">
+   <div class="w-[70%] h-[35vh]">
         <dv-border-box12>
             <div class="title">项目逾期任务看板</div>
             <div class="content-wrapper">

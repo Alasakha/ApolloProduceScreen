@@ -73,5 +73,15 @@ export const getstagnantAmount= () => {
     })
   }
 
-
+  // /WMS/deliveryTimelinessRateAdd
+  export const getdeliveryTimelinessRateAdd= (mo_d_id ,reason) => {
+    return request({
+      url: '/WMS/deliveryTimelinessRateAdd',
+      method: 'get',
+      params: {
+        mo_d_id,
+        reason
+      }
+    })
+  }
 

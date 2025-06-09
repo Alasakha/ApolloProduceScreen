@@ -35,6 +35,8 @@
     "tailwind-merge": "^3.0.2",
     "tailwindcss": "^4.1.6",
     "tailwindcss-animate": "^1.0.7",
+    "three": "^0.177.0",
+    "three.js": "^0.77.1",
     "vue": "^3.5.13",
     "vue-dompurify-html": "^5.3.0",
     "vue-router": "^4.5.0",

@@ -58,7 +58,7 @@ const lines = ref([
   { id: "2005", name: "2005质量检测",router:"Q" },
   { id: null, name: "注塑看板",router:"/injection" },
   { id: null, name: "总仓看板",router:"/wms" },
-  { id: null, name: "金工看板",router:"/material" },
+  { id: null, name: "来料收货管理看板",router:"/incoming" },
   { id: null, name: "供应链看板",router:"/newscm" },
   { id: null, name: "生产计划看板",router:"/produceplan" },
   { id: null, name: "PLM看板",router:"/plm" },
