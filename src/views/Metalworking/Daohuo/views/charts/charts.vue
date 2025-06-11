@@ -3,7 +3,7 @@
         <dv-border-box8 :dur="5">
             <!-- 标题和提示 -->
             <div class="flex items-center">
-                <GlobalTitle title="一课-到货信息" />
+                <GlobalTitle title="一课-在途信息" />
                 <TooltipInfo
                     class="ml-2"
                     tooltip-content="显示各采购员的来料不合格情况统计"

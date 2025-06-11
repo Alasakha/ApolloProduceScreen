@@ -2,7 +2,7 @@
     <div class="accounting">
         <dv-border-box10>
             <div class="bc h-[35vh] flex flex-col">
-                <div class="text-center text-2xl font-bold text-white">呆滞金额</div>
+                <div class="text-center text-2xl font-bold text-white">呆滞物料处理</div>
                 <div class="flex-1 table-area">
                     <ScrollBoard v-if="!isLoading" :config="config" class="w-full  pt-0 " />
                     <div v-else class="loading">正在加载......</div>

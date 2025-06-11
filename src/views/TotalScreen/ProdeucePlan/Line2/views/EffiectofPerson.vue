@@ -1,46 +1,50 @@
 <template>
-  <dv-border-box-1 class="box1">
-    <!-- 标题 -->
-    <GlobalTitle title="当日人时效率"/>
-        <!-- 如果正在加载，显示 loading -->
-        <div v-if="isLoading" class="w-full h-[85%]">
+  <div class="efficency w-[25%]">
+    <dv-border-box12>
+      <GlobalTitle title="当日人时效率"/>
+      <!-- 如果正在加载，显示 loading -->
+      <div v-if="isLoading" class="w-full h-[85%] text-white">
         <dv-loading>Loading...</dv-loading>
       </div>
-    <!-- 数量 -->
-    <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col  justify-start">
-    <div class="line flex-2 flex">
-      <!-- 配置人数 -->
-      <div class="peizhi flex-1">
-        <div ref="Indicators1" class="w-full h-[100%]"></div>
+      <!-- 数量 -->
+      <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col justify-start">
+        <div class="line flex-2 flex">
+          <!-- 配置人数 -->
+          <div class="peizhi flex-1">
+            <div ref="Indicators1" class="w-full h-[100%]"></div>
+          </div>
+          <!-- 出勤人数 -->
+          <div class="chuchai flex-1">
+            <div ref="Indicators2" class="w-full h-[100%]"></div>
+          </div>
+        </div>
+
+        <div class="line flex-1 flex gap-8 w-full h-full justify-center items-center">
+          <!-- 标准人效 -->
+          <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
+            <div class="title text-lg font-bold">标准人效</div>
+            <div class="value">{{ EfficentData.standardEfficiency }}</div>
+          </div>
+
+          <!-- 实际人效 -->
+          <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
+            <div class="title text-lg font-bold">实际人效</div>
+            <div class="value">{{ EfficentData.efficiency }}</div>
+          </div>
+        </div>
+
       </div>
-      <!-- 出勤人数 -->
-      <div class="chuchai flex-1">
-        <div ref="Indicators2" class="w-full h-[100%]"></div>
-      </div>
-    </div>
+    </dv-border-box12>
 
-    <div class="line flex-1 flex  gap-8 w-full h-full  justify-center items-center">
-    <!-- 标准人效 -->
-    <div class="eff-card  flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
-      <div class="title  text-lg font-bold">标准人效</div>
-      <div class="value">{{ EfficentData.standardEfficiency.value }}</div>
-    </div>
 
-    <!-- 实际人效 -->
-    <div class="eff-card  flex flex-col justify-center items-center rounded-xl p-2 shadow-lg ">
-      <div class="title  text-lg font-bold">实际人效</div>
-      <div class="value">{{ EfficentData.efficiency.value }}</div>
-    </div>
+
+
   </div>
-  </div>
-
-
-  </dv-border-box-1>
 </template>
 
-
-<script setup>
-import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, } from 'vue';
+  <script setup>
+  
+  import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, } from 'vue';
 import * as echarts from 'echarts';
 
 import DataCard from "@/components/DataCard.vue"; // 导入封装组件
@@ -51,7 +55,11 @@ import { eventBus } from '@/utils/eventbus';
 import BigScreenTitle from '@/components/title.vue'
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
+
 // 定义数据
+const config = reactive({
+  value: 66,
+})
 const diffrentLine = (prodLine) => {
   const prefix = prodLine.slice(0, 4); // 取前4位
 
@@ -70,14 +78,13 @@ const diffrentLine = (prodLine) => {
 };
 
 
-
-
 const EfficentData = reactive({
-  standardEfficiency: { value: 0 },
-  efficiency: { value: 0 },
+  standardEfficiency: null,
+  efficiency: null,
   total: null,
   clTotal: null,
-  scanNum: null
+  scanNum: null,
+  stanardNum:null
 });
 
 
@@ -92,40 +99,48 @@ const chart1 = useEcharts(Indicators1);
 const chart2 = useEcharts(Indicators2);
 
 const drawChart = () => {
+  console.log('drawChart - stanarNum:', EfficentData.stanarNum, 'scanNum:', EfficentData.scanNum);
+  
   const option1 = createGaugeOption({
     text: "配置人数",
-    data: diffrentLine(prodLine),
-    max: diffrentLine(prodLine)
+    data: EfficentData.stanardNum,
+    max: EfficentData.stanardNum
   });
 
   const option2 = createGaugeOption({
     text: "出勤人数",
-    data: EfficentData.scanNum,
-    max: diffrentLine(prodLine)
+    data: EfficentData.scanNum, 
+    max: EfficentData.stanardNum
   });
+
+  console.log('option1:', option1);
+  console.log('option2:', option2);
 
   chart1.setOption(option1);
   chart2.setOption(option2);
-
-  console.log('drawChart data:', EfficentData.scanNum, diffrentLine(prodLine));
-
 };
 
 const fetchData = async () => {
   const res = await getEfficiencyToday(prodLine);
-
+  console.log('res:', res);
   // 分别赋值，保持响应式
-  EfficentData.standardEfficiency.value = Number(res.data.standardEfficiency)|| 0;
-  EfficentData.efficiency.value = Number(res.data.efficiency)  || 0;
+  EfficentData.standardEfficiency = Number(res.data.standardEfficiency)|| 0;
+  EfficentData.efficiency = Number(res.data.efficiency)  || 0;
   EfficentData.total = res.data.total ?? 0;
   EfficentData.clTotal = res.data.clTotal ?? 0;
-  EfficentData.scanNum = res.data.scanNum ?? 0;
+  EfficentData.scanNum = Number(res.data.scanNum) ?? 0;
+  EfficentData.stanardNum = Number(res.data.stanardNum) ?? 0;
+
+  console.log('EfficentData:', EfficentData);
+  console.log('stanarNum:', EfficentData.stanarNum, typeof EfficentData.stanarNum);
+  console.log('scanNum:', EfficentData.scanNum, typeof EfficentData.scanNum);
+  
   isLoading.value = false;
   nextTick(() => {
     chart1.initChart();
-  chart2.initChart();
-  drawChart();
-        });
+    chart2.initChart();
+    drawChart();
+  });
 };
 
 
@@ -169,4 +184,6 @@ onMounted(() => {
   font-size: 1.8rem;
   font-weight: bold;
 }
+
+
 </style>

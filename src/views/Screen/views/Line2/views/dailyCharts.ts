@@ -47,7 +47,7 @@ tooltip: {
         color: '#fff',
         fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12            // 图例文字颜色
       },
-      data: ['计划产能', '实际产能']
+      data: ['生产排产', '实际产能']
     },
     xAxis: {
       type: 'category',
@@ -80,7 +80,7 @@ tooltip: {
     },
     series: [
       {
-        name: '计划产能',
+        name: '生产排产',
         type: 'line',
         data: value2,
         barWidth: '30%',

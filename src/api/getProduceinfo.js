@@ -94,3 +94,39 @@ export const getEfficiencyHour = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }
+
+// /apollo/production/
+export const getProductionPlan = (prodLine,type) => {
+  return request({
+    url: '/production/reasonHour',
+    method: 'get',
+    params: { prodLine,type } // 传递 prodLine 参数
+  })
+}
+
+// 插入小时计划数据
+export const insertHourPlan = (data) => {
+  return request({
+    url: '/production/insertHourEffReason',
+    method: 'post',
+    data: data  // data应该是一个数组
+  })
+}
+
+
+// /production/planHour 计划产量
+export const getPlanHour = (prodLine) => {
+  return request({
+    url: '/production/planHour',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}
+// /production/capacityHour
+export const getCapacityHour = (prodLine) => {
+  return request({
+    url: '/production/capacityHour',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}

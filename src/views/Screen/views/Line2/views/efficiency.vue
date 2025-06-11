@@ -23,13 +23,13 @@
           <!-- 标准人效 -->
           <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
             <div class="title text-lg font-bold">标准人效</div>
-            <div class="value">{{ EfficentData.standardEfficiency.value }}</div>
+            <div class="value">{{ EfficentData.standardEfficiency }}</div>
           </div>
 
           <!-- 实际人效 -->
           <div class="eff-card flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
             <div class="title text-lg font-bold">实际人效</div>
-            <div class="value">{{ EfficentData.efficiency.value }}</div>
+            <div class="value">{{ EfficentData.efficiency }}</div>
           </div>
         </div>
 
@@ -79,11 +79,12 @@ const diffrentLine = (prodLine) => {
 
 
 const EfficentData = reactive({
-  standardEfficiency: { value: 0 },
-  efficiency: { value: 0 },
+  standardEfficiency: null,
+  efficiency: null,
   total: null,
   clTotal: null,
-  scanNum: null
+  scanNum: null,
+  stanardNum:null
 });
 
 
@@ -98,38 +99,48 @@ const chart1 = useEcharts(Indicators1);
 const chart2 = useEcharts(Indicators2);
 
 const drawChart = () => {
+  console.log('drawChart - stanarNum:', EfficentData.stanarNum, 'scanNum:', EfficentData.scanNum);
+  
   const option1 = createGaugeOption({
     text: "配置人数",
-    data: diffrentLine(prodLine),
-    max: diffrentLine(prodLine)
+    data: EfficentData.stanardNum,
+    max: EfficentData.stanardNum
   });
 
   const option2 = createGaugeOption({
     text: "出勤人数",
-    data: EfficentData.scanNum,
-    max: diffrentLine(prodLine)
+    data: EfficentData.scanNum, 
+    max: EfficentData.stanardNum
   });
+
+  console.log('option1:', option1);
+  console.log('option2:', option2);
 
   chart1.setOption(option1);
   chart2.setOption(option2);
-
 };
 
 const fetchData = async () => {
   const res = await getEfficiencyToday(prodLine);
-
+  console.log('res:', res);
   // 分别赋值，保持响应式
-  EfficentData.standardEfficiency.value = Number(res.data.standardEfficiency)|| 0;
-  EfficentData.efficiency.value = Number(res.data.efficiency)  || 0;
+  EfficentData.standardEfficiency = Number(res.data.standardEfficiency)|| 0;
+  EfficentData.efficiency = Number(res.data.efficiency)  || 0;
   EfficentData.total = res.data.total ?? 0;
   EfficentData.clTotal = res.data.clTotal ?? 0;
-  EfficentData.scanNum = res.data.scanNum ?? 0;
+  EfficentData.scanNum = Number(res.data.scanNum) ?? 0;
+  EfficentData.stanardNum = Number(res.data.stanardNum) ?? 0;
+
+  console.log('EfficentData:', EfficentData);
+  console.log('stanarNum:', EfficentData.stanarNum, typeof EfficentData.stanarNum);
+  console.log('scanNum:', EfficentData.scanNum, typeof EfficentData.scanNum);
+  
   isLoading.value = false;
   nextTick(() => {
     chart1.initChart();
-  chart2.initChart();
-  drawChart();
-        });
+    chart2.initChart();
+    drawChart();
+  });
 };
 
 

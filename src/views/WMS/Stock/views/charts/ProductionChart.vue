@@ -3,10 +3,10 @@
         <dv-border-box8 :dur="5">
             <!-- 标题和提示 -->
             <div class="flex items-center">
-                <GlobalTitle title="二课-在途信息" />
+                <GlobalTitle title="入库信息(超时)" />
                 <TooltipInfo
                     class="ml-2"
-                    tooltip-content="显示各采购员的来料不合格情况统计"
+                    tooltip-content="显示各仓管眼的入库情况统计"
                     :detail-content="tooltipDetailContent"
                     dialog-title="指标说明"
                     placement="right"
@@ -15,7 +15,7 @@
                         <div class="detail-content">
                             <h3 class="text-lg font-bold mb-4">数据说明</h3>
                             <ul class="list-disc pl-4 space-y-2">
-                                <li>统计周期：每月更新</li>
+                                <li>统计周期：实时更新</li>
                                 <li>数据来源：质检部门检验记录</li>
                                 <li>计算方式：xxxx</li>
                                 <li>点击饼图可查看详细记录</li>
@@ -36,7 +36,7 @@
     <!-- 使用通用详情弹窗组件 -->
     <DetailDialog
         v-model="dialogVisible"
-        :title="`${selectedPurchaser}的来料不合格详情`"
+        :title="`${selectedPurchaser}的入库信息详情`"
         :loading="tableLoading"
         :data="detailData"
         :columns="tableColumns"
@@ -47,12 +47,12 @@
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
-import { getPlanPie ,getPlanInfo} from '@/api/getIncomingInfo'
+import { getEnterPie,getEnterInfo } from '@/api/getIncomingInfo'
 
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
-import { createChartOption } from './charts2';
+import { createChartOption } from './dailyCharts';
 import { ElMessage } from 'element-plus';
 import { useEcharts } from '@/utils/useEcharts';
 import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
@@ -102,21 +102,20 @@ const handleCurrentChange = (val) => {
     currentPage.value = val;
 };
 
+
 // 表格列配置
 const tableColumns = [
-    // { prop: 'arrival_date', label: '到货审核日期', width: 120 },
+    { prop: 'arrival_date', label: '到货审核日期', width: 120 },
     { prop: 'business_qty', label: '到货数量', width: 150 },
     { prop: 'caigou', label: '采购员', width: 100 },
-    // { prop: 'cangguan', label: '仓管员', width: 80 },
-    { prop: 'deliveryTime', label: '到货时间', width: 200 },
-    { prop: 'doc_no', label: '工单号', width: 200 },
-    // { prop: 'item_code', label: '品号', width: 200 },
+    { prop: 'cangguan', label: '仓管员', width: 80 },
+    { prop: 'item_code', label: '品号', width: 200 },
     { prop: 'item_description', label: '品名', width: 200 },
     { prop: 'item_specification', label: '规格', width: 200 },
-    // { prop: 'jianyan', label: '检验员', width: 200 },
+    { prop: 'jianyan', label: '检验员', width: 200 },
     { prop: 'supplierCode', label: '供应商', width: 200 },
-    // { prop: 'supplier_full_name', label: '供应商名称', width: 300 },
-    // { prop: 'udf021', label: '客户单号', width: 300 }
+    { prop: 'supplier_full_name', label: '供应商名称', width: 300 },
+    { prop: 'udf021', label: '客户单号', width: 300 }
 ]
 
 // 处理饼图点击事件
@@ -128,7 +127,7 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getPlanInfo({caigou:params.name,type:2});
+            const res = await getEnterInfo({cangguan:params.name,type:1});
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
                 if (res.data && Array.isArray(res.data)) {
@@ -164,8 +163,9 @@ const drawMonthlyIndicators = (formattedData) => {
 
 // 处理数据
 const processData = (data) => {
-    const formattedData = formatPieChartData(data, 'caigou', 'total');
-    const processedData = formattedData 
+    const formattedData = formatPieChartData(data, 'cangguan', 'total');
+
+    const processedData = formattedData
         .filter(item => item.value !== 0)
         .sort((a, b) => b.value - a.value);
 
@@ -177,9 +177,11 @@ const processData = (data) => {
     }
 };
 
+// 请求数据
+// 请求数据
 const fetchData = () => {
-    const params = { type: 2 };
-    getPlanPie(params).then(res => {
+    const params = { type: 1 };
+    getEnterPie(params).then(res => {
         isLoading.value = false;
         processData(res.data);
     }).catch(() => {

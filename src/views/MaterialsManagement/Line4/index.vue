@@ -60,7 +60,7 @@ const initChart = async (data: StagnantData) => {
 
         const option = {
             title: {
-                text: '呆滞金额',
+                text: '呆滞物料处理',
                 left: 'center',
                 textStyle: {
                     color: '#fff',

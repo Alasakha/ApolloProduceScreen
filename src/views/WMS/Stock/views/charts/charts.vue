@@ -3,7 +3,7 @@
         <dv-border-box8 :dur="5">
             <!-- 标题和提示 -->
             <div class="flex items-center">
-                <GlobalTitle title="二课-在途信息" />
+                <GlobalTitle title="在途信息" />
                 <TooltipInfo
                     class="ml-2"
                     tooltip-content="显示各采购员的来料不合格情况统计"
@@ -47,12 +47,12 @@
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
-import { getPlanPie ,getPlanInfo} from '@/api/getIncomingInfo'
+import { getPlanPie, getPlanInfo } from '@/api/getIncomingInfo'
 
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
-import { createChartOption } from './charts2';
+import { createChartOption } from './dailyCharts';
 import { ElMessage } from 'element-plus';
 import { useEcharts } from '@/utils/useEcharts';
 import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
@@ -128,7 +128,7 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getPlanInfo({caigou:params.name,type:2});
+            const res = await getPlanInfo({caigou:params.name,type:1});
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
                 if (res.data && Array.isArray(res.data)) {
@@ -164,9 +164,15 @@ const drawMonthlyIndicators = (formattedData) => {
 
 // 处理数据
 const processData = (data) => {
+
     const formattedData = formatPieChartData(data, 'caigou', 'total');
-    const processedData = formattedData 
-        .filter(item => item.value !== 0)
+
+    const processedData = formattedData
+        .filter(item => item.value !== 0 && item.name) // 确保name不为空
+        .map(item => ({
+            name: item.name || '未知',  // 如果name为空则显示"未知"
+            value: item.value
+        }))
         .sort((a, b) => b.value - a.value);
 
     if (processedData.length === 0) {
@@ -177,8 +183,10 @@ const processData = (data) => {
     }
 };
 
+// 请求数据
+// 请求数据
 const fetchData = () => {
-    const params = { type: 2 };
+    const params = { type: 1 };
     getPlanPie(params).then(res => {
         isLoading.value = false;
         processData(res.data);
@@ -188,12 +196,13 @@ const fetchData = () => {
     });
 };
 
+
 onMounted(() => {
     fetchData();
     window.addEventListener('resize', resizeChart)
     eventBus.on("refreshData", fetchData);
 });
-
+    
 onBeforeUnmount(() => {
     eventBus.off("refreshData", fetchData);
     window.removeEventListener('resize', resizeChart)

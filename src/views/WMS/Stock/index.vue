@@ -1,7 +1,7 @@
 <template>
     <div class="stock-view h-[25vh] flex ">
         <LeftContent class="pr-4"/>
-        <RightContent/>
+        <!-- <RightContent/> -->
         <!-- Add your template content here -->
     </div>
 </template>
