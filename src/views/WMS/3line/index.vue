@@ -1,8 +1,8 @@
 <template>
 <div class="h-[40vh] bg-red=300 w-full flex">
-<Accounting class="basis-[30%]"></Accounting>
-<Store class="basis-[55%]"></Store>
-<DeadMoney class="basis-[25%]"></DeadMoney>
+<Accounting class="flex-1"></Accounting>
+<Store class="flex-1"></Store>
+<DeadMoney class="flex-1"></DeadMoney>
 </div>
 
 </template>

@@ -1,20 +1,24 @@
 <template>
   <ExceptionTable
+      :ischarts="true"
     title="入库异常处理进度表"
     dialog-title="入库异常处理详情"
     :loading="inStoreLoading"
     :config="config"
     export-file-name="入库异常处理数据"
+    :piedata="processedData"
   />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
-import { gettimelyAccountingRateDetail } from '@/api/getWMSinfo'
+import { gettimelyAccountingRateDetail,gettimelyAccountingRateDetailPie } from '@/api/getWMSinfo'
 import { eventBus } from '@/utils/eventbus'
 import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
+import { formatPieChartData } from '@/utils/map';
 
 const inStoreLoading = ref(true)
+const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 const config = reactive({
   header: [ '仓管员','仓位','检验单号','品名','规格'],
@@ -29,7 +33,7 @@ const config = reactive({
   evenRowBGC: '#1976d2',
   waitTime: 5000,
   carousel: 'page',
-  showTooltip: true
+  showTooltip: false
 })
 
 const fetchData = async () => {
@@ -39,7 +43,7 @@ const fetchData = async () => {
     const list = res.data
 
     if (!Array.isArray(list) || list.length === 0) {
-      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据',]]
       return
     }
 
@@ -60,9 +64,34 @@ const fetchData = async () => {
   }
 }
 
+ // 处理数据
+const processData = (data) => {
+    const formattedData = formatPieChartData(data, 'warehouseKeeper', 'total');
+    
+    processedData.value = formattedData
+        .filter(item => item.value !== 0 && item.name)
+        .map(item => ({
+            name: item.name || '未知',
+            value: item.value
+        }))
+        .sort((a, b) => b.value - a.value);
+};
+
+// 请求数据
+const fetchData2 = () => {
+const params = { type: 1 };
+gettimelyAccountingRateDetailPie(params).then(res => {
+    processData(res.data);
+}).catch(() => {
+});
+};
+
+
+
 onMounted(() => {
   eventBus.on('refreshData', fetchData)
   fetchData()
+  fetchData2()
 })
 
 onBeforeUnmount(() => {

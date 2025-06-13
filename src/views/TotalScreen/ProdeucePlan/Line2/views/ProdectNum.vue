@@ -98,8 +98,8 @@ const processActualData = (hourData) => {
   const completeCategories = [];
   const completeValues = [];
   
-  // 从7点到22点遍历
-  for (let hour = 7; hour <= 22; hour++) {
+  // 从7点到23点遍历
+  for (let hour = 7; hour <= 23; hour++) {
     completeCategories.push(hour.toString());
     completeValues.push(hourData[hour] || 0);
   }
@@ -126,7 +126,7 @@ const fetchData = () => {
       // 处理PMC排产数据（planHour）
       const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
-      for (let hour = 7; hour <= 22; hour++) {
+      for (let hour = 7; hour <= 23; hour++) {
         planValues.push(planData[hour] || 0);
       }
       standard.value = planValues;

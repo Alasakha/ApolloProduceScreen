@@ -41,7 +41,7 @@ tooltip: {
     const planValue2 = params.find(p => p.seriesName === 'PMC排产')?.value || 0;
     
     // 计算产量差异
-    const diff = actualValue - planValue2;
+    const diff = planValue2 - actualValue;
     
     // 添加各个系列的值
     params.forEach(item => {

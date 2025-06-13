@@ -8,7 +8,7 @@
 </template>
 
 <script setup>
-import CustomTable from '@/components/injection/Table.vue';
+import CustomTable from '@/components/injection/NativeTable.vue';
 import { ref, onMounted } from 'vue';
 import { getInvokeDeviceList } from '@/api/getInjection';
 

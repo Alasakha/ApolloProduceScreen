@@ -76,6 +76,7 @@ const tableCellStyle = {
         <el-table-column :label="tableTitle">
           <el-table-column :prop="'name'" label="工艺参数" />
           <el-table-column prop="real" label="实际值" />
+          <el-table-column prop="real" label="参数" />
         </el-table-column>
       </el-table>
     </div>

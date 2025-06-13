@@ -1,11 +1,14 @@
 <template>
-    <div class="data w-[50%] text-white">
+    <div class="data w-[25%] text-white">
         <dv-border-box12>
             <div class="content  w-full h-full flex flex-col p-4 gap-8  ">
       <div class="row flex-1 flex gap-[3vw] justify-around">
         <DataCard  
           title="月计划" 
           :value="MonthlyData?.plan ??  '无数据'" 
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
           /> 
                     <!-- :backgroundcolor1="'#9333ea'" 
           :backgroundcolor2="'#a855f7'" -->
@@ -13,17 +16,24 @@
           <DataCard  
           title="本月已完成数" 
           :value="MonthlyData?.done ??  '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
           /> 
           <DataCard  
           title="待生产数" 
           :value="MonthlyData?.incomplete ??  '无数据'"
-  
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
           /> 
           <DataCard  title="本月达成率" 
           :value="MonthlyData?.done != null && MonthlyData?.plan
          !=null ? ((MonthlyData.done / MonthlyData.plan) * 100).toFixed(0) + '%'
           : '无数据'"
-          
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
           />
       </div> 
       <div class="row flex-1 flex gap-[3vw] justify-around">
@@ -36,15 +46,43 @@
           :smalltitle1="'人数'" 
           :smalltitle2="'效率'" 
           />  -->
-        <DataCard title="今日计划" :value="TodayData?.pcTotal ?? '无数据'" /> 
-        <DataCard title="今日已完成数"  :value=" TodayData?.done ?? '无数据'"  />
-        <DataCard title="待生产数" :value="TodayData?.unProduce ??  '无数据'" /> 
-        <DataCard title="今日达成率" :value="formatPercent(TodayData?.rate) ??  '无数据'"></DataCard>
+        <DataCard title="今日计划" :value="TodayData?.pcTotal ?? '无数据'" 
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          /> 
+        <DataCard title="今日已完成数"  :value=" TodayData?.done ?? '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          />
+        <DataCard title="待生产数" :value="TodayData?.unProduce ??  '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          /> 
+        <DataCard title="今日达成率" :value="formatPercent(TodayData?.rate) ??  '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          />
       </div>
       <div class="row flex-1 flex gap-[3vw] justify-around">
-        <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'" /> 
-        <DataCard title="今日合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"  />
-        <DataCard title="今日直通率" :value="formatPercent(passedInfo?.passPercent)  ?? '无数据'"/>
+        <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          /> 
+        <DataCard title="今日合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          /> 
+        <DataCard title="今日直通率" :value="formatPercent(passedInfo?.passPercent)  ?? '无数据'"
+          :titleFontSize="0.6"
+          :valueFontSize="0.8"
+          :squareHeight="70"
+          />
       </div>
       <!-- <div class="production-data">
         <div class="row" >

@@ -68,7 +68,6 @@ export const useAccountDataStore = defineStore('accountDataStore', {
     async fetchOutboundData() {
       this.Outboundloading = true
      const res = await getdeliveryTimelinessRat()
-      console.log('出库数据:', res)
       if (res.code === 200) {
         this.OutboundData = res.data
         

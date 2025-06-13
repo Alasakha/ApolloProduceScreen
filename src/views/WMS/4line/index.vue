@@ -166,7 +166,7 @@ const clickHandler = (row: any) => {
 </div>
 
       
-      <div class="chart-container" style="width:100%; height:18vh;"></div>
+
     </dv-border-box12>
   </div>
 

@@ -31,7 +31,7 @@ const getYesterday = () => {
 const queryDate = getYesterday(); // 昨天的日期
 // 表格配置
 const config = reactive({
-  header: ['采购内勤', '供应商','到货单号','品名', '品号','不合格数量','检验日期', '问题点', '判断结果' ,'最终检验合格时间','处理时长','处理结果'],
+  header: ['采购内勤', '供应商','到货单号','品名', '品号','规格','不合格数量','检验日期', '问题点', '判断结果' ,'处理时长','处理结果'],
   data: [],
   rawData: [],
   detailData: [], // 添加用于详细信息显示的数据
@@ -99,11 +99,11 @@ const refreshData = async () => {
       item.doc_no|| '--', // 客户单号
       item.item_description || '--',// 品名
       item.item_code || '--',// 品号
+      item.item_specification || '--',// 规格型号
       getResultNumber(item), //不合格数量
       formatDate(item.startTime),// 检验日期
       item.description || '--',// 问题点
       getResultLabel(item),//判断结果
-      item.acceptedDate ? item.acceptedDate.slice(0, 16) : '--',// 检验时间
       item.hoursBetweenReturnAndAccept|| '--',// 处理时长
       item.reason || '--' // 处理结果
     ])

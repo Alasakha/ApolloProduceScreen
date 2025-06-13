@@ -39,7 +39,7 @@ const config = reactive({
 const fetchData = async () => {
   try {
     isLoading.value = true;
-    const res = await getstagnantAmount();
+    const res = await getstagnantAmount(1);
     if (res.data && Array.isArray(res.data)) {
       const transformed = res.data.map(item => [
         item.warehouse_name +'-' + item.warehouseKeeper || '暂无数据',

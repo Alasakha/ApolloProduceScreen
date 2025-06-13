@@ -2,6 +2,8 @@
 
 // chartOption.ts
 export function createChartOption(data) {
+  const total = data.reduce((sum, item) => sum + item.value, 0);
+  console.log('total:',total);
     return {
       backgroundColor: 'transparent', // 或深色如 '#000' 视页面背景而定
       tooltip: {
@@ -9,7 +11,18 @@ export function createChartOption(data) {
         formatter: '{b}: {c} ({d}%)'
       },
       legend: undefined, // 或直接删除整个 legend 配置
-      
+      graphic: {
+        type: 'text',
+        left: '49%',
+        top: '75%',
+        style: {
+          text: `${total}`,
+          textAlign: 'center',
+          fill: '#fff',
+          fontSize: 18,
+          fontWeight: 'bold'
+        }
+      },
       series: [
         {
           name: '来源',
@@ -22,6 +35,7 @@ export function createChartOption(data) {
             borderColor: '#000',
             borderWidth: 0
           },
+ 
           label: {
             color: '#fff',
             fontSize: 14,

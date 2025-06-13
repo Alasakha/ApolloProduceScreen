@@ -1,20 +1,24 @@
 <template>
   <ExceptionTable
+    :ischarts="true"
     title="出库异常处理进度表"
     dialog-title="出库异常处理详情"
     :loading="outStoreLoading"
     :config="config"
     export-file-name="出库异常处理数据"
+    :piedata="processedData"
   />
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
-import { getdeliveryTimelinessRateDetail } from '@/api/getWMSinfo'
+import { getdeliveryTimelinessRateDetail,getdeliveryTimelinessRateDetailPie } from '@/api/getWMSinfo'
 import { eventBus } from '@/utils/eventbus'
 import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
+import { formatPieChartData } from '@/utils/map';
 
 const outStoreLoading = ref(true)
+const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 const config = reactive({
   header: [ '仓位','仓管员','需领用量','已领用量','品名','规格','工单号','客户单号','处理结果'],
@@ -79,9 +83,34 @@ const fetchData = async () => {
   }
 }
 
+// 处理数据
+const processData = (data) => {
+    const formattedData = formatPieChartData(data, 'warehouseKeeper', 'total');
+    
+    processedData.value = formattedData
+        .filter(item => item.value !== 0 && item.name)
+        .map(item => ({
+            name: item.name || '未知',
+            value: item.value
+        }))
+        .sort((a, b) => b.value - a.value);
+};
+
+// 请求数据
+const fetchData2 = () => {
+const params = { type: 1 };
+getdeliveryTimelinessRateDetailPie(params).then(res => {
+    processData(res.data);
+}).catch(() => {
+});
+};
+
+
+
 onMounted(() => {
   eventBus.on('refreshData', fetchData)
   fetchData()
+  fetchData2()
 })
 
 onBeforeUnmount(() => {

@@ -12,6 +12,7 @@ const service = axios.create({
   timeout: 120000,
 });
 
+// 请求拦截器
 service.interceptors.request.use(
   config => {
     // 默认设置 Content-Type 为 application/json（如果未手动指定）
@@ -33,10 +34,14 @@ service.interceptors.request.use(
   }
 );
 
-
 // 响应拦截器
 service.interceptors.response.use(
   response => {
+    // 如果是文件流，直接返回原始 response
+    if (response.config && response.config.responseType === 'blob') {
+      return response;
+    }
+
     const res = response.data;
 
     // 处理业务逻辑错误

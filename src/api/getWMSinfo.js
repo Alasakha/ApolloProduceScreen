@@ -10,10 +10,11 @@ export const getpositionUtilizationRate= () => {
 }
 // /WMS/stagnantAmount
 
-export const getstagnantAmount= () => {
+export const getstagnantAmount= (type) => {
     return request({
       url: '/WMS/stagnantAmount',
       method: 'get',
+      params: { type } // 传递 prodLine 参数
     })
   }
   
@@ -85,3 +86,18 @@ export const getstagnantAmount= () => {
     })
   }
 
+  // /apollo/WMS/deliveryTimelinessRateDetailPie
+  export const getdeliveryTimelinessRateDetailPie= () => {
+    return request({
+      url: '/WMS/deliveryTimelinessRateDetailPie',
+      method: 'get',
+    })
+  }
+
+  // /WMS/timelyAccountingRateDetailPie
+  export const gettimelyAccountingRateDetailPie= () => {
+    return request({
+      url: '/WMS/timelyAccountingRateDetailPie',
+      method: 'get',
+    })
+  }
