@@ -145,7 +145,7 @@ const exportVisible = ref(false);
 const calculateDiff = (hour) => {
   const actual = actualHourData.value[hour] || 0;
   const plan = planHourData.value[hour] || 0;
-  return plan-actual;
+  return -(plan-actual);
 };
 
 // 点击设置计划按钮
