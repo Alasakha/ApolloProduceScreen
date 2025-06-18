@@ -115,6 +115,9 @@ const tableColumns = [
     { prop: 'item_specification', label: '规格', width: 200 },
     // { prop: 'jianyan', label: '检验员', width: 200 },
     { prop: 'supplierCode', label: '供应商', width: 200 },
+    { prop: 'deliveryTime', label: '预计发货日期', width: 200 },
+    { prop: 'expectedArrivalDate', label: '到货日期', width: 200 },
+    { prop: 'item_code', label: '到货单号', width: 200 },
     // { prop: 'supplier_full_name', label: '供应商名称', width: 300 },
     // { prop: 'udf021', label: '客户单号', width: 300 }
 ]
@@ -131,6 +134,7 @@ const handleChartClick = async (params) => {
             const res = await getPlanInfo({caigou:params.name,type:1});
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
+                console.log('API返回数据:', res.data);
                 if (res.data && Array.isArray(res.data)) {
                     detailData.value = res.data;
                 } else {

@@ -7,7 +7,7 @@
           title="月计划" 
           :value="MonthlyData?.plan ??  '无数据'" 
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+          :valueFontSize="0.6"
           :squareHeight="70"
           /> 
                     <!-- :backgroundcolor1="'#9333ea'" 
@@ -17,14 +17,14 @@
           title="本月已完成数" 
           :value="MonthlyData?.done ??  '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+          :valueFontSize="0.6"
           :squareHeight="70"
           /> 
           <DataCard  
           title="待生产数" 
           :value="MonthlyData?.incomplete ??  '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+          :valueFontSize="0.6"
           :squareHeight="70"
           /> 
           <DataCard  title="本月达成率" 
@@ -32,7 +32,7 @@
          !=null ? ((MonthlyData.done / MonthlyData.plan) * 100).toFixed(0) + '%'
           : '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+          :valueFontSize="0.6"
           :squareHeight="70"
           />
       </div> 
@@ -48,22 +48,22 @@
           />  -->
         <DataCard title="今日计划" :value="TodayData?.pcTotal ?? '无数据'" 
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+               :valueFontSize="0.6"
           :squareHeight="70"
           /> 
         <DataCard title="今日已完成数"  :value=" TodayData?.done ?? '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+                :valueFontSize="0.6"
           :squareHeight="70"
           />
         <DataCard title="待生产数" :value="TodayData?.unProduce ??  '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+                :valueFontSize="0.6"
           :squareHeight="70"
           /> 
         <DataCard title="今日达成率" :value="formatPercent(TodayData?.rate) ??  '无数据'"
           :titleFontSize="0.6"
-          :valueFontSize="0.8"
+              :valueFontSize="0.6"
           :squareHeight="70"
           />
       </div>

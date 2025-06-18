@@ -1,5 +1,5 @@
 <template>
-<div class="w-screen h-[23vh] pl-[2vw] pr-[1vw] flex pt-[0.5vh]">
+<div class="w-screen h-[27vh] pl-[2vw] pr-[1vw] flex pt-[0.5vh]">
   <div class="left_part flex-1">
     <dv-border-box12>
       <div dv-bg>

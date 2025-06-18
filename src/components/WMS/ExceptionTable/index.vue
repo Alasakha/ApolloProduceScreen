@@ -309,7 +309,6 @@ const handleAddResult = async () => {
     return
   }
   try {
-    console.log('mo_d_id:', mo_d_id.value,handleResult.value)
     await getdeliveryTimelinessRateAdd(mo_d_id.value, handleResult.value)
     ElMessage.success('操作成功')
     handleResultVisible.value = false
@@ -331,7 +330,6 @@ const handleAddResult = async () => {
 
 // 打开处理结果输入框
 const openHandleResultDialog = (row) => {
-  console.log('选中的行数据:', row)
   mo_d_id.value = row.mo_d_id
   
   handleResult.value = row['处理结果'] === '--' ? '' : (row['处理结果'] || '')
@@ -348,7 +346,7 @@ const openHandleResultDialog = (row) => {
 }
 
 .title-container {
-  flex: 0 0 35px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -373,9 +371,9 @@ const openHandleResultDialog = (row) => {
 }
 
 .table-area {
-  flex: 1 1 auto;
-  min-height: 0;
+
   overflow: hidden;
+  height:90%;
   position: relative;
 }
 

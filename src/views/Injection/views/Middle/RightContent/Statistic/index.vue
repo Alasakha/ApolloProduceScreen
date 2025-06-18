@@ -1,107 +1,100 @@
 <template>
   <div class="flex-container">
-    <custom-table :tableData="tableDataC02" :tableTitle="titleC02" :productLabel="productLabelC02" />
-    <custom-table :tableData="tableDataC01" :tableTitle="titleC01" :productLabel="productLabelC01"/>
-    <custom-table :tableData="tableDataC04" :tableTitle="titleC04" :productLabel="productLabelC04"/>
-    <custom-table :tableData="tableDataC03" :tableTitle="titleC03" :productLabel="productLabelC03"/> 
+    <dv-loading v-if="loading">
+      <div class="text-white">
+        Loading...
+      </div>
+    </dv-loading>
+    <div class="row"  v-else v-for="(row, rowIdx) in chunkedDevices" :key="rowIdx">
+      <OrderCard
+        v-for="device in row"
+        :key="device.macCode"
+        :orderName="device.deviceName"
+        :totalQty="device.pcNum ?? '暂无数据'"
+        :doneQty="device.doneNum ?? '暂无数据'"
+        :spec="device.ta034 ?? '暂无数据'"
+        :spen="device.ta035 ?? '暂无数据'"
+        :progress="calcProgress(device)"
+        :status="device.deviceStatus"
+        :temperature="device.et1"
+        :pressure="device.esipp"
+        :maxspeed="device.eivm"
+        :keeptime="device.esipt"
+        :stdTemperature="device.tempreture"
+        :stdPressure="device.pressure"
+        :stdMaxspeed="device.maxspeed"
+        :stdKeeptime="device.keeptime"
+        :ta006="device.ta006"
+      />
+    </div>  
   </div>
 </template>
 
 <script setup>
 import CustomTable from '@/components/injection/NativeTable.vue';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { getInvokeDeviceList } from '@/api/getInjection';
+import OrderCard from '@/components/injection/DataCard.vue'
 
-// 初始化表格数据
-const tableDataC02 = ref([]);
-const tableDataC01 = ref([]);
-const tableDataC04 = ref([]);
-const tableDataC03 = ref([]);
-
-const titleC02 = ref('A机台');
-const titleC01 = ref('B机台');
-const titleC03 = ref('C机台');
-const titleC04 = ref('D机台');
-
-const productLabelC01 = ref('加工品号');
-const productLabelC02 = ref('加工品号');
-const productLabelC03 = ref('加工品号');
-const productLabelC04 = ref('加工品号');
-
-// 格式化数据函数
-const formatData = (deviceData) => {
-  const formatValue = (value) => {
-    if (value === null || value === undefined) return '暂无数据';
-    const num = parseFloat(value);
-    return num % 1 === 0 ? num.toFixed(0) : num.toFixed(1);
-  };
-
-  return [
-    {name: '品号', real: deviceData.ta006 || '暂无数据'},
-    {name: '温度', real: formatValue(deviceData.et1)},
-    {name: '压力', real: formatValue(deviceData.esipp)},
-    {name: '最大射速', real: formatValue(deviceData.eivm)},
-    {name: '保压时间', real: formatValue(deviceData.esipt)}
-  ];
-};
-
-// 获取并处理数据
+const deviceList = ref([]);
+const loading = ref(true)
 const fetchData = async () => {
   try {
     const res = await getInvokeDeviceList();
-    const { data } = res;
-    
-    if (data) {
-      // 将数据格式化并赋值给对应的表格数据
-      if (data.c02) {
-        tableDataC02.value = formatData(data.c02);
-        titleC02.value = data.c02.deviceCode || 'C02机台';
-        productLabelC02.value = data.c02.ta006 || '加工品号';
-      }
-      
-      if (data.c01) {
-        tableDataC01.value = formatData(data.c01);
-        titleC01.value = data.c01.deviceCode || 'C01机台';
-        productLabelC01.value = data.c01.ta006 || '加工品号';
-      }
-      
-      if (data.c04) {
-        tableDataC04.value = formatData(data.c04);
-        titleC04.value = data.c04.deviceCode || 'C04机台';
-        productLabelC04.value = data.c04.ta006 || '加工品号';
-      }
-      
-      if (data.c03) {
-        tableDataC03.value = formatData(data.c03);
-        titleC03.value = data.c03.deviceCode || 'C03机台';
-        productLabelC03.value = data.c03.ta006 || '加工品号';
-      }
+    if (res.data && Array.isArray(res.data)) {
+      deviceList.value = res.data;
+      loading.value = false
     }
   } catch (error) {
     console.error('数据获取失败', error);
   }
 };
 
-// 页面加载时获取数据
 onMounted(() => {
   fetchData();
 });
+
+const chunkedDevices = computed(() => {
+  const arr = [];
+  for (let i = 0; i < deviceList.value.length; i += 2) {
+    arr.push(deviceList.value.slice(i, i + 2));
+  }
+  return arr;
+});
+
+const calcProgress = (device) => {
+  if (!device.pcNum || !device.doneNum) return 0;
+  return Math.round((device.doneNum / device.pcNum) * 100);
+};
 </script>
 
 <style scoped>
 .flex-container {
   display: flex;
-  justify-content: space-between;
-  align-items: stretch;
+  flex-direction: column;
   gap: 1rem;
   height: 100%;
   width: 100%;
+  padding: 1rem;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  width: 100%;
+  flex: 1;
+  min-height: 0;
+}
+
+:deep(.order-card) {
+  height: 100%;
+  flex: 1;
 }
 
 @media (max-width: 1024px) {
-  .flex-container {
-    flex-wrap: wrap;
-    justify-content: center;
+  .row {
+    flex-direction: column;
   }
 }
 </style>

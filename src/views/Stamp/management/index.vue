@@ -7,7 +7,6 @@
                 <Line1></Line1>
                 <Line2></Line2>
                 <Line3></Line3>
-                <Line4></Line4>
             </div>
         </dv-border-box11>
     </body>
@@ -18,7 +17,6 @@ import Header from './Header/index.vue'
 import Line1 from './line1.vue'
 import Line2 from './line2.vue'
 import Line3 from './line3.vue'
-import Line4 from './line4.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { eventBus } from '@/utils/eventbus'
 
@@ -26,7 +24,7 @@ onMounted(() => {
   // 每分钟刷新一次数据
   const timer = setInterval(() => {
     eventBus.emit('refreshData')
-  }, 60000)
+  }, 180000)
 
   onUnmounted(() => {
     clearInterval(timer)
@@ -47,7 +45,5 @@ body{
     transition: transform 0.3s ease-in-out;
 }
 
-.flex-col {
-    gap: 1rem;  /* 添加组件之间的间距 */
-}
+
 </style>

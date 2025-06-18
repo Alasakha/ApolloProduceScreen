@@ -1,146 +1,224 @@
 <template>
   <div class="line2-container">
-    <div class="grid grid-cols-4 gap-4">
-      <dv-border-box-12 class="data-box">
-        <div class="box-content">
-          <div class="box-title">今日检验数</div>
-          <div class="box-value">{{ inspectionData.checkTotal }}</div>
+    <div class="w-full grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+      <BorderBox
+        v-for="(device) in devices"
+        :key="device.name"
+        width="100%"
+        height="100%"
+      >
+        <div class="flex flex-col h-full justify-between">
+          <!-- 设备名称 -->
+          <div class="text-center text-xl font-bold text-[#8DD8FF] mb-2">{{ device.name }}</div>
+          <!-- 三栏参数 -->
+          <div class="flex flex-row justify-between mb-2 gap-2">
+            <!-- 计划/完成 -->
+            <div class="flex flex-col items-center flex-1">
+              <div class="param-box">
+                <div class="param-title">计划数</div>
+                <div class="param-value">{{ device.plan }}</div>
+              </div>
+              <div class="param-box mt-2">
+                <div class="param-title">完成数</div>
+                <div class="param-value">{{ device.done }}</div>
+              </div>
+            </div>
+            <!-- 状态/开机时长 -->
+            <div class="flex flex-col items-center flex-1">
+              <div class="param-box">
+                <div class="param-title">状态</div>
+                <div class="param-value" :class="device.status === '运行' ? 'text-green-400 font-bold' : 'text-red-400 font-bold'">
+                  {{ device.status }}
+                </div>
+              </div>
+              <div class="param-box mt-2">
+                <div class="param-title">开机时长</div>
+                <div class="param-value">{{ device.runTime }}</div>
+              </div>
+            </div>
+            <!-- 功率/切割速度 -->
+            <div class="flex flex-col items-center flex-1">
+              <div class="param-box">
+                <div class="param-title">功率</div>
+                <div class="param-value">{{ device.power }}kW</div>
+              </div>
+              <div class="param-box mt-2">
+                <div class="param-title">切割速度</div>
+                <div class="param-value">{{ device.speed }}m/min</div>
+              </div>
+            </div>
+          </div>
+          <!-- 底部：开机时长+进度条 -->
+          <div class="flex items-center w-full mt-2">
+            <div class="text-[#8DD8FF] mr-2">进度</div>
+            <div class="flex-1 bg-[#1a2a4a] rounded h-4 relative overflow-hidden mx-2">
+              <div
+                class="bg-gradient-to-r from-[#4E71FF] to-[#00EAFF] h-4 rounded"
+                :style="{ width: (device.done/device.plan*100) + '%' }"
+              ></div>
+            </div>
+            <div class="text-[#8DD8FF] font-bold w-10 text-right">{{ Math.round(device.done/device.plan*100) }}%</div>
+          </div>
         </div>
-      </dv-border-box-12>
-
-      <dv-border-box-12 class="data-box">
-        <div class="box-content">
-          <div class="box-title">今日合格数</div>
-          <div class="box-value">{{ inspectionData.firstHgTotal }}</div>
-        </div>
-      </dv-border-box-12>
-
-      <dv-border-box-12 class="data-box">
-        <div class="box-content">
-          <div class="box-title">今日合格率</div>
-          <div class="box-value">{{ inspectionData.passPercent }}</div>
-        </div>
-      </dv-border-box-12>
-
-      <dv-border-box-12 class="data-box">
-        <div class="box-content">
-          <div class="box-title">今日产量达成率</div>
-          <div class="box-value">{{ productionData.rate }}%</div>
-        </div>
-      </dv-border-box-12>
+      </BorderBox>
     </div>
   </div>
-</template>
+</template>   
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { getTodayInspection, getTodayProduction, type TodayInspection, type TodayProduction } from '@/api/getStampinfo'
-import { useRoute } from 'vue-router'
-import { eventBus } from '@/utils/eventbus'
+import { ref, onMounted, nextTick } from 'vue'
+import * as echarts from 'echarts'
+import gsap from 'gsap'
+import BorderBox from '@/components/datav/BorderBox.vue'
 
-const route = useRoute()
-const prodLine = route.query.prodLine as string
+const devices = ref([
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+  {
+    name: '激光割管1号',
+    type: '激光割管',
+    count: 2,
+    status: '运行',
+    runTime: 120,
+    power: 80,
+    speed: 50,
+    plan: 1000,
+    done: 800
+  },
+])
 
-const inspectionData = ref<TodayInspection>({
-  checkTotal: 0,
-  firstHgTotal: 0,
-  passPercent: '0%'
-})
-
-const productionData = ref<TodayProduction>({
-  rate: 0,
-  pcTotal: 0,
-  done: 0,
-  undone: '0'
-})
-
-const fetchInspectionData = async () => {
-  try {
-    const res = await getTodayInspection(prodLine)
-    if (res.code === 200) {
-      inspectionData.value = {
-        ...res.data,
-        checkTotal: Math.round(res.data.checkTotal),
-        firstHgTotal: Math.round(res.data.firstHgTotal),
-        passPercent: res.data.passPercent.replace(/\..*%/, '%')
-      }
-    }
-  } catch (error) {
-    console.error('获取今日检验数据失败:', error)
-  }
-}
-
-const fetchProductionData = async () => {
-  try {
-    const res = await getTodayProduction(prodLine)
-    if (res.code === 200) {
-      productionData.value = {
-        ...res.data,
-        pcTotal: Math.round(res.data.pcTotal),
-        done: Math.round(res.data.done),
-        undone: String(Math.round(Number(res.data.undone))),
-        rate: res.data.pcTotal ? Math.round((res.data.done / res.data.pcTotal) * 100) : 0
-      }
-    }
-  } catch (error) {
-    console.error('获取今日生产数据失败:', error)
-  }
-}
-
-// 刷新数据
-const refreshData = () => {
-  fetchInspectionData()
-  fetchProductionData()
-}
+// ECharts初始化
+const chartRefs = ref<Array<HTMLDivElement | null>>([null, null, null, null, null, null])
+const chartInstances = ref<any[]>([])
 
 onMounted(() => {
-  refreshData()
-  
-  // 订阅刷新事件
-  eventBus.on('refreshData', refreshData)
-  
-  onUnmounted(() => {
-    eventBus.off('refreshData', refreshData)
+  nextTick(() => {
+    chartRefs.value.forEach((el, idx) => {
+      if (el) {
+        const chart = echarts.init(el)
+        chart.setOption({
+          series: [{
+            type: 'gauge',
+            progress: { show: true, width: 8 },
+            axisLine: { lineStyle: { width: 8 } },
+            pointer: { show: false },
+            detail: { valueAnimation: true, fontSize: 18, color: '#4E71FF' },
+            data: [{ value: devices.value[idx].done / devices.value[idx].plan * 100, name: '完成率' }]
+          }]
+        })
+        chartInstances.value[idx] = chart
+      }
+    })
+    // GSAP动画
+    gsap.from('.device-card', {
+      opacity: 0,
+      y: 40,
+      stagger: 0.1,
+      duration: 0.7,
+      ease: 'power2.out'
+    })
   })
 })
 </script>
 
 <style scoped>
 .line2-container {
-  padding: 0.5rem;
+  padding: 0.5rem 0.5rem 0 0;
+  width: 100%;
 }
 
 .data-box {
-  height: 15vh;
+  height: 40vh;
   padding: 1rem;
 }
 
-.box-content {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-}
-
-.box-title {
-  display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 95%;
-    text-align: center;
-    font-size: 0.9vw;
-    font-weight: bold;
-    margin: 1vh 0 0.5vh 0;
-    color: #fff;
-    letter-spacing: 0.3vw;
-    text-shadow: 0 0.3vh 1vw #000, 0 0 0.2vw #00bfff;
-    padding-bottom: 0.5vh;
-}
-
-.box-value {
-  font-size: 2rem;
-  font-weight: bold;
+.device-card {
+  background: rgba(30, 60, 120, 0.18);
+  border: 1.5px solid #4E71FF;
+  border-radius: 16px;
+  box-shadow: 0 4px 24px #4E71FF33;
+  min-width: 98%;
+  max-width: 100%;
   color: #fff;
+  transition: box-shadow 0.2s;
+}
+.device-card:hover {
+  box-shadow: 0 8px 32px #8DD8FF55;
+}
+
+.param-box {
+  border: 2px solid;
+  border-image: linear-gradient(90deg, #4E71FF, #00EAFF) 1;
+  border-radius: 10px;
+  padding: 4px 12px;
+  margin-bottom: 2px;
+  min-width: 80px;
+  background: rgba(30, 60, 120, 0.18);
+  box-shadow: 0 2px 8px #4E71FF22;
+}
+.param-title {
+  color: #8DD8FF;
+  font-size: 0.95em;
+  font-weight: bold;
+  text-align: center;
+}
+.param-value {
+  color: #fff;
+  font-size: 1.1em;
+  text-align: center;
+  font-weight: bold;
 }
 </style> 

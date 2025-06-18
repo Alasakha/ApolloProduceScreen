@@ -21,7 +21,7 @@ const inStoreLoading = ref(true)
 const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 const config = reactive({
-  header: [ '仓管员','仓位','检验单号','品名','规格'],
+  header: [ '仓管员','仓位','检验单号','品名','规格','到货单号','品号'],
   data: [], // 初始为空
   index: true,
   columnWidth: [50,100,100,150,200],
@@ -53,6 +53,8 @@ const fetchData = async () => {
       item.docNo ?? '无',
       item.itemDescription ?? '无',
       item.itemSpecification ?? '无',
+      item.purchase_doc_no ?? '无',
+      item.item_code ?? '无'
     ])
 
     config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
@@ -81,6 +83,7 @@ const processData = (data) => {
 const fetchData2 = () => {
 const params = { type: 1 };
 gettimelyAccountingRateDetailPie(params).then(res => {
+  
     processData(res.data);
 }).catch(() => {
 });

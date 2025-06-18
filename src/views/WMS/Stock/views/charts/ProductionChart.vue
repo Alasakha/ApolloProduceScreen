@@ -26,7 +26,7 @@
             </div>
 
             <!-- 图表容器 -->
-            <div class="chartsbox w-full h-[90%] mt-4">
+            <div class="chartsbox w-full h-[90%] ">
                 <div v-if="!isDataEmpty" ref="chartRef" class="w-full h-full"></div>
                 <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl">今日暂无数据</div>
             </div>  

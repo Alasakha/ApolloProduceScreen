@@ -2,7 +2,7 @@
   <div class="line1-container">
     <div class="grid grid-cols-3 gap-4">
       <dv-border-box-12 class="data-box ">
-        <div class="flex">
+        <div class="flex w-full h-full">
           <div class="box-title flex-1 flex-col">
             <div>今日计划总数</div>
              <div class="text-xl">TodayPlanned</div>
@@ -42,7 +42,7 @@
         
       </dv-border-box-12>
 
-      <dv-border-box-12 class="data-box">
+      <!-- <dv-border-box-12 class="data-box">
         <div class="circle-content-box">
           <svg viewBox="0 0 120 120" class="ring-svg">
             <circle
@@ -73,16 +73,21 @@
             <div class="box-value">{{ productionData.done }}</div>
           </div>
         </div>
-      </dv-border-box-12>
-
-      <dv-border-box-12 class="data-box">
-        <div class="circle-content-box">
+      </dv-border-box-12> -->
+      <dv-border-box-12 class="data-box ">
+        <div class="flex w-full h-full">
+          <div class="box-title flex-1 flex-col">
+            <div>今日已生产</div>
+             <div class="text-xl">ProducedToday</div>
+          </div>
+        <div class="circle-content-box flex-1">
+         
           <svg viewBox="0 0 120 120" class="ring-svg">
             <circle
               class="ring-bg"
               cx="60" cy="60" r="50"
               fill="none"
-              stroke="#00eaff33"
+              stroke="#02e0fd"
               stroke-width="8"
             />
             <circle
@@ -97,15 +102,58 @@
             <defs>
               <linearGradient id="gradient">
                 <stop offset="0%" stop-color="#00eaff"/>
-                <stop offset="100%" stop-color="#00ffb0"/>
+                <stop offset="100%" stop-color="#2392f1"/>
               </linearGradient>
             </defs>
           </svg>
           <div class="circle-content">
-            <div class="box-title">今日待生产</div>
-            <div class="box-value">{{ productionData.undone }}</div>
+            <!-- <div class="box-title">今日总排产</div> -->
+            <div class="box-value float-updown">{{ productionData.done }}</div>
           </div>
         </div>
+        </div>
+        
+      </dv-border-box-12>
+
+      <dv-border-box-12 class="data-box ">
+        <div class="flex w-full h-full">
+          <div class="box-title flex-1 flex-col">
+            <div>今日待生产</div>
+             <div class="text-xl">To Be Produced Today</div>
+          </div>
+        <div class="circle-content-box flex-1">
+         
+          <svg viewBox="0 0 120 120" class="ring-svg">
+            <circle
+              class="ring-bg"
+              cx="60" cy="60" r="50"
+              fill="none"
+              stroke="#02e0fd"
+              stroke-width="8"
+            />
+            <circle
+              class="ring-animate"
+              cx="60" cy="60" r="50"
+              fill="none"
+              stroke="url(#gradient)"
+              stroke-width="4"
+              stroke-dasharray="314"
+              stroke-dashoffset="0"
+            />
+            <defs>
+              <linearGradient id="gradient">
+                <stop offset="0%" stop-color="#00eaff"/>
+                <stop offset="100%" stop-color="#2392f1"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="circle-content">
+            <!-- <div class="box-title">今日总排产</div> -->
+            <div class="box-value float-updown">{{ productionData.undone }}</div>
+          </div>
+        </div>
+        </div>
+        
       </dv-border-box-12>
     </div>
   </div>
@@ -113,7 +161,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { getTodayProduction, type TodayProduction } from '@/api/getStampinfo'
+import { getTodayProduction, type TodayProduction } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
 import * as THREE from 'three'
@@ -188,10 +236,25 @@ function createParticleEffect(container: HTMLElement) {
   renderers.push(renderer)
 }
 
-const fetchData = async () => {
+const fetchData = async (prodLine) => {
   try {
-    const res = await getTodayProduction(prodLine)
+    const getLine = () => {
+      if (prodLine === 'CY') {
+        return '1001'
+      } else if (prodLine === 'HJ') {
+        return '1003'
+      }
+      return prodLine
+    }
+    
+    const lineValue = getLine()
+    console.log('生产线值:', lineValue)
+    console.log('请求参数:', { prodLine: lineValue })
+    const res = await getTodayProduction(lineValue)
+    console.log('API响应:', res)
+    
     if (res.code === 200) {
+      console.log('原始数据:', res.data)
       // 格式化数据,去除小数点
       productionData.value = {
         ...res.data,
@@ -201,6 +264,7 @@ const fetchData = async () => {
         // 达成率 = (已完成/计划) * 100,取整
         rate: res.data.pcTotal ? Math.round((res.data.done / res.data.pcTotal) * 100) : 0
       }
+      console.log('处理后的数据:', productionData.value)
     }
   } catch (error) {
     console.error('获取今日生产数据失败:', error)
@@ -208,9 +272,9 @@ const fetchData = async () => {
 }
 
 onMounted(() => {
-  fetchData()
+  fetchData(prodLine)
   // 订阅刷新事件
-  eventBus.on('refreshData', fetchData)
+  eventBus.on('refreshData', () => fetchData(prodLine))
   if (threeBox1.value) createParticleEffect(threeBox1.value)
   if (threeBox2.value) createParticleEffect(threeBox2.value)
   if (threeBox3.value) createParticleEffect(threeBox3.value)
@@ -228,7 +292,7 @@ onBeforeUnmount(() => {
 
 <style scoped>
 .line1-container {
-  padding: 0.5rem;
+  /* padding: 0.5rem; */
 }
 
 .data-box {
@@ -240,8 +304,8 @@ onBeforeUnmount(() => {
 
 .circle-content-box {
   position: relative;
-  width: 160px;  /* 可根据内容调整 */
-  height: 160px;
+  width: 100%;  /* 可根据内容调整 */
+  height: 100%;
   margin: 0 auto;
   display: flex;
   align-items: center;

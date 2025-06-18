@@ -2,7 +2,17 @@
   
   <dv-border-box-9 class="box1 w-full h-full">
     <div class="wrapper flex flex-col h-full">
-     <h2>工单异常</h2>
+     <div class="title-container">
+       <h2>工单异常</h2>
+       <el-button 
+         type="primary" 
+         size="small" 
+         @click="handleDetail"
+         class="action-btn"
+       >
+         查看详情
+       </el-button>
+     </div>
           
      <!-- 如果没有数据，显示暂无数据 -->
      <div v-if="!isLoading && isDataEmpty" class="empty-container">
@@ -25,23 +35,41 @@
     <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
   </div>
 </el-dialog>
+
+<!-- 使用封装的详情表格组件 -->
+<DetailTable
+  v-model="detailDialogVisible"
+  title="工单异常详情"
+  :headers="config.header"
+  :data="tableData"
+  :loading="tableLoading"
+  @update:reason="handleReasonUpdate"
+/>
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
+import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive, computed} from 'vue';
 import ScrollBoard from '@/components/datav/ScrollBoard.vue'
+import DetailTable from '@/components/totalScreen/DetailTable/index.vue'
 import * as echarts from 'echarts';
 import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
-import { eventBus } from '@/utils/eventbus';
+import { eventBus } from '@/utils/eventbus';  
+import { ElMessage } from 'element-plus';
 
 const dialogVisible = ref(false);//弹窗控制
+const detailDialogVisible = ref(false);
 const selectedItem = ref({});
 const route = useRoute();
 const prodLine = route.query.prodLine;
 const monthlyIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
+const tableLoading = ref(false);
+const currentPage = ref(1);
+const pageSize = ref(10);
+const total = ref(0);
+const tableData = ref([]);
 const categories = ref([]); // X 轴数据
 const values = ref([]); // Y 轴数据
 let chartInstance = null;
@@ -102,6 +130,51 @@ onMounted(() => {
   selectedItem.value = row.row; // 直接保存整行
   dialogVisible.value = true;
 };
+
+// 处理详情按钮点击
+const handleDetail = () => {
+  if (isLoading.value) {
+    ElMessage.warning('数据加载中，请稍后再试');
+    return;
+  }
+  
+  tableLoading.value = true;
+  try {
+    tableData.value = config.data.map((row) => {
+      const rowData = {};
+      config.header.forEach((header, index) => {
+        rowData[header] = row[index];
+      });
+      return rowData;
+    }); 
+    total.value = tableData.value.length;
+  } finally {
+    tableLoading.value = false;
+    detailDialogVisible.value = true;
+  }
+};
+
+// 处理分页
+const handleSizeChange = (val) => {
+  pageSize.value = val;
+  currentPage.value = 1;
+};
+
+const handleCurrentChange = (val) => {
+  currentPage.value = val;
+};
+
+// 处理原因更新
+const handleReasonUpdate = async ({ row, reason }) => {
+  try {
+    // TODO: 这里需要调用后端API保存原因
+    // await updateReason(row.workNo, reason);
+    ElMessage.success('原因更新成功');
+  } catch (error) {
+    console.error('更新原因失败:', error);
+    ElMessage.error('更新原因失败');
+  }
+};
 </script>
 
 
@@ -115,16 +188,83 @@ onMounted(() => {
   padding: 20px;
 }
 
-h2 {
-  top: 0.5vh;
-  left: 1vw;
-  margin: 0;
-  font-size: 1vw;
-  font-weight: bold;
+.title-container {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   margin-bottom: 10px;
 }
 
+h2 {
+  margin: 0;
+  font-size: 1vw;
+  font-weight: bold;
+}
 
+.action-btn {
+  margin-left: 10px;
+}
 
+.detail-table {
+  max-height: 60vh;
+  overflow-y: auto;
+}
+
+.pagination-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+  padding: 10px;
+}
+
+:deep(.el-table) {
+  background-color: transparent;
+  color: #333;
+}
+
+:deep(.el-table th) {
+  background-color: #0d47a1;
+}
+
+:deep(.el-table tr) {
+  background-color: #fff;
+}
+
+:deep(.el-pagination) {
+  margin-right: 20px;
+}
+
+:deep(.el-loading-mask) {
+  background-color: rgba(255, 255, 255, 0.7);
+}
+
+:deep(.custom-dialog) {
+  display: flex;
+  flex-direction: column;
+  margin: 0 !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  max-height: 90vh;
+}
+
+:deep(.custom-dialog .el-dialog__body) {
+  flex: 1;
+  overflow: auto;
+  padding: 20px;
+}
+
+:deep(.custom-dialog .el-dialog__header) {
+  padding: 20px;
+  margin: 0;
+  border-bottom: 1px solid #dcdfe6;
+}
+
+:deep(.custom-dialog .el-dialog__footer) {
+  padding: 20px;
+  margin: 0;
+  border-top: 1px solid #dcdfe6;
+}
 </style>
  

@@ -88,6 +88,17 @@
             />
           </div>
         </div>
+        <!-- 合计行 -->
+        <div class="grid grid-cols-8 gap-4 font-bold text-center bg-[#222] text-[#4E71FF]">
+          <div>合计</div>
+          <div></div>
+          <div>{{ totalPlan }}</div>
+          <div>{{ totalActual }}</div>
+          <div>{{ totalDiff }}</div>
+          <div>{{ totalWorkshop }}</div>
+          <div></div>
+          <div></div>
+        </div>
       </div>
       <template #footer>
         <span class="dialog-footer">
@@ -140,6 +151,20 @@ const carModels = ref(Array(24).fill(''));
 
 // 导出弹框控制
 const exportVisible = ref(false);
+
+// 合计
+const totalPlan = computed(() => {
+  return workingHours.value.reduce((sum, hour) => sum + (Number(planHourData.value[hour]) || 0), 0);
+});
+const totalActual = computed(() => {
+  return workingHours.value.reduce((sum, hour) => sum + (Number(actualHourData.value[hour]) || 0), 0);
+});
+const totalDiff = computed(() => {
+  return totalActual.value - totalPlan.value;
+});
+const totalWorkshop = computed(() => {
+  return workingHours.value.reduce((sum, hour) => sum + (Number(planNumbers.value[hour - 1]) || 0), 0);
+});
 
 // 计算产量差异
 const calculateDiff = (hour) => {

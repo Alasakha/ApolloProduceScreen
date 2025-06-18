@@ -36,7 +36,7 @@ config.data = res.data.map(item => [
     Math.round(item.expectedUsage)+'kg',
     '--',
     item.actualOutput,
-    Math.round(item.receivedUsage)+'kg',
+    Math.round(item.actualOutput2)+'kg',
     '--',
     '--'
 ]);
