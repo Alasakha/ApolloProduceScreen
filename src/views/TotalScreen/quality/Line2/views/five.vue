@@ -22,8 +22,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { getAtopDayInspector,getAbnormalDetail } from '@/api/getQuiltyinfo';
-import { useRoute } from 'vue-router';
+import { getComplaintPie2 ,getComplaint} from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
@@ -31,38 +30,36 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('今日功性能不良'); // 改为 ref
-const reasonType = 1;
+const title = ref('客户关闭及时率');
+const reasonType = 2;
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-const route = useRoute();
-const prodLine = route.query.prodLine;
+
+
 
 const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
 const gridData = ref([]);
 const gridColumns = [
-  { prop: 'ngName', label: '不良问题' },
-  { prop: 'createDate', label: '发现时间' },
-  { prop: 'ta002', label: '工单单号' },
-  { prop: 'ta006', label: '品号' },
-  { prop: 'mb002', label: '车型' },
-  { prop: 'peopleName', label: '发现人' },
-  { prop: 'admin_UNIT_NAME', label: '责任部门' },
-  { prop: 'ngResponPeople', label: '责任人' },
-  { prop: 'ngHandle', label: '处理结果' },
-  { prop: 'action', label: '操作' }
+  { prop: 'documentName', label: '客户等级' , width: '120'},
+  { prop: 'documentValue', label: '单据类型', width: '150' },
+  { prop: 'doc_no,', label: '订单号',width: '150' },
+  { prop: 'description', label: '问题点1',width: '500' },
+  { prop: 'udf021', label: '问题点2',width: '300' },
+  { prop: 'remark', label: '备注',width: '250' },
+  { prop: 'reqTime', label: '单据日期',width: '250' },
+  { prop: 'respTime', label: '处理时间' },
+  { prop: 'pf', label: '处理情况' },
 ];
 
 
 
 const opendialog = () => {
   dialogTableVisible.value = true;
-  getAbnormalDetail( '',reasonType)
- 
+  getComplaint()
     .then(res => {
       gridData.value = res.data;
     });
@@ -70,11 +67,20 @@ const opendialog = () => {
 
 
 const fetchData = () => {
-    getAtopDayInspector(prodLine, reasonType)
+    getComplaintPie2( )
     .then(res => {
       
       isLoading.value = false;
-      processData(res.data);
+     const data = res.data
+
+     const result = [
+  { value: data.greenCount, name: '及时处理' },
+  { value: data.yellowCount, name: '客诉响应' },
+  { value: data.orangeCount, name: '处理预警' },
+  { value: data.redCount, name: '未及时处理' }
+];
+
+rawData.value=result    
     })
     .catch(() => {
       isLoading.value = false;
@@ -87,21 +93,29 @@ const handleChartClick = (params) => {
   const clickedName = params.name;
   title.value = `${clickedName}的详细数据`;
   dialogTableVisible.value = true;
-
-  getAbnormalDetail(undefined,reasonType,undefined,clickedName) // 假设 API 接口第三个参数是问题名
+    console.log(clickedName)
+  getComplaint(null,isColor(clickedName)) // 假设 API 接口第三个参数是问题名
     .then(res => {
       gridData.value = res.data;
     });
 };
 
-const processData = (data) => {
-  const formatted = formatPieChartData(data, 'peopleName', 'total');
-  rawData.value = formatted.map(item => ({
-    name: item.name || '未知',
-    value: item.value ? parseInt(item.value, 10) : 0
-  }));
-  isDataEmpty.value = rawData.value.length === 0;
-};
+const isColor =(name)=>{
+    switch (name) {
+        case '及时处理':
+            return 'green'
+        case '客诉响应':
+            return 'yellow'
+        case '处理预警':
+            return 'orange'
+        case '未及时处理':
+            return 'red'
+        default:
+            return null
+    }
+}
+
+
 
 watch(rawData, () => {
   nextTick(() => {

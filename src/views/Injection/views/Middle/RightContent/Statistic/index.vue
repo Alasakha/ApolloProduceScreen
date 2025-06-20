@@ -1,11 +1,9 @@
 <template>
   <div class="flex-container">
     <dv-loading v-if="loading">
-      <div class="text-white">
-        Loading...
-      </div>
+      <div class="text-white">Loading...</div>
     </dv-loading>
-    <div class="row"  v-else v-for="(row, rowIdx) in chunkedDevices" :key="rowIdx">
+    <div class="row" v-else v-for="(row, rowIdx) in chunkedDevices" :key="rowIdx">
       <OrderCard
         v-for="device in row"
         :key="device.macCode"
@@ -25,28 +23,29 @@
         :stdMaxspeed="device.maxspeed"
         :stdKeeptime="device.keeptime"
         :ta006="device.ta006"
+        :gdNum="device.gdNum"
       />
-    </div>  
+    </div>
   </div>
 </template>
 
 <script setup>
-import CustomTable from '@/components/injection/NativeTable.vue';
-import { ref, onMounted, computed } from 'vue';
-import { getInvokeDeviceList } from '@/api/getInjection';
-import OrderCard from '@/components/injection/DataCard.vue'
+import CustomTable from "@/components/injection/NativeTable.vue";
+import { ref, onMounted, computed } from "vue";
+import { getInvokeDeviceList } from "@/api/getInjection";
+import OrderCard from "@/components/injection/DataCard.vue";
 
 const deviceList = ref([]);
-const loading = ref(true)
+const loading = ref(true);
 const fetchData = async () => {
   try {
     const res = await getInvokeDeviceList();
     if (res.data && Array.isArray(res.data)) {
       deviceList.value = res.data;
-      loading.value = false
+      loading.value = false;
     }
   } catch (error) {
-    console.error('数据获取失败', error);
+    console.error("数据获取失败", error);
   }
 };
 
@@ -62,7 +61,7 @@ const chunkedDevices = computed(() => {
   return arr;
 });
 
-const calcProgress = (device) => {
+const calcProgress = device => {
   if (!device.pcNum || !device.doneNum) return 0;
   return Math.round((device.doneNum / device.pcNum) * 100);
 };

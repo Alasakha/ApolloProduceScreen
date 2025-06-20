@@ -56,6 +56,7 @@ import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';  
 import { ElMessage } from 'element-plus';
+import { getAbnormalUnfinishedAdd } from '@/api/getProduceinfo.js';
 
 const dialogVisible = ref(false);//弹窗控制
 const detailDialogVisible = ref(false);
@@ -75,9 +76,9 @@ const values = ref([]); // Y 轴数据
 let chartInstance = null;
 const scrollBoardRef = ref(null);
 const config = reactive({
-  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长'],
+  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长','原因','责任人'],
   data: [
-    ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+    ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
   ],
   index: true,
 columnWidth: [50],
@@ -87,11 +88,13 @@ columnWidth: [50],
     showTooltip: true,
 })
 
+const rawData = ref([]); // 新增
 
 const fetchData = () => {
   fetchClosingRateData(prodLine)
     .then((res) => {
       if (res && res.length > 0) {
+        rawData.value = res; // 保存原始数据
         config.data = res.map(item => [
           '未完工',
           item.number ?? '无',
@@ -100,7 +103,9 @@ const fetchData = () => {
           Number(item.productionQuantity) ?? '无',
           item.dateTime  ?? '无',
           Number(item.productionQuantity)-Number(item.inboundQuantity),
-          item.daysBetween+'天' ??'无'
+          item.daysBetween+'天' ??'无',
+          item.reason ?? '无',
+          item.duty  ?? '无'
         ])
         isDataEmpty.value = false;
       } 
@@ -165,14 +170,42 @@ const handleCurrentChange = (val) => {
 };
 
 // 处理原因更新
-const handleReasonUpdate = async ({ row, reason }) => {
+const handleReasonUpdate = async ({ row, reason, duty }) => {
   try {
-    // TODO: 这里需要调用后端API保存原因
-    // await updateReason(row.workNo, reason);
-    ElMessage.success('原因更新成功');
+    // 通过唯一标识找到原始数据（假设用工单号 workNo）
+    const origin = rawData.value.find(item => item.workNo === row['工单号']);
+    if (!origin) {
+      ElMessage.error('未找到原始数据，无法上传');
+      return;
+    }
+    // 组装参数
+    const params = {
+      prodLine: origin.workCenter,
+      doc_no: origin.workNo,
+      item_code: origin.articleNumber,
+      pc_date: origin.dateTime,
+      reason,
+      duty
+    };
+    // 假设接口返回 { code: 200, ... }
+    const res = await getAbnormalUnfinishedAdd(
+      params.prodLine,
+      params.doc_no,
+      params.item_code,
+      params.pc_date,
+      params.reason,
+      params.duty
+    );
+    if (res && (res.code === 200 || res.status === 200)) {
+      ElMessage.success('保存成功');
+      // 这里可以手动更新 row['原因'] 和 row['责任人']，保证表格刷新
+      row['原因'] = reason;
+      row['责任人'] = duty;
+    } else {
+      ElMessage.error('保存失败');
+    }
   } catch (error) {
-    console.error('更新原因失败:', error);
-    ElMessage.error('更新原因失败');
+    ElMessage.error('保存失败');
   }
 };
 </script>

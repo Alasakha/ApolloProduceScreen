@@ -9,13 +9,24 @@
   >
     <div class="table-wrapper">
       <el-table :data="paginatedData" height="100%" style="width: 100%">
+        <template v-for="col in columns" :key="col.prop">
+          <el-table-column
+            v-if="col.prop !== 'action'"
+            :prop="col.prop"
+            :label="col.label"
+            :width="col.width+'px'"
+          />
+        </template>
         <el-table-column
-          v-for="col in columns"
-          :key="col.prop"
-          :prop="col.prop"
-          :label="col.label"
-          :width="col.width"
-        />
+          v-if="columns.some(col => col.prop === 'action')"
+          prop="action"
+          label="操作"
+          :width="120"
+        >
+          <template #default="{ row }">
+            <el-button size="small" @click="handleFill(row)">填写</el-button>
+          </template>
+        </el-table-column>
       </el-table>
 
       <!-- 总数 & 分页 -->
@@ -36,6 +47,8 @@
 
 <script setup lang="ts">
 import { ref, computed } from 'vue'
+import { ElMessageBox, ElMessage } from 'element-plus'
+import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
 
 const props = defineProps<{
   modelValue: boolean
@@ -62,6 +75,26 @@ const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
   return props.tableData.slice(start, start + pageSize.value)
 })
+
+const handleFill = async (row: any) => {
+  try {
+    const { value } = await ElMessageBox.prompt('请输入处理结果', '处理结果', {
+      confirmButtonText: '提交',
+      cancelButtonText: '取消',
+      inputPattern: /.+/,
+      inputErrorMessage: '处理结果不能为空'
+    })
+    await getAbnormalHandleAdd(row.uid, value)
+    ElMessage.success('提交成功')
+    // 实时更新表格内容
+    row.ngHandle = value
+  } catch (e) {
+    // 用户取消或接口异常
+  }
+}
+
+console.log('columns:', props.columns)
+console.log('data:', paginatedData.value)
 </script>
 
 <style scoped>

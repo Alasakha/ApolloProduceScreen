@@ -130,3 +130,22 @@ export const getCapacityHour = (prodLine) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }
+
+// /production/abnormalUnfinishedAdd
+export const getAbnormalUnfinishedAdd = (prodLine,doc_no,item_code,pc_date,reason,duty ) => {
+  return request({
+    url: '/production/abnormalUnfinishedAdd',
+    method: 'get',
+    params:{prodLine,doc_no,item_code,pc_date,reason,duty }
+  })
+}
+
+// /production/complaintPie2
+export const getComplaintPie2 = () => {
+  return request({
+    url: '/production/complaintPie2',
+    method: 'get',
+  })
+}
+
+

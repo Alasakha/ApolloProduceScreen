@@ -41,7 +41,7 @@ export function createChartOption(title: string, rawData: any) {
       series: [
         {
           type: 'pie',
-          radius: ['40%', '70%'],  // 修改为环形
+          radius: ['25%', '50%'],  // 修改为环形
           data,
           label: {
             show: true,

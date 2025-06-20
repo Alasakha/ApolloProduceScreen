@@ -5,6 +5,8 @@
         <Left></Left>
         <Middle></Middle>
         <Right></Right>
+        <Four> </Four>
+        <Five> </Five>
     </div>
   </template>
   
@@ -12,6 +14,8 @@
 import Left from './views/left.vue'
 import Middle from './views/middle.vue'
 import Right from './views/right.vue'
+import Four from './views/four.vue'
+import Five from './views/five.vue'
   </script>
   
   <style scoped>

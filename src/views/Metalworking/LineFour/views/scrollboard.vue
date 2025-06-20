@@ -1,8 +1,8 @@
 <template>
     <div class="scrollboard w-full h-full relative">
         <dv-loading v-if="loading">
-          <div class="color-white">
-            Loading...
+          <div class="text-white">
+            加载中...
           </div>
         </dv-loading>
         <ScrollBoard v-else :config="config" />
@@ -47,12 +47,13 @@ async function fetchData() {
     formatDate(item.arrival_date) || '--',
     item.udf021 || '--',
     item.supplierCode || '--',
+    item.supplier_full_name|| '--',
     item.item_code || '--',
     item.item_description || '--',
     item.item_specification || '--', 
     Math.round(item.business_qty) || '--',
-    formatDate(item.deliveryTime) || '--',
-    checkStatus(item.delayStatus) || '--'
+    // formatDate(item.deliveryTime) || '--',
+    // checkStatus(item.delayStatus) || '--'
   ])
 }
 
@@ -71,12 +72,13 @@ watch(filteredData, (val) => {
     formatDate(item.arrival_date) || '--',
     item.udf021 || '--',
     item.supplierCode || '--',
+    item.supplier_full_name|| '--',
     item.item_code || '--',
     item.item_description || '--',
     item.item_specification || '--',
     Math.round(item.business_qty) || '--',
-    formatDate(item.deliveryTime) || '--',
-    checkStatus(item.delayStatus) || '--'
+    // formatDate(item.deliveryTime) || '--',
+    // checkStatus(item.delayStatus) || '--'
 
   ])
 }, { immediate: true })

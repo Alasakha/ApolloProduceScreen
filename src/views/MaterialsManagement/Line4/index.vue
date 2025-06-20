@@ -175,7 +175,7 @@ const handleResize = () => {
 const fetchData = async () => {
     try {
         isLoading.value = true;
-        const res = await getstagnantAmount();
+        const res = await getstagnantAmount(1);
         console.log('Fetched data:', res.data);
         isLoading.value = false;
         await initChart(res.data);

@@ -34,11 +34,11 @@ config.data = res.data.map(item => [
   item.ty009, // 机台号
     item.planOutput,
     Math.round(item.expectedUsage)+'kg',
-    '--',
+    item.planLoss, 
     item.actualOutput,
     Math.round(item.actualOutput2)+'kg',
-    '--',
-    '--'
+    item.actualLoss,
+    Math.round((item.actualOutput2-item.actualLoss)/item.actualOutput2*100)+'%'
 ]);
     }
   } catch (error) {

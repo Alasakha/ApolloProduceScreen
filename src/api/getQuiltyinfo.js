@@ -120,3 +120,39 @@ export const getMistakesAndOmissions = (prodLine ) => {
     params: { prodLine } // 传递 prodLine 参数
   })
 }  
+
+// /quality/abnormalHandleAdd
+export const getAbnormalHandleAdd = (uid,ngHandle ) => {
+  return request({
+    url: '/quality/abnormalHandleAdd',
+    method: 'get',
+    params: { uid,ngHandle  } // 传递 prodLine 参数
+  })
+}  
+
+// /production/complaintPie
+export const getComplaintPie = () => {
+  return request({
+    url: '/production/complaintPie',
+    method: 'get',
+
+  })
+}
+// /production/complaint
+export const getComplaint = (documentName ,close) => {
+  return request({
+    url: '/production/complaint',
+    method: 'get',
+    params: { documentName,close }
+  })
+}
+
+// /production/complaintPie2
+export const getComplaintPie2 = () => {
+  return request({
+    url: '/production/complaintPie2',
+    method: 'get',
+  })
+}
+
+

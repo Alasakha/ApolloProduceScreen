@@ -1,6 +1,6 @@
 <template>
   <el-dialog
-    v-model="model"
+    v-model="dialogVisible"
     :title="title"
     :width="width"
     :destroy-on-close="true"
@@ -16,24 +16,34 @@
         style="width: 100%"
         height="670"
       >
-        <el-table-column 
-          v-for="(header, index) in headers" 
-          :key="header" 
-          :prop="header" 
-          :label="header" 
-          :fixed="index === 0"
-        />
-        <el-table-column label="说明原因" width="200">
+        <template v-for="(header, index) in headers" :key="header">
+          <el-table-column 
+            v-if="header !== '原因'"
+            :prop="header" 
+            :label="header" 
+            :fixed="index === 0"
+          />
+          <el-table-column 
+            v-else
+            :prop="header" 
+            :label="header"
+          >
+            <template #default="{ row }">
+              <span>{{ row[header] || '--' }}</span>
+            </template>
+          </el-table-column>
+        </template>
+        <el-table-column label="操作" width="120" fixed="right">
           <template #default="{ row }">
             <ReasonInput
-              v-model="row.reason"
+              v-model="row['原因']"
               :row="row"
-              @save="handleReasonSave"
+              @save="handleReasonUpdate"
             />
           </template>
         </el-table-column>
       </el-table>
-      
+      <!-- <el-table-column label="说明原因" width="200"></el-table-column> -->
       <div class="pagination-container">
         <el-pagination
           v-model:current-page="currentPage"
@@ -53,8 +63,11 @@
 import { ref, watch } from 'vue';
 import ReasonInput from '../ReasonInput/index.vue';
 
-const model = defineModel();
 const props = defineProps({
+  modelValue: {
+    type: Boolean,
+    default: false
+  },
   title: {
     type: String,
     default: '详情'
@@ -77,12 +90,23 @@ const props = defineProps({
   }
 });
 
-const emit = defineEmits(['update:reason']);
+const emit = defineEmits(['update:modelValue', 'update:reason']);
 
+const dialogVisible = ref(false);
 const currentPage = ref(1);
 const pageSize = ref(10);
 const total = ref(0);
 const tableData = ref([]);
+
+// 监听 modelValue 变化
+watch(() => props.modelValue, (val) => {
+  dialogVisible.value = val;
+});
+
+// 监听 dialogVisible 变化
+watch(dialogVisible, (val) => {
+  emit('update:modelValue', val);
+});
 
 // 监听数据变化
 watch(() => props.data, (val) => {
@@ -100,9 +124,9 @@ const handleCurrentChange = (val) => {
   currentPage.value = val;
 };
 
-// 处理原因保存
-const handleReasonSave = (data) => {
-  emit('update:reason', data);
+// 处理原因和责任人更新
+const handleReasonUpdate = ({ row, reason, duty }) => {
+  emit('update:reason', { row, reason, duty });
 };
 </script>
 

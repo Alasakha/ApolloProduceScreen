@@ -1,15 +1,12 @@
 <template>
   <div class="reason-input">
-    <div class="reason-cell">
-      <span>{{ model || '--' }}</span>
-      <el-button 
-        type="primary" 
-        size="small" 
-        @click="handleInput"
-      >
-        输入
-      </el-button>
-    </div>
+    <el-button 
+      type="primary" 
+      size="small" 
+      @click="handleInput"
+    >
+      输入
+    </el-button>
 
     <!-- 原因输入弹窗 -->
     <el-dialog
@@ -23,6 +20,13 @@
         type="textarea"
         :rows="4"
         placeholder="请输入说明原因"
+      />
+      <el-input
+        v-model="currentDuty"
+        type="text"
+        :rows="1"
+        placeholder="请输入责任人"
+        style="margin-top: 10px;"
       />
       <template #footer>
         <span class="dialog-footer">
@@ -38,34 +42,43 @@
 import { ref, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 
-const model = defineModel();
 const props = defineProps({
+  modelValue: {
+    type: String,
+    default: ''
+  },
   row: {
     type: Object,
     required: true
   }
 });
 
-const emit = defineEmits(['save']);
+const emit = defineEmits(['update:modelValue', 'save']);
 
 const dialogVisible = ref(false);
 const currentReason = ref('');
+const currentDuty = ref('');
 
-// 监听 model 变化
-watch(() => model.value, (val) => {
+// 初始化赋值
+watch(() => props.modelValue, (val) => {
   currentReason.value = val;
 });
+watch(() => props.row.duty, (val) => {
+  currentDuty.value = val || '';
+});
 
-// 处理输入按钮点击
+// 打开弹窗时赋值
 const handleInput = () => {
-  currentReason.value = model.value;
+  currentReason.value = props.modelValue;
+  currentDuty.value = props.row.duty || '';
   dialogVisible.value = true;
 };
 
 // 处理取消
 const handleCancel = () => {
   dialogVisible.value = false;
-  currentReason.value = model.value;
+  currentReason.value = props.modelValue;
+  currentDuty.value = props.row.duty || '';
 };
 
 // 处理保存
@@ -74,13 +87,16 @@ const handleSave = () => {
     ElMessage.warning('请输入说明原因');
     return;
   }
-
-  model.value = currentReason.value;
+  if (!currentDuty.value.trim()) {
+    ElMessage.warning('请输入责任人');
+    return;
+  }
+  emit('update:modelValue', currentReason.value);
   emit('save', {
     row: props.row,
-    reason: currentReason.value
+    reason: currentReason.value,
+    duty: currentDuty.value
   });
-  
   dialogVisible.value = false;
   ElMessage.success('保存成功');
 };

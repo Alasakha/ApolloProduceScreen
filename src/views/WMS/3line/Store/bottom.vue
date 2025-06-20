@@ -21,12 +21,12 @@ const outStoreLoading = ref(true)
 const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 const config = reactive({
-  header: [ '仓位','仓管员','需领用量','已领用量','品名','规格','工单号','客户单号','处理结果'],
+  header: ['仓位','仓管员','客户单号','工单号','品号','品名','规格','需领用量','已领用量','应完成时间','处理结果'],
   data: [], // 初始为空
   tableData: [],
   index: true,
-  columnWidth: [50,80,80,80,80,],
-  align: ['center','center','center','center','center','center','center','center','center'],
+  columnWidth: [80,80,150,150,150,150,400,100,100,100],
+  align: ['center','center','center','center','center','center','center','center','center','center'],
   rowNum: 4,
   headerHeight: 35,
   headerBGC: '#0d47a1',
@@ -44,19 +44,22 @@ const fetchData = async () => {
     const list = res.data
 
     if (!Array.isArray(list) || list.length === 0) {
-      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
       return
     }
 
     const transformed = list.map(item => [
       item.warehouse_name || '暂无数据',
       item.warehouseKeeper || '暂无数据',
+      item.udf021 || '暂无数据',
+      item.docNo || '暂无数据',
+      item.item_code || '暂无数据',
+      item.itemDescription || '暂无数据',
+
+      item.itemSpecification || '暂无数据',
       Number(item.required_qty).toFixed(0) || '暂无数据',
       Number(item.issued_qty).toFixed(0) || '暂无数据',
-      item.itemDescription || '暂无数据',
-      item.itemSpecification || '暂无数据',
-      item.docNo || '暂无数据',
-      item.udf021 || '暂无数据',
+      item.ty003 ||  '暂无数据', // 应完成时间，暂时使用占位符
       item.udf026 || '--',
       item.mo_d_id // 保留 mo_d_id 但不显示
     ])
@@ -64,20 +67,23 @@ const fetchData = async () => {
     const showtransformed = list.map(item => [
       item.warehouse_name || '暂无数据',
       item.warehouseKeeper || '暂无数据',
+      item.udf021 || '暂无数据',
+      item.docNo || '暂无数据',
+      item.item_code || '暂无数据',
+      item.itemDescription || '暂无数据',
+
+      item.itemSpecification || '暂无数据',
       Number(item.required_qty).toFixed(0) || '暂无数据',
       Number(item.issued_qty).toFixed(0) || '暂无数据',
-      item.itemDescription || '暂无数据',
-      item.itemSpecification || '暂无数据',
-      item.docNo || '暂无数据',
-      item.udf021 || '暂无数据',
+      item.ty003 || '暂无数据', // 应完成时间，暂时使用占位符
       item.udf026 || '--'
     ])
 
-    config.data = showtransformed.length > 0 ? showtransformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
-    config.tableData = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+    config.data = showtransformed.length > 0 ? showtransformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+    config.tableData = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
   } catch (e) {
     console.error('数据获取失败', e)
-    config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
+    config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
   } finally {
     outStoreLoading.value = false
   }

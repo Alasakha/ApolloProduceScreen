@@ -2,10 +2,9 @@ import { reactive } from 'vue'
 
 const config = reactive({
   header: [
- '采购员', '仓管员', '检验员', '到货日期','客户单号', '供应商编号', '品号', '品名', '规格', '数量', '发货日期', 
- '状态'],
+ '采购员', '仓管员', '检验员', '到货日期','客户单号', '供应商编号','供应商名称', '品号', '品名', '规格', '数量'],
   data: [],
-  columnWidth: [],
+  columnWidth: [100],
   index: true,
   align: [],
   rowNum: 6,

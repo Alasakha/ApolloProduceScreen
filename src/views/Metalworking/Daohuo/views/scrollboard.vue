@@ -1,8 +1,8 @@
 <template>
     <div class="scrollboard w-full h-full relative">
         <dv-loading v-if="loading">
-          <div class="color-white">
-            Loading...
+          <div class="text-white">
+            加载中...
           </div>
         </dv-loading>
         <ScrollBoard v-else :config="config" />
@@ -35,25 +35,47 @@ const filteredData = computed(() =>
 )
 
 async function fetchData() {
-  const res = await getPlanInfo()
-  const arr = Array.isArray(res.data) ? res.data : (res.data?.data || [])
-  rawData.value = arr
-  config.data = arr.map((item, idx) => [
-    item.caigou || '--',
-    // item.cangguan || '--',
-    // item.jianyan || '--',
-    // item.pcDate || '--',
-    // item.udf021 || '--',
-    item.doc_no || '--', //采购单号
-    item.supplierCode || '--',
-    // item.item_code || '--',
-    item.item_description || '--', 
-    item.item_specification || '--',
-    Math.round(item.business_qty) || '--',
-    formatDate(item.deliveryTime) || '--',
-    // formatDate(item.arrival_date) || '--',
-    // checkStatus(item.delayStatus) || '--'
-  ])
+  try {
+    console.log('开始获取数据...')
+    const res = await getPlanInfo()
+    console.log('API响应:', res)
+    
+    const arr = Array.isArray(res.data) ? res.data : (res.data?.data || [])
+    console.log('处理后的数据:', arr)
+    console.log('数据长度:', arr.length)
+    
+    rawData.value = arr
+    
+    // 调试：检查第一条数据的字段
+    if (arr.length > 0) {
+      console.log('第一条数据字段:', Object.keys(arr[0]))
+      console.log('供应商名称:', arr[0].supplier_full_name)
+      console.log('发货方式:', arr[0].shipmentMode)
+    }
+    
+    config.data = arr.map((item, idx) => [
+      item.caigou || '--',
+      // item.cangguan || '--',
+      // item.jianyan || '--',
+      // item.pcDate || '--',
+      // item.udf021 || '--',
+      item.doc_no || '--', //采购单号
+      item.supplierCode || '--',
+      item.supplier_full_name|| '--',
+      // item.item_code || '--',
+      item.item_description || '--', 
+      item.item_specification || '--',
+      Math.round(item.business_qty) || '--',
+      formatDate(item.deliveryTime) || '--',
+      status(item.shipmentMode)
+      // formatDate(item.arrival_date) || '--',
+      // checkStatus(item.delayStatus) || '--'
+    ])
+    
+    console.log('配置数据已更新:', config.data.length, '行')
+  } catch (error) {
+    console.error('获取数据失败:', error)
+  }
 }
 
 function formatDate(val) {
@@ -69,12 +91,15 @@ watch(filteredData, (val) => {
     // item.pcDate || '--',
     // item.udf021 || '--',
     item.doc_no || '--', //采购单号
-    item.supplierCode || '--',
+    item.supplierCode || '--',  
+   item.supplier_full_name || '--',
+
     // item.item_code || '--',
     item.item_description || '--', 
     item.item_specification || '--',
     Math.round(item.business_qty) || '--',
     formatDate(item.deliveryTime) || '--',
+    status(item.shipmentMode)
     // formatDate(item.arrival_date) || '--',
     // checkStatus(item.delayStatus) || '--'
   ])
@@ -91,6 +116,13 @@ const checkStatus = (item) => {
  }else{
   return '正常'
  }
+}
+
+
+const status = (item) =>{
+  if(item == 1) return '物流快递'
+  if(item == 0) return '自配送'
+  else return '暂无状态'
 }
 </script>
 

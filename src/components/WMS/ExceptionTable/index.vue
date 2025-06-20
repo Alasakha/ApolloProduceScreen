@@ -64,6 +64,7 @@
           :prop="header" 
           :label="header" 
           :fixed="index === 0"
+          :width="config.columnWidth?.[index] || undefined"
         />
         <el-table-column prop="source_id_roid" v-if="false" />
         <el-table-column prop="po_arrival_inspection_d_id" v-if="false" />

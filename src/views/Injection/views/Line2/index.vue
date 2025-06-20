@@ -18,6 +18,6 @@
   </template>
   
   <script setup lang="ts">
-  import DashboardCard from "@/components/DashboardCard.vue";
+import DashboardCard from "@/components/DashboardCard.vue";
 import Category from '../Middle/RightContent/Statistic/index.vue'
   </script>
