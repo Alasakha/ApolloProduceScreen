@@ -103,3 +103,4 @@ export const getAbnormalQualityReasonUpdate = (item_code, reason,docNo,po_arriva
     params: { item_code, reason,docNo,po_arrival_inspection_d_id }
   })
 }
+

@@ -8,7 +8,7 @@
     @close="emit('close')"
   >
     <div class="table-wrapper">
-      <el-table :data="paginatedData" height="100%" style="width: 100%">
+      <el-table :data="paginatedData" max-height="60vh" style="width: 100%">
         <template v-for="col in columns" :key="col.prop">
           <el-table-column
             v-if="col.prop !== 'action'"
@@ -107,7 +107,6 @@ console.log('data:', paginatedData.value)
 .table-wrapper {
   flex: 1;
   overflow: auto;
-  max-height: 70vh;
   display: flex;
   flex-direction: column;
 }

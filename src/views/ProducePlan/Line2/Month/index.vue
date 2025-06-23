@@ -25,7 +25,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
-import { getMonthTotalInfo } from '@/api/getProduceinfo';
+import { getMonthTotalInfo} from '@/api/getProduceinfo';
+import {getMonthProduction } from '@/api/getStampinfo'
 import { eventBus } from '@/utils/eventbus';
 
 const planList = ref([
@@ -42,8 +43,8 @@ const prodLines = {
     '二课包装：': '2005',
     '二课总装：': '2004',
     '一课总装：': '1004',
-    '一部焊接：': '1002',
-    '二部焊接：': '2002'
+    '一部焊接：': '1003',
+    '二部焊接：': '2003',
 };
 
 
@@ -53,14 +54,25 @@ const fetchLineData = async (item: any) => {
     if (!line) return item;
     
     try {
-        const res = await getMonthTotalInfo(line);
-        return {
-            ...item,
-            plan: res.data.plan || 0,
-            done: res.data.done || 0,
-            rate: res.data.done/res.data.plan ? `${(res.data.done/res.data.plan*100).toFixed(1)}`+'%' : '0%',
-            loading: false
-        };
+        if (item.name.includes('焊接')) {
+            const res = await getMonthProduction(line);
+            return {
+                ...item,
+                plan: res.data.pcTotal || 0,
+                done: res.data.done || 0,
+                rate: res.data.rate ? `${res.data.rate.toFixed(1)}%` : '0%',
+                loading: false
+            };
+        } else {
+            const res = await getMonthTotalInfo(line);
+            return {
+                ...item,
+                plan: res.data.plan || 0,
+                done: res.data.done || 0,
+                rate: res.data.done/res.data.plan ? `${(res.data.done/res.data.plan*100).toFixed(1)}`+'%' : '0%',
+                loading: false
+            };
+        }
     } catch (error) {
         console.error(`获取${item.name}数据失败:`, error);
         return {
@@ -125,7 +137,7 @@ onBeforeUnmount(() => {
     background: rgba(0, 32, 64, 0.55);
     border-radius: 1vw;
     padding: 0.5vh 0.5vw;
-    font-size: 1vw;
+    font-size: 1vw;     
     color: #fff;
     min-width: 40vw;
     box-shadow: 0 0.8vh 3vw 0 rgba(0,0,0,0.25);

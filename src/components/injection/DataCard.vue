@@ -212,7 +212,7 @@ const props = defineProps({
   gdNum: {
     type: [Number, String],
     default: "暂无"
-  }
+  },
 });
 
 //判断是否有数据

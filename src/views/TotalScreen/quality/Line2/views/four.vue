@@ -12,7 +12,7 @@
      <!-- 弹窗 -->
     <TableDialog
     v-model="dialogTableVisible"
-    :title= title
+    :title= dialogTitle
     width="60vw"
     :tableData="gridData"
     :columns="gridColumns"
@@ -23,7 +23,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { getComplaintPie ,getComplaint} from '@/api/getQuiltyinfo'
-import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
@@ -31,7 +30,8 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('客诉处理及时率');
+const title = ref('质量客诉次数');
+const dialogTitle = ref('质量客诉次数');
 const reasonType = 2;
 
 const qualityIndicators = ref(null);
@@ -47,7 +47,7 @@ const gridData = ref([]);
 const gridColumns = [
   { prop: 'documentName', label: '客户等级' , width: '120'},
   { prop: 'documentValue', label: '单据类型', width: '150' },
-  { prop: 'doc_no,', label: '订单号',width: '150' },
+  { prop: 'doc_no', label: '订单号',width: '150' },
   { prop: 'description', label: '问题点1',width: '500' },
   { prop: 'udf021', label: '问题点2',width: '300' },
   { prop: 'remark', label: '备注',width: '250' },
@@ -60,6 +60,7 @@ const gridColumns = [
 
 const opendialog = () => {
   dialogTableVisible.value = true;
+  dialogTitle.value = title.value;
   getComplaint(undefined,reasonType,undefined,undefined)
     .then(res => {
       gridData.value = res.data;
@@ -83,7 +84,7 @@ const fetchData = () => {
 // 点击饼图区域，弹出对应信息
 const handleChartClick = (params) => {
   const clickedName = params.name;
-  title.value = `${clickedName}的详细数据`;
+  dialogTitle.value = `${clickedName}的详细数据`;
   dialogTableVisible.value = true;
     console.log(clickedName)
   getComplaint(clickedName) // 假设 API 接口第三个参数是问题名

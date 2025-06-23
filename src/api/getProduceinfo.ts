@@ -140,12 +140,3 @@ export const getAbnormalUnfinishedAdd = (prodLine,doc_no,item_code,pc_date,reaso
   })
 }
 
-// /production/complaintPie2
-export const getComplaintPie2 = () => {
-  return request({
-    url: '/production/complaintPie2',
-    method: 'get',
-  })
-}
-
-

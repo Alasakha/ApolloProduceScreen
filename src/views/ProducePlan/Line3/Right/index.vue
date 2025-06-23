@@ -1,5 +1,5 @@
 <template>
-    <div class="right flex flex-col w-full">
+    <div class="right flex flex-col">
         <Top class="flex-1"/>     
         <Bottom class="flex-1"/>
     </div>

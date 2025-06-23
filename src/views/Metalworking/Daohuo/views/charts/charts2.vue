@@ -36,7 +36,7 @@
     <!-- 使用通用详情弹窗组件 -->
     <DetailDialog
         v-model="dialogVisible"
-        :title="`${selectedPurchaser}的来料不合格详情`"
+        :title="`${selectedPurchaser}的二课在途信息详情`"
         :loading="tableLoading"
         :data="detailData"
         :columns="tableColumns"

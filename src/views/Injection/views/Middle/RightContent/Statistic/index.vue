@@ -62,8 +62,8 @@ const chunkedDevices = computed(() => {
 });
 
 const calcProgress = device => {
-  if (!device.pcNum || !device.doneNum) return 0;
-  return Math.round((device.doneNum / device.pcNum) * 100);
+  if (!device.bgNum || !device.gdNum) return 0;
+  return Math.round((device.bgNum / device.gdNum) * 100);
 };
 </script>
 

@@ -19,7 +19,7 @@
   <dv-button
   class=" text-white text-lg font-semibold tracking-wide"
   :bg="false"
-  @click="dialogVisible = true"
+  @click="openDialog"
   color="#00eaff"
 >
   详细信息
@@ -39,35 +39,26 @@
       </div>
         <div ref="dayBarChart" class="bar-chart"></div>
 
-      
+           <!-- 弹窗 -->
+     <TableDialog
+    v-model="dialogVisible"
+    :title= dialogTitle
+    width="60vw"
+    :tableData="gridData"
+    :columns="gridColumns"
+  />
       </dv-border-box12>
     </div>
 
-     <!-- 弹窗 -->
-  <!-- <el-dialog
-    v-model="dialogVisible"
-    title="订单准交详细信息"
-    width="50%"
-    align-center
-    :close-on-click-modal="false"
-  >
-    <div style="font-size: 1vw; color: #00eaff; line-height: 1.8; font-weight: bold;">
-      <p>本月计划数：{{ monthData?.plan ?? '--' }}</p>
-      <p>本月已完成：{{ monthData?.done ?? '--' }}</p>
-      <p>本月准交率：{{ monthData?.rate ?? '--' }}</p>
-      <hr />
-      <p>今日计划数：{{ todayData?.plan ?? '--' }}</p>
-      <p>今日已完成：{{ todayData?.done ?? '--' }}</p>
-      <p>今日准交率：{{ todayData?.rate ?? '--' }}</p>
-    </div>
-  </el-dialog> -->
+
   </template>
   
+
   <script setup lang="ts">
   import { ref, onMounted, watch, nextTick } from 'vue'
   import * as echarts from 'echarts'
-  import { getDeliveryRateMonthInfo, getDeliveryRateTodayInfo } from '@/api/getPmcinfo'
-  
+  import { getDeliveryRateMonthInfo, getDeliveryRateTodayInfo,getAbnormalUnfinishedList } from '@/api/getPmcinfo'
+  import TableDialog from './dialog.vue'
   const monthData = ref<any>(null)
   const todayData = ref<any>(null)
   const loadingMonth = ref(true)
@@ -76,6 +67,17 @@
   const monthBarChart = ref()
   const dayBarChart = ref()
   const dialogVisible = ref(false)
+  const dialogTitle = ref('订单准交率');
+  const gridData = ref([]);
+  const gridColumns = [
+  { prop: 'docNo', label: '工单单号' , width: '220'},
+  // { prop: 'docId', label: '单据类型', width: '150' },
+  { prop: 'customerOrderNo', label: '客户单号',width: '250' },
+  { prop: 'planDate', label: '计划完成日期',width: '500' },
+  { prop: 'completeDate', label: '实际完成日期',width: '300' },
+  // { prop: 'planStatus', label: '备注',width: '250' },
+];
+
 
 
   const renderMonthChart = () => {
@@ -178,6 +180,13 @@
     }
   }
   
+  const openDialog = () =>{
+    dialogVisible.value = true
+    getAbnormalUnfinishedList()
+    .then(res =>{
+      gridData.value = res.data
+    })
+  }
   onMounted(fetchData)
   watch(monthData, () => nextTick(renderMonthChart))
   watch(todayData, () => nextTick(renderDayChart))

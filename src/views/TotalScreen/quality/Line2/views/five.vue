@@ -12,7 +12,7 @@
      <!-- 弹窗 -->
     <TableDialog
     v-model="dialogTableVisible"
-    :title= title
+    :title= dialogTitle
     width="60vw"
     :tableData="gridData"
     :columns="gridColumns"
@@ -24,14 +24,13 @@
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { getComplaintPie2 ,getComplaint} from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus';
-import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
 import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('客户关闭及时率');
-const reasonType = 2;
+const title = ref('客诉关闭及时率');
+const dialogTitle = ref('客诉关闭及时率');
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
@@ -46,7 +45,7 @@ const gridData = ref([]);
 const gridColumns = [
   { prop: 'documentName', label: '客户等级' , width: '120'},
   { prop: 'documentValue', label: '单据类型', width: '150' },
-  { prop: 'doc_no,', label: '订单号',width: '150' },
+  { prop: 'doc_no', label: '订单号',width: '150' },
   { prop: 'description', label: '问题点1',width: '500' },
   { prop: 'udf021', label: '问题点2',width: '300' },
   { prop: 'remark', label: '备注',width: '250' },
@@ -59,6 +58,7 @@ const gridColumns = [
 
 const opendialog = () => {
   dialogTableVisible.value = true;
+  dialogTitle.value = title.value;
   getComplaint()
     .then(res => {
       gridData.value = res.data;
@@ -74,11 +74,11 @@ const fetchData = () => {
      const data = res.data
 
      const result = [
-  { value: data.greenCount, name: '及时处理' },
-  { value: data.yellowCount, name: '客诉响应' },
-  { value: data.orangeCount, name: '处理预警' },
-  { value: data.redCount, name: '未及时处理' }
-];
+      { value: data.greenCount, name: '及时处理', itemStyle: { color: '#28a745' } }, // 绿色
+      { value: data.yellowCount, name: '客诉响应', itemStyle: { color: '#ffc107' } }, // 黄色
+      { value: data.orangeCount, name: '处理预警', itemStyle: { color: '#fd7e14' } }, // 橙色
+      { value: data.redCount, name: '未及时处理', itemStyle: { color: '#dc3545' } }  // 红色
+    ];
 
 rawData.value=result    
     })
@@ -91,7 +91,7 @@ rawData.value=result
 // 点击饼图区域，弹出对应信息
 const handleChartClick = (params) => {
   const clickedName = params.name;
-  title.value = `${clickedName}的详细数据`;
+  dialogTitle.value = `${clickedName}的详细数据`;
   dialogTableVisible.value = true;
     console.log(clickedName)
   getComplaint(null,isColor(clickedName)) // 假设 API 接口第三个参数是问题名

@@ -14,7 +14,7 @@ import { getrawMaterialMonitoring } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 // 初始化配置对象
 const config = reactive({
-  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料利用率'], // 表头
+  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料使用率'], // 表头
   data: [], // 数据
   index: true,
   align: ['center','center','center','center','center','center','center','center'],
@@ -38,7 +38,7 @@ config.data = res.data.map(item => [
     item.actualOutput,
     Math.round(item.actualOutput2)+'kg',
     item.actualLoss,
-    Math.round((item.actualOutput2-item.actualLoss)/item.actualOutput2*100)+'%'
+    item.useRate+'%'
 ]);
     }
   } catch (error) {
