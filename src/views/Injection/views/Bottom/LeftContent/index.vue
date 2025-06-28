@@ -30,14 +30,14 @@ const fetchData = async () => {
     // 假设返回的数据格式是数组，每个元素包含 { macNo, isFinish, guZhangTypeName, dutyDeptName }
     if (res && res.data) {
       // 转换数据格式以适应表格
-config.data = res.data.map(item => [
-  item.ty009, // 机台号
+    config.data = res.data.map(item => [
+    item.ty009, // 机台号
     item.planOutput,
     Math.round(item.expectedUsage)+'kg',
-    item.planLoss, 
+    Math.round(item.planLoss)+'kg', 
     item.actualOutput,
     Math.round(item.actualOutput2)+'kg',
-    item.actualLoss,
+    Math.round(item.actualLoss)+'kg',
     item.useRate+'%'
 ]);
     }
