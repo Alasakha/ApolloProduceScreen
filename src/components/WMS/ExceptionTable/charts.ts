@@ -1,12 +1,15 @@
-
-
 // chartOption.ts
-export function createChartOption(data) {
+export function createChartOption(data, showPurchaseTotal) {
     return {
       backgroundColor: 'transparent', // 或深色如 '#000' 视页面背景而定
       tooltip: {
         trigger: 'item',
-        formatter: '{b}: {c} ({d}%)'
+        formatter: function(params) {
+          if (showPurchaseTotal && params.data.purchase_total !== undefined) {
+            return `${params.name}: ${params.value}批（采购总数：${params.data.purchase_total}）`;
+          }
+          return `${params.name}: ${params.value}批 (${params.percent}%)`;
+        }
       },
       legend: undefined, // 或直接删除整个 legend 配置
       
@@ -25,10 +28,15 @@ export function createChartOption(data) {
           label: {
             color: '#fff',
             fontSize: 14,
-            formatter: function (params) {
-              // 假设 params.value 是“不合格数”，params.percent 是占比
-              const roundedPercent = Math.round(params.percent);  // 四舍五入占比
-              return `${params.name} ${params.value}个 (${roundedPercent}%)`;
+            formatter: function(params) {
+              if (showPurchaseTotal && params.data.purchase_total !== undefined) {
+                const roundedPercent = Math.round(params.percent);
+                return `${params.name} ${params.data.purchase_total}单 ${params.value}批 (${roundedPercent}%)`;
+              }else{
+                const roundedPercent = Math.round(params.percent);
+                return `${params.name} ${params.value}批 (${roundedPercent}%)`;
+              }
+            
             }
           },
           labelLine: {  

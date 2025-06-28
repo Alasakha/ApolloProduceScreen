@@ -36,7 +36,7 @@
     <!-- 使用通用详情弹窗组件 -->
     <DetailDialog
         v-model="dialogVisible"
-        :title="`${selectedPurchaser}的来料不合格详情`"
+        :title="`${selectedPurchaser}的在途信息`"
         :loading="tableLoading"
         :data="detailData"
         :columns="tableColumns"
@@ -159,10 +159,7 @@ const handleChartClick = async (params) => {
 const drawMonthlyIndicators = (formattedData) => {
     nextTick(() => {
         const option = createChartOption(formattedData);
-        initChart(); // 初始化图表实例
-        setOption(option); // 设置配置
-        offClick(handleChartClick); // 先移除之前的事件监听
-        onClick(handleChartClick); // 添加新的事件监听
+        setOption(option); // 只更新配置
     });
 };
 
@@ -188,7 +185,6 @@ const processData = (data) => {
 };
 
 // 请求数据
-// 请求数据
 const fetchData = () => {
     const params = { type: 1 };
     getPlanPie(params).then(res => {
@@ -203,7 +199,12 @@ const fetchData = () => {
 
 onMounted(() => {
     fetchData();
-    window.addEventListener('resize', resizeChart)
+    nextTick(() => {
+        initChart(); // 在 onMounted 中只初始化一次
+        offClick(handleChartClick);
+        onClick(handleChartClick);
+        window.addEventListener('resize', resizeChart)
+    });
     eventBus.on("refreshData", fetchData);
 });
     

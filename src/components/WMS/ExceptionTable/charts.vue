@@ -61,7 +61,11 @@ const props = defineProps({
     piedata: {
         type: Array,
         default: () => []
-    }
+    },
+    showPurchaseTotal: {
+       type: Boolean,
+       default: false
+     }
 });
 
 const getYesterday = () => {
@@ -161,7 +165,7 @@ const handleChartClick = async (params) => {
 // 渲染图表的函数
 const drawMonthlyIndicators = (piedata) => {
     nextTick(() => {
-        const option = createChartOption(piedata);
+        const option = createChartOption(piedata, props.showPurchaseTotal === true || props.showPurchaseTotal === 'true');
         initChart(); // 初始化图表实例
         setOption(option); // 设置配置
         offClick(handleChartClick); // 先移除之前的事件监听

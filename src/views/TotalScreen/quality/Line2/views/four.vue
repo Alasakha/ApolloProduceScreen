@@ -22,7 +22,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { getComplaintPie ,getComplaint} from '@/api/getQuiltyinfo'
+import {  getComplaint,getResponsityRank} from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
@@ -30,9 +30,10 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('质量客诉次数');
-const dialogTitle = ref('质量客诉次数');
+const title = ref('本月功性能不良');
+const dialogTitle = ref('本月功性能不良');
 const reasonType = 2;
+const dayType = 2
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
@@ -69,7 +70,7 @@ const opendialog = () => {
 
 
 const fetchData = () => {
-    getComplaintPie( )
+  getResponsityRank(reasonType,dayType )
     .then(res => {
       
       isLoading.value = false;
@@ -95,7 +96,9 @@ const handleChartClick = (params) => {
 
 
 const processData = (data) => {
-  const formatted = formatPieChartData(data, 'documentName', 'total');
+  console.log(data)
+  const formatted = formatPieChartData(data, 'ngName', 'total');
+  console.log(formatted)
   rawData.value = formatted.map(item => ({
     name: item.name || '未知',
     value: item.value ? parseInt(item.value, 10) : 0

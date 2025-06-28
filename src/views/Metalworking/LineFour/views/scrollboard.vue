@@ -20,6 +20,11 @@ import { useScrollBoardData } from './scrollboardDataHook'
 const { loading } = useScrollBoardData()  // 获取loading状态
 const rawData = ref([]) // 你实际接口拉回的原始数据
 
+// 保存原始数据到config中，供hook使用
+const setRawData = (data) => {
+  config.rawData = data
+}
+
 const filter = ref({ caigou: '', cangguan: '', jianyan: '' })
 
 const caigouList = computed(() => [...new Set(rawData.value.map(i => i.caigou).filter(Boolean))])
@@ -39,6 +44,8 @@ async function fetchData() {
   // 根据实际返回结构调整
   const arr = Array.isArray(res.data) ? res.data : (res.data?.data || [])
   rawData.value = arr
+  setRawData(arr) // 保存原始数据
+  
   config.data = arr.map((item, idx) => [
     item.caigou || '--',
     item.cangguan || '--',
@@ -46,8 +53,7 @@ async function fetchData() {
     // item.pcDate || '--',
     formatDate(item.arrival_date) || '--',
     item.udf021 || '--',
-    item.supplierCode || '--',
-    item.supplier_full_name|| '--',
+    item.supplierCode || '--', // 轮播表显示供应商编号
     item.item_code || '--',
     item.item_description || '--',
     item.item_specification || '--', 
@@ -64,6 +70,8 @@ function formatDate(val) {
 }
 
 watch(filteredData, (val) => {
+  setRawData(val) // 更新原始数据
+  
   config.data = val.map(item => [
     item.caigou || '--',
     item.cangguan || '--',
@@ -71,8 +79,7 @@ watch(filteredData, (val) => {
     // item.pcDate || '--',
     formatDate(item.arrival_date) || '--',
     item.udf021 || '--',
-    item.supplierCode || '--',
-    item.supplier_full_name|| '--',
+    item.supplierCode || '--', // 轮播表显示供应商编号
     item.item_code || '--',
     item.item_description || '--',
     item.item_specification || '--',

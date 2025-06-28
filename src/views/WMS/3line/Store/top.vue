@@ -7,6 +7,7 @@
     :config="config"
     export-file-name="入库异常处理数据"
     :piedata="processedData"
+    :showPurchaseTotal='true'
   />
 </template>
 
@@ -15,7 +16,6 @@ import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
 import { gettimelyAccountingRateDetail,gettimelyAccountingRateDetailPie } from '@/api/getWMSinfo'
 import { eventBus } from '@/utils/eventbus'
 import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
-import { formatPieChartData } from '@/utils/map';
 
 const inStoreLoading = ref(true)
 const processedData = ref([]) // 添加响应式变量存储饼图数据
@@ -24,7 +24,7 @@ const config = reactive({
   header: [ '仓管员','仓位','检验单号','品名','规格','到货单号','品号'],
   data: [], // 初始为空
   index: true,
-  columnWidth: [50,100,100,150,200],
+  columnWidth: [100,100,200,250,400,200,200],
   align: [],
   rowNum: 4,
   headerHeight: 35,
@@ -68,28 +68,31 @@ const fetchData = async () => {
 
  // 处理数据
 const processData = (data) => {
-    const formattedData = formatPieChartData(data, 'warehouseKeeper', 'total');
-    
-    processedData.value = formattedData
-        .filter(item => item.value !== 0 && item.name)
-        .map(item => ({
-            name: item.name || '未知',
-            value: item.value
-        }))
-        .sort((a, b) => b.value - a.value);
-};
+  // 先按 warehouseKeeper 分组，统计 total 和 purchase_total
+  const map = {}
+  data.forEach(item => {
+    const name = item.warehouseKeeper || '未知'
+    if (!map[name]) {
+      map[name] = { name, value: 0, purchase_total: 0 }
+    }
+    map[name].value += Number(item.total) || 0
+    map[name].purchase_total += Number(item.purchase_total) || 0
+  })
+  processedData.value = Object.values(map)
+    .filter((item:any) => item.value !== 0 && item.name)
+    .sort((a:any, b:any) => b.value - a.value)
+
+}
+
 
 // 请求数据
 const fetchData2 = () => {
 const params = { type: 1 };
 gettimelyAccountingRateDetailPie(params).then(res => {
-  
     processData(res.data);
 }).catch(() => {
 });
 };
-
-
 
 onMounted(() => {
   eventBus.on('refreshData', fetchData)

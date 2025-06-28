@@ -29,7 +29,7 @@
               <el-button type="primary" size="small" @click="dialogVisible = true">查看详细</el-button>
             </div>
             <div class="h-[90%] w-full"><Scroll_Board /></div>
-            <DialogDetail v-model:visible="dialogVisible" :table-data="tableData" :headers="headers" />
+            <DialogDetail v-model:visible="dialogVisible" :table-data="dialogTableData" :headers="dialogheaders" :column-width="columnWidth" />
         </div>
       </dv-border-box-8>
   </div>
@@ -44,9 +44,9 @@ import Charts from './views/charts/charts.vue'
 import Charts2 from './views/charts/charts2.vue'
 const dialogVisible = ref(false)
 // 假设你有一个组合式函数或其他方式获取表格数据和表头
-const { tableData, headers } = useScrollBoardData()
+const { tableData, headers, columnWidth, dialogTableData, dialogheaders } = useScrollBoardData()
 </script>
-
+  
 <style scoped>
 .content {
     /* Add your styles here */

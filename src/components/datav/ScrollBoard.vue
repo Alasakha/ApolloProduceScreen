@@ -27,6 +27,7 @@
         <div
           v-for="(row, ri) in state.rows"
           :key="`${row.toString()}${row.scroll}`"
+          :class="['row-item', props.rowClassName ? props.rowClassName(row, ri) : '']"
           class="row-item"
           :style="`
             height: ${state.heights[ri]}px;
@@ -39,6 +40,7 @@
           <div
             v-for="(ceil, ci) in row.ceils"
             :key="`${ceil}${ri}${ci}`"
+            :class="['ceil', props.cellClassName ? props.cellClassName(row, ceil, ci) : '']"
             class="ceil"
             :style="`width: ${state.widths[ci]}px;`"
             :align="state.aligns[ci]"
@@ -83,6 +85,14 @@
       type: Object,
       default: () => ({}),
     },
+    rowClassName: {
+      type: Function,
+      default: null
+    },
+    cellClassName: {
+      type: Function,
+      default: null
+    }
   });
    
   const emitEvent = defineEmits(["mouseover", "click", "getFirstRow"]);
@@ -556,4 +566,13 @@
     overflow: hidden;
     text-overflow: ellipsis;
   }
-  </style>
+  .overdue-row {
+    // background: #000000 !important;
+    color: #e03030 !important;
+    font-weight: bold;
+  }
+  .overdue-cell {
+    color: #e03030 !important;
+    font-weight: bold;
+  }
+  </style>  

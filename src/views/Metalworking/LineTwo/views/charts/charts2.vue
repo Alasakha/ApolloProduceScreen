@@ -44,63 +44,38 @@
 </template>
 
 
-<script setup>
-import BigScreenTitle from '@/components/title.vue'
-import { ref, onMounted, onBeforeUnmount, computed, nextTick } from 'vue';
+<script setup lang="ts">
+
+import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { getEnterPie,getEnterInfo } from '@/api/getIncomingInfo'
 
-import { useRoute } from 'vue-router';
+
 import { eventBus } from '@/utils/eventbus';
-import { formatPieChartData } from '@/utils/map';
+
 import { createChartOption } from './charts';
 import { ElMessage } from 'element-plus';
 import { useEcharts } from '@/utils/useEcharts';
 import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
 import TooltipInfo from '@/components/SCM/TooltipInfo/index.vue'
 
-const getYesterday = () => {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-};
 
-const queryDate = getYesterday();
+
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const chartRef = ref(null);
 
 // 使用 useEcharts
 const { initChart, setOption, onClick, offClick,resizeChart } = useEcharts(chartRef);
-
 // 详情弹窗相关
 const dialogVisible = ref(false);
 const tableLoading = ref(false);
-const currentPage = ref(1);
-const pageSize = ref(10);
-const total = ref(0);
 const detailData = ref([]);
 const selectedPurchaser = ref('');
 const currentRequestId = ref(0); // 添加请求标识符
+const processedData = ref([]) // 添加响应式变量存储饼图数据
 
-// 分页数据
-const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * pageSize.value;
-    const end = start + pageSize.value;
-    return detailData.value.slice(start, end);
-});
 
-// 处理分页
-const handleSizeChange = (val) => {
-    pageSize.value = val;
-    currentPage.value = 1;
-};
 
-const handleCurrentChange = (val) => {
-    currentPage.value = val;
-};
 
 
 // 表格列配置
@@ -163,21 +138,24 @@ const drawMonthlyIndicators = (formattedData) => {
 
 // 处理数据
 const processData = (data) => {
-    const formattedData = formatPieChartData(data, 'cangguan', 'total');
-
-    const processedData = formattedData
-        .filter(item => item.value !== 0)
-        .sort((a, b) => b.value - a.value);
-
-    if (processedData.length === 0) {
-        isDataEmpty.value = true;
-    } else {
-        isDataEmpty.value = false;
-        drawMonthlyIndicators(processedData);
+  // 先按 warehouseKeeper 分组，统计 total 和 purchase_total
+  const map = {}
+  data.forEach(item => {
+    const name = item.cangguan || '未知'
+    if (!map[name]) {
+      map[name] = { name, value: 0, purchase_total: 0 }
     }
-};
+    map[name].value += Number(item.total) || 0
+    map[name].purchase_total += Number(item.purchase_total) || 0
+  })
+  processedData.value = Object.values(map)
+    .filter((item:any) => item.value !== 0 && item.name)
+    .sort((a:any, b:any) => b.value - a.value)
+    drawMonthlyIndicators(processedData.value)
+    console.log(processedData.value)
+}
 
-// 请求数据
+
 // 请求数据
 const fetchData = () => {
     const params = { type: 2 };

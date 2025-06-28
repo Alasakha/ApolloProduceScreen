@@ -57,12 +57,17 @@
           style="width: 100%"
           height="670"
         >
+          <el-table-column label="状态" width="120" fixed="left">
+            <template #default="{ row }">
+              <StatusCell :completeDate="row['完成期限']" />
+            </template>
+          </el-table-column>
           <el-table-column 
-            v-for="(header, index) in config.header" 
+            v-for="(header, index) in config.fullHeader.slice(1)" 
             :key="header" 
             :prop="header" 
             :label="header" 
-            :fixed="index === 0"
+            :width="config.dialogWidth[index + 1]"
           />
           <el-table-column prop="source_id_roid" v-if="false" />
           <el-table-column prop="po_arrival_inspection_d_id" v-if="false" />
@@ -91,6 +96,13 @@
             type="textarea"
             :rows="4"
             placeholder="请输入处理结果"
+          />
+          <el-date-picker
+            v-model="completeDate"
+            type="date"
+            placeholder="请选择完成期限"
+            format="YYYY/MM/DD"
+            value-format="YYYY-MM-DD"
           />
           <template #footer>
             <span class="dialog-footer">
@@ -126,6 +138,7 @@
   import { ElMessage, ElMessageBox } from 'element-plus'
   import * as XLSX from 'xlsx'
   import { getAbnormalQualityReasonAdd } from '@/api/getPmcinfo'
+  import StatusCell from '@/components/SCM/DetailDialog/StatusCell.vue'
   
   interface TableConfig {
     header: string[];
@@ -143,6 +156,8 @@
     waitTime: number;
     carousel: string;
     showTooltip: boolean;
+    fullHeader?: string[];
+    dialogWidth?: number[];
   }
   
   const props = defineProps({
@@ -186,6 +201,7 @@
   const handleResultVisible = ref(false)
   const docNo = ref('')
   const po_arrival_inspection_d_id = ref('')
+  const completeDate = ref('')
   // const route = useRoute()
   // const prodLine = computed(() => route.query.prodLine as string)
 
@@ -218,14 +234,15 @@
     try {
       // 使用 detailData 而不是 data
       const sourceData = props.config.detailData || props.config.data
+      const headers = props.config.fullHeader || props.config.header
       detailData.value = sourceData.map((row: any[], index: number) => {
         const obj: any = {}
-        props.config.header.forEach((header: string, index: number) => {
-          obj[header] = row[index]
+        // 跳过第一列，从第二列开始
+        headers.slice(1).forEach((header: string, idx: number) => {
+          obj[header] = row[idx + 1] // 使用 idx + 1 来跳过第一列
         })
         // 使用rawData中的source_id_roid
         if (props.config.rawData && props.config.rawData[index]) {
-
           obj.source_id_roid = props.config.rawData[index].source_id_roid
           obj.po_arrival_inspection_d_id = props.config.rawData[index].po_arrival_inspection_d_id
         }
@@ -285,24 +302,25 @@
       return
     }
     try {
-      await getAbnormalQualityReasonAdd(currentItemCode.value, handleResult.value, docNo.value,po_arrival_inspection_d_id.value)
+      await getAbnormalQualityReasonAdd(currentItemCode.value, handleResult.value,
+       docNo.value,po_arrival_inspection_d_id.value,completeDate.value)
       ElMessage.success('操作成功')
       handleResultVisible.value = false
 
-      console.log('当前选中的ID:', currentItemCode.value)
-      console.log('更新前的数据:', JSON.stringify(detailData.value))
+      // console.log('当前选中的ID:', currentItemCode.value)
+      // console.log('更新前的数据:', JSON.stringify(detailData.value))
       
       // 更新当前行的处理结果
       const index = detailData.value.findIndex(item => item.source_id_roid === currentItemCode.value)
       if (index !== -1) {
         detailData.value[index]['处理结果'] = handleResult.value
-        // 强制更新表格数据
+        detailData.value[index]['完成期限'] = completeDate.value
         detailData.value = [...detailData.value]
       } else {
         console.error('未找到匹配的行:', currentItemCode.value)
       }
       
-      console.log('更新后的数据:', JSON.stringify(detailData.value))
+      // console.log('更新后的数据:', JSON.stringify(detailData.value))
       emit('refresh')
     } catch (error) {
       console.error('操作失败:', error)
@@ -317,6 +335,7 @@
     handleResult.value = row['处理结果'] === '--' ? '' : (row['处理结果'] || '')
     docNo.value = row['到货单号'] || row['docNo'] || ''
     po_arrival_inspection_d_id.value = row.po_arrival_inspection_d_id
+    completeDate.value = row['完成期限'] || ''
     handleResultVisible.value = true
   }
   </script>

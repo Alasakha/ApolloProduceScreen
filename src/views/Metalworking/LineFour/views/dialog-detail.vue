@@ -12,8 +12,9 @@
     />
     <div style="max-height:60vh;overflow:auto;">
       <el-table :data="pagedData" border style="width: 100%">
-        <el-table-column v-for="(col, idx) in headers" :key="col" :label="col" :prop="'col' + idx" />
-              <el-table-column label="状态" prop="delayStatus">
+        <el-table-column v-for="(col, idx) in headers" :key="col" :label="col" 
+        :prop="'col' + idx"  :width="columnWidth?.[idx] || undefined"/>
+              <!-- <el-table-column label="状态" prop="delayStatus">
                 <template #default="scope">
                   <el-tag
                     v-if="scope.row.col12 === '已超时'"
@@ -36,7 +37,7 @@
                     effect="plain"
                   >暂无法判断</el-tag>
                 </template>
-      </el-table-column>
+      </el-table-column> -->
         
       </el-table>
     </div>
@@ -63,7 +64,11 @@ import ExportExcel from '@/components/ExportExcel.vue'
 const props = defineProps({
   visible: Boolean,
   tableData: Array,
-  headers: Array
+  headers: Array,
+  columnWidth: {
+    type: Array,
+    default: () => []
+  }
 })
 const emit = defineEmits(['update:visible'])
 

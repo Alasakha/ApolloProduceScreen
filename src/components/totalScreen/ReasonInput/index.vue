@@ -25,9 +25,17 @@
         v-model="currentDuty"
         type="text"
         :rows="1"
-        placeholder="请输入责任人"
+        placeholder="请输入责任人1"
         style="margin-top: 10px;"
       />
+      <el-date-picker
+        v-model="currentCompleteDate"
+        type="date"
+        placeholder="请选择完成期限"
+        style="margin-top: 10px; width: 100%;"
+        value-format="YYYY-MM-DD"
+      />
+      
       <template #footer>
         <span class="dialog-footer">
           <el-button @click="handleCancel">取消</el-button>
@@ -39,7 +47,7 @@
 </template>
 
 <script setup>
-import { ref, watch } from 'vue';
+import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
 
 const props = defineProps({
@@ -58,27 +66,21 @@ const emit = defineEmits(['update:modelValue', 'save']);
 const dialogVisible = ref(false);
 const currentReason = ref('');
 const currentDuty = ref('');
+const currentCompleteDate = ref('');
 
-// 初始化赋值
-watch(() => props.modelValue, (val) => {
-  currentReason.value = val;
-});
-watch(() => props.row.duty, (val) => {
-  currentDuty.value = val || '';
-});
-
-// 打开弹窗时赋值
+// 打开弹窗时赋值（只在这里赋值，去掉 watch）
 const handleInput = () => {
   currentReason.value = props.modelValue;
-  currentDuty.value = props.row.duty || '';
+  // 兼容 duty/责任人
+  currentDuty.value = props.row.duty || props.row['责任人'] || '';
+  currentCompleteDate.value = props.row.completeDate || props.row['完成期限'] || '';
   dialogVisible.value = true;
 };
 
 // 处理取消
 const handleCancel = () => {
   dialogVisible.value = false;
-  currentReason.value = props.modelValue;
-  currentDuty.value = props.row.duty || '';
+  // 取消时不需要重置输入框内容
 };
 
 // 处理保存
@@ -91,11 +93,16 @@ const handleSave = () => {
     ElMessage.warning('请输入责任人');
     return;
   }
+  if (!currentCompleteDate.value) {
+    ElMessage.warning('请选择完成期限');
+    return;
+  }
   emit('update:modelValue', currentReason.value);
   emit('save', {
     row: props.row,
     reason: currentReason.value,
-    duty: currentDuty.value
+    duty: currentDuty.value,
+    completeDate: currentCompleteDate.value
   });
   dialogVisible.value = false;
   ElMessage.success('保存成功');

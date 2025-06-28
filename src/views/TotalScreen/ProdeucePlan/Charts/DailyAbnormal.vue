@@ -24,7 +24,7 @@
          <!-- 如果正在加载，显示 loading -->
        <dv-loading v-if="isLoading">Loading...</dv-loading>
 
-        <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
+        <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
       </div>
     </div>
   </dv-border-box-9>
@@ -47,36 +47,36 @@
 />
 </template>
 
-<script setup>
-import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive, computed} from 'vue';
+<script setup lang="ts">
+import { ref, onMounted ,onBeforeUnmount,reactive, } from 'vue';
 import ScrollBoard from '@/components/datav/ScrollBoard.vue'
 import DetailTable from '@/components/totalScreen/DetailTable/index.vue'
-import * as echarts from 'echarts';
 import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';  
 import { ElMessage } from 'element-plus';
 import { getAbnormalUnfinishedAdd } from '@/api/getProduceinfo.js';
+import dayjs from 'dayjs';
+// import dayjs from 'dayjs'; // 推荐用 dayjs 处理日期
 
 const dialogVisible = ref(false);//弹窗控制
 const detailDialogVisible = ref(false);
 const selectedItem = ref({});
 const route = useRoute();
 const prodLine = route.query.prodLine;
-const monthlyIndicators = ref(null);
+
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const tableLoading = ref(false);
-const currentPage = ref(1);
-const pageSize = ref(10);
+
 const total = ref(0);
 const tableData = ref([]);
-const categories = ref([]); // X 轴数据
-const values = ref([]); // Y 轴数据
-let chartInstance = null;
-const scrollBoardRef = ref(null);
+
+
 const config = reactive({
-  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长','原因','责任人'],
+  header: [
+    '状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长','原因','责任人', '完成期限'
+  ],
   data: [
     ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
   ],
@@ -91,22 +91,36 @@ columnWidth: [50],
 const rawData = ref([]); // 新增
 
 const fetchData = () => {
-  fetchClosingRateData(prodLine)
+  let line = Array.isArray(prodLine) ? prodLine[0] : prodLine;
+  fetchClosingRateData(line)
     .then((res) => {
       if (res && res.length > 0) {
         rawData.value = res; // 保存原始数据
-        config.data = res.map(item => [
-          '未完工',
-          item.number ?? '无',
-          item.workNo ?? '无',
-          item.specifications ?? '无',
-          Number(item.productionQuantity) ?? '无',
-          item.dateTime  ?? '无',
-          Number(item.productionQuantity)-Number(item.inboundQuantity),
-          item.daysBetween+'天' ??'无',
-          item.reason ?? '无',
-          item.duty  ?? '无'
-        ])
+        config.data = res.map(item => {
+          const completeDate = item.completeDate ?? '';
+          const reason = item.reason ?? '';
+          let isOverdue = false;
+          // 只有处理结果和完成时间都不为空时才判断日期，否则直接为true
+          if (reason && completeDate) {
+            isOverdue = dayjs().isAfter(dayjs(completeDate), 'day');
+          } else {
+            isOverdue = true;
+          }
+          return [
+            '未完工',
+            item.number ?? '无',
+            item.workNo ?? '无',
+            item.specifications ?? '无',
+            Number(item.productionQuantity) ?? '无',
+            item.dateTime  ?? '无',
+            Number(item.productionQuantity)-Number(item.inboundQuantity),
+            item.daysBetween != null ? item.daysBetween + '天' : '无',
+            item.reason ?? '无',
+            item.duty  ?? '无',
+            completeDate,
+            isOverdue // 新增一列，标记是否超期
+          ];
+        });
         isDataEmpty.value = false;
       } 
     })
@@ -159,18 +173,9 @@ const handleDetail = () => {
   }
 };
 
-// 处理分页
-const handleSizeChange = (val) => {
-  pageSize.value = val;
-  currentPage.value = 1;
-};
-
-const handleCurrentChange = (val) => {
-  currentPage.value = val;
-};
 
 // 处理原因更新
-const handleReasonUpdate = async ({ row, reason, duty }) => {
+const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
   try {
     // 通过唯一标识找到原始数据（假设用工单号 workNo）
     const origin = rawData.value.find(item => item.workNo === row['工单号']);
@@ -185,7 +190,8 @@ const handleReasonUpdate = async ({ row, reason, duty }) => {
       item_code: origin.articleNumber,
       pc_date: origin.dateTime,
       reason,
-      duty
+      duty,
+      completeDate
     };
     // 假设接口返回 { code: 200, ... }
     const res = await getAbnormalUnfinishedAdd(
@@ -194,13 +200,14 @@ const handleReasonUpdate = async ({ row, reason, duty }) => {
       params.item_code,
       params.pc_date,
       params.reason,
-      params.duty
+      params.duty,
+      params.completeDate
     );
     if (res && (res.code === 200 || res.status === 200)) {
       ElMessage.success('保存成功');
-      // 这里可以手动更新 row['原因'] 和 row['责任人']，保证表格刷新
       row['原因'] = reason;
       row['责任人'] = duty;
+      row['完成期限'] = completeDate;
     } else {
       ElMessage.error('保存失败');
     }
@@ -208,6 +215,16 @@ const handleReasonUpdate = async ({ row, reason, duty }) => {
     ElMessage.error('保存失败');
   }
 };
+
+function rowClassName(row) {
+  const lastIndex = row.ceils.length - 1;
+  return row.ceils[lastIndex] === true ? 'overdue-row' : '';
+}
+
+function cellClassName(row, ci) {
+  const lastIndex = row.ceils.length - 1;
+  return (ci === lastIndex - 1 && row.ceils[lastIndex] === true) ? 'overdue-cell' : '';
+}
 </script>
 
 
@@ -298,6 +315,15 @@ h2 {
   padding: 20px;
   margin: 0;
   border-top: 1px solid #dcdfe6;
+}
+
+.overdue-row {
+  background: #ffeaea !important;
+  color: #e03030 !important;
+}
+.overdue-cell {
+  color: #e03030 !important;
+  font-weight: bold;
 }
 </style>
  

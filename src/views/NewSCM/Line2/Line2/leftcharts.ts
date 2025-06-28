@@ -2,8 +2,6 @@
 
 // chartOption.ts
 export function createChartOption(data) {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
-
     return {
       backgroundColor: 'transparent', // 或深色如 '#000' 视页面背景而定
       tooltip: {
@@ -11,18 +9,7 @@ export function createChartOption(data) {
         formatter: '{b}: {c} ({d}%)'
       },
       legend: undefined, // 或直接删除整个 legend 配置
-      graphic: {
-        type: 'text',
-        left: '49%',
-        top: '75%',
-        style: {
-          text: `${total}`,
-          textAlign: 'center',
-          fill: '#fff',
-          fontSize: 18,
-          fontWeight: 'bold'
-        }
-      },
+      
       series: [
         {
           name: '来源',
@@ -40,14 +27,13 @@ export function createChartOption(data) {
             fontSize: 14,
             formatter: function (params) {
               // 假设 params.value 是“不合格数”，params.percent 是占比
-              
               const roundedPercent = Math.round(params.percent);  // 四舍五入占比
-              return `${params.name} ${params.data.purchase_total}单 ${params.value}单  (${roundedPercent}%)`;
+              return `${params.name} ${params.value}个 (${roundedPercent}%)`;
             }
           },
-          labelLine: {  
-            length: 15,     // 第一段（连接扇区）
-            length2: 10,    // 第二段（水平线）
+          labelLine: {    
+            length: 20,     // 第一段（连接扇区）
+            length2: 20,    // 第二段（水平线）
             lineStyle: {
               color: '#fff'
             }

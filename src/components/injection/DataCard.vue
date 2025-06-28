@@ -25,12 +25,12 @@
         <div class="info-progress-area">
           <div class="info-row">
             <div class="info-top">
-              <div class="info-code">品号：{{ ta006 }}</div>
+              <div class="info-code">品号：{{ ta006? ta006 : '暂无数据' }}</div>
               <div class="info-name">品名：{{ spec }}</div>
             </div>
             <div class="info-bottom">
               <div class="info-spec-value">规格：{{ spen }}</div>
-              <div class="info-code">工单数：{{ gdNum }}</div>
+              <div class="info-code">工单数：{{ gdNum ? gdNum : '暂无数据' }}</div>
             </div>
           </div>
           <div class="progress-row">
@@ -96,7 +96,7 @@
               <div class="text-white text-sm">
                 <div>当日开机时长：{{ dayRunTime }}</div>
                 <div>设备功耗：{{ pparams - blockower }}</div>
-                <div>当日耗电量：{{ dayPower }}</div>
+                <div>当日耗电量：{{ device.power }}</div>
               </div>
             </div>
           </div>
@@ -104,19 +104,13 @@
       </div>
     </div>
     <!-- 警告区域 -->
-    <div v-if="showMissingStandardTip" class="warning-area warning-info">
+    <div v-if="allWarnings.length > 0" class="warning-area">
       <div class="warning-title">
-        <span>ℹ 提示</span>
+        <span>⚠ 警告</span>
       </div>
-      <div class="warning-content">以下参数标准暂无标准：{{ missingStandardList.join("、") }}</div>
-    </div>
-    <div v-else-if="checkParamWarning.isWarning" class="warning-area">
-      <div class="warning-title">
-        <span>⚠ 参数超限警告！</span>
-      </div>
-      <div class="warning-content">
-        {{ checkParamWarning.message }}
-      </div>
+      <ul class="warning-content-list">
+        <li v-for="(warning, index) in allWarnings" :key="index">{{ warning }}</li>
+      </ul>
     </div>
   </div>
 </template>
@@ -213,6 +207,10 @@ const props = defineProps({
     type: [Number, String],
     default: "暂无"
   },
+  device: {
+    type: Object,
+    default: () => ({})
+  }
 });
 
 //判断是否有数据
@@ -230,78 +228,54 @@ const hasActualData = value => {
   return "实际值：" + num.toFixed(1);
 };
 
-// 判断是否有标准参数
-const hasAnyStandardMissing = computed(() => {
-  if (props.status == "加工中") {
-    return (
-      hasStrandData(props.stdTemperature) === "暂无标准" ||
-      hasStrandData(props.stdPressure) === "暂无标准" ||
-      hasStrandData(props.stdMaxspeed) === "暂无标准" ||
-      hasStrandData(props.stdKeeptime) === "暂无标准"
-    );
-  } else return false;
-});
-
-// 检查参数是否超限
-const checkParamWarning = computed(() => {
-  if (!hasAnyStandardMissing.value) {
-    return {
-      isWarning: false,
-      message: "此品号暂无标准参数"
-    };
+// 合并的警告逻辑
+const allWarnings = computed(() => {
+  if (props.status !== "加工中") {
+    return [];
   }
 
   const warnings = [];
 
   // 检查温度
-  if (hasStrandData(props.stdTemperature) !== "暂无标准" && props.temperature) {
+  if (hasStrandData(props.stdTemperature) === "暂无标准") {
+    warnings.push("温度：暂无标准");
+  } else if (props.temperature) {
     const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
     if (diff > 5) {
-      warnings.push(`温度偏差${diff.toFixed(1)}℃`);
+      warnings.push(`温度超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
     }
   }
 
   // 检查压力
-  if (hasStrandData(props.stdPressure) !== "暂无标准" && props.pressure) {
+  if (hasStrandData(props.stdPressure) === "暂无标准") {
+    warnings.push("压力：暂无标准");
+  } else if (props.pressure) {
     const diff = Math.abs(Number(props.pressure) - Number(props.stdPressure));
     if (diff > 5) {
-      warnings.push(`压力偏差${diff.toFixed(1)}MPa`);
+      warnings.push(`压力超出偏差 (偏差: ${diff.toFixed(1)}MPa)`);
     }
   }
 
   // 检查射速
-  if (hasStrandData(props.stdMaxspeed) !== "暂无标准" && props.maxspeed) {
+  if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
+    warnings.push("射速：暂无标准");
+  } else if (props.maxspeed) {
     const diff = Math.abs(Number(props.maxspeed) - Number(props.stdMaxspeed));
     if (diff > 5) {
-      warnings.push(`射速偏差${diff.toFixed(1)}mm/s`);
+      warnings.push(`射速超出偏差 (偏差: ${diff.toFixed(1)}mm/s)`);
     }
   }
 
   // 检查保压时间
-  if (hasStrandData(props.stdKeeptime) !== "暂无标准" && props.keeptime) {
+  if (hasStrandData(props.stdKeeptime) === "暂无标准") {
+    warnings.push("保压时间：暂无标准");
+  } else if (props.keeptime) {
     const diff = Math.abs(Number(props.keeptime) - Number(props.stdKeeptime));
     if (diff > 5) {
-      warnings.push(`保压时间偏差${diff.toFixed(1)}s`);
+      warnings.push(`保压时间超出偏差 (偏差: ${diff.toFixed(1)}s)`);
     }
   }
-
-  return {
-    isWarning: warnings.length > 0,
-    message: warnings.join("、")
-  };
-});
-
-const missingStandardList = computed(() => {
-  const list = [];
-  if (hasStrandData(props.stdTemperature) === "暂无标准") list.push("温度");
-  if (hasStrandData(props.stdPressure) === "暂无标准") list.push("压力");
-  if (hasStrandData(props.stdMaxspeed) === "暂无标准") list.push("射速");
-  if (hasStrandData(props.stdKeeptime) === "暂无标准") list.push("保压时间");
-  return list;
-});
-
-const showMissingStandardTip = computed(() => {
-  return props.status === "加工中" && missingStandardList.value.length > 0;
+  return warnings;
 });
 </script>
 
@@ -483,34 +457,30 @@ const showMissingStandardTip = computed(() => {
   flex: 1;
 }
 .info-spec-value {
-  flex: none;
+  flex: 1;
   font-weight: bold;
   color: #fff;
   font-size: 1.1em;
   text-align: right;
-  min-width: 200px;
 }
 .info-bottom {
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  justify-content: space-around;
   margin-top: 4px;
-  gap: 1vw;
 }
 .info-name {
   flex: 1;
   color: #fff;
-  font-size: 1em;
+  font-size: 1.1em;
   font-weight: bold;
-  text-align: left;
+  text-align: right;
 }
 .info-code {
   flex: 1;
   color: #fff;
-  font-size: 1em;
+  font-size: 1.1em;
   font-weight: bold;
-  min-width: 180px;
-  text-align: left;
+  text-align: right;
 }
 .progress-row {
   display: flex;
@@ -557,6 +527,16 @@ const showMissingStandardTip = computed(() => {
 .warning-content {
   line-height: 1.5;
   word-break: break-all;
+}
+.warning-content-list {
+  list-style-type: none; /* 移除默认的列表符号 */
+  padding-left: 0;
+  margin-top: 4px;
+}
+.warning-content-list li {
+  font-size: 0.9em;
+  color: #ffc473;
+  margin-bottom: 2px;
 }
 .warning-info {
   background: rgba(64, 158, 255, 0.1);

@@ -1,10 +1,14 @@
 <script setup>
-import { ref, reactive, computed, watch } from 'vue';
+import { ref, reactive, computed, watch,onMounted } from 'vue';
 import Header from './Header/index.vue'
 import Line1 from './Line1/index.vue'
 import Line2 from './Line2/index.vue'
 import Bottom from './Bottom/index.vue'
 import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
+
+onMounted(() => {
+  window.dispatchEvent(new Event('resize'));
+});
 </script>
 
 <template>

@@ -2,14 +2,19 @@
     <!-- 留出标题的高度 -->
      <!-- <div class="h-[3vh] w-full flex justify-center items-center"></div> -->
     <div class="h-[37vh] w-full flex justify-center items-center pl-1 mt-8 gap-4">
-        <LeftContent class="flex-1"></LeftContent>
-        <RightContent class="flex-1"></RightContent>
+      <LaiLiao class="flex-1"></LaiLiao>  
+      <ZhuangPei class="flex-1"></ZhuangPei>
+      <BaoZhuang class="flex-1"></BaoZhuang>
+        <CuoRou class="flex-1"></CuoRou>
+
     </div>
   </template>
   
   <script setup lang="ts">
-import LeftContent from './views/leftcontent.vue'
-import RightContent from './views/rightcontent.vue'
+import CuoRou from './views/CuoRou.vue'
+import LaiLiao from './views/LaiLiao.vue'
+import ZhuangPei from './views/ZhuangPei.vue'
+import BaoZhuang from './views/BaoZhuang.vue'
   </script>
   
   <style scoped>

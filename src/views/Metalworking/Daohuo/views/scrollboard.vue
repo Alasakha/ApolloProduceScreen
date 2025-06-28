@@ -20,6 +20,11 @@ import { useScrollBoardData } from './scrollboardDataHook'
 const { loading } = useScrollBoardData()  // 获取loading状态
 const rawData = ref([]) // 你实际接口拉回的原始数据
 
+// 保存原始数据到config中，供hook使用
+const setRawData = (data) => {
+  config.rawData = data
+}
+
 const filter = ref({ caigou: '', cangguan: '', jianyan: '' })
 
 const caigouList = computed(() => [...new Set(rawData.value.map(i => i.caigou).filter(Boolean))])
@@ -45,6 +50,7 @@ async function fetchData() {
     console.log('数据长度:', arr.length)
     
     rawData.value = arr
+    setRawData(arr) // 保存原始数据
     
     // 调试：检查第一条数据的字段
     if (arr.length > 0) {
@@ -60,15 +66,15 @@ async function fetchData() {
       // item.pcDate || '--',
       // item.udf021 || '--',
       item.doc_no || '--', //采购单号
-      item.supplierCode || '--',
-      item.supplier_full_name|| '--',
+      item.supplierCode || '--', // 轮播表显示供应商编号
+      // item.supplier_full_name|| '--',
       // item.item_code || '--',
       item.item_description || '--', 
       item.item_specification || '--',
       Math.round(item.business_qty) || '--',
       formatDate(item.deliveryTime) || '--',
-      status(item.shipmentMode)
-      // formatDate(item.arrival_date) || '--',
+      formatDate(item.expectedArrivalDate) || '--',
+      status(item.shipmentMode),
       // checkStatus(item.delayStatus) || '--'
     ])
     
@@ -84,6 +90,8 @@ function formatDate(val) {
 }
 
 watch(filteredData, (val) => {
+  setRawData(val) // 更新原始数据
+  
   config.data = val.map((item, idx) => [
     item.caigou || '--',
     // item.cangguan || '--',
@@ -91,16 +99,16 @@ watch(filteredData, (val) => {
     // item.pcDate || '--',
     // item.udf021 || '--',
     item.doc_no || '--', //采购单号
-    item.supplierCode || '--',  
-   item.supplier_full_name || '--',
+    item.supplierCode || '--', // 轮播表显示供应商编号
+    // item.supplier_full_name || '--',
 
     // item.item_code || '--',
     item.item_description || '--', 
     item.item_specification || '--',
     Math.round(item.business_qty) || '--',
     formatDate(item.deliveryTime) || '--',
-    status(item.shipmentMode)
-    // formatDate(item.arrival_date) || '--',
+    formatDate(item.expectedArrivalDate) || '--',
+    status(item.shipmentMode),
     // checkStatus(item.delayStatus) || '--'
   ])
 }, { immediate: true })

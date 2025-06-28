@@ -94,6 +94,18 @@
           :rows="4"
           placeholder="请输入处理结果"
         />
+        <!-- 填写处理时间 -->
+        <el-form label-position="top" style="margin-top: 16px;">
+          <el-form-item label="处理时间">
+            <el-date-picker
+              v-model="completeDate"
+              type="datetime"
+              placeholder="请选择处理时间"
+              style="width: 100%;"
+              value-format="YYYY-MM-DD"
+            />
+          </el-form-item>
+        </el-form>
         <template #footer>
           <span class="dialog-footer">
             <el-button @click="handleResultVisible = false">取消</el-button>
@@ -215,6 +227,7 @@ const tableData = ref<RowData[]>([])
 const handleResult = ref('')
 const handleResultVisible = ref(false)
 const mo_d_id = ref('')
+const completeDate = ref('')
 // const route = useRoute()
 // const prodLine = computed(() => route.query.prodLine as string)
 
@@ -310,7 +323,7 @@ const handleAddResult = async () => {
     return
   }
   try {
-    await getdeliveryTimelinessRateAdd(mo_d_id.value, handleResult.value)
+    await getdeliveryTimelinessRateAdd(mo_d_id.value, handleResult.value,completeDate.value)
     ElMessage.success('操作成功')
     handleResultVisible.value = false
 
@@ -331,8 +344,9 @@ const handleAddResult = async () => {
 
 // 打开处理结果输入框
 const openHandleResultDialog = (row) => {
+  console.log('row',row)
   mo_d_id.value = row.mo_d_id
-  
+  completeDate.value = row['处理时间'] 
   handleResult.value = row['处理结果'] === '--' ? '' : (row['处理结果'] || '')
   handleResultVisible.value = true
 }

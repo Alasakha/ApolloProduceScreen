@@ -125,8 +125,8 @@ const handleCurrentChange = (val) => {
 };
 
 // 处理原因和责任人更新
-const handleReasonUpdate = ({ row, reason, duty }) => {
-  emit('update:reason', { row, reason, duty });
+const handleReasonUpdate = ({ row, reason, duty ,completeDate}) => {
+  emit('update:reason', { row, reason, duty,completeDate });
 };
 </script>
 

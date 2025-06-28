@@ -40,12 +40,11 @@
       :close-on-click-modal="false"
       @closed="handleDialogClosed"
     >
-    <!-- 导出弹出框 -->
-    <Export
-      v-model="exportVisible"
-      :prod-line="prodLine"
-    />
-      <div class="flex flex-col">
+      <Export v-model="exportVisible" :prod-line="prodLine" />
+      <div v-if="planLoading" class="flex flex-col justify-center items-center" style="height: 300px;">
+        <dv-loading class="text-white">加载中...</dv-loading>
+      </div>
+      <div v-else class="flex flex-col">
         <div class="grid grid-cols-8 gap-4 font-bold mb-4 text-center">
           <div>时间</div>
           <div>车型</div>
@@ -109,8 +108,6 @@
       </template>
     </el-dialog>
   </div>
-
-  
 </template>
 
 <script setup>
@@ -118,7 +115,7 @@ import { ref, defineProps, defineEmits, computed } from 'vue';
 import { ElMessage } from 'element-plus';
 import { insertHourPlan, getCapacityHour } from '@/api/getProduceinfo';
 import Export from './Exportvue.vue'
-
+const planLoading = ref(false);
 const props = defineProps({
   prodLine: {
     type: String,
@@ -189,8 +186,11 @@ const handleClick = () => {
 
 // 开发模式直接打开弹框
 const handleDevModeOpen = async () => {
+  planVisible.value = true;      // 1. 先打开弹窗
+  planLoading.value = true;      // 2. 显示 loading
   try {
-    // 获取所有需要的数据
+    // 3. 加载数据
+    // 获取所有需要的数据 
     const res = await getCapacityHour(props.prodLine);
     const data = res.data;
     
@@ -240,7 +240,7 @@ const handleDevModeOpen = async () => {
   } catch (error) {
     console.error('获取数据失败：', error);
   }
-  planVisible.value = true;
+  planLoading.value = false;     // 4. 数据加载完，显示内容
 };
 
 // 处理登录
@@ -363,8 +363,18 @@ const updateCarModels = (data) => {
 // 确认设置计划
 const handleConfirm = async () => {
   try {
+    const now = new Date();
+    const currentHour = now.getHours();
+    console.log('当前时间:', now.toLocaleString(), '当前小时:', currentHour);
+    
+    // 使用本地时间而不是UTC时间
     const today = new Date();
-    const dateStr = today.toISOString().split('T')[0];
+    const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
+    const dateStr = `${year}-${month}-${day}`;
+    
+    console.log('计算的日期:', dateStr);
 
     // 只保存工作时间范围内的数据
     const saveData = workingHours.value.map(hour => {
@@ -416,6 +426,7 @@ const handleDialogClosed = () => {
   remarks.value = Array(24).fill('');
   duties.value = Array(24).fill('');
   carModels.value = Array(24).fill('');
+  planLoading.value = false;
 };
 </script>
 

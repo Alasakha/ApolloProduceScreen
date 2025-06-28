@@ -23,7 +23,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { getAtopDayInspector,getAbnormalDetail } from '@/api/getQuiltyinfo';
-import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
@@ -33,13 +32,14 @@ import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 const dialogTableVisible = ref(false);
 const title = ref('今日其他类责任');
 const reasonType = 2;
+const dayType = 1
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-const route = useRoute();
-const prodLine = route.query.prodLine;
+
+
 
 const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
@@ -59,7 +59,8 @@ const gridColumns = [
 
 const opendialog = () => {
   dialogTableVisible.value = true;
-  getAbnormalDetail(undefined,reasonType,undefined,undefined)
+  getAbnormalDetail('', reasonType, '', '', '', '', dayType)
+ 
     .then(res => {
       gridData.value = res.data;
     });
@@ -67,7 +68,7 @@ const opendialog = () => {
 
 
 const fetchData = () => {
-    getAtopDayInspector(prodLine, reasonType)
+    getAtopDayInspector( reasonType,dayType)
     .then(res => {
       
       isLoading.value = false;
@@ -85,7 +86,7 @@ const handleChartClick = (params) => {
   title.value = `${clickedName}的详细数据`;
   dialogTableVisible.value = true;
 
-  getAbnormalDetail(undefined,reasonType,undefined,clickedName) // 假设 API 接口第三个参数是问题名
+  getAbnormalDetail('', reasonType, '', clickedName, '', '', dayType) // 假设 API 接口第三个参数是问题名
     .then(res => {
       gridData.value = res.data;
     });

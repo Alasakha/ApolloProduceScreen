@@ -62,7 +62,7 @@
   const monthData = ref<any>(null)
   const todayData = ref<any>(null)
   const loadingMonth = ref(true)
-  const loadingToday = ref(true)
+  const loadingToday = ref(true)  
   const prodLine = '1005' // 这里写死包装产线，如需动态可用props或route
   const monthBarChart = ref()
   const dayBarChart = ref()

@@ -23,7 +23,6 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
 import { getAtopDayInspector,getAbnormalDetail } from '@/api/getQuiltyinfo';
-import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import TableDialog from '../components/dialog.vue';
@@ -33,35 +32,34 @@ import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 const dialogTableVisible = ref(false);
 const title = ref('今日功性能不良'); // 改为 ref
 const reasonType = 1;
-
+const dayType = 1
 const qualityIndicators = ref(null);
 const rawData = ref([]);
 const isLoading = ref(true);
-const isDataEmpty = ref(false);
-const route = useRoute();
-const prodLine = route.query.prodLine;
+const isDataEmpty = ref(false); 
+
 
 const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
 const gridData = ref([]);
 const gridColumns = [
-  { prop: 'ngName', label: '不良问题' },
-  { prop: 'createDate', label: '发现时间' },
-  { prop: 'ta002', label: '工单单号' },
-  { prop: 'ta006', label: '品号' },
-  { prop: 'mb002', label: '车型' },
-  { prop: 'peopleName', label: '发现人' },
-  { prop: 'admin_UNIT_NAME', label: '责任部门' },
-  { prop: 'ngResponPeople', label: '责任人' },
-  { prop: 'ngHandle', label: '处理结果' },
-  { prop: 'action', label: '操作' }
+  { prop: 'guZhangTypeName', label: '故障类型' },
+  { prop: 'startRemark', label: '故障描述' },
+  { prop: 'startPeopleName', label: '申报人' },
+  { prop: 'startTime', label: '申报时间' },
+  { prop: 'endTime', label: '故障结束时间' },
+  { prop: 'dutyPeopleName', label: '故障责任人' },
+  { prop: 'endPeopleName', label: '故障解除人' },
+  { prop: 'ta001', label: '工单号1' },
+  { prop: 'ta002', label: '工单号2' },
+  { prop: 'dutyDeptName', label: '故障责任部门' }
 ];
 
 
 
 const opendialog = () => {
   dialogTableVisible.value = true;
-  getAbnormalDetail( '',reasonType)
+  getAbnormalDetail('', reasonType, '', '', '', '', dayType)
  
     .then(res => {
       gridData.value = res.data;
@@ -70,7 +68,7 @@ const opendialog = () => {
 
 
 const fetchData = () => {
-    getAtopDayInspector(prodLine, reasonType)
+    getAtopDayInspector( reasonType,dayType)
     .then(res => {
       
       isLoading.value = false;
@@ -88,7 +86,7 @@ const handleChartClick = (params) => {
   title.value = `${clickedName}的详细数据`;
   dialogTableVisible.value = true;
 
-  getAbnormalDetail(undefined,reasonType,undefined,clickedName) // 假设 API 接口第三个参数是问题名
+  getAbnormalDetail('', reasonType, '', clickedName, '', '', dayType) // 假设 API 接口第三个参数是问题名
     .then(res => {
       gridData.value = res.data;
     });

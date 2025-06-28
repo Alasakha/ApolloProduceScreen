@@ -18,7 +18,6 @@
 
 
 <script setup >
-
 import Header from './Header/index.vue'
 import Stock from './Stock/index.vue'
 import Line3 from './3line/index.vue'

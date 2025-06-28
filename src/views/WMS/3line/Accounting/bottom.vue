@@ -41,9 +41,12 @@ watch(OutboundData, () => {
 
 onMounted(() => {
   fetchData()
+  nextTick(() => { // 确保 DOM 挂载后再初始化
+      initChart();
+      resizeChart();
+  });
   eventBus.on('refreshData', fetchData)
 })
-
   onBeforeUnmount(() => {
   eventBus.off('refreshData', fetchData)
   })

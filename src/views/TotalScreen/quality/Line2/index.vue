@@ -5,8 +5,8 @@
         <Left></Left>
         <Middle></Middle>
         <Right></Right>
-        <Four> </Four>
-        <Five> </Five>
+        <MonthAbnormal> </MonthAbnormal>
+        <MonthResponsibilty> </MonthResponsibilty>
     </div>
   </template>
   
@@ -14,8 +14,8 @@
 import Left from './views/left.vue'
 import Middle from './views/middle.vue'
 import Right from './views/right.vue'
-import Four from './views/four.vue'
-import Five from './views/five.vue'
+import MonthAbnormal from './views/mothAbnormal.vue'
+import MonthResponsibilty from './views/monthResponsibilty.vue'
   </script>
   
   <style scoped>

@@ -132,11 +132,19 @@ export const getCapacityHour = (prodLine) => {
 }
 
 // /production/abnormalUnfinishedAdd
-export const getAbnormalUnfinishedAdd = (prodLine,doc_no,item_code,pc_date,reason,duty ) => {
+export const getAbnormalUnfinishedAdd = (prodLine,doc_no,item_code,pc_date,reason,duty,completeDate ) => {
   return request({
     url: '/production/abnormalUnfinishedAdd',
     method: 'get',
-    params:{prodLine,doc_no,item_code,pc_date,reason,duty }
+    params:{prodLine,doc_no,item_code,pc_date,reason,duty,completeDate }
   })
 }
 
+// /production/efficiencyBelowAdd
+export const getEfficiencyBelowAdd = (prodLine,reason ) => {
+  return request({
+    url: '/production/efficiencyBelowAdd',
+    method: 'get',
+    params:{prodLine,reason }
+  })
+}

@@ -5,6 +5,7 @@
         width="80%"
         :close-on-click-modal="false"
         :destroy-on-close="true"
+        append-to-body
     >
         <SearchTable
             :data="data"

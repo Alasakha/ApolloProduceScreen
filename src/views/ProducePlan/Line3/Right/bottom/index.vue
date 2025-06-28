@@ -21,7 +21,7 @@ const config = reactive({
     header: ['工作中心', '故障类型', '申报时间', '客户单号', '规格', '故障描述', '申请人'],
     data: [],
     index: true,
-    columnWidth: [80, 80, 120, 120, 120, 300, ],
+    columnWidth: [50, 100, 100, 180, 150, 160,200,150 ],
     align: [],
     rowNum: 6,
     headerBGC: '#0d47a1',
