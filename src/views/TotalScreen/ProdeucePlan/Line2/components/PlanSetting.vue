@@ -56,7 +56,7 @@
           <div>责任人</div>
         </div>
         <div v-for="hour in workingHours" :key="hour" class="grid grid-cols-8 gap-4 mb-2 items-center">
-          <div class="text-center">{{ hour-1 }}-{{ hour }} 时</div>
+          <div class="text-center">{{ hour }}-{{ hour+1 }} 时</div>
           <div class="text-center">{{ carModels[hour - 1] || '' }}</div>
           <div class="text-center">{{ planHourData[hour] || 0  }}</div>
           <div class="text-center">{{ actualHourData[hour] || 0}}</div>
@@ -127,7 +127,7 @@ const emit = defineEmits(['update-data']);
 
 // 工作时间范围（7-23点）
 const workingHours = computed(() => {
-  return Array.from({ length: 17 }, (_, i) => i + 7);
+  return Array.from({ length: 18 }, (_, i) => i + 7);
 });
 
 // 登录相关
