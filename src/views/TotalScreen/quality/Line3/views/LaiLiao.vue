@@ -44,7 +44,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { getCheckPie, getCheckInfo } from '@/api/getIncomingInfo';
+import { getQualityCheckPie, getQualityCheck } from '@/api/getQuiltyinfo';
 import { eventBus } from '@/utils/eventbus';
 import { formatPieChartData } from '@/utils/map';
 import { createChartOption } from './data';
@@ -82,8 +82,8 @@ const rawData = ref([]);
 
 // 饼图数据加载
 const fetchData = () => {
-  getCheckPie({ type: 1 }).then(res => {
-    const formatted = formatPieChartData(res.data, 'caigou', 'total');
+  getQualityCheckPie({ type: 1 }).then(res => {
+    const formatted = formatPieChartData(res.data, 'jianyan', 'total');
     rawData.value = formatted.filter(item => item.value !== 0).sort((a, b) => b.value - a.value);
     isDataEmpty.value = rawData.value.length === 0;
     nextTick(() => {
@@ -107,7 +107,7 @@ const handleChartClick = async (params: any) => {
     dialogVisible.value = true;
     tableLoading.value = true;
     try {
-      const res = await getCheckInfo({ caigou: params.name, type: 1 });
+      const res = await getQualityCheck({ jianyan: params.name, type: 1 });
       if (requestId === currentRequestId.value) {
         detailData.value = Array.isArray(res.data) ? res.data : [];
       }
@@ -126,7 +126,7 @@ const openDetailDialog = async () => {
   dialogVisible.value = true;
   tableLoading.value = true;
   try {
-    const res = await getCheckInfo({ type: 1 });
+    const res = await getQualityCheck({ type: 1 });
     detailData.value = Array.isArray(res.data) ? res.data : [];
   } catch {
     detailData.value = [];

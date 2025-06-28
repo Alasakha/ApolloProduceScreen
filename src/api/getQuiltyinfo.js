@@ -190,3 +190,22 @@ export const getMistakesAndOmissions = (udf04 ) => {
     params: { udf04 }
   })
 }
+
+// /quality/qualityCheck
+export const getQualityCheck = (params ) => {
+  return request({
+    url: '/quality/qualityCheck',
+    method: 'post',
+    params: params,
+    data: ''
+  })
+}
+// /quality/qualityCheckPie
+export const getQualityCheckPie = (params ) => {
+  return request({
+    url: '/quality/qualityCheckPie',
+    method: 'post',
+    params: params,
+    data: ''
+  })
+}
