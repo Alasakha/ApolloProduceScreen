@@ -127,7 +127,7 @@ const emit = defineEmits(['update-data']);
 
 // 工作时间范围（7-23点）
 const workingHours = computed(() => {
-  return Array.from({ length: 18 }, (_, i) => i + 7);
+  return Array.from({ length: 17 }, (_, i) => i + 7);
 });
 
 // 登录相关
