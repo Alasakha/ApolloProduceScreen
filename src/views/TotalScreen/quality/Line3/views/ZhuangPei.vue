@@ -58,7 +58,7 @@
   const tableLoading = ref(false);
   const detailData = ref([]);
   const dialogTitle = ref('装配检验超时');
-  const pageTitle = ref('装配检验超时');
+  // const title = ref('装配检验超时');
   const selectedPurchaser = ref('');
   const currentRequestId = ref(0);  
   
@@ -116,20 +116,20 @@
   };
   
   // 详细数据按钮
-  const openDetailDialog = async () => {
-    selectedPurchaser.value = '';
-    dialogTitle.value = pageTitle.value;
-    dialogVisible.value = true;
-    tableLoading.value = true;
-    try {
-      const res = await getCheckOutTime({ type: 1 });
-      detailData.value = Array.isArray(res.data) ? res.data : [];
-    } catch {
-      detailData.value = [];
-    } finally {
-      tableLoading.value = false;
-    }
-  };
+  // const openDetailDialog = async () => {
+  //   selectedPurchaser.value = '';
+  //   dialogTitle.value = pageTitle.value;
+  //   dialogVisible.value = true;
+  //   tableLoading.value = true;
+  //   try {
+  //     const res = await getCheckOutTime({ type: 1 });
+  //     detailData.value = Array.isArray(res.data) ? res.data : [];
+  //   } catch {
+  //     detailData.value = [];
+  //   } finally {
+  //     tableLoading.value = false;
+  //   }
+  // };
   
   onMounted(() => {
     fetchData();

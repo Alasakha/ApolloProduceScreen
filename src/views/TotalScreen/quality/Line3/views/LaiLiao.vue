@@ -120,20 +120,20 @@ const handleChartClick = async (params: any) => {
 };
 
 // 详细数据按钮
-const openDetailDialog = async () => {
-  selectedPurchaser.value = '';
-  dialogTitle.value = '来料检验超时';
-  dialogVisible.value = true;
-  tableLoading.value = true;
-  try {
-    const res = await getQualityCheck({ type: 1 });
-    detailData.value = Array.isArray(res.data) ? res.data : [];
-  } catch {
-    detailData.value = [];
-  } finally {
-    tableLoading.value = false;
-  }
-};
+// const openDetailDialog = async () => {
+//   selectedPurchaser.value = '';
+//   dialogTitle.value = '来料检验超时';
+//   dialogVisible.value = true;
+//   tableLoading.value = true;
+//   try {
+//     const res = await getQualityCheck({ type: 1 });
+//     detailData.value = Array.isArray(res.data) ? res.data : [];
+//   } catch {
+//     detailData.value = [];
+//   } finally {
+//     tableLoading.value = false;
+//   }
+// };
 
 onMounted(() => {
   fetchData();

@@ -118,20 +118,20 @@
   };
   
   // 详细数据按钮
-  const openDetailDialog = async () => {
-    // selectedPurchaser.value = '';
-    // dialogTitle.value = '本月错漏检累计次数';
-    // dialogVisible.value = true;
-    // tableLoading.value = true;
-    // try {
-    //   const res = await getCheckInfo({ type: 1 });
-    //   detailData.value = Array.isArray(res.data) ? res.data : [];
-    // } catch {
-    //   detailData.value = [];
-    // } finally {
-    //   tableLoading.value = false;
-    // }
-  };
+  // const openDetailDialog = async () => {
+  //   // selectedPurchaser.value = '';
+  //   // dialogTitle.value = '本月错漏检累计次数';
+  //   // dialogVisible.value = true;
+  //   // tableLoading.value = true;
+  //   // try {
+  //   //   const res = await getCheckInfo({ type: 1 });
+  //   //   detailData.value = Array.isArray(res.data) ? res.data : [];
+  //   // } catch {
+  //   //   detailData.value = [];
+  //   // } finally {
+  //   //   tableLoading.value = false;
+  //   // }
+  // };
   
   onMounted(() => {
     fetchData();

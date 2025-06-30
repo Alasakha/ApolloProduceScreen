@@ -94,9 +94,9 @@
             <div class="energy-block">
               <div class="energy-title">能耗监控</div>
               <div class="text-white text-sm">
-                <div>当日开机时长：{{ dayRunTime }}</div>
-                <div>设备功耗：{{ power }}</div>
-                <div>当日耗电量：{{ pparams - blockowerdevice }}</div>
+                <div>当日开机时长：{{ device.hourBetween }}</div>
+                <div>设备功耗：{{ device.power }}</div>
+                <div>当日耗电量：{{ Number(device.power) * Number(device.hourBetween) }}</div>
               </div>
             </div>
           </div>

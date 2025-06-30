@@ -57,13 +57,13 @@
         </div>
         <div v-for="hour in workingHours" :key="hour" class="grid grid-cols-8 gap-4 mb-2 items-center">
           <div class="text-center">{{ hour }}-{{ hour+1 }} 时</div>
-          <div class="text-center">{{ carModels[hour - 1] || '' }}</div>
-          <div class="text-center">{{ planHourData[hour] || 0  }}</div>
-          <div class="text-center">{{ actualHourData[hour] || 0}}</div>
-          <div class="text-center">{{ calculateDiff(hour) }}</div>
+          <div class="text-center">{{ carModels[hour] || '' }}</div>
+          <div class="text-center">{{ planHourData[hour+1] || 0  }}</div>
+          <div class="text-center">{{ actualHourData[hour+1] || 0}}</div>
+          <div class="text-center">{{ calculateDiff(hour+1) }}</div>
           <div>
             <el-input-number 
-              v-model="planNumbers[hour - 1]" 
+              v-model="planNumbers[hour]" 
               :min="0"
               size="small"
               placeholder="请输入产量"
@@ -72,7 +72,7 @@
           </div>
           <div>
             <el-input 
-              v-model="remarks[hour - 1]"
+              v-model="remarks[hour]"
               size="small"
               placeholder="请输入原因分析"
               class="w-full"
@@ -80,7 +80,7 @@
           </div>
           <div>
             <el-input 
-              v-model="duties[hour - 1]"
+              v-model="duties[hour]"
               size="small"
               placeholder="请输入责任人"
               class="w-full"
@@ -160,7 +160,7 @@ const totalDiff = computed(() => {
   return totalActual.value - totalPlan.value;
 });
 const totalWorkshop = computed(() => {
-  return workingHours.value.reduce((sum, hour) => sum + (Number(planNumbers.value[hour - 1]) || 0), 0);
+  return workingHours.value.reduce((sum, hour) => sum + (Number(planNumbers.value[hour]) || 0), 0);
 });
 
 // 计算产量差异
@@ -204,7 +204,8 @@ const handleDevModeOpen = async () => {
     // 处理计划产能数据（planHour）
     const planData = {};
     data.planHour.forEach(item => {
-      planData[item.hour2] = item.total;
+      // hour2: "8" 表示 7-8点
+      planData[item.hour2 - 1] = item.total;
     });
     planHourData.value = planData;
 
@@ -268,7 +269,8 @@ const handleLogin = async () => {
       // 处理计划产能数据（planHour）
       const planData = {};
       data.planHour.forEach(item => {
-        planData[item.hour2] = item.total;
+        // hour2: "8" 表示 7-8点
+        planData[item.hour2 - 1] = item.total;
       });
       planHourData.value = planData;
 
