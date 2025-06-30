@@ -1,0 +1,8 @@
+@import "tailwindcss";
+@theme {
+  --breakpoint-hd: 40rem;      /* 720px */
+  --breakpoint-fullhd: 48rem ; /* 1080px */
+  --breakpoint-2k: 64rem;      /* 1280px 这里稍作调整，如果你要用2560，需要更大 */
+  --breakpoint-2k-plus: 80rem; /* 2560px */
+  --breakpoint-4k: 96rem ;     /* 3840px */
+}
