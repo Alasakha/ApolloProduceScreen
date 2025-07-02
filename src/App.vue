@@ -17,7 +17,7 @@ onMounted(async () => {
     intervalId = setInterval(() => {
       console.log("🔄 触发全局更新事件");
       eventBus.emit("refreshData");
-    }, 1000*60*3);
+    }, 1000*60*5);
   }
 });
 

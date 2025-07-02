@@ -131,7 +131,7 @@ const rukuColumns = [
 
 // 出库表头
 const chukuColumns = [
-    { prop: 'mo_d_id', label: '出库明细ID' },
+    { prop:'udf021',label:'客户单号'},
     { prop: 'ty003', label: '出库日期' },
     { prop: 'warehouse_name', label: '仓库名称' },
     { prop: 'warehouseKeeper', label: '仓管员' },
@@ -141,7 +141,6 @@ const chukuColumns = [
     { prop: 'itemSpecification', label: '规格' },
     { prop: 'docNo', label: '单据号' },
     { prop: 'item_code', label: '物料编码' },
-    { prop: 'total', label: '总数' }
 ]
 
 // 动态表头
@@ -164,7 +163,13 @@ const handleChartClick = async (params) => {
                 // 检查这个请求是否是最新的
                 if (requestId === currentRequestId.value) {
                     if (res.data && Array.isArray(res.data)) {
-                        detailData.value = res.data;
+                        const formatDetailData = (data) => {
+                            return data.map(item => ({
+                                ...item,
+   
+                            }));
+                        };
+                        detailData.value = formatDetailData(res.data);
                     } else {
                         detailData.value = [];
                         ElMessage.warning('暂无详细数据');
@@ -176,7 +181,19 @@ const handleChartClick = async (params) => {
                 // 检查这个请求是否是最新的
                 if (requestId === currentRequestId.value) {
                     if (res.data && Array.isArray(res.data)) {
-                        detailData.value = res.data;
+                        const formatDetailData = (data) => {
+                            return data.map(item => ({
+                                ...item,
+                                required_qty: item.required_qty != null && item.required_qty !== ''
+                                  ? Number(item.required_qty).toFixed(0)
+                                  : '',
+                                issued_qty: item.issued_qty != null && item.issued_qty !== ''
+                                  ? Number(item.issued_qty).toFixed(0)
+                                  : '',
+   
+                            }));
+                        };
+                        detailData.value = formatDetailData(res.data);
                     } else {
                         detailData.value = [];
                         ElMessage.warning('暂无详细数据');

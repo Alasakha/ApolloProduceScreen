@@ -67,3 +67,12 @@ export const getrawMaterialMonitoring = () => {
     method: 'get',
   })
 }
+
+// /injection/rawMaterialMonitoringAdd
+export const getRawMaterialMonitoringAdd =(zhsCode,reason ) =>{
+  return request({
+    url: '/injection/rawMaterialMonitoringAdd',
+    method: 'get',
+    params:{zhsCode,reason}
+  })
+}

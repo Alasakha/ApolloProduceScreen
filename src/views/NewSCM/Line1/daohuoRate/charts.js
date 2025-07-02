@@ -3,6 +3,10 @@ export const createChartOption = (data) => {
   const names = data.map(item => item.purchaserName);
   const deliveryRates = data.map(item => (item.deliveryRate * 100).toFixed(0));
   const productionRates = data.map(item => (item.productionRate * 100).toFixed(0));
+  
+  // 判断是否显示图例
+  const hasDelivery = deliveryRates.some(rate => parseFloat(rate) > 0);
+  const hasProduction = productionRates.some(rate => parseFloat(rate) > 0);
 
   return {
     tooltip: {
@@ -20,7 +24,9 @@ export const createChartOption = (data) => {
       }
     },
     legend: {
-      data: ['预交达成率', '准时排交达成率'],
+      data: hasDelivery && hasProduction ? ['预交达成率', '准时排交达成率'] : 
+            hasDelivery ? ['预交达成率'] : 
+            hasProduction ? ['准时排交达成率'] : ['预交达成率', '准时排交达成率'],
       textStyle: {
         color: '#fff'
       },
@@ -58,9 +64,9 @@ export const createChartOption = (data) => {
         itemStyle: {
           color: '#006cff'
         },
-        barWidth: '40%',
+        barWidth: hasDelivery && hasProduction ? '40%' : '60%',
         label: {
-          show: true,
+          show: hasDelivery,
           position: 'top',
           formatter: '{c}%',
           color: '#fff',
@@ -74,9 +80,9 @@ export const createChartOption = (data) => {
         itemStyle: {
           color: '#60cda0'
         },
-        barWidth: '40%',
+        barWidth: hasDelivery && hasProduction ? '40%' : '60%',
         label: {
-          show: true,
+          show: hasProduction,
           position: 'top',
           formatter: '{c}%',
           color: '#fff',

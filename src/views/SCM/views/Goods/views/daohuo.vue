@@ -3,12 +3,11 @@ import { ref, computed, watch, onMounted, nextTick, onBeforeUnmount } from 'vue'
 import * as echarts from 'echarts';
 import { getGoodsRate } from '@/api/getScmInfo.js';
 import { eventBus } from '@/utils/eventbus';
+
 // 1. 响应式数据
 const rawData = ref([]);
 const qualityIndicators = ref(null);
 let chartInstance = null;
-
-
 
 // 3. 监听数据变化，确保获取数据后绘制
 watch(rawData, () => {
@@ -22,7 +21,6 @@ const fetchData = () => {
       rawData.value = res.data;
     })
     .catch(() => {
-      console.log('数据获取失败');
     });
 };
 
@@ -119,13 +117,9 @@ const updateChart = () => {
         fontWeight: 'bold'
       }
     },
-
   ]
 };
-
 chartInstance.setOption(option);
-
-
 };
 
 // 7. 监听窗口变化，自适应图表
@@ -199,6 +193,5 @@ onBeforeUnmount(() => {
   display: flex;
   height: 100%;
 }
-
 
 </style>

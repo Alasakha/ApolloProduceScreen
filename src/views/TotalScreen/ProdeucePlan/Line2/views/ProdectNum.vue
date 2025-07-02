@@ -97,16 +97,14 @@ const alignCarModelsWithCategories = (carModels) => {
 const processActualData = (hourData) => {
   const completeCategories = [];
   const completeValues = [];
-  
-  // 从7点到23点遍历
-  for (let hour = 7; hour <= 23; hour++) {
+  // 横坐标 7~22（如果你想显示到22-23时）
+  for (let hour = 7; hour <= 22; hour++) {
     completeCategories.push(hour.toString());
-    completeValues.push(hourData[hour] || 0);
+    // 取 hour2=hour+1 的数据
+    completeValues.push(hourData[hour + 1] || 0);
   }
-  
   return { completeCategories, completeValues };
-};
-
+};  
 // 请求数据 & 渲染图表
 const fetchData = () => {
   getCapacityHour(prodLine)
@@ -123,18 +121,21 @@ const fetchData = () => {
       categories.value = completeCategories;
       values.value = completeValues;
 
-      // 处理PMC排产数据（planHour）
-      const planData = processArrayToObject(data.planHour, 'hour2', 'total');
+// 处理PMC排产数据（planHour）
+const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
-      for (let hour = 7; hour <= 23; hour++) {
-        planValues.push(planData[hour] || 0);
+      for (let hour = 7; hour <= 22; hour++) {
+        planValues.push(planData[hour + 1] || 0);
       }
       standard.value = planValues;
 
-      // 处理车间小时产量数据（从reasonHour中提取）
+      // 处理车间小时产量数据（reasonHour）- 生产排产
       const workshopData = processArrayToObject(data.reasonHour, 'hour2', 'total');
-      const planNumbers = updatePlanNumbers(workshopData);
-      alignPlanNumbersWithCategories(planNumbers);
+      const workshopValues = [];
+      for (let hour = 7; hour <= 22; hour++) {
+        workshopValues.push(workshopData[hour + 1] || 0);
+      }
+      alignedPlanNumbers.value = workshopValues;
 
       // 处理备注数据
       const remarkData = processArrayToObjectWithReason(data.reasonHour, 'hour2', 'reason');

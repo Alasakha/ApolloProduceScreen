@@ -2,7 +2,7 @@
   <ExceptionTable
       :ischarts="true"
     title="入库异常处理进度表"
-    dialog-title="入库异常处理详情"
+    dialogTitle="入库异常处理详情"
     :loading="inStoreLoading"
     :config="config"
     export-file-name="入库异常处理数据"
@@ -20,6 +20,7 @@ import ExceptionTable from '@/components/WMS/ExceptionTable/index.vue'
 const inStoreLoading = ref(true)
 const processedData = ref([]) // 添加响应式变量存储饼图数据 
 
+// 生成表图钩子
 const config = reactive({
   header: [ '仓管员','仓位','检验单号','品名','规格','到货单号','品号'],
   data: [], // 初始为空
@@ -82,7 +83,6 @@ const processData = (data) => {
     .filter((item:any) => item.value !== 0 && item.name)
     .sort((a:any, b:any) => b.value - a.value)
 
-    console.log(processedData.value)
 }
 
 
@@ -91,7 +91,6 @@ const processData = (data) => {
 const fetchData2 = () => {
 const params = { type: 1 };
 gettimelyAccountingRateDetailPie(params).then(res => {
-  console.log(res.data)
     processData(res.data);
 }).catch(() => {
 });

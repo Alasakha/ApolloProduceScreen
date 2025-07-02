@@ -119,7 +119,7 @@ const planLoading = ref(false);
 const props = defineProps({
   prodLine: {
     type: String,
-    required: true
+    required: true  
   }
 });
 
@@ -204,8 +204,7 @@ const handleDevModeOpen = async () => {
     // 处理计划产能数据（planHour）
     const planData = {};
     data.planHour.forEach(item => {
-      // hour2: "8" 表示 7-8点
-      planData[item.hour2 - 1] = item.total;
+      planData[item.hour2] = item.total;
     });
     planHourData.value = planData;
 
@@ -269,8 +268,7 @@ const handleLogin = async () => {
       // 处理计划产能数据（planHour）
       const planData = {};
       data.planHour.forEach(item => {
-        // hour2: "8" 表示 7-8点
-        planData[item.hour2 - 1] = item.total;
+        planData[item.hour2] = item.total;
       });
       planHourData.value = planData;
 

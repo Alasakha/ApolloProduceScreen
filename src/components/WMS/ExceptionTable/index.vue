@@ -33,7 +33,7 @@
   <!-- 详情弹窗 -->
   <el-dialog
     v-model="dialogVisible"
-    :title="dialogTitle"
+    :title="props.dialogTitle"
     :width="dialogWidth"
     :destroy-on-close="true"
     :fullscreen="false"

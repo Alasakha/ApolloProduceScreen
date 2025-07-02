@@ -8,7 +8,7 @@
     @close="emit('close')"
   >
     <div class="table-wrapper">
-      <el-table :data="paginatedData" max-height="60vh" style="width: 100%">
+      <el-table :data="paginatedData" v-loading="loading" max-height="60vh" style="width: 100%">
         <template v-for="col in columns" :key="col.prop">
           <el-table-column
             v-if="col.prop !== 'action'"
@@ -60,6 +60,7 @@ const props = defineProps<{
     label: string
     width?: string | number
   }>
+  loading?: boolean
 }>()
 
 const emit = defineEmits(['update:modelValue', 'close'])
@@ -92,9 +93,6 @@ const handleFill = async (row: any) => {
     // 用户取消或接口异常
   }
 }
-
-console.log('columns:', props.columns)
-console.log('data:', paginatedData.value)
 </script>
 
 <style scoped>

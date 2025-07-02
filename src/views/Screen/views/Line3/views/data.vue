@@ -3,9 +3,11 @@
         <dv-border-box12>
             <div class="box1"> 
           <div class="w-full h-full">
-              <div ref="qualityIndicators" class="chart-container w-full h-[80%]"></div>
-              <div class="showData">
-                异常总数：{{ rawData.length }} 已填写数量：{{ rawData.length }}
+              <div ref="qualityIndicators" class="chart-container w-full h-[85%]"></div>
+              <div class="showData flex gap-4 items-center ml-4 mb-2">
+                异常总数：<span style="color:#23a7dc">{{ totalNum }}</span>
+                未填写数量：<span style="color:#ff4d4f">{{ unWriteNum }}</span>
+                已填写数量：<span style="color:#67c23a">{{ hasWriteNum }}</span>
               </div>
               <dv-button class=" w-[11vw] pl-4" :color="'#23a7dc'"  :bg="false" @click="() => opendialog(prodLine)">详细数据</dv-button>
             </div>
@@ -25,7 +27,7 @@
   </template>
   
   <script setup>
-import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
+import { ref, onMounted, onBeforeUnmount, watch, nextTick,computed } from 'vue';
 import { getResponsityRank,getAbnormalDetail } from '@/api/getQuiltyinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
@@ -39,6 +41,7 @@ const title = ref('今日功性能不良'); // 对话框标题
 const pageTitle = ref('今日功性能不良'); // 新增：固定的页面标题
 
 const reasonType = 1;
+
 
 const qualityIndicators = ref(null);
 const rawData = ref([]);
@@ -55,7 +58,7 @@ const gridColumns = [
   { prop: 'createDate', label: '发现时间' },
   { prop: 'ta002', label: '工单单号' },
   { prop: 'ta006', label: '品号' },
-  { prop: 'mb002', label: '车型' },
+  { prop: 'mb002', label: '车型' }, 
   { prop: 'peopleName', label: '发现人' },
   { prop: 'admin_UNIT_NAME', label: '责任部门'},
   { prop: 'ngResponPeople', label: '责任人'},
@@ -68,6 +71,7 @@ const gridColumns = [
 const getDetail = () => {
   getAbnormalDetail(prodLine, reasonType)
     .then(res => {
+      console.log(res.data);
       gridData.value = res.data;
     });
 }
@@ -77,6 +81,29 @@ const opendialog = () => {
   getDetail()
 };
 
+const totalNum = computed(() => {
+  // rawData.value 里每个 item.value 是异常数量
+  return rawData.value.reduce((sum, item) => sum + (Number(item.value) || 0), 0);
+}); 
+
+const unWriteNum = computed(() => gridData.value.length - hasWriteNum.value);
+
+const hasWriteNum = computed(() => {
+  return gridData.value.filter(item =>
+    (item.ngReason && item.ngReason.trim() !== '') &&
+    (item.ngHandle && item.ngHandle.trim() !== '')
+  ).length;
+});
+
+const unWriteNgNames = computed(() => {
+  return gridData.value
+    .filter(item =>
+      (!item.ngReason || item.ngReason.trim() === '') ||
+      (!item.ngHandle || item.ngHandle.trim() === '')
+    )
+    .map(item => item.ngName)
+    .filter((v, i, arr) => arr.indexOf(v) === i); // 去重
+});
 
 const fetchData = () => {
   getResponsityRank(prodLine, reasonType)
@@ -105,19 +132,28 @@ const handleChartClick = (params) => {
 
 const processData = (data) => {
   const formatted = formatPieChartData(data, 'ngName', 'total');
-  rawData.value = formatted.map(item => ({
-    name: item.name || '未知',
-    value: item.value ? parseInt(item.value, 10) : 0
-  }));
+  rawData.value = formatted.map(item => {
+    const isUnWrite = unWriteNgNames.value.includes(item.name);
+    return {
+      ...item,
+      label: isUnWrite ? { color: '#ff4d4f', fontWeight: 'bold' } : {},
+      labelLine: isUnWrite ? { lineStyle: { color: '#ff4d4f', width: 2 } } : {},
+      // itemStyle: isUnWrite ? { borderColor: '#ff4d4f', borderWidth: 2 } : {}, // 可选：扇区边框
+    };
+  });
   isDataEmpty.value = rawData.value.length === 0;
 };
 
-watch(rawData, () => {
+watch([rawData, gridData], () => {
   nextTick(() => {
+    // 这里 unWriteNgNames.value 一定是最新的
     initChart();
-    const option = createChartOption(pageTitle.value, rawData.value); // 使用固定的页面标题
+    const option = createChartOption(pageTitle.value, rawData.value, {
+      highlightLegend: true,
+      highlightNames: unWriteNgNames.value
+    });
     setOption(option);
-    onClick(handleChartClick); // ✅ 恢复点击事件绑定
+    onClick(handleChartClick);
   });
 }, { deep: true, immediate: true });
 

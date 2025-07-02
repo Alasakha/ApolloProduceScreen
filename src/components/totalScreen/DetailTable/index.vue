@@ -9,6 +9,7 @@
     class="custom-dialog"
   >
     <div class="detail-table">
+
       <el-table 
         v-loading="loading"
         :data="tableData" 
@@ -16,12 +17,15 @@
         style="width: 100%"
         height="670"
       >
+      <el-table-column type="index" label="序号" width="60" align="center"  :fixed/>
         <template v-for="(header, index) in headers" :key="header">
+          
+
           <el-table-column 
             v-if="header !== '原因'"
             :prop="header" 
             :label="header" 
-            :fixed="index === 0"
+          
           />
           <el-table-column 
             v-else

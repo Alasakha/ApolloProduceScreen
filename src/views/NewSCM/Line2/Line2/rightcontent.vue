@@ -35,7 +35,7 @@ const getYesterday = () => {
 
 const queryDate = getYesterday(); // 昨天的日期
 // 原始 header
-const fullHeader = ['状态',
+const fullHeader = [
   '采购内勤', '供应商','到货单号','品名', '品号','规格',
   '不合格数量','检验日期', '问题点', '判断结果' ,'处理时长','完成期限','处理结果',
 ]
@@ -50,8 +50,8 @@ const config = reactive({
   rawData: [],
   detailData: [], // 添加用于详细信息显示的数据
   index: true,
-  columnWidth: [50,80,100],
-  dialogWidth: [70,200,150,150,200],
+  columnWidth: [50,100,100,120,90,120,130,100,100,100,100,100,100],
+  dialogWidth: [70,100,150,150,180,130,350,100,100,100,100,100,130],
   align: [],
   rowNum: 5,
   headerHeight:25,

@@ -12,10 +12,11 @@
      <!-- 弹窗 -->
     <TableDialog
     v-model="dialogTableVisible"
-    :title= title
+    :title="title"
     width="60vw"
     :tableData="gridData"
     :columns="gridColumns"
+    :loading="tableLoading"
   />
 </template>
 
@@ -38,33 +39,35 @@ const qualityIndicators = ref(null);
 const rawData = ref([]);
 const isLoading = ref(true);
 const isDataEmpty = ref(false); 
-
+const tableLoading = ref(false);
 
 const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
 const gridData = ref([]);
 const gridColumns = [
-  { prop: 'guZhangTypeName', label: '故障类型' },
-  { prop: 'startRemark', label: '故障描述' },
-  { prop: 'startPeopleName', label: '申报人' },
-  { prop: 'startTime', label: '申报时间' },
-  { prop: 'endTime', label: '故障结束时间' },
-  { prop: 'dutyPeopleName', label: '故障责任人' },
-  { prop: 'endPeopleName', label: '故障解除人' },
+  { prop: 'ngName', label: '不良问题' },
+  { prop: 'peopleName', label: '申报人' },
+  { prop: 'createDate', label: '申报时间' },
+  { prop: 'ngResponPeople', label: '责任人' },
+  { prop: 'admin_UNIT_NAME', label: '责任部门' },
   { prop: 'ta001', label: '工单号1' },
   { prop: 'ta002', label: '工单号2' },
-  { prop: 'dutyDeptName', label: '故障责任部门' }
-];
+  { prop: 'mb002', label: '车型' },
+  { prop: 'ta006', label: '品号' }
+]
 
 
 
 const opendialog = () => {
   dialogTableVisible.value = true;
+  tableLoading.value = true; // 开始加载
   title.value = pageTitle.value; // 使用固定的页面标题
   getAbnormalDetail('', reasonType, '', '', '', '', dayType)
- 
     .then(res => {
       gridData.value = res.data;
+    })
+    .finally(() => {
+      tableLoading.value = false; // 加载结束
     });
 };
 

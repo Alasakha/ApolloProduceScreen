@@ -63,7 +63,7 @@
             </template>
           </el-table-column>
           <el-table-column 
-            v-for="(header, index) in config.fullHeader.slice(1)" 
+            v-for="(header, index) in config.fullHeader" 
             :key="header" 
             :prop="header" 
             :label="header" 
@@ -238,7 +238,7 @@
       detailData.value = sourceData.map((row: any[], index: number) => {
         const obj: any = {}
         // 跳过第一列，从第二列开始
-        headers.slice(1).forEach((header: string, idx: number) => {
+        headers.forEach((header: string, idx: number) => {
           obj[header] = row[idx + 1] // 使用 idx + 1 来跳过第一列
         })
         // 使用rawData中的source_id_roid

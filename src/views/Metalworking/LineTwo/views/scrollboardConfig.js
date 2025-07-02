@@ -11,7 +11,7 @@ const config = reactive({
   ],
   data: [],
   rawData: [], // 保存原始数据
-  columnWidth: [50,70,70,70,100,80,120,100,100,200,80],
+  columnWidth: [50,70],
   dialogcolumnWidth: [120,120,120,130,100,150,250,150,120,220,80],
   index: true,
   align: [],

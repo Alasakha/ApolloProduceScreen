@@ -16,7 +16,7 @@ const config1 = reactive({
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[],
+  columnWidth:[50,100,100,100,100,100,100],
   rowNum: 5,
   showTooltip:true,
 });
@@ -29,7 +29,7 @@ const config2 = reactive({
   carousel: 'page',
   waitTime: 5000,
   headerHeight: 25,
-  columnWidth:[],
+  columnWidth:[50,100,100,100,100,100,100],
   rowNum: 5,
   showTooltip:true,
 });
@@ -93,7 +93,7 @@ const fetchData = () => {
 
       config2.data = name.value[1].length
         ? name.value[1]
-        : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+        : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
     })
     .catch(() => {
       console.log('数据获取失败');

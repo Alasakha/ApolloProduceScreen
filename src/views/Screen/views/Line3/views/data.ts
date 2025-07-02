@@ -1,19 +1,24 @@
-
 const size = window.devicePixelRatio ;
 const getFontSize = () =>size>=2? 10 : size >= 1.5 ? 15 : 22;  
 
+interface ChartOptionExtra {
+  highlightLegend?: boolean;
+  highlightNames?: string[];
+}
+
 // createChartOption.ts
-export function createChartOption(title: string, rawData: any) {
+export function createChartOption(title: string, rawData: any, options: ChartOptionExtra = {}) {
+    const { highlightLegend  = false, highlightNames = [] } = options;
     const isEmpty = !rawData || rawData.length === 0;
   
     const data = isEmpty
-      ? [{ name: '暂无异常', value: 1, itemStyle: { color: 'green 	' } }]
+      ? [{ name: '暂无异常', value: 1, itemStyle: { color: 'green' } }]
       : rawData;
   
     return {
 //       color: [
 //         '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-//         '#247BA0',  // 深海蓝
+//         '#247BA0',  // 深海
 // '#70C1B3',  // 湖水绿
 // '#B2DBBF', // 薄荷绿
 // '#F3FFBD',  // 柠檬黄
@@ -45,7 +50,7 @@ export function createChartOption(title: string, rawData: any) {
         left: 'center',
         textStyle: {
           color: '#ffffff',
-           fontSize:size>=2? 6 : size >= 1.5 ? 10 : 15,
+          fontSize: size >= 2 ? 6 : size >= 1.5 ? 10 : 15,
         }
       },
       series: [
@@ -56,16 +61,25 @@ export function createChartOption(title: string, rawData: any) {
           label: {
             show: true,
             position: 'outside',
-            
-            formatter: (params: any) => {
-                if (isEmpty) return `{name|暂无异常}`;
-                return `{name|${params.name}}\n{value|${params.value} 件}  {percent|${params.percent}%}`;
-              },
+            formatter: (params) => {
+              const isUnWrite = highlightLegend && highlightNames && highlightNames.includes(params.name);
+              console.log(params.name, isUnWrite);
+              const nameTag = isUnWrite ? 'red' : 'name';
+              const icon = isUnWrite ? '❗' : '';
+              if (isEmpty) return `{name|暂无异常}`;
+              return `${icon}{${nameTag}|${params.name}}\n{value|${params.value} 件}  {percent|${params.percent}%}`;
+            },
             rich: {
               name: {
                 fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
-                  color: '#fff',
-                  lineHeight: 15
+                color: '#fff',
+                lineHeight: 15
+              },
+              red: {
+                fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
+                color: '#ff4d4f',
+                fontWeight: 'bold',
+                lineHeight: 15
               },
               value: {
                 fontSize: size >= 2 ? 7 : size >= 1.5 ? 10 : 16,
@@ -76,6 +90,11 @@ export function createChartOption(title: string, rawData: any) {
                 color: '#66ccff'
               }
             }
+          },
+          labelLine: {
+            show: true,
+            length: 15,
+            length2: 10
           },
           emphasis: {
             itemStyle: {

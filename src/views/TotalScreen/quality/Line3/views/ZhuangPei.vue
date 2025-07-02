@@ -63,13 +63,16 @@
   const currentRequestId = ref(0);  
   
   const tableColumns = [
-  { prop: 'ta001', label: '工单单号' },
+  { prop: 'udf021', label: '客户单号' },
   { prop: 'ta006', label: '品号' },
   { prop: 'mb002', label: '品名' },
   { prop: 'mb003', label: '规格' },
   { prop: 'address', label: '车架码' },
   { prop: 'workCenterID', label: '车间' },
   { prop: 'workCenterName', label: '工作中心' },
+  { prop: 'creatTime', label: '送检日期' },
+  { prop: 'ngReason', label: '异常原因' },
+  { prop: 'ngHandle', label: '处理情况' },
   ];
   
   const rawData = ref([]);
@@ -105,7 +108,14 @@
       try {
         const res = await getCheckOutTime('XXJ',selectedPurchaser.value);
         if (requestId === currentRequestId.value) {
-          detailData.value = Array.isArray(res.data) ? res.data : [];
+          const formatDetailData = (data) => {
+            return data.map(item => ({
+              ...item,
+              ta001ta002:
+                (item.ta001 != null && item.ta001 !== '' ? item.ta001 : '') +'-'+(item.ta002 != null && item.ta002 !== '' ? item.ta002 : '')
+            }));
+          };
+          detailData.value = formatDetailData(res.data);
         }
       } catch {
         if (requestId === currentRequestId.value) detailData.value = [];

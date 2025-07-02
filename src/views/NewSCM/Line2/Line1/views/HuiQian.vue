@@ -90,7 +90,8 @@ const queryDate = getYesterday(); // 昨天的日期
         { label: '采购员', prop: 'purchaserName' },
         { label: '供应商名称', prop: 'supplierName' },
         { label: '客户单', prop: 'kehudan' },
-        { label: '到货日期', prop: 'approveDate' }
+        { label: '到货日期', prop: 'approveDate' },
+        { label: '采购单审核时间', prop: 'doc_date' }
         ];
 
     
@@ -109,7 +110,18 @@ const queryDate = getYesterday(); // 昨天的日期
                 // 检查这个请求是否是最新的
                 if (requestId === currentRequestId.value) {
                     if (res.data && Array.isArray(res.data)) {
-                        detailData.value = res.data;
+                        const formatDetailData = (data) => {
+                            return data.map(item => ({
+                                ...item,
+                                doc_date: item.doc_date != null && item.doc_date !== ''
+                                    ? item.doc_date.slice(0, 16)
+                                    : '',
+                                    approveDate: item.approveDate != null && item.approveDate !== ''
+                                    ? item.approveDate.slice(0, 16)
+                                    : ''
+                            }));
+                        };
+                        detailData.value = formatDetailData(res.data);
                     } else {
                         detailData.value = [];
                         ElMessage.warning('暂无详细数据');
