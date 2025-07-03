@@ -6,7 +6,7 @@
       <!-- 第一行 -->
       <Header></Header>
       
-      <Line2 class="pr-2"></Line2>
+      <Line2 class="pr-2 h-[40vh]"></Line2>
         <!-- <div class="work-progress-container">
           <WorkProgress />
         </div> -->

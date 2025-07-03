@@ -1,5 +1,5 @@
 <template>
-<div class=" flex">
+<div class="flex h-[25vh]">
     <BasicData class="pl-4"></BasicData>
     <EffiectOfPerson></EffiectOfPerson>
     <ProductNum/>      

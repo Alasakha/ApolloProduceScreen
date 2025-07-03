@@ -40,8 +40,9 @@ export function createChartOption(data) {
             fontSize: 14,
             formatter: function (params) {
               // 假设 params.value 是“不合格数”，params.percent 是占比
+              
               const roundedPercent = Math.round(params.percent);  // 四舍五入占比
-              return `${params.name} ${params.value}个 (${roundedPercent}%)`;
+              return `${params.name} ${params.data.purchase_total}单 ${params.value}批  (${roundedPercent}%)`;
             }
           },
           labelLine: {  

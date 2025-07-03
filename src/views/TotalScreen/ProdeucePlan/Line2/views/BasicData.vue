@@ -128,7 +128,7 @@ onMounted(() => {
 <style scoped>
 .box1 {
   width: 25%;
-  height: 20vw;
+  height: 100%;
   display: flex;
   flex-wrap: wrap;
   font-size: 18px;

@@ -157,7 +157,6 @@ const chart1 = useEcharts(Indicators1);
 const chart2 = useEcharts(Indicators2);
 
 const drawChart = () => {
-  console.log('drawChart - stanarNum:', EfficentData.stanarNum, 'scanNum:', EfficentData.scanNum);
   
   const option1 = createGaugeOption({
     text: "配置人数",
@@ -170,9 +169,6 @@ const drawChart = () => {
     data: EfficentData.scanNum, 
     max: EfficentData.stanardNum
   });
-
-  console.log('option1:', option1);
-  console.log('option2:', option2);
 
   chart1.setOption(option1);
   chart2.setOption(option2);
@@ -190,11 +186,6 @@ const fetchData = async () => {
   EfficentData.stanardNum = Number(res.data.stanardNum) ?? 0;
   EfficentData.warning = res.data.warning ?? 0;
   EfficentData.reason = res.data.reason || '';
-
-  console.log('EfficentData:', EfficentData);
-  console.log('stanarNum:', EfficentData.stanarNum, typeof EfficentData.stanarNum);
-  console.log('scanNum:', EfficentData.scanNum, typeof EfficentData.scanNum);
-  
   isLoading.value = false;
   nextTick(() => {
     chart1.initChart();
@@ -236,7 +227,7 @@ onMounted(() => {
 <style scoped>
 .box1 {
   width: 25%;
-  height: 20vw;
+  height: 100%;
   display: flex;
   flex-wrap: wrap;
   font-size: 18px;

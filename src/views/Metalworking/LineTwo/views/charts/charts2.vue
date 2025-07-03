@@ -103,6 +103,7 @@ const handleChartClick = async (params) => {
         
         try {
             const res = await getEnterInfo({cangguan:params.name,type:2});
+            console.log(res)
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
                 if (res.data && Array.isArray(res.data)) {
