@@ -32,9 +32,9 @@ tooltip: {
   trigger: 'axis',
   formatter: function(params) {
     const hour = params[0].axisValue; // x 轴的时段
+    const hourNum = Number(hour);
     const index = category.indexOf(hour);
-    let str = `时段${hour-1}-${hour}时 产能<br/>`;
-    
+    let str = `时段${hourNum-1}-${hourNum}时 产能<br/>`;
     // 获取各个系列的值
     const actualValue = params.find(p => p.seriesName === '实际产能')?.value || 0;
     // const planValue = params.find(p => p.seriesName === '生产排产')?.value || 0;
@@ -85,6 +85,9 @@ tooltip: {
       data: category,
       axisLabel: {
         interval: 0,
+        formatter: function(value) {
+          return `${value-1}-${value}`; // 修改 x 轴标签显示，hour2=8 显示为 7-8
+        },
         color: '#fff',
         fontSize: size>=2 ? 5   :size>=1.5? 7 : 12,
       },
@@ -122,7 +125,6 @@ tooltip: {
         label: {
           show: true,
           position: 'top',
-         
           color: 'orange',
           fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
         }

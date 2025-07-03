@@ -90,8 +90,8 @@ const queryDate = getYesterday(); // 昨天的日期
         { label: '采购员', prop: 'purchaserName' },
         { label: '供应商名称', prop: 'supplierName' },
         { label: '客户单', prop: 'kehudan' },
-        { label: '到货日期', prop: 'approveDate' },
-        { label: '采购单审核时间', prop: 'doc_date' }
+        { label: '采购单审核时间', prop: 'approveDate' },
+
         ];
 
     

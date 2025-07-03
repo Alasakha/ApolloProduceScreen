@@ -97,10 +97,10 @@ const alignCarModelsWithCategories = (carModels) => {
 const processActualData = (hourData) => {
   const completeCategories = [];
   const completeValues = [];
-  // 横坐标 7~22
-  for (let hour = 7; hour <= 22; hour++) {
+  // 横坐标 7~23
+  for (let hour = 7; hour <= 24; hour++) {
     completeCategories.push(hour.toString());
-    completeValues.push(hourData[hour + 1] || 0); // hour2=hour+1
+    completeValues.push(hourData[hour] || 0);
   }
   return { completeCategories, completeValues };
 };  
@@ -124,7 +124,7 @@ const fetchData = () => {
       // 处理PMC排产数据（planHour）
       const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
-      for (let hour = 7; hour <= 22; hour++) {
+      for (let hour = 7; hour <= 24; hour++) {
         planValues.push(planData[hour + 1] || 0);
       }
       standard.value = planValues;
@@ -132,8 +132,8 @@ const fetchData = () => {
       // 处理车间小时产量数据（reasonHour）- 生产排产
       const workshopData = processArrayToObject(data.reasonHour, 'hour2', 'total');
       const workshopValues = [];
-      for (let hour = 7; hour <= 22; hour++) {
-        workshopValues.push(workshopData[hour + 1] || 0);
+      for (let hour = 7; hour <= 24; hour++) {
+        workshopValues.push(workshopData[hour] || 0); // hour2="8" 已经代表 7-8 时段
       }
       alignedPlanNumbers.value = workshopValues;
 

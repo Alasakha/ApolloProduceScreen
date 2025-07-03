@@ -56,11 +56,11 @@
           <div>责任人</div>
         </div>
         <div v-for="hour in workingHours" :key="hour" class="grid grid-cols-8 gap-4 mb-2 items-center">
-          <div class="text-center">{{ hour }}-{{ hour+1 }} 时</div>
+          <div class="text-center">{{ hour-1 }}-{{ hour }} 时</div>
           <div class="text-center">{{ carModels[hour] || '' }}</div>
-          <div class="text-center">{{ planHourData[hour+1] || 0  }}</div>
-          <div class="text-center">{{ actualHourData[hour+1] || 0}}</div>
-          <div class="text-center">{{ calculateDiff(hour+1) }}</div>
+          <div class="text-center">{{ planHourData[hour] || 0  }}</div>
+          <div class="text-center">{{ actualHourData[hour] || 0}}</div>
+          <div class="text-center">{{ calculateDiff(hour) }}</div>
           <div>
             <el-input-number 
               v-model="planNumbers[hour]" 
@@ -125,9 +125,9 @@ const props = defineProps({
 
 const emit = defineEmits(['update-data']);
 
-// 工作时间范围（7-23点）
+// 工作时间范围（6-23点）
 const workingHours = computed(() => {
-  return Array.from({ length: 17 }, (_, i) => i + 7);
+  return Array.from({ length: 18 }, (_, i) => i + 7); // 从7开始，因为hour2=7代表6-7时
 });
 
 // 登录相关
@@ -298,10 +298,7 @@ const handleLogin = async () => {
       data.planHour.forEach(item => {
         carModelData[item.hour2] = item.description || '暂无数据';
       });
-      console.log('车型数据:', carModelData);
       updateCarModels(carModelData);
-      console.log('更新后的车型数组:', carModels.value);
-
     } catch (error) {
       console.error('获取数据失败：', error);
     }
@@ -320,7 +317,7 @@ const handleLogin = async () => {
 const updatePlanNumbers = (data) => {
   planNumbers.value = Array(24).fill(0);
   for (const key in data) {
-    const index = parseInt(key, 10) - 1;
+    const index = parseInt(key, 10); // key就是hour2，代表这个小时结束时的时间点
     if (!isNaN(index)) {
       planNumbers.value[index] = parseInt(data[key], 10);
     }
@@ -331,7 +328,7 @@ const updatePlanNumbers = (data) => {
 const updateRemarks = (data) => {
   remarks.value = Array(24).fill('');
   for (const key in data) {
-    const index = parseInt(key, 10) - 1;
+    const index = parseInt(key, 10);
     if (!isNaN(index)) {
       remarks.value[index] = data[key] || '';
     }
@@ -342,7 +339,7 @@ const updateRemarks = (data) => {
 const updateDuties = (data) => {
   duties.value = Array(24).fill('');
   for (const key in data) {
-    const index = parseInt(key, 10) - 1;
+    const index = parseInt(key, 10);
     if (!isNaN(index)) {
       duties.value[index] = data[key] || '';
     }
@@ -353,7 +350,7 @@ const updateDuties = (data) => {
 const updateCarModels = (data) => {
   carModels.value = Array(24).fill('');
   for (const key in data) {
-    const index = parseInt(key, 10) - 1;
+    const index = parseInt(key, 10);
     if (!isNaN(index)) {
       carModels.value[index] = data[key] || '暂无数据';
     }
@@ -378,11 +375,11 @@ const handleConfirm = async () => {
 
     // 只保存工作时间范围内的数据
     const saveData = workingHours.value.map(hour => {
-      const index = hour - 1;
+      const index = hour;
       if (planNumbers.value[index] > -1 || remarks.value[index] || duties.value[index] || carModels.value[index]) {
         return {
           prodLine: props.prodLine,
-          hour: hour.toString(),
+          hour: hour.toString(), // hour2=8 代表 7-8时
           date: dateStr,
           reason: remarks.value[index] || '',
           cl: planNumbers.value[index].toString(),
