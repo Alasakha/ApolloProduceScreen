@@ -5,7 +5,7 @@
                 <!-- <div class="w-full h-[3vh] " ></div> -->
                 <Header></Header>
                 <Line1></Line1>
-                <Line2></Line2>
+                <!-- <Line2></Line2> -->
                 <Line3></Line3>
             </div>
         </dv-border-box11>
@@ -15,7 +15,7 @@
 <script lang="ts" setup>
 import Header from './Header/index.vue'
 import Line1 from './Line1/index.vue'
-import Line2 from './Line2/index.vue'
+// import Line2 from './Line2/index.vue'
 import Line3 from './line3.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { eventBus } from '@/utils/eventbus'

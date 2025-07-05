@@ -25,7 +25,7 @@
         v-model="currentDuty"
         type="text"
         :rows="1"
-        placeholder="请输入责任人1"
+        placeholder="请输入责任人"
         style="margin-top: 10px;"
       />
       <el-date-picker
@@ -70,11 +70,16 @@ const currentCompleteDate = ref('');
 
 // 打开弹窗时赋值（只在这里赋值，去掉 watch）
 const handleInput = () => {
-  currentReason.value = props.modelValue;
-  // 兼容 duty/责任人
-  currentDuty.value = props.row.duty || props.row['责任人'] || '';
-  currentCompleteDate.value = props.row.completeDate || props.row['完成期限'] || '';
-  dialogVisible.value = true;
+  try {
+    currentReason.value = props.modelValue || '';
+    // 兼容 duty/责任人，添加数据验证
+    currentDuty.value = (props.row?.duty || props.row?.['责任人'] || '').trim();
+    currentCompleteDate.value = props.row?.completeDate || props.row?.['完成期限'] || '';
+    dialogVisible.value = true;
+  } catch (error) {
+    console.error('Input error:', error);
+    ElMessage.error('数据加载失败，请重试');
+  }
 };
 
 // 处理取消
@@ -85,6 +90,8 @@ const handleCancel = () => {
 
 // 处理保存
 const handleSave = () => {
+  console.log(currentReason.value,currentDuty.value,currentCompleteDate.value);
+  console.log(props.row);
   if (!currentReason.value.trim()) {
     ElMessage.warning('请输入说明原因');
     return;
@@ -97,15 +104,28 @@ const handleSave = () => {
     ElMessage.warning('请选择完成期限');
     return;
   }
-  emit('update:modelValue', currentReason.value);
-  emit('save', {
-    row: props.row,
-    reason: currentReason.value,
-    duty: currentDuty.value,
-    completeDate: currentCompleteDate.value
-  });
-  dialogVisible.value = false;
-  ElMessage.success('保存成功');
+
+  // 检查row数据是否完整
+  if (!props.row || typeof props.row !== 'object') {
+    console.error('Row data is invalid:', props.row);
+    ElMessage.error('数据格式错误，请刷新页面重试');
+    return;
+  }
+
+  try {
+    emit('update:modelValue', currentReason.value);
+    emit('save', {
+      row: props.row,
+      reason: currentReason.value.trim(),
+      duty: currentDuty.value.trim(),
+      completeDate: currentCompleteDate.value
+    });
+    dialogVisible.value = false;
+  } catch (error) {
+    console.error('Save error:', error);
+    ElMessage.error('保存失败，请重试');
+    return;
+  }
 };
 </script>
 

@@ -15,6 +15,23 @@ export const getTodayProduction = (prodLine) => {
   })
 }
 
+
+// /apollo/stampingWelding
+export const getApolloStampingWelding = (prodLine) => {
+  return request({
+    url: '/stampingWelding/todayInspection',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+// "checkTotal": 9,
+// "firstHgTotal": 8,
+// "passPercent": "88.9%"
+export interface ApolloStampingWelding {
+  checkTotal: number
+  firstHgTotal: number
+  passPercent: string
+}
 // /stampingWelding/todayWeldingProduction
 // export const getTodayWeldingProduction = (prodLine) => {
 //   return request({

@@ -176,23 +176,43 @@ const handleDetail = () => {
 // 处理原因更新
 const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
   try {
-    // 通过唯一标识找到原始数据（假设用工单号 workNo）
-    const origin = rawData.value.find(item => item.workNo === row['工单号']);
+    console.log('更新数据:', { row, reason, duty, completeDate });
+    console.log('原始数据:', rawData.value);
+    
+    // 修改查找逻辑，使用多个字段匹配
+    const origin = rawData.value.find(item => 
+      item.workNo === row['工单号'] || 
+      item.workNo === row['客户单号'] ||
+      item.number === row['工单号']
+    );
+
     if (!origin) {
-      ElMessage.error('未找到原始数据，无法上传');
+      console.error('匹配失败:', {
+        rowWorkNo: row['工单号'],
+        rowCustomerNo: row['客户单号'],
+        availableWorkNos: rawData.value.map(item => ({
+          workNo: item.workNo,
+          number: item.number
+        }))
+      });
+      ElMessage.error('未找到匹配数据，请刷新后重试');
       return;
     }
+
     // 组装参数
     const params = {
       prodLine: origin.workCenter,
-      doc_no: origin.workNo,
+      doc_no: origin.workNo || origin.number, // 使用备选字段
       item_code: origin.articleNumber,
       pc_date: origin.dateTime,
       reason,
       duty,
       completeDate
     };
-    // 假设接口返回 { code: 200, ... }
+
+    console.log('发送参数:', params);
+
+    // 调用API
     const res = await getAbnormalUnfinishedAdd(
       params.prodLine,
       params.doc_no,
@@ -202,16 +222,41 @@ const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
       params.duty,
       params.completeDate
     );
+
     if (res && (res.code === 200 || res.status === 200)) {
       ElMessage.success('保存成功');
-      row['原因'] = reason;
-      row['责任人'] = duty;
-      row['完成期限'] = completeDate;
+      // 更新本地数据
+      const index = config.data.findIndex(item => 
+        item[1] === row['工单号'] || 
+        item[2] === row['工单号']
+      );
+      
+      if (index !== -1) {
+        config.data[index][8] = reason;
+        config.data[index][9] = duty;
+        config.data[index][10] = completeDate;
+        
+        // 更新表格数据
+        const tableIndex = tableData.value.findIndex(item => 
+          item['工单号'] === row['工单号'] || 
+          item['客户单号'] === row['工单号']
+        );
+        if (tableIndex !== -1) {
+          tableData.value[tableIndex]['原因'] = reason;
+          tableData.value[tableIndex]['责任人'] = duty;
+          tableData.value[tableIndex]['完成期限'] = completeDate;
+        }
+      }
+      
+      // 刷新数据
+      fetchData();
     } else {
-      ElMessage.error('保存失败');
+      console.error('API响应错误:', res);
+      ElMessage.error(res?.message || '保存失败，请重试');
     }
   } catch (error) {
-    ElMessage.error('保存失败');
+    console.error('处理异常:', error);
+    ElMessage.error('操作失败: ' + (error.message || '未知错误'));
   }
 };
 

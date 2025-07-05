@@ -34,7 +34,7 @@
               class="reason-tip mb-1"
             >
               <el-icon style="color:#FFA000;vertical-align:middle;"><WarningFilled /></el-icon>
-              <span class="ml-1">{{ EfficentData.reason }}</span>
+              <!-- <span class="ml-1">{{ EfficentData.reason }}</span> -->
             </div>
             <!-- 原有卡片内容 -->
             <div

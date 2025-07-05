@@ -2,7 +2,7 @@
   
 
       <div class="wrapper flex flex-col h-full">
-        <!-- <div class="title-container">
+        <div class="title-container">
           <h2>工单异常</h2>
           <el-button 
             type="primary" 
@@ -12,7 +12,7 @@
           >
             查看详情
           </el-button>
-        </div> -->
+        </div>
             
        <!-- 如果没有数据，显示暂无数据 -->
        <div v-if="!isLoading && isDataEmpty" class="empty-container">
@@ -24,7 +24,7 @@
            <!-- 如果正在加载，显示 loading -->
          <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
   
-          <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
+          <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
         </div>
       </div>
 
@@ -41,14 +41,14 @@
     v-model="detailDialogVisible"
     title="工单异常详情"
     :headers="tableHeaders"
-    :data="config.tableData"
+    :data="tableData"
     :loading="tableLoading"
     @update:reason="handleReasonUpdate"
   />
   </template>
   
   <script setup>
-  import { ref, onMounted, watch, nextTick, onBeforeUnmount, reactive, defineExpose } from 'vue';
+  import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
   import ScrollBoard from '@/components/datav/ScrollBoard.vue'
   import DetailTable from '@/components/totalScreen/DetailTable/index.vue'
   import * as echarts from 'echarts';
@@ -57,15 +57,7 @@
   import { eventBus } from '@/utils/eventbus';
   import { ElMessage } from 'element-plus';
   import { getAbnormalUnfinishedAdd } from '@/api/getProduceinfo.js';
-  import dayjs from 'dayjs';
-
-  const props = defineProps({
-    headers: {
-      type: Array,
-      default: () => []
-    }
-  });
-
+  
   const dialogVisible = ref(false);//弹窗控制
   const detailDialogVisible = ref(false);
   const selectedItem = ref({});
@@ -83,11 +75,10 @@
   const scrollBoardRef = ref(null);
 
   // 扩展表头，添加原因、责任人和完成期限
-  const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '车型名称', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
+  const tableHeaders = ['状态', '客户单号', '工单号', '车型名称', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限'];
 
   const config = reactive({
-    header: tableHeaders.value,
-    tableData: [],
+    header: ['状态', '客户单号', '工单号', '车型名称', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限'],
     data: [
       ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
     ],
@@ -106,29 +97,19 @@
         console.log('获取到的原始数据:', res);
         if (res && res.length > 0) {
           rawData.value = res; // 保存原始数据
-          config.tableData = res.map(item => {
-            const completeDate = item.completeDate ?? '';
-            const reason = item.reason ?? '';
-            let isOverdue = '否';
-            // 只有处理结果和完成时间都不为空时才判断日期，否则直接为true
-            if (reason && completeDate) {
-              isOverdue = dayjs().isAfter(dayjs(completeDate), 'day') ? '是' : '否';
-            } else {
-              isOverdue = '是';
-            }
-            return [
-              '未完工',
-              item.number ?? '无',
-              item.workNo ?? '无',
-              item.specifications ?? '无',
-              Number(item.productionQuantity) ?? '无',
-              item.dateTime ?? '无',
-              Number(item.productionQuantity) - Number(item.inboundQuantity),
-              item.daysBetween + '天' ?? '无',
-              isOverdue
-            ]
-          });
-          config.data = config.tableData; // Keep data in sync
+          config.data = res.map(item => [
+            '未完工',
+            item.number ?? '无',
+            item.workNo ?? '无',
+            item.specifications ?? '无',
+            Number(item.productionQuantity) ?? '无',
+            item.dateTime ?? '无',
+            Number(item.productionQuantity) - Number(item.inboundQuantity),
+            item.daysBetween + '天' ?? '无',
+            item.reason ?? '无',
+            item.duty ?? '无',
+            item.completeDate ?? '无'
+          ]);
           isDataEmpty.value = false;
         } else {
           isDataEmpty.value = true;
@@ -211,11 +192,28 @@
   // 处理原因更新
   const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
     try {
-      console.log('更新数据:', { row, reason, duty, completeDate });
-      console.log('原始数据:', rawData.value);
-      
-      // 修改查找逻辑，使用多个字段匹配
+      console.log('传入的行数据:', row);
+      console.log('原始数据数组:', rawData.value);
+
+      // 检查数据结构
+      if (!row || !rawData.value || !Array.isArray(rawData.value)) {
+        console.error('数据结构错误:', { row, rawData: rawData.value });
+        ElMessage.error('数据结构错误，请刷新页面重试');
+        return;
+      }
+
+      // 打印所有可用的匹配字段
+      console.log('待匹配的工单号:', row['工单号']);
+      console.log('待匹配的客户单号:', row['客户单号']);
+      console.log('可用的工单号列表:', rawData.value.map(item => ({
+        workNo: item.workNo,
+        number: item.number,
+        articleNumber: item.articleNumber
+      })));
+
+      // 修改查找逻辑，使用更多字段匹配
       const origin = rawData.value.find(item => {
+        // 转换为字符串进行比较
         const rowWorkNo = String(row['工单号'] || '').trim();
         const rowCustomerNo = String(row['客户单号'] || '').trim();
         const itemWorkNo = String(item.workNo || '').trim();
@@ -228,7 +226,7 @@
       });
 
       if (!origin) {
-        console.error('匹配失败:', {
+        console.error('匹配失败，详细信息:', {
           rowData: {
             workNo: row['工单号'],
             customerNo: row['客户单号']
@@ -239,6 +237,13 @@
           }))
         });
         ElMessage.error('数据匹配失败，请检查工单号是否正确');
+        return;
+      }
+
+      // 组装参数前先检查必要字段
+      if (!origin.workCenter && !prodLine) {
+        console.error('缺少必要参数 prodLine:', { origin, prodLine });
+        ElMessage.error('缺少生产线信息，请检查数据完整性');
         return;
       }
 
@@ -253,7 +258,17 @@
         completeDate
       };
 
-      console.log('发送参数:', params);
+      // 检查参数完整性
+      const requiredFields = ['prodLine', 'doc_no', 'item_code', 'pc_date', 'reason', 'duty', 'completeDate'];
+      const missingFields = requiredFields.filter(field => !params[field]);
+      
+      if (missingFields.length > 0) {
+        console.error('缺少必要参数:', { missingFields, params });
+        ElMessage.error(`缺少必要参数: ${missingFields.join(', ')}`);
+        return;
+      }
+
+      console.log('准备发送的参数:', params);
 
       // 调用API
       const res = await getAbnormalUnfinishedAdd(
@@ -268,6 +283,7 @@
 
       if (res && (res.code === 200 || res.status === 200)) {
         ElMessage.success('保存成功');
+        
         // 更新本地数据
         const index = config.data.findIndex(item => {
           const itemWorkNo = String(item[2] || '').trim();
@@ -287,6 +303,27 @@
           config.data[index][8] = reason;
           config.data[index][9] = duty;
           config.data[index][10] = completeDate;
+          
+          // 更新表格数据
+          const tableIndex = tableData.value.findIndex(item => {
+            const itemWorkNo = String(item['工单号'] || '').trim();
+            const itemCustomerNo = String(item['客户单号'] || '').trim();
+            const targetWorkNo = String(row['工单号'] || '').trim();
+            const targetCustomerNo = String(row['客户单号'] || '').trim();
+            
+            return (
+              itemWorkNo === targetWorkNo ||
+              itemWorkNo === targetCustomerNo ||
+              itemCustomerNo === targetWorkNo ||
+              itemCustomerNo === targetCustomerNo
+            );
+          });
+
+          if (tableIndex !== -1) {
+            tableData.value[tableIndex]['原因'] = reason;
+            tableData.value[tableIndex]['责任人'] = duty;
+            tableData.value[tableIndex]['完成期限'] = completeDate;
+          }
         }
         
         // 刷新数据
@@ -300,31 +337,13 @@
       ElMessage.error('操作失败: ' + (error.message || '未知错误'));
     }
   };
-
-  // 暴露方法和数据给父组件
-  defineExpose({
-    handleReasonUpdate,
-    config,
-    rawData,
-    fetchData
-  });
-
-
-  function rowClassName(row) {
-    const lastIndex = row.ceils.length - 1;
-    return row.ceils[lastIndex] === '是' ? 'overdue-row' : '';
-  }
-
-  function cellClassName(row, ci) {
-    const lastIndex = row.ceils.length - 1;
-    return (ci === lastIndex - 1 && row.ceils[lastIndex] === '是') ? 'overdue-cell' : '';
-  }
   </script>
   
   
   <style scoped>
   .wrapper {
     height: 100%;
+    padding: 10px;
   }
 
   .title-container {
@@ -398,16 +417,6 @@
     left: 50%;
     transform: translate(-50%, -50%);
     max-height: 90vh;
-  }
-
-  .overdue-row {
-    background: #ffeaea !important;
-    color: #e03030 !important;
-  }
-
-  .overdue-cell {
-    color: #e03030 !important;
-    font-weight: bold;
   }
   </style>
    

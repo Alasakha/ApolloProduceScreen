@@ -125,7 +125,7 @@ const fetchData = () => {
       const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
       for (let hour = 7; hour <= 24; hour++) {
-        planValues.push(planData[hour + 1] || 0);
+        planValues.push(planData[hour] || 0);
       }
       standard.value = planValues;
 

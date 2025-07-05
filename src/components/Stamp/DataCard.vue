@@ -7,17 +7,45 @@
     <!-- 右上角角标 -->
     <div v-if="status" class="order-card-badge">{{ status }}</div>
     <!-- 主体内容 -->
-    <div class="order-card-main simple-main">
-      <div class="simple-row"><span>开机时长：</span><span>{{ dayRunTime }}</span></div>
-      <div class="simple-row"><span>激光功率：</span><span>{{ pparams }} kW</span></div>
-      <div class="simple-row"><span>切割速度：</span><span>{{ spen }}</span></div>
-      <div class="simple-row"><span>计划数：</span><span>{{ totalQty }}</span></div>
-      <div class="simple-row"><span>完成数：</span><span>{{ doneQty }}</span></div>
+    <div class="order-card-main">
+      <div class="data-grid">
+        <!-- 上排三个框 -->
+        <div class="data-box">
+          <div class="box-label">开机时长</div>
+          <div class="box-value">{{ dayRunTime }}</div>
+        </div>
+        <div class="data-box">
+          <div class="box-label">激光功率</div>
+          <div class="box-value">{{ pparams }} kW</div>
+        </div>
+        <div class="data-box">
+          <div class="box-label">切割速度</div>
+          <div class="box-value">{{ spen }}</div>
+        </div>
+        <!-- 下排两个框 -->
+        <div class="data-box">
+          <div class="box-label">计划数</div>
+          <div class="box-value">{{ totalQty }}</div>
+        </div>
+        <div class="data-box">
+          <div class="box-label">完成数</div>
+          <div class="box-value">{{ doneQty }}</div>
+        </div>
+      </div>
+      <!-- 进度条 -->
+      <div class="progress-section">
+        <div class="progress-bar">
+          <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
+        </div>
+        <div class="progress-text">进度条: {{ progressPercent }}%</div>
+      </div>
     </div>
   </div>
 </template>
 
 <script setup>
+import { computed } from 'vue'
+
 const props = defineProps({
   orderName: {
     type: String,
@@ -47,6 +75,13 @@ const props = defineProps({
     type: String,
     default: "暂无"
   }
+})
+
+// 计算进度百分比
+const progressPercent = computed(() => {
+  const total = Number(props.totalQty) || 0
+  const done = Number(props.doneQty) || 0
+  return total > 0 ? Math.round((done / total) * 100) : 0
 })
 </script>
 
@@ -93,17 +128,50 @@ const props = defineProps({
   z-index: 3;
   border: 1.5px solid #fffbe6;
 }
-.simple-main {
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 10px;
+  padding: 15px;
+}
+.data-box {
+  border: 1px solid rgba(124, 231, 253, 0.5);
+  border-radius: 4px;
+  padding: 8px;
+  background: rgba(37, 117, 252, 0.1);
   display: flex;
   flex-direction: column;
-  gap: 14px;
-  padding: 18px 10px 10px 10px;
+  align-items: center;
 }
-.simple-row {
-  display: flex;
-  justify-content: space-between;
+.box-label {
+  font-size: 14px;
+  color: rgb(93, 220, 255);
+  margin-bottom: 4px;
+}
+.box-value {
   font-size: 18px;
+  font-weight: bold;
   color: #fff;
-  font-family: "HarmonyOS Sans SC", "PingFang SC", "Microsoft YaHei", "Source Han Sans SC", "Noto Sans SC", Arial, sans-serif;
+}
+.progress-section {
+  padding: 0 15px 15px;
+}
+.progress-bar {
+  height: 6px;
+  background: rgba(37, 117, 252, 0.2);
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd000, #02da0d);
+  transition: width 0.3s ease;
+}
+.progress-text {
+  font-size: 12px;
+  color: #ffffff;
+  text-align: right;
 }
 </style>

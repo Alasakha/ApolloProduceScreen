@@ -34,7 +34,7 @@
               class="reason-tip mb-1"
             >
               <el-icon style="color:#FFA000;vertical-align:middle;"><WarningFilled /></el-icon>
-              <span class="ml-1">{{ EfficentData.reason }}</span>
+              <!-- <span class="ml-1">{{ EfficentData.reason }}</span> -->
             </div>
             <!-- 原有卡片内容 -->
             <div
@@ -92,40 +92,19 @@
   </div>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, computed } from 'vue';
-import * as echarts from 'echarts';
 
-import DataCard from "@/components/DataCard.vue"; // 导入封装组件
-import EffiectCard from "@/components/EffiectCard.vue"; // 导入封装组件
 import { getEfficiencyToday, getEfficiencyBelowAdd } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import BigScreenTitle from '@/components/title.vue'
+
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
 import { WarningFilled } from '@element-plus/icons-vue'
 
 // 定义数据
-const config = reactive({
-  value: 66,
-})
-const diffrentLine = (prodLine) => {
-  const prefix = prodLine.slice(0, 4); // 取前4位
 
-  switch (prefix) {
-    case '1004':
-      return 52;
-    case '2004':
-      return 30;
-    case '1005':
-      return 18;
-    case '2005':
-      return 13;
-    default:
-      return null; // 未匹配时返回 null 或默认值
-  }
-};
 
 
 const EfficentData = reactive({
@@ -140,9 +119,9 @@ const EfficentData = reactive({
 });
 
 // 计算属性：判断实际人效是否低于标准人效
-const isEfficiencyLow = computed(() => {
-  return EfficentData.efficiency < EfficentData.standardEfficiency;
-});
+// const isEfficiencyLow = computed(() => {
+//   return EfficentData.efficiency < EfficentData.standardEfficiency;
+// });
 
 const showWarning = computed(() => EfficentData.warning === 1);
 
