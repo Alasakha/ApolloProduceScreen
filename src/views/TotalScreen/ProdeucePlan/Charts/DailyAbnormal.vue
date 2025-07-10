@@ -116,7 +116,7 @@ const fetchData = () => {
             item.daysBetween != null ? item.daysBetween + '天' : '无',
             item.reason ?? '无',
             item.duty  ?? '无',
-            completeDate,
+            item.completeDate ?? '无',
             isOverdue // 最后一项只用于变色，不展示
           ];
         });

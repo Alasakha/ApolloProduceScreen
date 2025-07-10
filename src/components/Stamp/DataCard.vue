@@ -15,14 +15,18 @@
           <div class="box-value">{{ dayRunTime }}</div>
         </div>
         <div class="data-box">
-          <div class="box-label">激光功率</div>
+          <div class="box-label">焊接电流</div>
           <div class="box-value">{{ pparams }} kW</div>
         </div>
         <div class="data-box">
-          <div class="box-label">切割速度</div>
+          <div class="box-label">焊接电压</div>
           <div class="box-value">{{ spen }}</div>
         </div>
         <!-- 下排两个框 -->
+        <div class="data-box">
+          <div class="box-label">焊接速度</div>
+          <div class="box-value">{{ totalQty }}</div>
+        </div>
         <div class="data-box">
           <div class="box-label">计划数</div>
           <div class="box-value">{{ totalQty }}</div>

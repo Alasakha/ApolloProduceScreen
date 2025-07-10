@@ -90,8 +90,7 @@ const handleCancel = () => {
 
 // 处理保存
 const handleSave = () => {
-  console.log(currentReason.value,currentDuty.value,currentCompleteDate.value);
-  console.log(props.row);
+
   if (!currentReason.value.trim()) {
     ElMessage.warning('请输入说明原因');
     return;

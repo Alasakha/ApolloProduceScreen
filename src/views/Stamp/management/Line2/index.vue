@@ -22,7 +22,7 @@
   
   const devices = ref([
     {
-      name: '激光割管1号',
+      name: '工作站1',
       status: '运行',
       runTime: 120,
       power: 80,
@@ -31,7 +31,7 @@
       done: 800
     },
     {
-      name: '激光割管2号',
+      name: '工作站2',
       status: '运行',
       runTime: 95,
       power: 75,
@@ -40,7 +40,7 @@
       done: 950
     },
     {
-      name: '激光割管3号',
+      name: '工作站3',
       status: '停机',
       runTime: 0,
       power: 0,
@@ -49,7 +49,7 @@
       done: 750
     },
     {
-      name: '激光割管4号',
+      name: '工作站4',
       status: '运行',
       runTime: 180,
       power: 85,
@@ -58,7 +58,7 @@
       done: 1200
     },
     {
-      name: '激光割管5号',
+      name: '工作站5',
       status: '运行',
       runTime: 150,
       power: 82,
@@ -66,15 +66,6 @@
       plan: 1100,
       done: 900
     },
-    {
-      name: '激光割管6号',
-      status: '运行',
-      runTime: 200,
-      power: 88,
-      speed: 53,
-      plan: 1300,
-      done: 1100
-    }
   ])
   </script>
   

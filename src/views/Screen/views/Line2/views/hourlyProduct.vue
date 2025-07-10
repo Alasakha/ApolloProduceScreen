@@ -1,13 +1,13 @@
 <template>
-  <dv-border-box-1 class="box1">
+  <dv-border-box-1 class="box1 h-full">
     <div class="flex justify-between items-center px-4">
       <GlobalTitle title="当日小时产能" />
       <PlanSetting :prod-line="prodLine" @update-data="fetchData" />
     </div>
 
     <!-- 图表区域 -->
-    <div class="h-[6%]"></div>
-    <div ref="monthlyIndicators" class="w-full h-[85%]"></div>
+    <div class="h-[3%]"></div>
+    <div ref="monthlyIndicators" class="w-full h-[95%]"></div>
   </dv-border-box-1>
 </template>
 
@@ -98,7 +98,7 @@ const processActualData = (hourData) => {
   const completeCategories = [];
   const completeValues = [];
   // 横坐标 7~23
-  for (let hour = 7; hour <= 24; hour++) {
+  for (let hour = 8; hour <= 24; hour++) {
     completeCategories.push(hour.toString());
     completeValues.push(hourData[hour] || 0);
   }
@@ -124,7 +124,7 @@ const fetchData = () => {
       // 处理PMC排产数据（planHour）
       const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
-      for (let hour = 7; hour <= 24; hour++) {
+      for (let hour = 8; hour <= 24; hour++) {
         planValues.push(planData[hour] || 0);
       }
       standard.value = planValues;
@@ -132,7 +132,7 @@ const fetchData = () => {
       // 处理车间小时产量数据（reasonHour）- 生产排产
       const workshopData = processArrayToObject(data.reasonHour, 'hour2', 'total');
       const workshopValues = [];
-      for (let hour = 7; hour <= 24; hour++) {
+      for (let hour = 8; hour <= 24; hour++) {
         workshopValues.push(workshopData[hour] || 0); // hour2="8" 已经代表 7-8 时段
       }
       alignedPlanNumbers.value = workshopValues;
@@ -211,13 +211,28 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-.box1 {
+  .box1 {
   width: 50%;
-  height: 100%;
   display: flex;
-  flex-wrap: wrap;
+  flex-direction: column; /* 改为纵向排列 */
   font-size: 18px;
   color: aliceblue;
+  min-height: 0 !important; /* 覆盖默认的最小高度 */
+}
+
+:deep(.dv-border-box-1) {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+:deep(.dv-border-svg-container) {
+  min-height: 0 !important;
+  height: 100% !important;
+}
+
+:deep(.border-box-content) {
+  min-height: 0 !important;
+  height: 100% !important;
 }
 
 :deep(.el-button) {

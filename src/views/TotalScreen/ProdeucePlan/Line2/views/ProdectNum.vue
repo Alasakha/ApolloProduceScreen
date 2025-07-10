@@ -98,7 +98,7 @@ const processActualData = (hourData) => {
   const completeCategories = [];
   const completeValues = [];
   // 横坐标 7~23
-  for (let hour = 7; hour <= 24; hour++) {
+  for (let hour = 8; hour <= 24; hour++) {
     completeCategories.push(hour.toString());
     completeValues.push(hourData[hour] || 0);
   }
@@ -124,7 +124,7 @@ const fetchData = () => {
       // 处理PMC排产数据（planHour）
       const planData = processArrayToObject(data.planHour, 'hour2', 'total');
       const planValues = [];
-      for (let hour = 7; hour <= 24; hour++) {
+      for (let hour = 8; hour <= 24; hour++) {
         planValues.push(planData[hour] || 0);
       }
       standard.value = planValues;
@@ -132,7 +132,7 @@ const fetchData = () => {
       // 处理车间小时产量数据（reasonHour）- 生产排产
       const workshopData = processArrayToObject(data.reasonHour, 'hour2', 'total');
       const workshopValues = [];
-      for (let hour = 7; hour <= 24; hour++) {
+      for (let hour = 8; hour <= 24; hour++) {
         workshopValues.push(workshopData[hour] || 0); // hour2="8" 已经代表 7-8 时段
       }
       alignedPlanNumbers.value = workshopValues;

@@ -23,7 +23,7 @@ const outStoreLoading = ref(true)
 const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 const config = reactive({
-  header: ['仓位','仓管员','客户单号','工单号','品号','品名','规格','需领用量','已领用量','应完成时间','处理结果','处理时间'],
+  header: ['仓位','仓管员','客户单号','工单号','品号','品名','规格','需领用量','已领用量','领料模式','应完成时间','处理结果','处理时间'],
   data: [], // 初始为空
   tableData: [],
   index: true,
@@ -61,6 +61,7 @@ const fetchData = async () => {
       item.itemSpecification || '暂无数据',
       Number(item.required_qty).toFixed(0) || '暂无数据',
       Number(item.issued_qty).toFixed(0) || '暂无数据',
+      item.simpleProperty || '暂无数据',
       item.ty003 ||  '暂无数据', // 应完成时间，暂时使用占位符
       item.udf026 || '--',
       item.udf025,  // 处理时间
@@ -79,6 +80,7 @@ const fetchData = async () => {
       item.itemSpecification || '暂无数据',
       Number(item.required_qty).toFixed(0) || '暂无数据',
       Number(item.issued_qty).toFixed(0) || '暂无数据',
+      item.simpleProperty || '暂无数据',
       item.ty003 || '暂无数据', // 应完成时间，暂时使用占位符
       item.udf026 || '--'
     ])
