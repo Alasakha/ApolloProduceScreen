@@ -2,7 +2,7 @@
   <dv-border-box-1 class="box1 h-full">
     <div class="flex justify-between items-center px-4">
       <GlobalTitle title="当日小时产能" />
-      <PlanSetting :prod-line="prodLine" @update-data="fetchData" />
+      <PlanSetting :prod-line="prodLine" @update-data="fetchData" :istotalProduct="false" />
     </div>
 
     <!-- 图表区域 -->

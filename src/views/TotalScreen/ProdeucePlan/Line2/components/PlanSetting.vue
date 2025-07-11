@@ -63,12 +63,14 @@
           <div class="text-center">{{ calculateDiff(hour) }}</div>
           <div>
             <el-input-number 
+              v-if="!istotalProduct"
               v-model="planNumbers[hour]" 
               :min="0"
               size="small"
               placeholder="请输入产量"
               class="w-full"
             />
+            <div  v-else class="text-center">{{planNumbers[hour] }}</div>
           </div>
           <div>
             <el-input 
@@ -120,6 +122,10 @@ const props = defineProps({
   prodLine: {
     type: String,
     required: true  
+  },
+  istotalProduct: {
+    type: Boolean,
+    default: false
   }
 });
 

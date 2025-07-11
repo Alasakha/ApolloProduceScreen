@@ -17,15 +17,18 @@
         style="width: 100%"
         height="670"
       >
-      <el-table-column type="index" label="序号" width="60" align="center"  :fixed/>
+      <el-table-column 
+        type="index" 
+        label="序号" 
+        width="60" 
+        align="center"  
+        fixed="left"
+      />
         <template v-for="(header, index) in headers" :key="header">
-          
-
           <el-table-column 
             v-if="header !== '原因'"
             :prop="header" 
             :label="header" 
-          
           />
           <el-table-column 
             v-else
@@ -37,11 +40,16 @@
             </template>
           </el-table-column>
         </template>
-        <el-table-column label="操作" width="120" fixed="right">
+        <el-table-column 
+          label="操作" 
+          width="120" 
+          fixed="right"
+        >
           <template #default="{ row }">
             <ReasonInput
               v-model="row['原因']"
               :row="row"
+              :original-data="row.originalData"
               @save="handleReasonUpdate"
             />
           </template>
@@ -114,6 +122,7 @@ watch(dialogVisible, (val) => {
 
 // 监听数据变化
 watch(() => props.data, (val) => {
+  console.log('DetailTable received data:', val);
   tableData.value = val;
   total.value = val.length;
 }, { immediate: true });
@@ -129,8 +138,9 @@ const handleCurrentChange = (val) => {
 };
 
 // 处理原因和责任人更新
-const handleReasonUpdate = ({ row, reason, duty ,completeDate}) => {
-  emit('update:reason', { row, reason, duty,completeDate });
+const handleReasonUpdate = (data) => {
+  console.log('DetailTable - Updating reason with data:', data);
+  emit('update:reason', data);
 };
 </script>
 

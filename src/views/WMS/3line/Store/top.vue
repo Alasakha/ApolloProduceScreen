@@ -22,7 +22,7 @@ const processedData = ref([]) // 添加响应式变量存储饼图数据
 
 // 生成表图钩子
 const config = reactive({
-  header: [ '仓管员','仓位','检验单号','品名','规格','到货单号','品号'],
+  header: [ '仓管员','仓位','检验单号','品名','规格','到货单号','品号','供应商信息'],
   data: [], // 初始为空
   index: true,
   columnWidth: [100,100,200,250,400,200,200],
@@ -42,6 +42,7 @@ const fetchData = async () => {
   try {
     const res = await gettimelyAccountingRateDetail()
     const list = res.data
+    console.log(list)
 
     if (!Array.isArray(list) || list.length === 0) {
       config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据',]]
@@ -55,9 +56,10 @@ const fetchData = async () => {
       item.itemDescription ?? '无',
       item.itemSpecification ?? '无',
       item.purchase_doc_no ?? '无',
-      item.item_code ?? '无'
+      item.item_code ?? '无',
+      item.supplierFullName ?? '无'
     ])
-
+    console.log(transformed)
     config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']]
   } catch (e) {
     console.error('数据获取失败', e)

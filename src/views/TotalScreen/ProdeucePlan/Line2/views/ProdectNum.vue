@@ -2,7 +2,7 @@
   <dv-border-box-1 class="box1 h-full">
     <div class="flex justify-between items-center px-4">
       <GlobalTitle title="当日小时产能" />
-      <PlanSetting :prod-line="prodLine" @update-data="fetchData" />
+      <PlanSetting :prod-line="prodLine" @update-data="fetchData" :istotalProduct="isShow" />
     </div>
 
     <!-- 图表区域 -->
@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, nextTick, onBeforeUnmount } from 'vue';
+import { ref, onMounted, nextTick, onBeforeUnmount ,computed} from 'vue';
 import { useRoute } from 'vue-router';
 import { getCapacityHour } from '@/api/getProduceinfo';
 import { useEcharts } from '@/utils/useEcharts';
@@ -198,8 +198,15 @@ const fetchData = () => {
 // 引入 echarts 封装逻辑
 const { initChart, setOption, resizeChart } = useEcharts(monthlyIndicators);
 
+const isShow = computed(() => {
+  if(prodLine === '1004' || prodLine === '1005'){
+    return true;
+  }
+  return false;
+});
 // 监听刷新事件
 onMounted(() => {
+
   fetchData();
   eventBus.on('refreshData', fetchData);  
 });

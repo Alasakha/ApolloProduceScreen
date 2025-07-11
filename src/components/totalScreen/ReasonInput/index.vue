@@ -49,6 +49,7 @@
 <script setup>
 import { ref } from 'vue';
 import { ElMessage } from 'element-plus';
+import { onMounted } from 'vue';
 
 const props = defineProps({
   modelValue: {
@@ -56,6 +57,10 @@ const props = defineProps({
     default: ''
   },
   row: {
+    type: Object,
+    required: true
+  },
+  originalData: {
     type: Object,
     required: true
   }
@@ -68,29 +73,8 @@ const currentReason = ref('');
 const currentDuty = ref('');
 const currentCompleteDate = ref('');
 
-// 打开弹窗时赋值（只在这里赋值，去掉 watch）
-const handleInput = () => {
-  try {
-    currentReason.value = props.modelValue || '';
-    // 兼容 duty/责任人，添加数据验证
-    currentDuty.value = (props.row?.duty || props.row?.['责任人'] || '').trim();
-    currentCompleteDate.value = props.row?.completeDate || props.row?.['完成期限'] || '';
-    dialogVisible.value = true;
-  } catch (error) {
-    console.error('Input error:', error);
-    ElMessage.error('数据加载失败，请重试');
-  }
-};
-
-// 处理取消
-const handleCancel = () => {
-  dialogVisible.value = false;
-  // 取消时不需要重置输入框内容
-};
-
 // 处理保存
 const handleSave = () => {
-
   if (!currentReason.value.trim()) {
     ElMessage.warning('请输入说明原因');
     return;
@@ -104,28 +88,69 @@ const handleSave = () => {
     return;
   }
 
-  // 检查row数据是否完整
-  if (!props.row || typeof props.row !== 'object') {
-    console.error('Row data is invalid:', props.row);
-    ElMessage.error('数据格式错误，请刷新页面重试');
-    return;
-  }
-
   try {
     emit('update:modelValue', currentReason.value);
+    
+    // 发送完整的数据结构
     emit('save', {
       row: props.row,
       reason: currentReason.value.trim(),
       duty: currentDuty.value.trim(),
       completeDate: currentCompleteDate.value
     });
+    
     dialogVisible.value = false;
   } catch (error) {
     console.error('Save error:', error);
+    console.error('Error details:', {
+      error: error.message,
+      row: props.row,
+      originalData: props.originalData,
+      currentValues: {
+        reason: currentReason.value,
+        duty: currentDuty.value,
+        completeDate: currentCompleteDate.value
+      }
+    });
     ElMessage.error('保存失败，请重试');
     return;
   }
 };
+
+// 打开弹窗时赋值
+const handleInput = () => {
+  try {
+    console.log('ReasonInput - Opening dialog with data:', {
+      row: props.row,
+      originalData: props.originalData
+    });
+    
+    // 设置初始值
+    currentReason.value = props.row['原因'] || props.modelValue || '';
+    currentDuty.value = props.row['责任人'] || '';
+    currentCompleteDate.value = props.row['完成期限'] || '';
+    
+    dialogVisible.value = true;
+  } catch (error) {
+    console.error('Input error:', error);
+    console.error('Input error details:', {
+      error: error.message,
+      row: props.row,
+      originalData: props.originalData
+    });
+    ElMessage.error('数据加载失败，请重试');
+  }
+};
+  
+// 处理取消
+const handleCancel = () => {
+  dialogVisible.value = false;
+  // 取消时不需要重置输入框内容
+};
+
+onMounted(() => {
+  console.log('props.row',props.row)
+})
 </script>
 
 <style scoped>

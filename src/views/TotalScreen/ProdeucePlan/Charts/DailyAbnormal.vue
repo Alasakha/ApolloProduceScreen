@@ -158,13 +158,34 @@ const handleDetail = () => {
   
   tableLoading.value = true;
   try {
-    tableData.value = config.data.map((row) => {
-      const rowData = {};
-      config.header.forEach((header, index) => {
-        rowData[header] = row[index];
+    // 修改数据处理逻辑，保留原始数据
+    tableData.value = config.data.map((row, index) => {
+      // 获取原始数据
+      const originalData = rawData.value[index];
+      console.log('Processing row:', { displayRow: row, originalData });
+
+      // 构建显示数据
+      const displayData = {};
+      config.header.forEach((header, idx) => {
+        displayData[header] = row[idx];
       });
-      return rowData;
+
+      // 合并数据，确保API所需字段存在
+      return {
+        ...displayData,
+        工单号: originalData.number || row[1], // 使用 number 作为工单号
+        客户单号: originalData.workNo || row[2], // 使用 workNo 作为客户单号
+        应完成时间: originalData.dateTime || row[5],
+        articleNumber: originalData.articleNumber,
+        workNo: originalData.workNo,
+        workCenter: originalData.workCenter,
+        dateTime: originalData.dateTime,
+        // 保留原始数据的引用
+        originalData: originalData
+      };
     }); 
+
+    console.log('Processed table data:', tableData.value);
     total.value = tableData.value.length;
   } finally {
     tableLoading.value = false;
@@ -172,39 +193,41 @@ const handleDetail = () => {
   }
 };
 
-
-// 处理原因更新
 const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
   try {
     console.log('更新数据:', { row, reason, duty, completeDate });
-    console.log('原始数据:', rawData.value);
     
-    // 修改查找逻辑，使用多个字段匹配
-    const origin = rawData.value.find(item => 
-      item.workNo === row['工单号'] || 
-      item.workNo === row['客户单号'] ||
-      item.number === row['工单号']
-    );
-
-    if (!origin) {
-      console.error('匹配失败:', {
-        rowWorkNo: row['工单号'],
-        rowCustomerNo: row['客户单号'],
-        availableWorkNos: rawData.value.map(item => ({
-          workNo: item.workNo,
-          number: item.number
-        }))
-      });
-      ElMessage.error('未找到匹配数据，请刷新后重试');
+    // 使用保存的原始数据
+    console.log('row',row)
+    const originalData = row.originalData;
+    
+    if (!originalData) {
+      console.error('找不到原始数据:', row);
+      ElMessage.error('数据不完整，请刷新后重试');
       return;
     }
 
+    const workCenter = (line: string) => {
+    switch (line) {
+      case'1004':
+        return '汽油车组装车间'
+      case'1005':
+        return '汽油车包装车间'
+      case'1006':
+        return '电动车组装车间'
+      case'1007':
+        return '电动车包装车间'
+      case'zs':
+        return '注塑车间'
+      default:
+        return ''
+    }}// 处理原因更新
     // 组装参数
     const params = {
-      prodLine: origin.workCenter,
-      doc_no: origin.workNo || origin.number, // 使用备选字段
-      item_code: origin.articleNumber,
-      pc_date: origin.dateTime,
+      prodLine: workCenter(Array.isArray(prodLine) ? prodLine[0] : prodLine),
+      doc_no: originalData.workNo,
+      item_code: originalData.articleNumber,
+      pc_date: originalData.dateTime,
       reason,
       duty,
       completeDate
@@ -227,8 +250,8 @@ const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
       ElMessage.success('保存成功');
       // 更新本地数据
       const index = config.data.findIndex(item => 
-        item[1] === row['工单号'] || 
-        item[2] === row['工单号']
+        item[2] === originalData.workNo || 
+        item[1] === originalData.number
       );
       
       if (index !== -1) {
@@ -238,8 +261,8 @@ const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
         
         // 更新表格数据
         const tableIndex = tableData.value.findIndex(item => 
-          item['工单号'] === row['工单号'] || 
-          item['客户单号'] === row['工单号']
+          item.workNo === originalData.workNo || 
+          item.工单号 === originalData.number
         );
         if (tableIndex !== -1) {
           tableData.value[tableIndex]['原因'] = reason;
