@@ -59,8 +59,10 @@ const lines = ref([
   { id: null, name: "供应链看板",router:"/newscm" },
   { id: null, name: "生产计划看板",router:"/produceplan" },
   { id: null, name: "PLM看板",router:"/plm" },
-  { id: "CY", name: "冲压生产管理看板",router:"/stampmanagement" },
+  { id: "CY", name: "冲压生产管理看板",router:"/pressboard" },
   { id: "HJ", name: "焊接生产管理看板",router:"/stampmanagement" },
+  { id: "finance", name: "财务绩效管理看板",router:"/financialkpi" },
+  { id: "qualitykpi", name: "品质绩效管理看板",router:"/qualitykpidashboard" },
 ]);
 
 // 获取 lines 中指定范围的数据

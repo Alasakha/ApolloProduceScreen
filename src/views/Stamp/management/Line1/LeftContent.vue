@@ -1,31 +1,49 @@
 <template>
   <div class="line1-container flex flex-col ">
-    <div class="grid grid-cols-3 gap-4 h-full">
+    <div class="grid grid-cols-4 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-        <Datacard title="今日计划总数" EnlishTitle="TodayPlanned" :value="productionData.pcTotal" />
+        <Datacard title="今日排产工单单数" EnlishTitle="TodayPlanned" :value="productionData.pcGdTotal" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="今日已完成" EnlishTitle="ProducedToday" :value="productionData.done" />
+      <Datacard title="已派工单数" EnlishTitle="ProducedToday" :value="productionData.gdPg" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="今日达成率" EnlishTitle="ProducedRate" :value="productionData.rate+'%'" />
+      <Datacard title="已报工单数" EnlishTitle="ProducedRate" :value="productionData.gdDone" />
+      </dv-border-box-12>
+
+      <dv-border-box-12 class="data-box ">  
+      <Datacard title="达成率" EnlishTitle="PassRateToday" :value="productionData.gdRate" />
       </dv-border-box-12>
     </div>
 
-    <div class="grid grid-cols-3 gap-4 h-full">
+    <div class="grid grid-cols-7 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-        <Datacard title="今日检验数" EnlishTitle="InspectionsToday" :value="apolloStampingWeldingData.checkTotal" />
+      <Datacard title="今日排产数" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box ">
+        <Datacard title="已报工数" EnlishTitle="InspectionsToday" :value="productionData.done" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box ">
+        <Datacard title="达成率" EnlishTitle="InspectionsToday" :value="productionData.rate" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box ">
+      <Datacard title="检验工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.checkTotal" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="今日合格数" EnlishTitle="QualifiedToday" :value="apolloStampingWeldingData.firstHgTotal" />
+      <Datacard title="合格工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.firstHgTotal" />
+      </dv-border-box-12>
+  
+      <dv-border-box-12 class="data-box ">
+      <Datacard title="已报工待检验工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.toBeInspected" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box ">
+      <Datacard title="合格数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
       </dv-border-box-12>
 
-      <dv-border-box-12 class="data-box ">
-      <Datacard title="今日合格率" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
-      </dv-border-box-12>
+
     </div>
   </div>
  
@@ -42,16 +60,22 @@ const route = useRoute()
 const prodLine = route.query.prodLine as string
 
 const productionData = ref<TodayProduction>({
-  rate: 0,
-  pcTotal: 0,
-  done: 0,
-  undone: '0'
+  pcGdTotal: 0 ,  // 排产工单数
+  gdPg: 0   ,       // 工单派工数
+  rate: 0 ,          // 达成率
+  gdRate: 0 ,       // 工单达成率
+  pg: 0 ,           // 派工数
+  gdDone: 0 ,     // 工单报工数
+  pcTotal: 0 ,  // 排产数
+  done: 0 ,         // 报工数
+  undone: 0 ,     // 未报工数
 })
 
 const apolloStampingWeldingData = ref<ApolloStampingWelding>({
   checkTotal: 0,
   firstHgTotal: 0,
-  passPercent: '0%'
+  passPercent: '0%',
+  toBeInspected: 0
 })
 
 const fetchData = async (prodLine) => {
@@ -71,19 +95,23 @@ const fetchData = async (prodLine) => {
     const apolloRes = await getApolloStampingWelding(lineValue)
     
     if (res.code === 200) {
-
       // 格式化数据,去除小数点
       productionData.value = {
         ...res.data,
+        pcGdTotal: Math.round(res.data.pcGdTotal),
+        gdpP: Math.round(res.data.gdpP),
+        rate: Math.round(res.data.rate),
+        gdRate: Math.round(res.data.gdRate),
+        pg: Math.round(res.data.pg),
+        gdDone: Math.round(res.data.gdDone),
         pcTotal: Math.round(res.data.pcTotal),
         done: Math.round(res.data.done),
-        undone: String(Math.round(Number(res.data.undone))),
-        // 达成率 = (已完成/计划) * 100,取整
-        rate: res.data.rate 
+        undone: Math.round(res.data.undone)
       }
-      if (apolloRes.code === 200) {
-        apolloStampingWeldingData.value = apolloRes.data
-      }
+    }
+    
+    if (apolloRes.code === 200) {
+      apolloStampingWeldingData.value = apolloRes.data
     }
   } catch (error) {
     console.error('获取今日生产数据失败:', error)

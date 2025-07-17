@@ -29,18 +29,22 @@
           :smalltitle1="'人数'" 
           :smalltitle2="'效率'" 
           />  -->
-          <DataCard title="今日计划数" :value="TodayData?.pcTotal ?? '无数据'" /> 
+        <DataCard title="今日计划数" :value="TodayData?.pcTotal ?? '无数据'" /> 
         <DataCard title="今日已完成"  :value=" TodayData?.done ?? '无数据'"  />
         <DataCard title="今日达成率"    
               :value="TodayData?.pcTotal != null && TodayData?.done != null
         ? ((TodayData.done / TodayData.pcTotal) * 100).toFixed(0) + '%'
         : '无数据'"></DataCard>
       </div>
-      <div class="row flex-1 flex gap-[3vw] justify-around">
+      <div class="row flex-1 flex gap-2 justify-around">
         <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'" /> 
-        <DataCard title="今日合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"  />
+        <DataCard title="今日一次合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"  />
         <DataCard title="今日直通率" 
         :value="formatPercent(passedInfo?.passPercent)" />
+        <DataCard title="今日合格数" 
+        :value="passedInfo?.passTotal" />
+        <DataCard title="今日合格率" 
+        :value="qualifiedRate" />
       </div>
       <!-- <div class="production-data">
         <div class="row" >
@@ -75,7 +79,7 @@
 
 
 <script setup>
-import { ref, onMounted,onBeforeUnmount } from 'vue';
+import { ref, onMounted,onBeforeUnmount, computed } from 'vue';
 import DataCard from "@/components/DataCard.vue"; // 导入封装组件
 import { getMonthTotalInfo ,getTodayProductionInfo,} from '@/api/getProduceinfo';
 import { getPaassedInfo } from '@/api/getQuiltyinfo';
@@ -95,6 +99,13 @@ function formatPercent(percentStr) {
   const rounded = Math.round(num);         // 四舍五入取整 0
   return `${rounded}%`;                    // 转为字符串 "0%"
 }
+
+const qualifiedRate = computed(() => {
+  if (!passedInfo.value?.passTotal || !passedInfo.value?.checkTotal) return '无数据';
+  if (passedInfo.value.checkTotal === 0) return '0%';
+  return ((passedInfo.value.passTotal / passedInfo.value.checkTotal) * 100).toFixed(0) + '%';
+});
+
 const scale = window.devicePixelRatio;
 console.log(scale)
 

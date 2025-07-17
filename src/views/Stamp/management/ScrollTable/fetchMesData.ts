@@ -49,8 +49,8 @@ function mapProdLineToWorkCenter(prodLine: string | number): string {
             case 'CY':
               return '冲压车间';
               case 'ZS':
-                return '注塑车间';
-                    case 'HJ':
-                return '焊接车间'
+                return '注塑车间'
+                case 'HJ':
+                  return '焊接车间'
   }
 }

@@ -1,5 +1,5 @@
 <template>
-    <div class="stock-view h-[25vh] flex ">
+    <div class="stock-view h-[20vh] flex ">
         <LeftContent class="pr-4"/>
         <!-- <RightContent/> -->
         <!-- Add your template content here -->

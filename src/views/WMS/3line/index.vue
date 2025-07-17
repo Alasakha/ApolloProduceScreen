@@ -1,5 +1,5 @@
 <template>
-<div class="h-[40vh] bg-red=300 w-full flex">
+<div class="h-[40vh] bg-red=300 w-full flex gap-4 pl-2 pr-2">
 <Accounting class="flex-1"></Accounting>
 <Store class="flex-1"></Store>
 <DeadMoney class="flex-1"></DeadMoney>

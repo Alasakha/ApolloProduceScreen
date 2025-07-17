@@ -1,38 +1,38 @@
 <template>
-    <div class="flex w-full h-full items-center">
-  <div class="box-title flex-1 flex flex-col justify-center h-full">
-    <div class="text-2xl">{{props.title}}</div>
-     <div class="text-sm">{{props.EnlishTitle}}</div>
-  </div>
+  <div class="flex w-full h-full items-center">
+<div class="box-title flex-1 flex flex-col justify-center h-full">
+  <div class="text-xs	bold">{{props.title}}</div>
+   <!-- <div class="text-sm">{{props.EnlishTitle}}</div> -->
+</div>
 <div class="circle-content-box flex-1 h-full">
- 
-  <svg viewBox="0 0 120 120" class="ring-svg">
-    <circle
-      class="ring-bg"
-      cx="60" cy="60" r="50"
-      fill="none"
-      stroke="#02e0fd"
-      stroke-width="8"
-    />
-    <circle
-      class="ring-animate"
-      cx="60" cy="60" r="50"
-      fill="none"
-      stroke="url(#gradient)"
-      stroke-width="4"
-      stroke-dasharray="314"
-      stroke-dashoffset="0"
-    />
-    <defs>
-      <linearGradient id="gradient">
-        <stop offset="0%" stop-color="#00eaff"/>
-        <stop offset="100%" stop-color="#2392f1"/>
-      </linearGradient>
-    </defs>
-  </svg>
-  <div class="circle-content">
-    <div class="box-value float-updown">{{ props.value }}</div>
-  </div>
+
+<svg viewBox="0 0 120 120" class="ring-svg">
+  <circle
+    class="ring-bg"
+    cx="60" cy="60" r="50"
+    fill="none"
+    stroke="#02e0fd"
+    stroke-width="8"
+  />
+  <circle
+    class="ring-animate"
+    cx="60" cy="60" r="50"
+    fill="none"
+    stroke="url(#gradient)"
+    stroke-width="4"xixi
+    stroke-dasharray="314"
+    stroke-dashoffset="0"
+  />
+  <defs>
+    <linearGradient id="gradient">
+      <stop offset="0%" stop-color="#00eaff"/>
+      <stop offset="100%" stop-color="#2392f1"/>
+    </linearGradient>
+  </defs>
+</svg>
+<div class="circle-content">
+  <div class="box-value float-updown">{{ props.value }}</div>
+</div>
 </div>
 </div>
 </template>
@@ -114,7 +114,7 @@ text-shadow: 0 0.3vh 1vw #000, 0 0 0.2vw #00bfff;
 }
 
 .box-value {
-font-size: 2rem;
+font-size: 1.3rem;
 font-weight: bold;
 color: #fff;
 }

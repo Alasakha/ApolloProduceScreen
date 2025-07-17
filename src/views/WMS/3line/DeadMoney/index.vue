@@ -49,14 +49,14 @@ const fetchData = async () => {
         item.planAmt && item.actualAmt ? Math.round((item.actualAmt / item.planAmt) * 100) + '%' : '暂无数据'
       ]);
       rawData.value = transformed;
-      config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+      config.data = transformed.length > 0 ? transformed : [['暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据']];
     } else {
-      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+      config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据']];
     }
     isLoading.value = false;
   } catch (e) {
     console.log('数据获取失败');
-    config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+    config.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据']];
     isLoading.value = false;
   }
 };

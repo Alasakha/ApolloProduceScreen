@@ -5,12 +5,16 @@ import { getWarningNextDay } from '@/api/getScmInfo.js';
 import {getNextDay} from './nextday'
 import { eventBus } from '@/utils/eventbus';
 import * as echarts from 'echarts';
+import DetailTable from '@/components/WMS/DialogAbnormal/index.vue';
+const detailDialogVisible = ref(false);
 
+const tableLoading = ref(false);
 const rawData = ref([[], []]);  // 使用一个数组来保存两份数据
 const name = ref<any[]>([[], []]);  // 使用二维数组
 const config1 = reactive({
   header: ['排产时间', '客户单号','供应商代号','品号','品名','采购员','欠料数量'],
-  data: [],
+  dataForScrollBoard: [],
+  dataForElTable: [],
   index: true,
   align: [],
   carousel: 'page',
@@ -23,20 +27,19 @@ const config1 = reactive({
 let chartInstance: any = null; // 图表实例
 const dialogVisible = ref(false);
 const selectedItem = ref<any>({});
-  const detailHeaders = [
-  '排产时间',
-  '客户单号',
-  '供应商代号',
-  '品号',
-  '品名',
-  '采购员',
-  '欠料数量',
-];
+//   const detailHeaders = [
+//   '排产时间',
+//   '客户单号',
+//   '供应商代号',
+//   '品号',
+//   '品名',
+//   '采购员',
+//   '欠料数量',
+// ];
 
 
 // 获取数据并转换
 const fetchData = () => {
-
   getWarningNextDay()
     .then((res) => {
       rawData.value[0] = res.data.zzyk || [];
@@ -46,7 +49,6 @@ const fetchData = () => {
       name.value[0] = rawData.value[0].map((item: any) => [
         nextday,
         item.customerOrderNo,
-
         item.supplierCode,
         item.itemNo,
         item.itemName,
@@ -54,20 +56,34 @@ const fetchData = () => {
         Math.round(Number(item.purchaseQuantity))
       ]);
 
-      config1.data = name.value[0];
-
-      // ✅ 加占位
-      if (config1.data.length === 0) {
-        config1.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
+      if (name.value[0].length === 0) {
+        config1.dataForScrollBoard = [
+          {
+            排产时间: '暂无数据',
+            客户单号: '暂无数据',
+            供应商代号: '暂无数据',
+            品号: '暂无数据',
+            品名: '暂无数据',
+            采购员: '暂无数据',
+            欠料数量: '暂无数据'
+          }
+        ];
+      } else {
+        config1.dataForScrollBoard = name.value[0];
+config1.dataForElTable = name.value[0].map((row) => {
+  const obj: any = {};
+  config1.header.forEach((key, index) => {
+    obj[key] = row[index];
+  });
+  return obj;
+});
       }
     })
     .catch(() => {
       console.log('数据获取失败');
-    })
-    .finally(() => {
-      
     });
 };
+
 
 // 初始化图表
 const initChart = () => {
@@ -133,7 +149,12 @@ onBeforeUnmount(() => {
   window.removeEventListener('resize', resizeChart);
 });
 
-
+const openDialog = () => {
+  tableLoading.value = true;
+  fetchData();
+  detailDialogVisible.value = true;
+  tableLoading.value = false;
+};
 
 const clickHandler = (row: any) => {
   selectedItem.value = row.row; // 直接保存整行
@@ -142,20 +163,20 @@ const clickHandler = (row: any) => {
 </script>
 
 <template>
-  <div class="qianliao h-[20vh]">
+  <div class="qianliao h-[25vh]">
     <dv-border-box12 >
       <!-- 标题行 -->
     <div class="flex justify-around items-center">
     
       <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">次日生产欠料预警</h2>
-   
+      <el-button type="primary" class="mt-4 absolute right-4" @click="openDialog">查看详细</el-button>
     </div>
       
       <div class="flex">
       <div class='w-full'>        
         <ScrollBoard
           class="pl-4 pr-4 pt-2"
-          :config="config1"
+          :config="{ ...config1, data: config1.dataForScrollBoard }"
           style="width:100%;height:16vh"
           @click="clickHandler"
         />
@@ -165,18 +186,22 @@ const clickHandler = (row: any) => {
 
 </div>
 
-      
+        <!-- 使用封装的详情表格组件 -->
+  <DetailTable
+    v-model="detailDialogVisible"
+    title="工单异常详情"
+    :headers="config1.header"
+    :data="config1.dataForElTable"
+    :loading="tableLoading"
+   
+  />
 
     </dv-border-box12>
   </div>
 
 
 <!-- 弹窗部分 -->
-<el-dialog v-model="dialogVisible" title="详细信息" width="50%">
-  <div v-for="(label, index) in detailHeaders" :key="index" class="mb-2">
-    <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
-  </div>
-</el-dialog>
+
 </template>
 
 <style scoped>

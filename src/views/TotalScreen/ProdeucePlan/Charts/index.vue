@@ -11,19 +11,6 @@
   </script>
   
   <style scoped>
-  .box {
-    width: 100vw;
-    height: 100vh;
-  }
-  
-  
-  
-  
-  .picture{
-    margin-top: 1vh;
-    display: flex;
-    justify-content: space-around;
-  }
-  
+
   </style>
   

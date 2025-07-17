@@ -13,7 +13,7 @@
 
       
       <!-- //表格区域 -->
-      <div class="picture h-[50vh] flex p-4">
+      <div class="picture h-[45vh] flex p-4">
         <Line3></Line3>
       </div>
       

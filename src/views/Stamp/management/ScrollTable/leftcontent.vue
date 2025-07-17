@@ -12,7 +12,7 @@
        <!-- 数据加载完成且非空时显示图表 -->
         <div class="tablebox w-full h-[90%]">
            <!-- 如果正在加载，显示 loading -->
-         <dv-loading v-if="isLoading">Loading...</dv-loading>
+         <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
   
           <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
         </div>
@@ -30,7 +30,7 @@
   <script setup>
   import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
   import * as echarts from 'echarts';
-  import { getAbnormalList } from '@/api/getProduceinfo';
+  import { getWarningNextDay } from '@/api/getStampWeldinfo';
   import { useRoute } from 'vue-router';
   import { eventBus } from '@/utils/eventbus';
   import ScrollBoard from '@/components/datav/ScrollBoard.vue'
@@ -45,7 +45,13 @@
   const values = ref([]); // Y 轴数据
   let chartInstance = null;
   const config = reactive({
-    header: ['故障类型', '故障描述', '呼叫时间','解除时间','时长/分','责任人','故障解除人'],
+    header: ['排产时间',
+  '客户单号',
+  '供应商代号',
+  '品号',
+  '品名',
+  '采购员',
+  '欠料数量',],
     data: [
       ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
     ],
@@ -57,26 +63,38 @@
     showTooltip: true,
   })
   
+    const getNextDay = () => {
+    const today = new Date();
+    today.setDate(today.getDate() + 1); // 将日期增加一天
   
+    // const year = today.getFullYear();
+    const month = String(today.getMonth() + 1).padStart(2, '0'); // 获取月份，月份从0开始，因此加1
+    const day = String(today.getDate()).padStart(2, '0'); // 获取日期，确保日期格式为两位数
+  
+    return `${month}-${day}`; // 格式化为 yyyy-MM-dd 格式
+  };
+
+  const nextday = getNextDay();
+
   const fetchData = () => {
-    getAbnormalList(prodLine).then(res => {
-    isLoading.value = false;
-      console.log('获取到的数据:', res.data.length);
-    if (res.data.length !== 0) {
-      const list = res.data;
-  
-      config.data = list.map(item => [
-        item.guZhangTypeName ?? '无',
-        item.startRemark ?? '无',
-          item.startTime ? item.startTime.slice(5, 16) : '无',
-          item.endTime ? item.endTime.slice(5, 16) : '无',
-        item.guZhangTypeDuration,
-        item.dutyPeopleName ?? '无',
-        item.endPeopleName ?? '无'
-      ]);
-      console.log('config.data:', config.data)
-    }
-  });}
+    const param = prodLine === 'CY' ? '1003' : undefined; // 或其他默认值
+getWarningNextDay(param).then(res => {
+  isLoading.value = false;
+  if (res.data.length !== 0) {
+    const list = res.data;
+    config.data = list.map(item => [
+      nextday,
+      item.customerOrderNo,
+      item.supplierCode,
+      item.itemNo,
+      item.itemName,
+      item.purchaserName,
+      Math.round(Number(item.purchaseQuantity))
+    ]);
+    console.log('config.data:', config.data)
+  }
+});
+  }
   
   // 在组件挂载时启动定时获取数据
   onMounted(() => {
@@ -115,8 +133,6 @@
     font-weight: bold;
     margin-bottom: 10px;
   }
-  
-  
-  
+
   </style>
    

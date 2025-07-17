@@ -106,3 +106,11 @@ export const getAbnormalQualityReasonUpdate = (item_code, reason,docNo,po_arriva
   })
 }
 
+// /apollo/PlC/stagnantAmount 
+export const getStagnantAmount = (type:Number) => {
+  return request({
+    url: '/PMC/stagnantAmount',
+    method: 'get',
+    params: { type}
+  })
+}
