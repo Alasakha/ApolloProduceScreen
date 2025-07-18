@@ -38,7 +38,7 @@
       </div>
       <div class="row flex-1 flex gap-2 justify-around">
         <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'" /> 
-        <DataCard title="今日一次合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"  />
+        <DataCard title="今日一次合格"  titleFontSize="0.6" :value=" passedInfo?.firstTotal ?? '无数据'"  />
         <DataCard title="今日直通率" 
         :value="formatPercent(passedInfo?.passPercent)" />
         <DataCard title="今日合格数" 

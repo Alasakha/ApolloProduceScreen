@@ -73,7 +73,7 @@
           :valueFontSize="0.8"
           :squareHeight="70"
           /> 
-        <DataCard title="今日第一次合格数"  :value=" passedInfo?.firstTotal ?? '无数据'"
+        <DataCard title="今日一次合格"  :value=" passedInfo?.firstTotal ?? '无数据'"
           :titleFontSize="0.6"
           :valueFontSize="0.8"
           :squareHeight="70"

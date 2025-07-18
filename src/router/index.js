@@ -11,9 +11,10 @@ import  NEWSCM from '@/views/NewSCM/index.vue' // 这里是新 SCM 的路径
 import ProducePlan from '@/views/ProducePlan/index.vue'
 import PLM from '@/views/PLM/index.vue'
 import MaterialManagement from '@/views/MaterialsManagement/index.vue'
-import StampManagement from '@/views/Stamp/management/index.vue'
-import PressBoard from '@/views/Stamp/management/index.vue'
+import  PressBoard from '@/views/Stamp/management/index.vue'
+import StampManagement from '@/views/Welding/management/index.vue'
 import FinicialKpi from '@/views/Finance/index.vue'
+import Qualitykpi from '@/views/QualityKPIDashboard/index.vue'
 const routes = [
   {
     path: '/',
@@ -108,6 +109,12 @@ const routes = [
     path:'/financialkpi',
     name:'FinicialKpi',
     component:FinicialKpi,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path:'/qualitykpidashboard',
+    name:'Qualitykpi',
+    component:Qualitykpi,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   }
 ];

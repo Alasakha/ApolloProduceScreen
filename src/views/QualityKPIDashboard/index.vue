@@ -4,7 +4,8 @@
     <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
         <Header></Header>
         <Line1></Line1>
-
+        <Line2></Line2>
+        <Line3></Line3>
     </dv-border-box11>
   </dv-full-screen-container>
   </body>
@@ -13,8 +14,11 @@
   
 <script setup >
 import BorderBox from '@/components/datav/BorderBox.vue'
-import Line1 from './Line1/index.vue'
+// import Line1 from './Line1/index.vue'
 import Header from './header/index.vue'
+import Line1 from './Line1/index.vue'
+import Line2 from './Line2/index.vue'
+import Line3 from './Line3/index.vue'
 </script>
   
 

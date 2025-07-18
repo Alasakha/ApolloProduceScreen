@@ -67,7 +67,8 @@ const productionData = ref<TodayProduction>({
 const apolloStampingWeldingData = ref<ApolloStampingWelding>({
   checkTotal: 0,
   firstHgTotal: 0,
-  passPercent: '0%'
+  passPercent: '',
+  toBeInspected: 0
 })
 
 const fetchData = async (prodLine) => {
