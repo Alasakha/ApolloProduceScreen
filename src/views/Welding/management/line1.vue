@@ -170,10 +170,15 @@ const route = useRoute()
 const prodLine = route.query.prodLine as string
 
 const productionData = ref<TodayProduction>({
-  rate: 0,
-  pcTotal: 0,
-  done: 0,
-  undone: '0'
+  pcGdTotal: 0,   // 排产工单数
+  gdPg: 0,            // 工单派工数
+  rate: 0,            // 达成率
+  gdRate: 0,         // 工单达成率
+  pg: 0,             // 派工数
+  gdDone: 0,       // 工单报工数
+  pcTotal: 0,    // 排产数
+  done: 0,           // 报工数
+  undone: 0,       // 未报工数
 })
 
 const threeBox1 = ref()

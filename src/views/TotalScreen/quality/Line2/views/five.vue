@@ -29,7 +29,7 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('z');
+const title = ref('客诉关闭及时率');
 const dialogTitle = ref('客诉关闭及时率');
 
 const qualityIndicators = ref(null);

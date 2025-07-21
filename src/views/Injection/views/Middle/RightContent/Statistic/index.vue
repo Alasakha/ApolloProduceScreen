@@ -35,6 +35,8 @@ import CustomTable from "@/components/injection/NativeTable.vue";
 import { ref, onMounted, computed } from "vue";
 import { getInvokeDeviceList } from "@/api/getInjection";
 import OrderCard from "@/components/injection/DataCard.vue";
+import { usePowerStore } from '@/store/power';
+const powerStore = usePowerStore();
 
 const deviceList = ref([]);
 const loading = ref(true);
@@ -43,11 +45,22 @@ const fetchData = async () => {
     const res = await getInvokeDeviceList();
     if (res.data && Array.isArray(res.data)) {
       deviceList.value = res.data;
+
+      // 计算总标准耗电量
+      const total = res.data.reduce((sum, device) => {
+        const power = parseFloat((device.power || "0").replace("kw", "").trim());
+        const hour = parseFloat(device.hourBetween || 0);
+        return sum + power * hour;
+      }, 0);
+
+      powerStore.setTotalPower(Number(total.toFixed(1)));
       loading.value = false;
     }
+    console.log(totalStandardPower.value,'totalStandardPower.value')
   } catch (error) {
     console.error("数据获取失败", error);
   }
+
 };
 
 onMounted(() => {

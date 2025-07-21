@@ -136,7 +136,6 @@ export const getComplaintPie = () => {
   return request({
     url: '/production/complaintPie',
     method: 'get',
-
   })
 }
 // /production/complaint
@@ -206,5 +205,74 @@ export const getQualityCheckPie = (params ) => {
     method: 'post',
     params: params,
     data: ''
+  })
+}
+
+export const getServiceRequest = (documentName,hasAccessory,isCrossBorder, customer_name) =>{
+  return request({
+    url: '/quality/serviceRequest',
+    method: 'get',
+    params: { documentName,hasAccessory,isCrossBorder, customer_name }
+  })
+}
+
+// /quality/serviceRequestDetail
+export const getServiceRequestDetail = (documentName,hasAccessory,isCrossBorder, customer_name ) => {
+  return request({
+    url: '/quality/serviceRequestDetail',
+    method: 'get',
+    params: { documentName,hasAccessory,isCrossBorder, customer_name }
+  })
+}
+
+// /quality/serviceRequestReasonAdd
+export const getServiceRequestReasonAdd = (type ,reason ,solve ) => {
+  return request({
+    url: '/quality/serviceRequestReasonAdd',
+    method: 'get',
+    params: { type ,reason ,solve }
+  })
+}
+// d j i c
+
+// /quality/serviceRequestReason
+export const getServiceRequestReason = (type ) => {
+  return request({
+    url: '/quality/serviceRequestReason',
+    method: 'get',
+    params: { type }
+  })
+}
+
+// /apollo/quality/afterServicePie
+export const getAfterServicePie = ( ) => {
+  return request({
+    url: '/quality/afterServicePie',
+    method: 'get',
+  })
+}
+
+// /quality/afterService
+export const getAfterService = (breakdown_id,customer_code,feature_d_id  ) => {
+  return request({
+    url: '/quality/afterService',
+    method: 'get',
+    params:{breakdown_id,customer_code,feature_d_id}
+  })
+}
+
+// /quality/afterServiceCustomerPie
+export const getAfterServiceCustomerPie = ( ) => {
+  return request({
+    url: '/quality/afterServiceCustomerPie',
+    method: 'get',
+  })
+}
+
+// /quality/afterServiceCxPie
+export const getAfterServiceCxPie = ( ) => {
+  return request({
+    url: '/quality/afterServiceCxPie',
+    method: 'get',
   })
 }

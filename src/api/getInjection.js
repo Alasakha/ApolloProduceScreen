@@ -1,3 +1,4 @@
+
 import request from '../utils/request'
 
 //注塑
@@ -74,5 +75,14 @@ export const getRawMaterialMonitoringAdd =(zhsCode,reason ) =>{
     url: '/injection/rawMaterialMonitoringAdd',
     method: 'get',
     params:{zhsCode,reason}
+  })
+}
+
+
+
+export const getElectricToday =() =>{
+  return request({
+    url: '/injection/electricToday',
+    method: 'get',
   })
 }

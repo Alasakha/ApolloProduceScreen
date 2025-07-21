@@ -1,5 +1,5 @@
 <template>
-    <div class="h-[40vh] w-full grid grid-cols-3 gap-4 pl-4 pr-4">
+    <div class="h-[35vh] w-full grid grid-cols-3 gap-4 pl-4 pr-4">
         <Chart1></Chart1>
         <Chart2></Chart2>
         <Chart3></Chart3>

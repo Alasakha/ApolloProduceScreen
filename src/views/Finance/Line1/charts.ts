@@ -4,7 +4,7 @@ interface GaugeOptionResult {
 }
 
 export function createGaugeOption({
-    text = '标题',
+    // text = '标题',
     data = 0,
     max = 100
 }: { text?: string; data: number; max: number }): GaugeOptionResult {
@@ -32,7 +32,7 @@ export function createGaugeOption({
                 name: `ring_arc_${i}`,
                 type: 'custom',
                 coordinateSystem: "none",
-                renderItem: function (params: any, api: any) {
+                renderItem: function ( api: any) {
                     let currentAngle = api.value(0);
                     return {
                         type: 'arc',
@@ -60,7 +60,7 @@ export function createGaugeOption({
                 name: `ring_dot_${i}`,
                 type: 'custom',
                 coordinateSystem: "none",
-                renderItem: function (params: any, api: any) {
+                renderItem: function ( api: any) {
                     let currentAngle = api.value(0);
                     let x0 = api.getWidth() / 2;
                     let y0 = api.getHeight() / 2;

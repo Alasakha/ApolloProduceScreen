@@ -73,7 +73,6 @@ const opendialog = () => {
 const fetchData = () => {
     getAtopDayInspector( reasonType,dayType)
     .then(res => {
-      
       isLoading.value = false;
       processData(res.data);
     })

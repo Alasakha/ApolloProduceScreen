@@ -61,7 +61,6 @@
           <div>标准耗电量: {{ (Number(device.power.replace('kw', '')) * Number(device.hourBetween)).toFixed(2) }} kw·h</div>
           <div>实际耗电量: --</div>
         </div>
-          
         </div> -->
       </div>
     </div>

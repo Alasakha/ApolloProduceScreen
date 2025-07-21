@@ -90,6 +90,13 @@ const STATE_MAP = {
   'P': 'not-started' // 未下达
 }
 
+// 处理时间字符串的函数
+const parseDateTime = (dateTimeStr) => {
+  if (!dateTimeStr) return new Date();
+  // 确保时间字符串格式正确
+  return new Date(dateTimeStr.replace(' ', 'T'));
+}
+
 // 处理接口数据
 const processData = (data) => {
   // 按项目号分组
@@ -106,40 +113,45 @@ const processData = (data) => {
     }
     
     const project = projectMap.get(item.pno)
-    const endTime = new Date(item.etime)
-    const now = new Date()
     let status = STATE_MAP[item.tstate] || 'not-issued'
     
-    // E状态需要根据etime判断是否逾期
+    // 修改这里的逻辑：如果是E状态且没有结束时间，就直接显示为进行中
     if (item.tstate === 'E') {
-      status = endTime < now ? 'overdue' : 'in-progress'
+      status = 'in-progress'  // 直接标记为进行中，不再判断是否逾期
     }
     
     project.stages.push({
       name: item.pname,
       status: status,
       startTime: new Date(item.stime),
-      endTime: endTime,
-      duration: 0 // 将在后面计算
+      endTime: item.etime ? new Date(item.etime) : null,  // 如果etime为null就保持为null
+      duration: 0
     })
   })
 
-  // 计算每个阶段的持续时间占比
+  // 计算每个阶段的持续时间占比时也需要处理null的情况
   projectMap.forEach(project => {
     // 找出项目的最早开始时间和最晚结束时间
     const startTimes = project.stages.map(s => s.startTime.getTime())
-    const endTimes = project.stages.map(s => s.endTime.getTime())
+    const endTimes = project.stages
+      .filter(s => s.endTime) // 只处理有结束时间的阶段
+      .map(s => s.endTime.getTime())
+    
     const projectStart = Math.min(...startTimes)
-    const projectEnd = Math.max(...endTimes)
+    const projectEnd = endTimes.length > 0 ? Math.max(...endTimes) : Date.now() // 如果没有结束时间，使用当前时间
     const totalDuration = projectEnd - projectStart
 
     // 计算每个阶段的持续时间占比
     project.stages.forEach(stage => {
-      const stageDuration = stage.endTime.getTime() - stage.startTime.getTime()
-      stage.duration = (stageDuration / totalDuration) * 100
-      
-      // 添加时间信息用于tooltip
-      stage.timeInfo = `${stage.startTime.toLocaleDateString()} - ${stage.endTime.toLocaleDateString()}`
+      if (stage.endTime) {
+        const stageDuration = stage.endTime.getTime() - stage.startTime.getTime()
+        stage.duration = (stageDuration / totalDuration) * 100
+        stage.timeInfo = `${stage.startTime.toLocaleDateString()} - ${stage.endTime.toLocaleDateString()}`
+      } else {
+        // 如果没有结束时间，就显示"开始时间 - 进行中"
+        stage.duration = ((Date.now() - stage.startTime.getTime()) / totalDuration) * 100
+        stage.timeInfo = `${stage.startTime.toLocaleDateString()} - 进行中`
+      }
     })
 
     // 按开始时间排序

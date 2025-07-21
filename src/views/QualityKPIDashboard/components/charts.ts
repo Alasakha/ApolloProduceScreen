@@ -2,12 +2,49 @@ interface GaugeOptionResult {
     option: any;
     startAnimation: (chart: any) => () => void;
 }
-
+const colorMap = {
+    normal: '#0CD3DB',   // 蓝色
+    warn: '#FFA500',     // 橙色
+    danger: '#FF4C4C'     // 红色
+  };
+  const gradientMap = {
+    normal: {
+      type: 'linear',
+      x: 0, y: 0, x2: 0, y2: 1,
+      colorStops: [
+        { offset: 0, color: '#4FADFD' },
+        { offset: 1, color: '#28E8FA' }
+      ]
+    },
+    warn: {
+      type: 'linear',
+      x: 0, y: 0, x2: 0, y2: 1,
+      colorStops: [
+        { offset: 0, color: '#FFA500' },
+        { offset: 1, color: '#FFCC66' }
+      ]
+    },
+    danger: {
+      type: 'linear',
+      x: 0, y: 0, x2: 0, y2: 1,
+      colorStops: [
+        { offset: 0, color: '#FF4C4C' },
+        { offset: 1, color: '#FF9999' }
+      ]
+    }
+  };
 export function createGaugeOption({
-    text = '标题',
+    // text = '标题',
     data = 0,
-    max = 100
-}: { text?: string; data: number; max: number }): GaugeOptionResult {
+    max = 100,
+    warnLevel = 'normal'
+  }: {
+    text?: string;
+    data: number;
+    max: number;
+    warnLevel?: 'normal' | 'warn' | 'danger';
+  }): GaugeOptionResult  {
+    const gaugeColor = colorMap[warnLevel];
     let angle = 0;
     let value = data;     // 用外部传入的 data
     let animatedValue = 0;
@@ -32,7 +69,7 @@ export function createGaugeOption({
                 name: `ring_arc_${i}`,
                 type: 'custom',
                 coordinateSystem: "none",
-                renderItem: function (params: any, api: any) {
+                renderItem: function (_: any, api: any) {
                     let currentAngle = api.value(0);
                     return {
                         type: 'arc',
@@ -44,10 +81,10 @@ export function createGaugeOption({
                             endAngle: (arc.end + currentAngle) * Math.PI / 180
                         },
                         style: {
-                            stroke: "#0CD3DB",
+                            stroke: gaugeColor, // 警告时橙色
                             fill: "transparent",
                             lineWidth: 1.5
-                        },
+                          },
                         silent: true
                     }
                 },
@@ -60,7 +97,7 @@ export function createGaugeOption({
                 name: `ring_dot_${i}`,
                 type: 'custom',
                 coordinateSystem: "none",
-                renderItem: function (params: any, api: any) {
+                renderItem: function ( _: any,api: any) {
                     let currentAngle = api.value(0);
                     let x0 = api.getWidth() / 2;
                     let y0 = api.getHeight() / 2;
@@ -74,9 +111,10 @@ export function createGaugeOption({
                             r: 4
                         },
                         style: {
-                            stroke: "#0CD3DB",
-                            fill: "#0CD3DB"
-                        },
+                            stroke: gaugeColor, // 警告时橙色
+                            fill: "transparent",
+                            lineWidth: 1.5
+                          },
                         silent: true
                     }
                 },
@@ -91,41 +129,53 @@ export function createGaugeOption({
     const option = {
         backgroundColor: 'transparent',
         title: {
-            text: `{a|${animatedValue.toFixed(2)}}{c|%}`,
+            text: `{a|${animatedValue.toFixed(0)}}{c|%}`,
             x: 'center',
             y: 'center',
+            // textStyle: {
+            //     rich: {
+            //         a: {
+            //             fontSize: 20,
+            //             color: '#29EEF3'
+            //         },
+            //         c: {
+            //             fontSize: 20,
+            //              color: '#29EEF3'
+            //         }
+            //     }
+            // }
             textStyle: {
                 rich: {
-                    a: {
-                        fontSize: 20,
-                        color: '#29EEF3'
-                    },
-                    c: {
-                        fontSize: 20,
-                         color: '#29EEF3'
-                    }
+                  a: {
+                    fontSize: 20,
+                    color: gaugeColor // 标题变橙色
+                  },
+                  c: {
+                    fontSize: 20,
+                    color: gaugeColor
+                  }
                 }
-            }
+              }
         },
-        legend: {
-            type: "plain",
-            orient: "vertical",
-            right: 0,
-            top: "10%",
-            align: "auto",
-            data: [
-                { name: '涨价后没吃过', icon: "circle" },
-                { name: '天天吃', icon: "circle" },
-                { name: '三五天吃一次', icon: "circle" },
-                { name: '半个月吃一次', icon: "circle" }
-            ],
-            textStyle: {
-                color: "white",
-                fontSize: 16,
-                padding: [10, 1, 10, 0]
-            },
-            selectedMode: false
-        },
+        // legend: {
+        //     type: "plain",
+        //     orient: "vertical",
+        //     right: 0,
+        //     top: "10%",
+        //     align: "auto",
+        //     // data: [
+        //     //     { name: '涨价后没吃过', icon: "circle" },
+        //     //     { name: '天天吃', icon: "circle" },
+        //     //     { name: '三五天吃一次', icon: "circle" },
+        //     //     { name: '半个月吃一次', icon: "circle" }
+        //     // ],
+        //     textStyle: {
+        //         color: "white",
+        //         fontSize: 16,
+        //         padding: [10, 1, 10, 0]
+        //     },
+        //     selectedMode: false
+        // },
         series: [
             ...createCustomSeries(),
             {
@@ -147,14 +197,25 @@ export function createGaugeOption({
                     {
                         value: value,
                         name: "",
+                        // itemStyle: {
+                        //     color: {
+                        //         colorStops: [
+                        //             { offset: 0, color: '#4FADFD' },
+                        //             { offset: 1, color: '#28E8FA' }
+                        //         ]
+                        //     }
+                        // }
                         itemStyle: {
-                            color: {
-                                colorStops: [
-                                    { offset: 0, color: '#4FADFD' },
-                                    { offset: 1, color: '#28E8FA' }
-                                ]
-                            }
-                        }
+                            // color: warn
+                            //   ? '#FFA500' // 橙色（警告）
+                            //   : {
+                            //       colorStops: [
+                            //         { offset: 0, color: '#4FADFD' },
+                            //         { offset: 1, color: '#28E8FA' }
+                            //       ]
+                            //     }
+                            color: gradientMap[warnLevel]
+                          }
                     },
                     {
                         value: max - value,
@@ -175,15 +236,15 @@ export function createGaugeOption({
             let progress = Math.min((timestamp - startTime) / duration, 1);
             animatedValue = value * progress;
     
-            const percent = (animatedValue / max) * 100;
+            // const percent = (animatedValue / max) * 100;
     
             chart.setOption({
                 title: {
-                    text: `{a|${percent.toFixed(2)}}{c|%}`
+                    text: `{a|${animatedValue.toFixed(0)}}`
                 }
             });
     
-            if (progress < 1) {
+            if (progress < 1) { 
                 requestAnimationFrame(step);
             }
         }
