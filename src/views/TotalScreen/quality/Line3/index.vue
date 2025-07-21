@@ -13,8 +13,8 @@
   <script setup lang="ts">
 import CuoRou from './views/CuoRou.vue'
 import LaiLiao from './views/LaiLiao.vue'
-import ZhuangPei from './views/ZhuangPei.vue'
-import BaoZhuang from './views/BaoZhuang.vue'
+import ZhuangPei from './views/ZhuangPei2.vue'
+import BaoZhuang from './views/BaoZhuang2.vue'
   </script>
   
   <style scoped>

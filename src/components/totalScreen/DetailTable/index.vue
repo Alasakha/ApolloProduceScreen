@@ -140,6 +140,17 @@ const handleCurrentChange = (val) => {
 // 处理原因和责任人更新
 const handleReasonUpdate = (data) => {
   console.log('DetailTable - Updating reason with data:', data);
+
+  // 更新 tableData 中对应行的数据（确保响应式）
+  const index = tableData.value.findIndex(item => item === data.row);
+  if (index !== -1) {
+    // 直接更新数据源字段
+    tableData.value[index]['原因'] = data.reason;
+    tableData.value[index]['责任人'] = data.duty;
+    tableData.value[index]['完成期限'] = data.completeDate;
+  }
+
+  // 向父组件派发更新事件（可携带完整数据）
   emit('update:reason', data);
 };
 </script>

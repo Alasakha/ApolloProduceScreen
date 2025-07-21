@@ -7,9 +7,9 @@
       
    <div class="flex-1 flex justify-center items-center w-full h-full  ">
 
-      <div class=" flex items-center text-white text-sm drop-shadow-lg justify-end flex-col">
+      <div class=" flex items-center text-white text-2xl drop-shadow-lg justify-end flex-col w-full">
         <!-- SVG图标（示例为电量/闪电图标，可替换为你喜欢的） -->
-         <div class="flex"> <svg class="w-5 h-5 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
+         <div class="flex"> <svg class="w-7 h-7 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
         <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
         </svg> <div class="tracking-widest from-cyan-500 to-white ">当日耗电总量</div>
        </div>
@@ -29,9 +29,9 @@
     </div>
     </div>
 
-    <div class=" flex items-center text-white text-sm drop-shadow-lg justify-end flex-col">
+    <div class=" flex items-center text-white text-2xl drop-shadow-lg justify-end flex-col w-full">
         <!-- SVG图标（示例为电量/闪电图标，可替换为你喜欢的） -->
-         <div class="flex"> <svg class="w-5 h-5 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
+         <div class="flex"> <svg class="w-7 h-7 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
         <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
         </svg> <div class="tracking-widest from-cyan-500 to-white ">当日标准耗总电量</div>
        </div>
@@ -44,7 +44,7 @@
     </div>
     </div>
 
-      <img src="@/assets/APOLLO.png" alt="" class="w-[50%]">
+    
       </div>
      
    
@@ -60,6 +60,7 @@
       <div class="flex-1 flex justify-center items-center justify-around
       text-3xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
       tracking-wide w-[300px] h-full pl-4 pr-4 ">
+      <img src="@/assets/APOLLO.png" alt="" class="w-[50%]">
       <dv-border-box1 >
         <div class="text-xl flex justify-around  item-center text-white flex-col w-full h-full">
          

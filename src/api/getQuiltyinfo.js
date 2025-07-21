@@ -276,3 +276,12 @@ export const getAfterServiceCxPie = ( ) => {
     method: 'get',
   })
 }
+
+
+// quality/checkTotalDone 装配包装 需检验数/已检验数
+export const getCheckTotalDone = ( ) => {
+  return request({
+    url: '/quality/checkTotalDone',
+    method: 'get',
+  })
+}
