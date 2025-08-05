@@ -33,13 +33,17 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
           detail: {
             show: true,
             color: "#fff",
-            // offsetCenter: [0, 15],
+            // offsetCenter: [0, 15], 
             offsetCenter: size >= 2 ? [0, 15] : size >= 1.5 ? [0, 20] : [0, 35],
             fontSize: size >= 2 ? 12 : size >= 1.5 ? 16 : 24,
             formatter: () => {
               // 判断标题是否是 'xx'，如果是加百分号
               if (text === '点检及时率') {
                 return `${Math.round(data)}%`;
+              }
+              // 对于人效相关指标，保留两位小数
+              if (text === '实际人效' || text === '标准人效') {
+                return `${data.toFixed(2)}`;
               }
               return `${Math.round(data)}`;
             },

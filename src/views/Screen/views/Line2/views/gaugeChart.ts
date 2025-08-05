@@ -1,6 +1,7 @@
+
 // gaugeChart.ts
 const size = window.devicePixelRatio;
-export function createGaugeOption({ text = '标题', data = 0, max = 100, unit = '' }: { text?: string; data: number; max: number; unit?: string }) {
+export function createGaugeOption({ text = '标题', data , max  }: { text?: string; data: number; max: number }) {
     return {
       title: {
         text: text,
@@ -25,14 +26,14 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100, unit =
           radius: '75%',
           z: 1,
           clockwise: false,
-          startAngle: -269.99,
-          endAngle: 90,
+          startAngle: 90,
+          endAngle: -270,
           splitNumber: 24,
           splitLine: { show: false },
           detail: {
             show: true,
             color: "#fff",
-            // offsetCenter: [0, 15],
+            // offsetCenter: [0, 15], 
             offsetCenter: size >= 2 ? [0, 15] : size >= 1.5 ? [0, 20] : [0, 35],
             fontSize: size >= 2 ? 12 : size >= 1.5 ? 16 : 24,
             formatter: () => {
@@ -40,8 +41,9 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100, unit =
               if (text === '点检及时率') {
                 return `${Math.round(data)}%`;
               }
-              if (unit) {
-                return `${Math.round(data)}${unit}`;
+              // 对于人效相关指标，保留两位小数
+              if (text === '实际人效' || text === '标准人效') {
+                return `${data.toFixed(2)}`;
               }
               return `${Math.round(data)}`;
             },
@@ -125,7 +127,7 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100, unit =
         },
         {
           type: 'gauge',
-          max: max,
+          max: max, // ← 关键就是补这一行
           z: 5,
           clockwise: false,
           startAngle: -269.99,
@@ -142,14 +144,15 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100, unit =
             height: 14,
             offsetCenter: [0, '-100%'],
             itemStyle: {
+              // color: 'rgba(140, 234, 174, 1)',
               color:'rgb(255, 255, 255)'
             },
           },
           detail: { show: false },
           title: { show: false },
           data: [
-            { value: data }, // 实时移动的小圆点
-            { value: 0 },    // 固定在起始位置的小圆点
+            { value: data },
+            { value: 0 },
           ],
         },
       ],

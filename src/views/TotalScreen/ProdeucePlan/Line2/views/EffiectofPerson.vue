@@ -178,7 +178,6 @@ const chart5 = useEcharts(Indicators5);
 const chart6 = useEcharts(Indicators6);
 
 const drawChart = () => {
-  console.log('drawChart - stanarNum:', EfficentData.stanarNum, 'scanNum:', EfficentData.scanNum);
   
   const option1 = createGaugeOption({
     text: "配置人数",
@@ -209,13 +208,13 @@ const drawChart = () => {
   const option5 = createGaugeOption({
     text: "标准人效",
     data: EfficentData.standardEfficiency,
-    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) * 1.2 || 100
+    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency)  || 0
   });
 
   const option6 = createGaugeOption({
     text: "实际人效",
     data: EfficentData.efficiency,
-    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) * 1.2 || 100
+    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency)  || 0
   });
 
 
@@ -228,11 +227,13 @@ const drawChart = () => {
 };
 
 const fetchData = async () => {
-  const res = await getEfficiencyToday(prodLine);
 
+  const res = await getEfficiencyToday(prodLine);
+  
   // 分别赋值，保持响应式
   EfficentData.standardEfficiency = Number(res.data.standardEfficiency) || 0;
   EfficentData.efficiency = Number(res.data.efficiency) || 0;
+  
   EfficentData.total = res.data.total ?? 0;
   EfficentData.clTotal = res.data.clTotal ?? 0;
   EfficentData.scanNum = Number(res.data.scanNum) ?? 0;
