@@ -1,18 +1,43 @@
 <template>
-    <div class="content w-full h-full p-4">
-        <h1 class="text-2xl font-bold text-[#00eeff]">月度接单达成</h1>
-        <div class="table-container overflow-auto rounded-lg border border-[#00eeff] shadow-[0_0_20px_rgba(0,238,255,0.3)]">
-            <table class="w-full text-sm text-center border-collapse text-[#00eeff]">
+    <div class="content w-full h-full p-2 ">
+        <h1 class="
+            text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 
+            font-bold text-[#00eeff] 
+            text-center sm:text-left 
+            3xl:text-sm 4xl:text-xl
+        ">月度接单达成</h1>
+        <div class="
+
+            table-container overflow-auto 
+            rounded-sm sm:rounded-md md:rounded-lg 
+            border border-[#00eeff] 
+            shadow-[0_0_10px_rgba(0,238,255,0.2)] sm:shadow-[0_0_15px_rgba(0,238,255,0.25)] md:shadow-[0_0_20px_rgba(0,238,255,0.3)]
+            max-h-[calc(100vh-8rem)] sm:max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-12rem)]
+            3xl:max-h-[calc(20vh-2rem)] 4xl:max-h-[calc(20vh-2.5rem)]
+            
+        ">
+            <table class="w-full  text-center border-collapse text-[#00eeff] 3xl:text-[12px] 4xl:text-xs
+            2xl:text-[10px] xl:text-[10px] lg:text-[10px] md:text-[10px] sm:text-[10px]">
                 <thead>
                     <tr class="border-b border-[#00eeff40] bg-[#001122]">
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">组别</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">配件接单</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算数量</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算金额(美元)</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算数量</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算金额(美元)</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单数量</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单金额(美元)</th>
+                        <th 
+                            v-for="header in tableHeaders" 
+                            :key="header.key"
+                            class="
+                                px-1 py-1 
+                                border-x border-[#00eeff40] text-[#00FFFF] font-normal 
+
+                            "
+                        >
+                            <!-- XL屏幕显示 -->
+                            <span v-if="header.xl !== header.lg" class="hidden xl:inline">{{ header.xl }}</span>
+                            <!-- LG屏幕显示 -->
+                            <span v-if="header.lg !== header.md" :class="header.xl !== header.lg ? 'hidden lg:inline xl:hidden' : 'hidden lg:inline'">{{ header.lg }}</span>
+                            <!-- MD屏幕显示 -->
+                            <span v-if="header.md !== header.sm" :class="header.lg !== header.md ? 'hidden md:inline lg:hidden' : 'hidden md:inline'">{{ header.md }}</span>
+                            <!-- SM及以下屏幕显示 -->
+                            <span :class="header.md !== header.sm ? 'md:hidden' : ''">{{ header.sm }}</span>
+                        </th>
                     </tr>
                 </thead>
                 <tbody>
@@ -144,7 +169,7 @@ th {
     letter-spacing: 2px;
     font-family: 'Segoe UI', 'Arial', sans-serif;
     text-shadow: 0 0 10px rgba(0,225,255,0.5);
-    font-size: 0.9rem;
+
     background: linear-gradient(180deg, #001122 0%, #001a33 100%);
 }
 
@@ -250,6 +275,66 @@ interface TableItem {
 }
 
 const tableData = ref<TableItem[]>([])
+
+// 表头配置
+const tableHeaders = [
+  {
+    key: 'empCategory',
+    xl: '组别',
+    lg: '组别',
+    md: '组别',
+    sm: '组别'
+  },
+  {
+    key: 'pjTotal',
+    xl: '配件接单',
+    lg: '配件接单',
+    md: '配件接单',
+    sm: '接单'
+  },
+  {
+    key: 'ysQuantityYear',
+    xl: '年度预算数量',
+    lg: '年度预算数量',
+    md: '年预算量',
+    sm: '年量'
+  },
+  {
+    key: 'ysAmtYear',
+    xl: '年度预算金额(美元)',
+    lg: '年预算金额',
+    md: '年金额',
+    sm: '年$'
+  },
+  {
+    key: 'ysQuantityAgain',
+    xl: '再次预算数量',
+    lg: '再次预算数量',
+    md: '再预算量',
+    sm: '再量'
+  },
+  {
+    key: 'ysAmtAgain',
+    xl: '再次预算金额(美元)',
+    lg: '再预算金额',
+    md: '再金额',
+    sm: '再$'
+  },
+  {
+    key: 'xdCount',
+    xl: '已下单数量',
+    lg: '已下单数量',
+    md: '已下单量',
+    sm: '下量'
+  },
+  {
+    key: 'xdTotal',
+    xl: '已下单金额(美元)',
+    lg: '已下单金额',
+    md: '下金额',
+    sm: '下$'
+  }
+]
 
 // 修改数据展示的计算属性
 const regularData = computed(() => {

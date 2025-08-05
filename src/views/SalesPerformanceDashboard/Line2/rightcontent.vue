@@ -1,6 +1,6 @@
 <template>
-  <div class="h-full w-full p-4">
-    <div class="chart-container h-full w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]">
+  <div class="h-full w-full p-2 sm:p-3 md:p-4 lg:p-4 xl:p-4 3xl:p-1 4xl:p-2">
+    <div class="chart-container h-[calc(22vh-2.5rem)] w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]">
       <v-chart class="chart" :option="chartOption"  autoresize />
     </div>
   </div>
@@ -82,11 +82,11 @@ const chartOption = computed(() => ({
     },
     formatter: (name: string) => {
       const unitMap: Record<string, string> = {
-        '年度预算金额': '万元',
-        '再次预算金额': '万元',
-        '已下单金额': '万元'
+        '年度预算金额': '$',
+        '再次预算金额': '$',
+        '已下单金额': '$'
       };
-      return `${name}（${unitMap[name] || '万'}）`;
+      return `${name}（${unitMap[name] || '$'}）`;
     },
     top: 10
   },
@@ -105,13 +105,13 @@ const chartOption = computed(() => ({
   },
   yAxis: {
     type: 'value',
-    name: '金额（万元）',
+    name: '金额（$）',
     nameTextStyle: {
       color: '#fff'
     },
     axisLabel: {
       color: '#fff',
-      formatter: (value: number) => `${value.toFixed(2)}万`
+      formatter: (value: number) => `${value.toFixed(2)}$`
     },
     splitLine: {
       lineStyle: {
@@ -136,7 +136,7 @@ const chartOption = computed(() => ({
       label: {
         show: true,
         position: 'top',
-        formatter: '{c}万',
+        formatter: '{c}$',
         color: '#fff'
       }
     },
@@ -156,7 +156,7 @@ const chartOption = computed(() => ({
       label: {
         show: true,
         position: 'top',
-        formatter: '{c}万',
+        formatter: '{c}$',
         color: '#fff'
       }
     },
@@ -174,7 +174,7 @@ const chartOption = computed(() => ({
       label: {
         show: true,
         position: 'top',
-        formatter: '{c}万',
+        formatter: '{c}$',
         color: '#fff'
       }
     }

@@ -70,7 +70,7 @@
       formatter: (params: any[]) => {
       let result = `${params[0].name}<br/>`;
       params.forEach(param => {
-        const unit = param.seriesName === '已下单金额' ? '万' : '';
+        const unit = param.seriesName === '已下单金额' ? '$' : '';
         result += `${param.seriesName}：${param.value.toFixed(2)}${unit}<br/>`;
       });
       return result;
@@ -82,7 +82,7 @@
         color: '#fff'
       },
       formatter: (name: string) => {
-        return name + '万'
+        return name + '$'
       }
     },
     grid: {
@@ -105,7 +105,7 @@
         position: 'left',
         axisLabel: {
           color: '#fff',
-          formatter: (value: number) => `${value.toFixed(2)}万元`
+          formatter: (value: number) => `${value.toFixed(2)}$`
         },
         splitLine: {
           lineStyle: {
@@ -190,7 +190,7 @@
         label: {
         show: true,
         position: 'top',
-        formatter: '{c}万',
+        formatter: '{c}$',
         color: '#fff'
       }
       }

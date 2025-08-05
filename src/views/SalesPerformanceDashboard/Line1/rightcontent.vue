@@ -1,7 +1,7 @@
 <template>
-  <div class="h-full w-full p-4">
+  <div class="h-full w-full p-2 3xl:p-1 4xl:p-2">
     <!-- 修改容器样式 -->
-    <div class="chart-container w-full" style="height: calc(100% - 2rem);">
+    <div class="chart-container w-full" style="height: 100%;">
       <v-chart class="chart" :option="chartOption" autoresize />
     </div>
   </div>
@@ -193,7 +193,6 @@ watch(() => props.tableData, (newVal) => {
   background: rgba(0,19,47,0.95);
   border: 1px solid #00eeff;
   border-radius: 8px;
-  min-height: 300px; /* 添加最小高度 */
 }
 
 .chart {

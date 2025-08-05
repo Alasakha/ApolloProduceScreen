@@ -1,18 +1,21 @@
 <template>
-    <div class="content w-full h-full p-4">
-        <h1 class="text-2xl font-bold text-[#00eeff]">大客户接单达成</h1>
-        <div class="table-container overflow-auto rounded-lg border border-[#00eeff] shadow-[0_0_20px_rgba(0,238,255,0.3)]">
-            <table class="w-full text-sm text-center border-collapse text-[#00eeff]">
+    <div class="content w-full h-full p-2 sm:p-3 md:p-4 lg:p-4 xl:p-4 3xl:p-1 4xl:p-2">
+        <h1 class="            text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 
+            font-bold text-[#00eeff] 
+            text-center sm:text-left 
+            3xl:text-sm 4xl:text-xl">大客户接单达成</h1>
+        <div class="table-container h-[calc(22vh-2.5rem)] overflow-y-auto rounded-lg border border-[#00eeff] shadow-[0_0_20px_rgba(0,238,255,0.3)]">
+            <table class="w-full text-xs 3xl:text-5xl 4xl:text-sm text-center border-collapse text-[#00eeff] 3xl:text-xs 4xl:text-sm">
                 <thead>
-                    <tr class="border-b border-[#00eeff40] bg-[#001122]">
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">组别</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">配件接单</th>
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算数量</th> -->
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算金额(美元)</th>
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算数量</th> -->
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算金额(美元)</th>
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单数量</th> -->
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单金额(美元)</th>
+                    <tr class="border-b border-[#00eeff40] bg-[#001122] text-sm sm:text-sm md:text-sm lg:text-sm xl:text-sm 3xl:text-[10px] 4xl:text-sm">
+                        <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">组别</th>
+                        <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">配件接单</th> -->
+                        <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">年度预算数量</th> -->
+                        <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">年度预算金额(美元)</th>
+                        <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">再次预算数量</th> -->
+                        <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">再次预算金额(美元)</th>
+                        <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">已下单数量</th> -->
+                        <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">已下单金额(美元)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,8 +25,8 @@
                         idx % 2 === 0 ? 'bg-[rgba(0,245,255,0.4)]' : 'bg-[rgba(0,238,255,0.1)]',
                         'hover:bg-[rgba(0,238,255,0.2)]'
                     ]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ item.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.pjTotal }}</td>
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 text-left border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ item.empCategory }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ item.pjTotal }}</td> -->
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysQuantityYear" 
@@ -34,7 +37,7 @@
                                 {{ item.ysQuantityYearComparison }}
                             </span>
                         </td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] relative group 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">
                             <input 
                                 v-model="item.ysAmtYear" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -54,7 +57,7 @@
                                 {{ item.ysQuantityAgainComparison }}
                             </span>
                         </td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] relative group 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">
                             <input 
                                 v-model="item.ysAmtAgain" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -64,32 +67,32 @@
                                 {{ item.ysAmtAgainComparison }}
                             </span>
                         </td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdCount }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdTotal }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ item.xdCount }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ item.xdTotal }}</td>
                     </tr>
                     
                     <!-- 合计行 -->
                     <tr class="bg-[rgba(0,238,255,0.15)] font-semibold border-b border-[#00eeff40]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ total.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.pjTotal }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysQuantityYear }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysAmtYear }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysQuantityAgain }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysAmtAgain }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdCount }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdTotal }}</td>
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 text-left border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.empCategory }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.pjTotal }}</td> -->
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysQuantityYear }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysAmtYear }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysQuantityAgain }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysAmtAgain }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.xdCount }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.xdTotal }}</td>
                     </tr>
 
                     <!-- 阶段性汇总行 -->
                     <tr v-if="summaryData" class="bg-[rgba(0,238,255,0.1)] font-semibold border-b border-[#00eeff40]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ summaryData.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.pjTotal }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysQuantityYear }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysAmtYear }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysQuantityAgain }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysAmtAgain }}</td>
-                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdCount }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdTotal }}</td>
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 text-left border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.empCategory }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.pjTotal }}</td> -->
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysQuantityYear }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysAmtYear }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysQuantityAgain }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysAmtAgain }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.xdCount }}</td> -->
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.xdTotal }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -144,7 +147,6 @@ th {
     letter-spacing: 2px;
     font-family: 'Segoe UI', 'Arial', sans-serif;
     text-shadow: 0 0 10px rgba(0,225,255,0.5);
-    font-size: 0.9rem;
     background: linear-gradient(180deg, #001122 0%, #001a33 100%);
 }
 

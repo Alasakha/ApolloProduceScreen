@@ -1,7 +1,11 @@
 <template>
-  <div class="grid grid-cols-2 gap-4 h-[20vh]">
-    <LeftContent @update:chartData="updateChartData" />
-    <RightContent :chartData="chartData" />
+  <div class="flex gap-4 h-[20vh]">
+    <div class="w-2/3 ">
+      <LeftContent @update:chartData="updateChartData" />
+    </div>
+    <div class="w-1/3 ">
+      <RightContent :chartData="chartData" />
+    </div>
   </div>
 </template>
 
