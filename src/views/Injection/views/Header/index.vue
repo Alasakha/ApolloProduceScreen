@@ -17,13 +17,13 @@
        
        <div style=" color: aqua;">
       <div color-green font-600 class="content" bg="~ dark/0">
-        {{TotalElectrcity}}kw·h 
+        {{ injectionPowerStore.totalPower }}kw·h 
         <span :style="{ color: powerDiffDirection.includes('↑') 
                         ? 'red' 
                         : powerDiffDirection.includes('↓') 
                           ? 'lime' 
                           : 'gray' }">
-  {{ powerDiffDirection }}kw·h
+  {{ powerDiffDirection }}
 </span>
       </div>
     </div>
@@ -39,7 +39,7 @@
        
        <div style=" color: aqua;">
       <div color-green font-600 class="content" bg="~ dark/0">
-        {{ powerStore.totalStandardPower }} kw·h
+        {{ injectionPowerStore.totalStandardPower }} kw·h
       </div>
     </div>
     </div>
@@ -80,8 +80,8 @@
 import {onMounted, ref,computed} from 'vue'
 import Time from './time.vue'
 import { useDateTime } from "./time";
-import { usePowerStore } from '@/store/power';
-const powerStore = usePowerStore();
+import { useInjectionPowerStore } from '@/store/injectionPower';
+const injectionPowerStore = useInjectionPowerStore();
 const { dateStr } = useDateTime();
 // import BorderBox from '@/components/datav/BorderBox.vue'
 
@@ -91,7 +91,7 @@ const fetchChartData = async () => {
   try {
     const res = await getElectricToday()
     console.log(res)
-    TotalElectrcity.value = res.data
+    injectionPowerStore.setTotalPower(res.data)
     // 假设返回的数据结构为 { data: ... }
     console.log('今日耗电量数据:', res.data)
     console.log('今日耗电量数据:', TotalElectrcity.value)
@@ -103,8 +103,8 @@ const fetchChartData = async () => {
 }
 
 const powerDiffDirection = computed(() => {
-  const actual = Number(TotalElectrcity.value)
-  const standard = Number(powerStore.totalStandardPower)
+  const actual = Number(injectionPowerStore.totalPower)
+  const standard = Number(injectionPowerStore.totalStandardPower)
 
   if (isNaN(actual) || isNaN(standard)) return ''  // 安全处理
   if (actual > standard) {

@@ -22,7 +22,7 @@
     "src/**/*.vue",
     "src/main.js",
     "src/utils/eventbus.ts",
-    "src/router/index.js",
+    "src/router/index.ts",
     "src/types/**/*.ts"
   ]
 }

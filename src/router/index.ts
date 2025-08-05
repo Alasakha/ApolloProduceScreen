@@ -1,4 +1,5 @@
 import { createRouter, createWebHistory } from 'vue-router';
+import type { RouteRecordRaw } from 'vue-router';
 import Home from '../views/index.vue';
 import Screen from '../views/Screen/index.vue';
 import Project from '../views/TotalScreen/ProdeucePlan/index.vue';
@@ -12,13 +13,20 @@ import ProducePlan from '@/views/ProducePlan/index.vue'
 import PLM from '@/views/PLM/index.vue'
 import MaterialManagement from '@/views/MaterialsManagement/index.vue'
 import  PressBoard from '@/views/Stamp/management/index.vue'
+import  paint from '@/views/Paint/management/index.vue'
+import  welding2 from '@/views/Welding2/management/index.vue'
 import StampManagement from '@/views/Welding/management/index.vue'
 import FinicialKpi from '@/views/Finance/index.vue'
 import Qualitykpi from '@/views/QualityKPIDashboard/index.vue'
-const routes = [
+import SalesPerformanceDashboard from '@/views/SalesPerformanceDashboard/index.vue'
+import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanceDashboard/index.vue'
+import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
+
+const routes: RouteRecordRaw[] = [
   {
     path: '/',
-    redirect: '/home',
+    name: 'root',
+    redirect: '/home'
   },
   {
     path: '/home',
@@ -98,11 +106,23 @@ const routes = [
     component: StampManagement,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
+  {
+    path: '/welding2',
+    name: 'welding2',
+    component: welding2,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
   // 冲压看板
   {
     path: '/pressboard',
     name: 'PressBoard',
     component: PressBoard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/paint',
+    name: 'paint',
+    component: paint,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
   {
@@ -116,8 +136,33 @@ const routes = [
     name:'Qualitykpi',
     component:Qualitykpi,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
-  }
+  },
+  {
+    path: '/SalesPerformanceDashboard',
+    name: 'SalesPerformanceDashboard',
+    component: SalesPerformanceDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/SalesPerformanceDashboard',
+    name: 'SalesPerformanceDashboard',
+    component: SalesPerformanceDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/BudgetvsActualPerformanceDashboard',
+    name: 'BudgetvsActualPerformanceDashboard',
+    component: BudgetvsActualPerformanceDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/EnergyMonitoringDashboard',
+    name: 'EnergyMonitoringDashboard',
+    component: EnergyMonitoringDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
 ];
+
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),

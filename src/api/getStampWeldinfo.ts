@@ -56,3 +56,68 @@ export const getWarningNextDay = (prodLine) =>{
     params: { prodLine}
   })
 }
+
+
+// /stampingWelding/stampingPgAbnormal
+export const getStampingPgAbnormal = (prodLine) => {
+  return request({
+    url: '/stampingWelding/stampingPgAbnormal',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+
+export const getStampingGeneralData = (prodLine) => {
+  return request({
+    url: '/stampingWelding/stampingGeneralData',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+// /stampingWelding/stampingBgAbnormal
+export const getStampingBgAbnormal = (prodLine) => {
+  return request({
+    url: '/stampingWelding/stampingBgAbnormal',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+// /apollo/incoming/selectSalesIssueAmt
+export const getSelectSalesIssueAmt = () => {
+  return request({
+    url: '/incoming/selectSalesIssueAmt',
+    method: 'post',
+  })
+}
+
+
+// /stampingWelding/stampingMachineData
+export const getStampingMachineData = (prodLine,type) => {
+  return request({
+    url: '/stampingWelding/stampingMachineData',
+    method: 'get',
+    params: { prodLine,type }
+  })
+}
+
+
+// /stampingWelding/addProcesshum  /apollo/stampingWelding/addProcesshum 填写工序完成数量
+export const addProcesshum = (mo_routing_d_id ,num) => {
+  return request({
+    url: '/stampingWelding/addProcessNum',
+    method: 'get',
+    params: { mo_routing_d_id ,num },
+
+  })
+} 
+
+// 焊接补焊API接口
+export const addWeldingRepair = (workNo: string, productId: string, num: number) => {
+  return request({
+    url: '/stampingWelding/repairWelding',
+    method: 'get',
+    params: { workNo, productId, num }
+  })
+} 

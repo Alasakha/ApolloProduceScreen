@@ -59,10 +59,16 @@ const lines = ref([
   { id: null, name: "供应链看板",router:"/newscm" },
   { id: null, name: "生产计划看板",router:"/produceplan" },
   { id: null, name: "PLM看板",router:"/plm" },
-  { id: "CY", name: "冲压生产管理看板",router:"/pressboard" },
-  { id: "HJ", name: "焊接生产管理看板",router:"/stampmanagement" },
+  { id: "1001", name: "冲压生产管理看板",router:"/pressboard" },
+  { id: "2001", name: "金工二部焊接",router:"/welding2" },
+  { id: "2003", name: "涂装看板",router:"/paint" },
+  { id: "1003", name: "焊接生产管理看板" ,router:"/stampmanagement" },
   { id: "finance", name: "财务绩效管理看板",router:"/financialkpi" },
   { id: "qualitykpi", name: "品质绩效管理看板",router:"/qualitykpidashboard" },
+  { id: "SalesPerformanceDashboard", name: "销售绩效管理看板",router:"/SalesPerformanceDashboard" },
+  // 预算与实际达成对比（销售）
+  { id: "BudgetvsActualPerformanceDashboard", name: "预算与实际达成对比",router:"/BudgetvsActualPerformanceDashboard" },
+  { id: "EnergyMonitoringDashboard", name: "能源监控看板",router:"/EnergyMonitoringDashboard" },
 ]);
 
 // 获取 lines 中指定范围的数据
@@ -80,7 +86,12 @@ const selectLine = (line) => {
     router.push({ path: "/quality", query: { prodLine: line.id } });
   }else if(line.router == '/stampmanagement'){
     router.push({ path: "/stampmanagement", query: { prodLine: line.id } });
-  }else{
+  }else if(line.router == '/pressboard'){
+    router.push({ path: "/pressboard", query: { prodLine: line.id } });
+  }else if(line.router == '/stampmanagement'){
+    router.push({ path: "/stampmanagement", query: { prodLine: line.id } });
+  }
+  else{
     router.push({ path: line.router, query: { prodLine: line.id } });
   }
 };

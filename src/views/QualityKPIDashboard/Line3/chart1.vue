@@ -26,6 +26,8 @@
             <el-table-column prop="unit_name" label="单位" />
             <el-table-column prop="doc_no" label="单号" />
             <el-table-column prop="khdh" label="客户代号" />
+            <!-- doc_name -->
+
         </el-table>
     </el-dialog>
 </template>

@@ -2,47 +2,55 @@
   <div class="line1-container flex flex-col ">
     <div class="grid grid-cols-4 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-        <Datacard title="今日排除工单数" EnlishTitle="TodayPlanned" :value="productionData.pcTotal" />
+        <Datacard title="今日排产工单单数" EnlishTitle="TodayPlanned" :value="productionData.pcGdTotal" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="已派工单数" EnlishTitle="ProducedToday" :value="productionData.done" />
+      <Datacard title="已派工单数" EnlishTitle="ProducedToday" :value="productionData.gdPg" 
+      @click="() => handleClick('已派工单数', 'getStampingPgAbnormal')"/>
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="已报工单数" EnlishTitle="ProducedRate" :value="productionData.rate+'%'" />
+      <Datacard title="已报工单数" EnlishTitle="ProducedRate" :value="productionData.gdDone" 
+      @click="() => handleClick('已报工单数', 'getStampingBgAbnormal')"/>
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="达成率" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
+      <Datacard title="达成率" EnlishTitle="PassRateToday" :value="productionData.gdRate+'%'" />
       </dv-border-box-12>
 
     </div>
 
     <div class="grid grid-cols-6 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-      <Datacard title="今日排产数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
+      <Datacard title="今日排产产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
       </dv-border-box-12>
       <dv-border-box-12 class="data-box ">
-        <Datacard title="已报工数" EnlishTitle="InspectionsToday" :value="apolloStampingWeldingData.checkTotal" />
-      </dv-border-box-12>
-
-      <dv-border-box-12 class="data-box ">
-      <Datacard title="达成率" EnlishTitle="QualifiedToday" :value="apolloStampingWeldingData.firstHgTotal" />
+        <Datacard title="已报工产量" EnlishTitle="InspectionsToday" :value="productionData.done" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="检验数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
+      <Datacard title="达成率" EnlishTitle="QualifiedToday" :value="productionData.rate+'%'" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="合格数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
+      <Datacard title="检验数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.checkTotal" />
+      </dv-border-box-12>
+
+      <dv-border-box-12 class="data-box ">
+      <Datacard title="合格数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.firstHgTotal" />
       </dv-border-box-12>
       <dv-border-box-12 class="data-box ">
       <Datacard title="合格率" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
       </dv-border-box-12>
 
     </div>
+    <Dialog 
+      v-model="dialogVisible" 
+      :fetchData="fetchTableData"
+      :header="header"
+      :title="dialogTitle"
+    />
   </div>
  
 </template>
@@ -53,10 +61,15 @@ import { getTodayProduction, type TodayProduction, getApolloStampingWelding, typ
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
 import Datacard from '../components/Datacard.vue'
+import { getStampingPgAbnormal,getStampingBgAbnormal } from '@/api/getStampWeldinfo'
+import Dialog from '../components/Dialog.vue'
 
+
+const currentApi = ref<'getStampingPgAbnormal' | 'getStampingBgAbnormal'>('getStampingPgAbnormal')
 const route = useRoute()
 const prodLine = route.query.prodLine as string
-
+const dialogVisible = ref(false)
+const dialogTitle = ref('')
 const productionData = ref<TodayProduction>({
   pcGdTotal: 0,   // 排产工单数
   gdPg: 0,            // 工单派工数
@@ -68,13 +81,17 @@ const productionData = ref<TodayProduction>({
   done: 0,           // 报工数
   undone: 0,       // 未报工数
 })
-
+ const header = [
+ '工作中心','工单号','客户单号','排产日期','品号','品名','规格','工单数量','排产数'
+]
 const apolloStampingWeldingData = ref<ApolloStampingWelding>({
   checkTotal: 0,
   firstHgTotal: 0,
   passPercent: '',
   toBeInspected: 0
 })
+
+
 
 const fetchData = async (prodLine) => {
   try {
@@ -88,28 +105,61 @@ const fetchData = async (prodLine) => {
     }
     
     const lineValue = getLine()
-
     const res = await getTodayProduction(lineValue)
     const apolloRes = await getApolloStampingWelding(lineValue)
     
     if (res.code === 200) {
-
       // 格式化数据,去除小数点
       productionData.value = {
         ...res.data,
+        pcGdTotal: Math.round(res.data.pcGdTotal),
+        gdpP: Math.round(res.data.gdpP),
+        rate: Math.round(res.data.rate),
+        gdRate: Math.round(res.data.gdRate),
+        pg: Math.round(res.data.pg),
+        gdDone: Math.round(res.data.gdDone),
         pcTotal: Math.round(res.data.pcTotal),
         done: Math.round(res.data.done),
-        undone: String(Math.round(Number(res.data.undone))),
-        // 达成率 = (已完成/计划) * 100,取整
-        rate: res.data.rate 
+        undone: Math.round(res.data.undone)
       }
-      if (apolloRes.code === 200) {
-        apolloStampingWeldingData.value = apolloRes.data
-      }
+    }
+    
+    if (apolloRes.code === 200) {
+      apolloStampingWeldingData.value = apolloRes.data
     }
   } catch (error) {
     console.error('获取今日生产数据失败:', error)
   }
+}
+
+
+const fetchTableData = async () => {
+  try {
+    // 根据当前选择的API调用不同接口
+    const api = currentApi.value === 'getStampingPgAbnormal' ? getStampingPgAbnormal : getStampingBgAbnormal
+    const res = await api(prodLine)
+    
+    return res.data.map(item => ({
+      '工作中心': item.workCenter,
+      '工单号': item.doc_no,
+      '客户单号': item.udf021,
+      '排产日期': item.ty003,
+      '品号': item.item_code,
+      '品名': item.item_description,
+      '规格': item.item_specification,
+      '工单数量': item.plan_qty,
+      '排产数': item.ty004
+    }))
+  } catch (error) {
+    console.error('获取数据失败:', error)
+    return []
+  }
+}
+
+const handleClick = (title: string, api: 'getStampingPgAbnormal' | 'getStampingBgAbnormal') => {
+  dialogTitle.value = title
+  currentApi.value = api
+  dialogVisible.value = true
 }
 
 onMounted(() => {

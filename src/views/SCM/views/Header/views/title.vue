@@ -5,7 +5,9 @@ import { ref, reactive, computed, watch } from 'vue';
 </script>
 
 <template>
-<div class="title title-main flex justify-center items-center">供应链管理系统</div>
+<div class="flex justify-center items-center
+           text-white font-bold tracking-[0.5vw]
+           2xl:text-[1.5vw] 3xl:text-[2vw] 4xl:text-[2vw]">供应链管理系统</div>
 </template>
 
 <style scoped>

@@ -68,12 +68,13 @@
     <el-dialog v-model="detailDialogVisible" title="详细信息" width="80%" class="custom-dialog">
       <el-table :data="detailData" style="width: 100%" v-loading="detailLoading" height="500">
         <el-table-column type="index" label="序号" width="60" />
-        <el-table-column prop="doc_date" label="单据日期" width="100" />
+        <el-table-column prop="doc_date" label="单据日期" width="120" />
         <el-table-column prop="doc_no" label="单号" width="150" />
         <el-table-column prop="customer_name" label="客户名称" width="120" />
         <el-table-column prop="documentName" label="客户类型" width="100" />
         <el-table-column prop="description" label="问题描述" show-overflow-tooltip />
         <el-table-column prop="approveDate" label="审批日期" width="150" />
+        <el-table-column  prop="doc_name" label="单据类型" width="140"/>
       </el-table>
     </el-dialog>
   </template>

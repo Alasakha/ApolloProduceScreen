@@ -86,3 +86,10 @@ export const getElectricToday =() =>{
     method: 'get',
   })
 }
+
+export const getElectricStandard =() =>{
+  return request({
+    url: '/injection/electricStandard',
+    method: 'get',
+  })
+}

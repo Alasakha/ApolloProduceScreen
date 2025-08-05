@@ -1,6 +1,6 @@
 import { createApp } from 'vue';
 import App from './App.vue';
-import router from './router';  // 引入 vue-router 配置文件
+import router from './router/index';  // 引入 vue-router 配置文件
 import DataVVue3 from '@kjgl77/datav-vue3'
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
@@ -12,17 +12,17 @@ import '@/style.css'
 
 import VueDOMPurifyHTML from "vue-dompurify-html"
 
-function setRootFontSize() {
-  const baseSize = 16; // 设计稿默认 100% 缩放时 html 的 font-size
-  const scale = 1 / window.devicePixelRatio;
-  document.documentElement.style.fontSize = `${baseSize * scale}px`;
-}
+// function setRootFontSize() {
+//   const baseSize = 16; // 设计稿默认 100% 缩放时 html 的 font-size
+//   const scale = 1 / window.devicePixelRatio;
+//   document.documentElement.style.fontSize = `${baseSize * scale}px`;
+// }
 
-// 初始化
-setRootFontSize();
+// // 初始化
+// setRootFontSize();
 
-// 监听窗口缩放（可选）
-window.addEventListener('resize', setRootFontSize);
+// // 监听窗口缩放（可选）
+// window.addEventListener('resize', setRootFontSize);
 
 
 const app = createApp(App);

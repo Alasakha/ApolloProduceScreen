@@ -56,16 +56,15 @@ const fetchData = async () => {
     const target = res.data.find(item => item.workCenterName === '汽油车组装车间')
     if(target){
       chartData1.value = [target.total, target.checkTotal]
-      chartLabels1.value = ['总数', '检查数']
+      chartLabels1.value = ['总数', '检验数']
     const target2 = res.data.find(item => item.workCenterName === '电动车组装')
     if(target2){
       chartData2.value = [target2.total, target2.checkTotal]
-      chartLabels2.value = ['总数', '检查数']
+      chartLabels2.value = ['总数', '检验数']
     }
       drawChart()
     }
   }
-
 }
 
 onMounted(async () => {

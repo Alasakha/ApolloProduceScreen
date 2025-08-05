@@ -1,8 +1,8 @@
 <template>
   <div class="order-card-glow">
-    <div class="order-card-main gap-4">
+    <div class="order-card-main">
       <div class="line1-content flex w-full  ">
-          <div class="catogory">{{ catogory }}</div>
+          <div class="catogory">{{ machineName }}</div>
           <div class="flex flex-col"><div class="box-label">客户单号：</div><div class="text-sm text-white">{{ frame }}</div></div>
           <div class="flex flex-col"><div class="box-label">车型/规格：</div><div class="text-sm text-white">{{ customerNo }} </div></div>
           <div class="flex flex-col"><div class="box-label">计划数：</div><div class="text-sm text-white">{{ modelSpec }}</div></div>
@@ -12,20 +12,20 @@
 
         <!-- 下排三个框 -->
         <div  class=" data-box">
-          <div class="box-label">1号站节拍/数量</div>
-          <div class="box-value">{{ planCount }}</div>
+          <div class="box-label">产量</div>
+          <div class="box-value">{{ production }}</div>
         </div>
         <div class="data-box">
-          <div class="box-label">2号站节拍/数量</div>
-          <div class="box-value">{{ autoWeldProgress }}</div>
+          <div class="box-label">电流</div>
+          <div class="box-value">{{ liu }}</div>
         </div>
         <div class="data-box">
-          <div class="box-label">3号站节拍/数量</div>
-          <div class="box-value">{{ progressPercent }}%</div>
+          <div class="box-label">电压</div>
+          <div class="box-value">{{ ya }}</div>
         </div>
         <div class="data-box">
-          <div class="box-label">4号站节拍/数量</div>
-          <div class="box-value">{{ progressPercent }}%</div>
+          <div class="box-label">节拍</div>
+          <div class="box-value">{{ jp }}</div>
         </div>
       </div>
       <!-- 进度条 -->
@@ -33,7 +33,7 @@
         <div class="progress-bar">
           <div class="progress-fill" :style="{ width: progressPercent + '%' }"></div>
         </div>
-        <div v-if="props.deviceCategory=='weldingA'||props.deviceCategory=='weldingB'" class="progress-text">已补焊：{{ manualWeldCount }} 件（此处可以手工录入，每2小时录1次）</div>
+        <div v-if="props.deviceCategory=='weldingA'||props.deviceCategory=='weldingB'" class="progress-text">已补焊：{{ repairWelding }} 件</div>
         <div v-if="props.deviceCategory=='weldingC'" class="progress-text flex justify-between items-center w-full">
           <div>合格率：{{ passRate }}%，</div>
           <div class="flex gap-x-4">
@@ -53,7 +53,7 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  catogory: {
+  machineName: {
     type: String,
     default: ""
   },
@@ -69,7 +69,7 @@ const props = defineProps({
     type: String,
     default: ""
   },
-  planCount: {
+  production: {
     type: [Number, String],
     default: 0
   },
@@ -84,6 +84,22 @@ const props = defineProps({
   deviceCategory:{
     type:String,
   },
+  liu: {
+    type: [Number, String],
+    default: 0
+  },
+  ya: {
+    type: [Number, String],
+    default: 0
+  },
+  jp: {
+    type: [Number, String],
+    default: 0
+  },  
+  repairWelding: {
+    type: [Number, String],
+    default: 0
+  }
 })
 
 // 计算进度百分比
@@ -99,6 +115,7 @@ const progressPercent = computed(() => {
   width: 100%;
   height: 100%;
   min-height: 80px; /* 减小最小高度 */
+  max-height: 120px;
   background: rgba(255, 255, 255, 0.13);
   border-radius: 16px;
   box-shadow:
@@ -116,7 +133,7 @@ const progressPercent = computed(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  /* justify-content: space-between; */
+  justify-content: start
 }
 
 .data-grid {
@@ -131,10 +148,11 @@ const progressPercent = computed(() => {
 .data-box {
   border: 1px solid rgba(124, 231, 253, 0.5);
   border-radius: 4px;
-  padding: 4px; /* 减小内边距 */
+  /* padding: 4px; 减小内边距 */
   background: rgba(37, 117, 252, 0.1);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
+  gap: 4px; /* 减小间距 */
   align-items: center;
   justify-content: center;
 }
@@ -147,7 +165,7 @@ const progressPercent = computed(() => {
 }
 
 .box-value {
-  font-size: clamp(4px, 1vw, 14px); /* 减小字体大小范围 */
+  font-size: clamp(4px, 0.8vw, 14px); /* 减小字体大小范围 */
   font-weight: bold;
   color: #fff;
   word-break: break-all;
@@ -193,11 +211,11 @@ const progressPercent = computed(() => {
 }
 
 .catogory {
-  width: 2vw; /* 减小圆圈大小 */
-  height: 2vw;
+  width: 4vw; /* 减小圆圈大小 */
+  height: 1vw;
   min-width: 24px;
   min-height: 24px;
-  border-radius: 50%;
+  /* border-radius: 50%; */
   background: rgba(37, 117, 252, 0.1);
   border: 2px solid #2575fc;
   box-shadow: 0 0 15px rgba(37, 117, 252, 0.3);
@@ -205,7 +223,7 @@ const progressPercent = computed(() => {
   align-items: center;
   justify-content: center;
   color: #fff;
-  font-size: 0.8vw;
+  font-size: 0.6vw;
   flex-shrink: 0;
 }
 

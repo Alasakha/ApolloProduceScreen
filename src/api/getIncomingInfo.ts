@@ -62,3 +62,70 @@ export const getPlanInfo = (params) => {
     data: ''
   })
 }
+
+// /incoming/orderCompletion 
+export const getOrderCompletion = (params) => {
+  return request({
+    url: '/incoming/orderCompletion',
+    method: 'post',
+    params: params,
+    data: ''
+  })
+}
+// /incoming/updateSalesPerformanceYs 更新
+export const updateSalesPerformanceYs = (params) => {
+  return request({
+    url: '/incoming/updateSalesPerformanceYs',
+    method: 'post',
+    params: params,
+    data: ''
+  })
+}
+
+
+// /apollo/incoming/financeQuantity
+export const getFinanceQuantity = () => {
+  return request({
+    url: '/incoming/financeQuantity',
+    method: 'post',
+    data: ''
+  })
+}
+
+// /incoming/financeIncome
+export const getFinanceIncome = () => {
+  return request({
+    url: '/incoming/financeIncome',
+    method: 'post',
+    data: ''
+  })
+}
+
+// /apollo/incoming/financeProfit 利润
+export const getFinanceProfit = () => {
+  return request({
+    url: '/incoming/financeProfit',
+    method: 'post',
+    data: ''
+  })
+}
+
+
+///incoming/financeList 获取数据
+export const getFinanceList = () => {
+  return request({
+    url: '/incoming/financeList',
+    method: 'post',
+    data: ''
+  })
+}
+
+// /incoming/updateFinanceById
+export const updateFinanceById = (params) => {
+  return request({
+    url: '/incoming/updateFinanceById',
+    method: 'post',
+    params: params,
+    data: ''
+  })
+}

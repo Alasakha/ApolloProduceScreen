@@ -1,8 +1,16 @@
 @import "tailwindcss";
 @theme {
-  --breakpoint-hd: 40rem;      /* 720px */
-  --breakpoint-fullhd: 48rem ; /* 1080px */
-  --breakpoint-2k: 64rem;      /* 1280px 这里稍作调整，如果你要用2560，需要更大 */
-  --breakpoint-2k-plus: 80rem; /* 2560px */
-  --breakpoint-4k: 96rem ;     /* 3840px */
+  /* 重置所有默认断点 */
+  --breakpoint-*: initial;
+  
+  /* 配置标准断点 */
+  --breakpoint-sm: 40rem;    /* 640px */
+  --breakpoint-md: 48rem;    /* 768px */
+  --breakpoint-lg: 64rem;    /* 1024px */
+  --breakpoint-xl: 80rem;    /* 1280px */
+  --breakpoint-2xl: 96rem;   /* 1536px */
+  
+  /* 配置自定义大屏断点 */
+  --breakpoint-3xl: 115.625rem;  /* 1850px */
+  --breakpoint-4xl: 156.25rem;   /* 2500px */
 }

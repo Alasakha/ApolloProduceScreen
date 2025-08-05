@@ -3,7 +3,7 @@ import { ElMessage } from 'element-plus';
 
 // 获取配置的 baseURL
 const baseURL =  'http://192.168.1.197:10999/apollo'; // 默认值可以设置为开发环境的地址
-
+// http://192.168.1.101:10999/
 // http://192.168.1.197:10999/apollo/quality/passRanking
 // http://192.168.1.185:10999/apollo
 // 创建一个 axios 实例

@@ -83,7 +83,7 @@
   const scrollBoardRef = ref(null);
 
   // 扩展表头，添加原因、责任人和完成期限
-  const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '车型名称', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
+  const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
 
   const config = reactive({
     header: tableHeaders.value,
@@ -120,7 +120,7 @@
               '未完工',
               item.number ?? '无',
               item.workNo ?? '无',
-              item.specifications ?? '无',
+              item.articleName ?? '无',
               Number(item.productionQuantity) ?? '无',
               item.dateTime ?? '无',
               Number(item.productionQuantity) - Number(item.inboundQuantity),
