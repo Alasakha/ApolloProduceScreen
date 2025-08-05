@@ -148,3 +148,13 @@ export const getEfficiencyBelowAdd = (prodLine,reason ) => {
     params:{prodLine,reason }
   })
 }
+
+
+// /production/efficiencyReduceAdd
+export const getEfficiencyReduceAdd = (prodLine,reduce_minute,reason ,reduce_type ) => {
+  return request({
+    url: '/production/efficiencyReduceAdd',
+    method: 'get',
+    params:{prodLine,reduce_minute,reason ,reduce_type }
+  })
+}

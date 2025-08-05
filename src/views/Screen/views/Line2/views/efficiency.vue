@@ -6,65 +6,62 @@
       <div v-if="isLoading" class="w-full h-[85%] text-white">
         <dv-loading>Loading...</dv-loading>
       </div>
-      <!-- 数量 -->
-      <div v-if="!isLoading" class="w-full h-[95%] p-4 pt-5 flex flex-col justify-start">
-        <div class="line flex-2 flex">
-          <!-- 配置人数 -->
-          <div class="peizhi flex-1">
+      <!-- 六个图形 - 两列三行布局 -->
+      <div v-if="!isLoading" class="w-full h-[95%] p-2">
+        <div class="grid grid-cols-2 grid-rows-3 gap-2 h-full">
+          <!-- 第一个图形 - 配置人数 -->
+          <div class="chart-container  p-2">
             <div ref="Indicators1" class="w-full h-[100%]"></div>
           </div>
-          <!-- 出勤人数 -->
-          <div class="chuchai flex-1">
-            <div ref="Indicators2" class="w-full h-[100%]"></div>
+          
+          <!-- 第二个图形 - 出勤人数 -->
+          <div class="chart-container  p-2">
+            <div ref="Indicators2" class="w-full h-full"></div>
           </div>
-        </div>
-
-        <div class="line flex-1 flex gap-8 w-full h-full justify-center items-center">
-          <!-- 标准人效 -->
-          <div class="eff-card flex-1 flex flex-col justify-center items-center rounded-xl p-2 shadow-lg">
-            <div class="title text-lg font-bold flex-1">标准人效</div>
-            <div class="value flex-1">{{ EfficentData.standardEfficiency }}</div>
+          
+          <!-- 第三个图形 - 换型换线时间 -->
+          <div class="chart-container  p-2">
+            <div 
+              ref="Indicators3" 
+              class="w-full h-full cursor-pointer"
+              @click="openTimeDialog(1)"
+            ></div>
           </div>
-
-          <!-- 实际人效 -->
-          <div class="eff-card-wrap flex-1 flex-col items-center">
-            <!-- 上方原因提示 -->
-            <div
-              v-if="EfficentData.reason"
-              class="reason-tip mb-1"
-            >
-              <el-icon style="color:#FFA000;vertical-align:middle;"><WarningFilled /></el-icon>
-              <!-- <span class="ml-1">{{ EfficentData.reason }}</span> -->
-            </div>
-            <!-- 原有卡片内容 -->
-            <div
-              class="eff-card flex-1 flex flex-row items-center justify-center rounded-xl p-2 shadow-lg"
-              :class="{ 'efficiency-low': showWarning }"
+          
+          <!-- 第四个图形 - 计划生产外时间 -->
+          <div class="chart-container  p-2">
+            <div 
+              ref="Indicators4" 
+              class="w-full h-full cursor-pointer"
+              @click="openTimeDialog(2)"
+            ></div>
+          </div>
+          
+          <!-- 第五个图形 - 标准人效 -->
+          <div class="chart-container  p-2">
+            <div ref="Indicators5" class="w-full h-full"></div>
+          </div>
+          
+          <!-- 第六个图形 - 实际人效 -->
+          <div class="chart-container  relative">
+            <div 
+              ref="Indicators6" 
+              class="w-full h-[100%] cursor-pointer"
               @click="openReasonDialog"
-              style="cursor: pointer;"
+            ></div>
+            <!-- 警告提示 -->
+            <el-tooltip
+              v-if="showWarning"
+              :content="EfficentData.reason || '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等'"
+              placement="top"
+              effect="dark"
             >
-              <el-tooltip
-                v-if="showWarning"
-                :content="EfficentData.reason || '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等'"
-                placement="left"
-                effect="dark"
-              >
-                <div class="warn-icon-box flex items-center justify-center mr-3">
-                  <svg class="warn-icon" width="38" height="38" viewBox="0 0 24 24">
-                    <polygon points="12,3 22,20 2,20" fill="#FFD600" stroke="#FFA000" stroke-width="2"/>
-                    <rect x="11" y="9" width="2" height="5" fill="#FFA000"/>
-                    <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
-                  </svg>
-                </div>
-              </el-tooltip>
-              <div class="flex flex-col items-center justify-center">
-                <div class="title text-lg font-bold">实际人效</div>
-                <div class="value">{{ EfficentData.efficiency }}</div>
+              <div class="absolute top-1 right-1 text-[#FFA000]">
+                <el-icon><WarningFilled /></el-icon>
               </div>
-            </div>
+            </el-tooltip>
           </div>
         </div>
-
       </div>
     </dv-border-box12>
 
@@ -73,6 +70,7 @@
       title="实际人效原因说明"
       width="400px"
       :close-on-click-modal="false"
+
     >
       <div class="mb-2" style="color:#e03030;font-weight:bold;">
         当前原因：{{ EfficentData.reason || '暂无原因' }}
@@ -89,13 +87,21 @@
       </template>
     </el-dialog>
 
+    <!-- 时间详情对话框 -->
+    <TimeDetailDialog
+      v-model="timeDialogVisible"
+      :time-type="currentTimeType"
+      :Data="EfficentData"
+      :prodLine="prodLineValue"
+      @close="handleTimeDialogClose"
+    />
+
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, computed } from 'vue';
 import * as echarts from 'echarts';
-
 import DataCard from "@/components/DataCard.vue"; // 导入封装组件
 import EffiectCard from "@/components/EffiectCard.vue"; // 导入封装组件
 import { getEfficiencyToday, getEfficiencyBelowAdd } from '@/api/getProduceinfo';
@@ -105,7 +111,11 @@ import BigScreenTitle from '@/components/title.vue'
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
 import { WarningFilled } from '@element-plus/icons-vue'
-
+import TimeDetailDialog from '@/views/Screen/components/TimeDetailDialog.vue'
+const prodLineValue = ref('')
+// 时间对话框相关状态
+const timeDialogVisible = ref(false)
+const currentTimeType = ref(1) // '1' 或 '2' 1:换型换线时间,2:计划生产外时间
 // 定义数据
 const config = reactive({
   value: 66,
@@ -137,6 +147,8 @@ const EfficentData = reactive({
   stanardNum: null,
   warning: 0,
   reason: '',
+  reduceMinute_hx:0, // 换型换线时间
+  reduceMinute_jhw:0// 计划生产外时间
 });
 
 // 计算属性：判断实际人效是否低于标准人效
@@ -148,13 +160,22 @@ const showWarning = computed(() => EfficentData.warning === 1);
 
 const Indicators1 = ref(null);
 const Indicators2 = ref(null);
+const Indicators3 = ref(null);
+const Indicators4 = ref(null);
+const Indicators5 = ref(null);
+const Indicators6 = ref(null);
 const route = useRoute();
 const prodLine = route.query.prodLine; // 通过 query 获取参数
+prodLineValue.value = prodLine
 const isLoading = ref(true);
 
 
 const chart1 = useEcharts(Indicators1);
 const chart2 = useEcharts(Indicators2);
+const chart3 = useEcharts(Indicators3);
+const chart4 = useEcharts(Indicators4);
+const chart5 = useEcharts(Indicators5);
+const chart6 = useEcharts(Indicators6);
 
 const drawChart = () => {
   console.log('drawChart - stanarNum:', EfficentData.stanarNum, 'scanNum:', EfficentData.scanNum);
@@ -171,16 +192,44 @@ const drawChart = () => {
     max: EfficentData.stanardNum
   });
 
-  console.log('option1:', option1);
-  console.log('option2:', option2);
+  const option3 = createGaugeOption({
+    text: "换型换线时间",
+    data: EfficentData.reduceMinute_hx,
+    max: Math.max(EfficentData.reduceMinute_hx * 1.5, 60) || 60, // 默认最大值60分钟
+    unit: "分钟"
+  });
+
+  const option4 = createGaugeOption({
+    text: "计划生产外时间",
+    data: EfficentData.reduceMinute_jhw,
+    max: Math.max(EfficentData.reduceMinute_jhw * 1.5, 60) || 60, // 默认最大值60分钟
+    unit: "分钟"
+  });
+
+  const option5 = createGaugeOption({
+    text: "标准人效",
+    data: EfficentData.standardEfficiency,
+    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) * 1.2 || 100
+  });
+
+  const option6 = createGaugeOption({
+    text: "实际人效",
+    data: EfficentData.efficiency,
+    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) * 1.2 || 100
+  });
+
 
   chart1.setOption(option1);
   chart2.setOption(option2);
+  chart3.setOption(option3);
+  chart4.setOption(option4);
+  chart5.setOption(option5);
+  chart6.setOption(option6);
 };
 
 const fetchData = async () => {
   const res = await getEfficiencyToday(prodLine);
-  console.log('res:', res);
+
   // 分别赋值，保持响应式
   EfficentData.standardEfficiency = Number(res.data.standardEfficiency) || 0;
   EfficentData.efficiency = Number(res.data.efficiency) || 0;
@@ -190,15 +239,19 @@ const fetchData = async () => {
   EfficentData.stanardNum = Number(res.data.stanardNum) ?? 0;
   EfficentData.warning = res.data.warning ?? 0;
   EfficentData.reason = res.data.reason || '';
-
-  console.log('EfficentData:', EfficentData);
-  console.log('stanarNum:', EfficentData.stanarNum, typeof EfficentData.stanarNum);
-  console.log('scanNum:', EfficentData.scanNum, typeof EfficentData.scanNum);
-  
+  // 新增字段，如果API没有返回则使用模拟数据
+  EfficentData.reduceMinute_hx = Number(res.data.reduceMinute_hx) ?? 0 ; 
+  EfficentData.reduceMinute_jhw = Number(res.data.reduceMinute_jhw) ?? 0;
+  EfficentData.reduceMinute_hx_reason = res.data.reduceMinute_hx_reason || '';
+  EfficentData.reduceMinute_jhw_reason = res.data.reduceMinute_jhw_reason || '';
   isLoading.value = false;
   nextTick(() => {
     chart1.initChart();
     chart2.initChart();
+    chart3.initChart();
+    chart4.initChart();
+    chart5.initChart();
+    chart6.initChart();
     drawChart();
   });
 };
@@ -229,6 +282,29 @@ onMounted(() => {
     await getEfficiencyBelowAdd(prodLine, customReason.value);
     reasonDialogVisible.value = false;
     fetchData(); // 提交后刷新数据
+  }
+
+  // 打开时间详情对话框
+  function openTimeDialog(type) {
+    currentTimeType.value = type;
+    timeDialogVisible.value = true;
+  }
+
+  // 关闭时间详情对话框
+  function handleTimeDialogClose() {
+    timeDialogVisible.value = false;
+  }
+
+
+  // 获取当前时间值
+  function getCurrentTimeValue() {
+    if (currentTimeType.value === 1) {
+      // 返回换型换线时间的当前值，这里可以从 EfficentData 中获取
+      return EfficentData.reduceMinute_hx || 85;
+    } else {
+      // 返回计划生产外时间的当前值
+      return EfficentData.reduceMinute_jhw || 45;
+    }
   }
 </script>
 

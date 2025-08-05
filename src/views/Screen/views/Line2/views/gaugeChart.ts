@@ -1,6 +1,6 @@
 // gaugeChart.ts
 const size = window.devicePixelRatio;
-export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { text?: string; data: number; max: number }) {
+export function createGaugeOption({ text = '标题', data = 0, max = 100, unit = '' }: { text?: string; data: number; max: number; unit?: string }) {
     return {
       title: {
         text: text,
@@ -39,6 +39,9 @@ export function createGaugeOption({ text = '标题', data = 0, max = 100 }: { te
               // 判断标题是否是 'xx'，如果是加百分号
               if (text === '点检及时率') {
                 return `${Math.round(data)}%`;
+              }
+              if (unit) {
+                return `${Math.round(data)}${unit}`;
               }
               return `${Math.round(data)}`;
             },
