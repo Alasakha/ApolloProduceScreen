@@ -3,7 +3,7 @@
     <dv-border-box-2 >
         <div class="flex w-full h-full justify-between">
             <div v-for="item in data" class=" flex flex-col items-center justify-center h-full ">
-                  <div class="text-[#00eeff] text-base sm:text-lg md:text-xl 3xl:text-xl 4xl:text-lg  flex items-center">
+                  <div class="text-[#00eeff] text-base sm:text-lg md:text-xl 3xl:text-sm 4xl:text-lg  flex items-center">
             {{item.category}}
             <span :class="{'text-red-500': item.ratio.startsWith('↑'), 'text-green-500': item.ratio.startsWith('↓')}" class="ml-2">
               {{item.ratio}}
@@ -11,7 +11,7 @@
           </div>
         <!-- <div class="flex justify-center items-center gap-8 felx-col"> -->
           <div class="flex items-center">
-            <span class="text-white  text-sm sm:text-base md:text-lg 3xl:text-sm 4xl:text-lg">标准耗电：</span>
+            <span class="text-white  text-sm sm:text-base md:text-lg xl:text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">标准耗电：</span>
             <dv-digital-flop :config="{
               number: [item.standardConsumption],
               content: '{nt}kW/h',
@@ -22,7 +22,7 @@
             }" />
           </div>
           <div class="flex items-center">
-            <span class="text-white  text-sm sm:text-base md:text-lg 3xl:text-sm 4xl:text-lg">实际耗电：</span>
+            <span class="text-white  text-sm sm:text-base md:text-lg xl:text-sm  2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">实际耗电：</span>
             <dv-digital-flop :config="{
               number: [item.actualConsumption],
               content: '{nt}kW/h',
@@ -40,79 +40,61 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, reactive, ref } from 'vue'
+import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { useEnergyStore } from '@/store/energy'
 
-const data = reactive([
-  {
-    category: '空压机',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '注塑',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '焊接',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '金工一楼',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '金工四楼',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '冲压',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '宿舍',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '包装',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  },
-  {
-    category: '装配',
-    standardConsumption: 0,
-    actualConsumption: 0,
-    ratio: '='
-  }
-])
+const energyStore = useEnergyStore()
 
-// 更新数据
-const updateData = () => {
-  data.forEach(item => {
-    item.standardConsumption = Math.floor(Math.random() * 2000)
-    item.actualConsumption = Math.floor(Math.random() * 2000)
-    item.ratio = item.standardConsumption > item.actualConsumption 
-      ? '↑' + (item.standardConsumption - item.actualConsumption).toFixed(1)
-      : item.standardConsumption < item.actualConsumption
-        ? '↓' + (item.actualConsumption - item.standardConsumption).toFixed(1)
-        : '='
-  })
+// 电表设备代码到显示名称的映射
+const DEVICE_MAPPING = {
+  '616506210001': '空压机',
+  '616506210002': '注塑', 
+  '616506210003': '焊接',
+  '616506210004': '金工一楼',
+  '616506210006': '金工四楼',
+  '616506210007': '冲压',
+  '616506210008': '宿舍',
+  '616506210009': '包装',
+  '616506210005': '装配'
 }
 
-let timer: number | null = null
+// 使用计算属性基于真实数据生成显示数据 - 使用当月数据
+const data = computed(() => {
+  const electricData = energyStore.monthlyElectricData
+  
+  return Object.entries(DEVICE_MAPPING).map(([machCode, category]) => {
+    const deviceData = electricData.find(item => item.machCode === machCode)
+    const actualConsumption = deviceData ? Math.round(deviceData.numberPower) : 0
+    const standardConsumption = 0 // 标准数据暂时设为0
+    
+    // 计算比率
+    let ratio = ''
+    if (standardConsumption > 0) {
+      const diff = actualConsumption - standardConsumption
+      if (diff > 0) {
+        ratio = `↑${diff}`
+      } else if (diff < 0) {
+        ratio = `↓${Math.abs(diff)}`
+      }
+    }
+    
+    return {
+      category,
+      standardConsumption,
+      actualConsumption,
+      ratio,
+      machCode
+    }
+  })
+})
+
+// 数据刷新相关
+const updateInterval = ref<number | null>(null)
+
+// Line3组件现在使用store中的当月数据，不再独立获取数据
+// 数据由主组件统一管理
+
+console.log('📊 Line3组件：使用store中的当月数据')
 
 // 获取当前窗口宽度
 const windowWidth = ref(window.innerWidth)
@@ -144,15 +126,13 @@ const updateWidth = () => {
 }
 
 onMounted(() => {
-  updateData()
-  timer = window.setInterval(updateData, 3000)
   window.addEventListener('resize', updateWidth)
 })
 
 onUnmounted(() => {
-  if (timer) {
-    clearInterval(timer)
-    timer = null
+  if (updateInterval.value) {
+    clearInterval(updateInterval.value)
+    updateInterval.value = null
   }
   window.removeEventListener('resize', updateWidth)
 })

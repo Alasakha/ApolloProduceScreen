@@ -21,7 +21,7 @@ import Qualitykpi from '@/views/QualityKPIDashboard/index.vue'
 import SalesPerformanceDashboard from '@/views/SalesPerformanceDashboard/index.vue'
 import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanceDashboard/index.vue'
 import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
-
+import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard/index.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -159,6 +159,12 @@ const routes: RouteRecordRaw[] = [
     path: '/EnergyMonitoringDashboard',
     name: 'EnergyMonitoringDashboard',
     component: EnergyMonitoringDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/ManufacturingPerformanceManagementDashboard',
+    name: 'ManufacturingPerformanceManagementDashboard',
+    component: ManufacturingPerformanceManagementDashboard,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
 ];

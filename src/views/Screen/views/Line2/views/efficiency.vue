@@ -94,6 +94,7 @@
       :Data="EfficentData"
       :prodLine="prodLineValue"
       @close="handleTimeDialogClose"
+      @save="handleTimeDialogSave"
     />
 
   </div>
@@ -193,14 +194,14 @@ const drawChart = () => {
   });
 
   const option3 = createGaugeOption({
-    text: "换型换线时间",
+    text: "换型换线工时",
     data: EfficentData.reduceMinute_hx,
     max: Math.max(EfficentData.reduceMinute_hx * 1.5, 60) || 60, // 默认最大值60分钟
     unit: "分钟"
   });
 
   const option4 = createGaugeOption({
-    text: "计划生产外时间",
+    text: "计划外工时",
     data: EfficentData.reduceMinute_jhw,
     max: Math.max(EfficentData.reduceMinute_jhw * 1.5, 60) || 60, // 默认最大值60分钟
     unit: "分钟"
@@ -286,13 +287,21 @@ onMounted(() => {
 
   // 打开时间详情对话框
   function openTimeDialog(type) {
+    console.log('点击打开时间对话框，类型:', type);
     currentTimeType.value = type;
     timeDialogVisible.value = true;
+    console.log('对话框状态已设置为:', timeDialogVisible.value);
   }
 
   // 关闭时间详情对话框
   function handleTimeDialogClose() {
     timeDialogVisible.value = false;
+  }
+
+  // 保存时间详情对话框数据后刷新
+  function handleTimeDialogSave(data) {
+    console.log('时间详情保存完成，刷新数据:', data);
+    fetchData(); // 刷新大屏数据
   }
 
 

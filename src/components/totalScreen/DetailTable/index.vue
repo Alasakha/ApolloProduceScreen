@@ -139,7 +139,7 @@ const handleCurrentChange = (val) => {
 
 // 处理原因和责任人更新
 const handleReasonUpdate = (data) => {
-  console.log('DetailTable - Updating reason with data:', data);
+
 
   // 更新 tableData 中对应行的数据（确保响应式）
   const index = tableData.value.findIndex(item => item === data.row);

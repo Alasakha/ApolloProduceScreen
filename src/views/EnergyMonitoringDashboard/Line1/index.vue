@@ -2,7 +2,7 @@
   <div class="h-[20vh] w-full p-2">
     <dv-border-box-2>
       
-      <div class="box-content h-full">
+      <div class="box-content h-[30%]">
         <el-carousel trigger="click" height="100%" :interval="5000" indicator-position="none">
           <el-carousel-item>
             <!-- 样式1：科技感十足 -->

@@ -4,10 +4,9 @@
       <div class="flex flex-col h-full">
         <!-- 标题 -->
         <div class="text-[#00eeff] text-2xl font-bold px-8 py-2 flex justify-between items-center">
-          <span>天然气排放监控</span>
-          <span v-if="isLeaking" class="text-red-500 text-xl animate-pulse flex items-center">
-            <i class="el-icon-warning mr-2"></i>
-            检测到泄露！浓度：{{ leakageLevel }}ppm
+          <span>000025061899公司用气总表</span>
+          <span class="text-gray-400 text-sm">
+            数据时间：{{ new Date().toLocaleString() }}
           </span>
         </div>
 
@@ -15,14 +14,14 @@
         <div class="flex-1 flex justify-between px-20">
           <!-- 年度排放 -->
           <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">年度排放</div>
+            <div class="text-[#00eeff] text-xl mb-4">年度用气</div>
             <div class="flex gap-4 items-start h-full">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center">
                   <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualYear}}m³</span>
+                  <span class="text-[#00eeff] text-2xl">{{actualYear.toFixed(1)}}m³</span>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{yearDiff}}m³</div>
+                <div class="text-red-500 text-sm">同比：{{yearDiff.toFixed(1)}}m³</div>
               </div>
               <div class="relative">
                 <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
@@ -32,14 +31,14 @@
 
           <!-- 月度排放 -->
           <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">月度排放</div>
+            <div class="text-[#00eeff] text-xl mb-4">月度用气</div>
             <div class="flex gap-4 items-start h-full">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center">
                   <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualMonth}}m³</span>
+                  <span class="text-[#00eeff] text-2xl">{{actualMonth.toFixed(1)}}m³</span>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{monthDiff}}m³</div>
+                <div class="text-red-500 text-sm">同比：{{monthDiff.toFixed(1)}}m³</div>
               </div>
               <div class="relative">
                 <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
@@ -49,14 +48,14 @@
 
           <!-- 日排放 -->
           <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">日排放</div>
+            <div class="text-[#00eeff] text-xl mb-4">日用气</div>
             <div class="flex gap-4 items-start h-full">
               <div class="flex flex-col gap-2">
                 <div class="flex items-center">
                   <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualDay}}m³</span>
+                  <span class="text-[#00eeff] text-2xl">{{actualDay.toFixed(1)}}m³</span>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{dayDiff}}m³</div>
+                <div class="text-red-500 text-sm">同比：{{dayDiff.toFixed(1)}}m³</div>
               </div>
               <div class="relative">
                 <dv-water-level-pond :config="waterConfig3" style="width:140px;height:140px" />
@@ -70,24 +69,44 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useEnergyStore } from '@/store/energy'
 
-// 模拟数据
-const standardYear = ref(1000)
-const actualYear = ref(800)
-const yearDiff = ref(-200)
+// 获取能源store
+const energyStore = useEnergyStore()
 
-const standardMonth = ref(100)
-const actualMonth = ref(80)
-const monthDiff = ref(-20)
+// 用气数据标准值
+const standardYear = ref(9000)
+const standardMonth = ref(900)
+const standardDay = ref(30)
 
-const standardDay = ref(10)
-const actualDay = ref(8)
-const dayDiff = ref(-2)
+// 从store中获取用气数据
+const gasData = computed(() => energyStore.gasData)
+const dailyGasData = computed(() => energyStore.dailyData.filter(item => item.machCode === '000025061899'))
+const monthlyGasData = computed(() => energyStore.monthlyData.filter(item => item.machCode === '000025061899'))
 
-// 泄露检测
-const isLeaking = ref(false)
-const leakageLevel = ref(0)
+// 计算实际用气量和差值
+const actualYear = computed(() => {
+  const data = gasData.value.find(item => item.machCode === '000025061899')
+  return data ? parseFloat(String(data.numberPower)) || 0 : 0
+})
+
+const actualMonth = computed(() => {
+  const data = monthlyGasData.value.find(item => item.machCode === '000025061899')
+  return data ? parseFloat(String(data.numberPower)) || 0 : 0
+})
+
+const actualDay = computed(() => {
+  const data = dailyGasData.value.find(item => item.machCode === '000025061899')
+  return data ? parseFloat(String(data.numberPower)) || 0 : 0
+})
+
+const yearDiff = computed(() => actualYear.value - standardYear.value)
+const monthDiff = computed(() => actualMonth.value - standardMonth.value)
+const dayDiff = computed(() => actualDay.value - standardDay.value)
+
+// 数据更新时间
+const lastUpdateTime = ref(new Date())
 
 // 水位图配置
 const waterConfig1 = ref({
@@ -116,29 +135,13 @@ const waterConfig3 = ref({
 
 // 更新数据
 const updateData = () => {
-  // 年度数据
-  actualYear.value = Math.floor(Math.random() * 500 + 500)
-  yearDiff.value = actualYear.value - standardYear.value
-  waterConfig1.value.data = [actualYear.value / standardYear.value * 100]
+  // 更新水位图配置，使用computed值
+  waterConfig1.value.data = [Math.min(actualYear.value / standardYear.value * 100, 100)]
+  waterConfig2.value.data = [Math.min(actualMonth.value / standardMonth.value * 100, 100)]
+  waterConfig3.value.data = [Math.min(actualDay.value / standardDay.value * 100, 100)]
 
-  // 月度数据
-  actualMonth.value = Math.floor(Math.random() * 50 + 50)
-  monthDiff.value = actualMonth.value - standardMonth.value
-  waterConfig2.value.data = [actualMonth.value / standardMonth.value * 100]
-
-  // 日数据
-  actualDay.value = Math.floor(Math.random() * 5 + 5)
-  dayDiff.value = actualDay.value - standardDay.value
-  waterConfig3.value.data = [actualDay.value / standardDay.value * 100]
-
-  // 模拟泄露检测
-  if (Math.random() > 0.8) {
-    isLeaking.value = true
-    leakageLevel.value = Math.floor(Math.random() * 100 + 100)
-  } else {
-    isLeaking.value = false
-    leakageLevel.value = 0
-  }
+  // 更新时间
+  lastUpdateTime.value = new Date()
 }
 
 let timer: NodeJS.Timeout

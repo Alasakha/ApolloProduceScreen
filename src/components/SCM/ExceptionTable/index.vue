@@ -50,13 +50,13 @@
             导出Excel
           </el-button>
         </div>
-        <el-table 
-          v-loading="tableLoading"
-          :data="paginatedData" 
-          border 
-          style="width: 100%"
-          height="670"
-        >
+        <div class="table-container">
+          <el-table 
+            v-loading="tableLoading"
+            :data="paginatedData" 
+            border 
+            style="width: 100%"
+          >
           <el-table-column label="状态" width="120" fixed="left">
             <template #default="{ row }">
               <StatusCell :completeDate="row['完成期限']" />
@@ -83,6 +83,7 @@
             </template>
           </el-table-column>
         </el-table>
+        </div>
         
         <!-- 处理结果输入对话框 -->
         <el-dialog
@@ -381,14 +382,24 @@
   }
   
   .detail-table {
-    max-height: 60vh;
-    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
   }
   
   .dialog-toolbar {
+    flex: 0 0 auto;
     margin-bottom: 16px;
     display: flex;
     justify-content: flex-end;
+  }
+
+  .table-container {
+    flex: 1 1 auto;
+    overflow: auto;
+    min-height: 0;
+    max-height: calc(80vh - 200px);
   }
   
   .action-btn {
@@ -397,10 +408,13 @@
   }
   
   .pagination-container {
+    flex: 0 0 auto;
     display: flex;
     justify-content: flex-end;
     margin-top: 20px;
     padding: 10px;
+    border-top: 1px solid #dcdfe6;
+    background-color: #fff;
   }
   
   :deep(.ScrollBoard) {
@@ -412,11 +426,18 @@
   :deep(.el-table) {
     background-color: transparent;
     color: #333;
+    height: auto !important;
+    max-height: none !important;
+  }
+
+  :deep(.el-table .el-table__body-wrapper) {
+    max-height: none !important;
+    overflow: visible !important;
   }
   
   :deep(.el-table th) {
-    /* background-color: #0d47a1; */
-    /* color: #fff; */
+    background-color: #f5f7fa;
+    color: #606266;
   }
   
   :deep(.el-table tr) {
@@ -451,13 +472,16 @@
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    max-height: 90vh;
+    height: 80vh;
+    max-height: 80vh;
   }
   
   :deep(.custom-dialog .el-dialog__body) {
     flex: 1;
-    overflow: auto;
+    overflow: hidden;
     padding: 20px;
+    display: flex;
+    flex-direction: column;
   }
   
   :deep(.custom-dialog .el-dialog__header) {

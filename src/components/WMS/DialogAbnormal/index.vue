@@ -122,7 +122,7 @@ watch(dialogVisible, (val) => {
 
 // 监听数据变化
 watch(() => props.data, (val) => {
-  console.log('DetailTable received data:', val);
+ 
   tableData.value = val;
   total.value = val.length;
 }, { immediate: true });

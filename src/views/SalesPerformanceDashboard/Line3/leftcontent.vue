@@ -44,7 +44,7 @@
                                 {{ item.ysAmtYearComparison }}
                             </span>
                         </td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysQuantityAgain" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -53,7 +53,7 @@
                             <span class="comparison-icon" v-if="item.ysQuantityAgainComparison">
                                 {{ item.ysQuantityAgainComparison }}
                             </span>
-                        </td>
+                        </td> -->
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysAmtAgain" 

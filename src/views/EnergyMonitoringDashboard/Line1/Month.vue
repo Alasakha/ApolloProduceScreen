@@ -9,7 +9,7 @@
     <div class="gauge-container">
       <div 
         class="gauge-item" 
-        v-for="item in energyStore.allConfiguredElectricMeters" 
+        v-for="item in energyStore.monthlyElectricData" 
         :key="item.machCode"
       >
         <v-chart :option="getGaugeOption(item)" autoresize />
@@ -19,7 +19,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onUnmounted } from 'vue';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
 import { GaugeChart } from 'echarts/charts';
@@ -52,27 +52,16 @@ const getGaugeOption = (item: EnergyData) => {
   );
 };
 
-// 定时刷新数据
-const startDataRefresh = async () => {
-  await refreshData();
-  updateInterval.value = window.setInterval(refreshData, 180000); // 每3分钟刷新一次
-};
+// Month组件现在使用store中的当月数据，不再独立获取数据
+// 数据由主组件统一管理
 
-// 刷新数据
-const refreshData = async () => {
-  const today = new Date();
-  const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
-  await energyStore.fetchEnergyData(firstDayOfMonth);
-};
+console.log('📊 Line1/Month组件：使用store中的当月数据')
 
-// 生命周期钩子
-onMounted(() => {
-  startDataRefresh();
-});
-
+// 清理不再需要的定时器
 onUnmounted(() => {
   if (updateInterval.value) {
     clearInterval(updateInterval.value);
+    updateInterval.value = null;
   }
 });
 </script>
