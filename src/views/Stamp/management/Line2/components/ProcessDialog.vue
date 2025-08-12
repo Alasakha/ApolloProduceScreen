@@ -108,14 +108,14 @@
 
 <script setup lang="ts">
 import { ref, watch, computed } from 'vue'
-import { getStampingAll, type StampingAllItem } from '@/api/getStampWeldinfo'
+import { getStampingDoing, type StampingAllItem } from '@/api/getStampWeldinfo'
 
 interface ProcessCard {
   // 基础信息
   processName: string        // 工序名称
   status: string            // 状态
   progress: number          // 进度百分比
-  plan_qty: number
+  plan_qty: number | string
   // 九个关键参数
   macNo: string            // 设备编号
   machineName: string      // 设备名称  
@@ -140,7 +140,7 @@ interface Props {
     // 其他卡片信息
   }
   prodLine?: string
-  type?: string  // 新增 type 参数
+  type?: string | number  // 新增 type 参数
 }
 
 const props = defineProps<Props>()
@@ -152,7 +152,7 @@ const emit = defineEmits<{
 // API数据状态
 const loading = ref(false)
 const error = ref('')
-const apiProcessData = ref<StampingAllItem[]>([])
+const apiProcessData = ref<any[]>([])
 
 
 
@@ -166,9 +166,22 @@ const fetchProcessData = async () => {
   error.value = ''
   
   try {
-    const response = await getStampingAll(props.prodLine, props.type)
-    console.log('response', response)
-    apiProcessData.value = response.data || []
+    const response = await getStampingDoing(props.prodLine, props.type)
+    console.log('ProcessDialog API response:', response)
+    
+    // API返回的data是一个对象，包含设备组的键值对
+    const responseData = response.data
+    if (responseData && typeof responseData === 'object') {
+      // 从对象中提取第一个键的值（应该是对应设备组的数组）
+      const firstKey = Object.keys(responseData)[0]
+      if (firstKey && Array.isArray(responseData[firstKey])) {
+        apiProcessData.value = responseData[firstKey]
+      } else {
+        apiProcessData.value = []
+      }
+    } else {
+      apiProcessData.value = []
+    }
 
   } catch (err) {
     error.value = '获取工序数据失败'
@@ -200,7 +213,7 @@ const convertApiDataToCards = (apiData: StampingAllItem[]): ProcessCard[] => {
     return {
       // 基础信息
       processName: item.processName || '未知工序',
-      status: status,
+      status: item.isDoing === '1' ? '进行中' : '待机',
       progress: progress,
       
       // 九个关键参数
@@ -213,7 +226,7 @@ const convertApiDataToCards = (apiData: StampingAllItem[]): ProcessCard[] => {
       workNo: item.workNo || '-',                         // 工单号
       employeeName: item.employeeName || '-',             // 操作员工
       orderNo: item.te001te002 || '-',                    // 订单号，使用te001te002字段
-      plan_qty:item.plan_qty || 0,
+      plan_qty: parseFloat(item.plan_qty) || 0,
       // API原始数据字段
       isDoing: item.isDoing,
       num: item.num

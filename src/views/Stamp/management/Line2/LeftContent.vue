@@ -46,6 +46,7 @@ const emptyCardData = {
   spen: "暂无",
   ta006: "暂无",
   gdNum: "暂无",
+  workNo: "暂无",
   device: {
     hourBetween: "暂无",
     power: "暂无"
@@ -57,7 +58,7 @@ const formatCardData = (item) => {
   return {
     orderName: item.machineName || "暂无",
     totalQty: item.num ? Math.round(item.num) : "暂无",
-    doneQty: item.workNo || "暂无",
+    doneQty: item.num || "暂无",
     spec: item.processName || "暂无",
     progress: item.workNo && item.num ? Number(((item.workNo / item.num) * 100).toFixed(0)) : 0,
     status: item.deviceStateName || '暂无',
@@ -75,7 +76,8 @@ const formatCardData = (item) => {
     device: {
       hourBetween: "8.5",
       power: "75kw"
-    }
+    },
+    workNo: item.macNo || "暂无"
   }
 }
 
@@ -86,7 +88,7 @@ function toFixedNumber(num) {
 }
 
 const fetchStampingData = () => {
-  getStampingMachineData(prodLine,1).then(res => {
+  getStampingMachineData(prodLine,0).then(res => {
     stampingMachineData.value = res.data || [];
   })
 }

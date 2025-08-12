@@ -16,7 +16,8 @@
     <div class="flex-1 flex flex-row gap-4 p-4 min-h-0">
       <!-- 左侧数量区块 -->
       <div class="flex flex-col justify-center gap-4 w-28">
-        <div class="flex flex-col items-center bg-blue-900/60 border-2 border-cyan-400/50 rounded-xl px-3 py-3 shadow-lg">
+        <div class="flex flex-col items-center bg-blue-900/60 border-2 border-cyan-400/50 rounded-xl px-3 py-3 shadow-lg cursor-pointer hover:bg-blue-800/70 hover:border-cyan-300/70 transition-all duration-200"
+             @click="handleTotalQtyClick">
           <div class="text-sm text-cyan-200 mb-1">任务总数量</div>
           <div class="text-3xl font-bold text-white drop-shadow-lg">{{ totalQty }}</div>
         </div>
@@ -32,22 +33,24 @@
         <!-- 设备统计卡片 -->
         <div class="grid grid-cols-3 gap-3 mb-2">
           <!-- 设备组数量 -->
-          <div class="bg-blue-700/50 border border-blue-400/50 rounded-lg p-3 text-center">
+          <div class="bg-blue-700/50 border border-blue-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-blue-600/60 hover:border-blue-300/70 transition-all duration-200"
+               @click="handleDeviceGroupClick">
             <div class="text-cyan-200 text-sm mb-1">设备组数量</div>
-            <div class="text-2xl font-bold text-white">{{ deviceGroupCount || gdNum || 0 }}</div>
+            <div class="text-2xl font-bold text-white">{{ deviceGroupCount  }}</div>
           </div>
           
           <!-- 开机数量 -->
           <div class="bg-green-600/50 border border-green-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-green-500/60 hover:border-green-300/70 transition-all duration-200" 
                @click="handleRunningClick">
             <div class="text-green-200 text-sm mb-1">开机数量</div>
-            <div class="text-2xl font-bold text-white">{{ runningCount || Math.floor((gdNum || 0) * 0.7) }}</div>
+            <div class="text-2xl font-bold text-white">{{ runningCount  }}</div>
           </div>
           
           <!-- 待机数量 -->
-          <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center">
+          <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-yellow-500/60 hover:border-yellow-300/70 transition-all duration-200"
+               @click="handleWaitingClick">
             <div class="text-yellow-200 text-sm mb-1">待机数量</div>
-            <div class="text-2xl font-bold text-white">{{ waitingCount || Math.ceil((gdNum || 0) * 0.3) }}</div>
+            <div class="text-2xl font-bold text-white">{{ waitingCount  }}</div>
           </div>
         </div>
         
@@ -84,7 +87,7 @@ const props = defineProps({
 })
 
 // 定义事件发射
-const emit = defineEmits(['click-running', 'click-completed'])
+const emit = defineEmits(['click-running', 'click-completed', 'click-total-qty', 'click-device-group', 'click-waiting'])
 
 
 
@@ -105,6 +108,18 @@ const handleRunningClick = () => {
 
 const handleCompletedClick = () => {
   emit('click-completed', props.data)
+}
+
+const handleTotalQtyClick = () => {
+  emit('click-total-qty', props.data)
+}
+
+const handleDeviceGroupClick = () => {
+  emit('click-device-group', props.data)
+}
+
+const handleWaitingClick = () => {
+  emit('click-waiting', props.data)
 }
 
 // 设备组逻辑已简化

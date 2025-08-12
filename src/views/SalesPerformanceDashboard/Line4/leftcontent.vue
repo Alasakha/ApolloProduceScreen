@@ -1,37 +1,37 @@
 <template>
-  <div class="content w-full h-full p-4">
-    <h1 class="text-2xl font-bold text-[#00eeff]">销售计划达成</h1>
+  <div class="content w-full h-full p-2 3xl:p-1 4xl:p-2">
+    <h1 class="text-lg 3xl:text-xl 4xl:text-2xl font-bold text-[#00eeff] mb-1">销售计划达成</h1>
     <div class="table-container overflow-auto rounded-lg border border-[#00eeff] shadow-[0_0_20px_rgba(0,238,255,0.3)]">
       <table class="w-full text-sm text-center border-collapse text-[#00eeff]">
         <thead>
           <tr class="border-b border-[#00eeff40] bg-[#001122]">
-            <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">类型</th>
-            <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">计划销售数量</th>
-            <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">实际销售数量</th>
-            <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">达成率</th>
+            <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">类型</th>
+            <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">计划销售数量</th>
+            <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">实际销售数量</th>
+            <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">达成率</th>
           </tr>
         </thead>
         <tbody>
           <!-- 汽油车行 -->
           <tr class="border-b border-[#00eeff40] bg-[rgba(0,238,255,0.1)]">
-            <td class="px-4 py-2 text-left border-x border-[#00eeff40]">汽油车</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(gasData.plan) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(gasData.actual) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatPercent(gasData.percent) }}</td>
+            <td class="px-2 py-1 text-left border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">汽油车</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(gasData.plan) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(gasData.actual) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatPercent(gasData.percent) }}</td>
           </tr>
           <!-- 摩托车行 -->
           <tr class="border-b border-[#00eeff40] bg-[rgba(0,238,255,0.1)]">
-            <td class="px-4 py-2 text-left border-x border-[#00eeff40]">摩托车</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(motoData.plan) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(motoData.actual) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatPercent(motoData.percent) }}</td>
+            <td class="px-2 py-1 text-left border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">摩托车</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(motoData.plan) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(motoData.actual) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatPercent(motoData.percent) }}</td>
           </tr>
           <!-- 合计行 -->
           <tr class="bg-[rgba(0,238,255,0.15)] font-semibold border-b border-[#00eeff40]">
-            <td class="px-4 py-2 text-left border-x border-[#00eeff40]">合计</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(totalData.plan) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatNumber(totalData.actual) }}</td>
-            <td class="px-4 py-2 border-x border-[#00eeff40]">{{ formatPercent(totalData.percent) }}</td>
+            <td class="px-2 py-1 text-left border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">合计</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(totalData.plan) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatNumber(totalData.actual) }}</td>
+            <td class="px-2 py-1 border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ formatPercent(totalData.percent) }}</td>
           </tr>
         </tbody>
       </table>

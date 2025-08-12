@@ -2,7 +2,11 @@
   <div class="part1-container">
     <!-- 常规客户总直通率 -->
     <div class="total-passrate-section">
-      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">常规客户总直通率</div>
+      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+        常规客户总直通率
+        <span v-if="loading" class="loading-indicator">加载中...</span>
+        <span v-if="error" class="error-indicator" :title="error">❌</span>
+      </div>
       <div class="metrics-row">
         <div class="metric-item">
           <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
@@ -111,20 +115,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useProductionDataStore } from '@/store/productionData'
 
-// Mock数据
-const regularData = ref({
-  totalPassRate: {
-    target: 92.0,
-    actual: 89.3,
-    achievement: 97.1
-  },
-  annualData: {
-    target: 94.0,
-    plan: 91.5,
-    achievement: 97.3
+// 使用 Pinia store
+const productionStore = useProductionDataStore()
+
+// 计算属性：处理后的客户数据
+const regularData = computed(() => {
+  // 月度数据（常规客户总直通率）- 使用store中的数据
+  const totalPassRate = {
+    target: productionStore.monthlyNormalTarget,
+    actual: productionStore.monthlyNormalActual,
+    achievement: productionStore.monthlyNormalAchievement
   }
+  
+  // 年度数据（常规客户年度数据）- 使用store中的数据
+  const annualData = {
+    target: productionStore.yearlyATarget,
+    plan: productionStore.yearlyAActual,
+    achievement: productionStore.yearlyAAchievement
+  }
+
+  return { totalPassRate, annualData }
 })
 
 // 弹窗状态
@@ -181,6 +194,16 @@ const submitReason = () => {
   alert('原因/对策已提交成功！')
   closeReasonDialog()
 }
+
+// 组件挂载时启动store的自动刷新
+onMounted(() => {
+  productionStore.startAutoRefresh()
+})
+
+// 组件卸载时停止自动刷新
+onUnmounted(() => {
+  productionStore.stopAutoRefresh()
+})
 </script>
 
 <style scoped>
@@ -440,5 +463,23 @@ const submitReason = () => {
 
 .achievement-warning {
   color: #ff4444;
+}
+
+.loading-indicator {
+  color: #00d4ff;
+  font-size: 10px;
+  margin-left: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.error-indicator {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 </style>

@@ -3,7 +3,7 @@
       <div class="text-center text-[#00eeff] text-3xl 
   3xl:text-xl 
   4xl:text-3xl font-light tracking-widest mb-2 title-elegant w-full">
-  本年电表
+  当月电表
 </div>
       
       <!-- 样式3：未来科幻 -->

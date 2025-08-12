@@ -1,6 +1,6 @@
 <template>
-  <div class="h-full w-full P-4">
-    <div class="chart-container h-full w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]">
+  <div class="h-full w-full p-1 3xl:p-1 4xl:p-2">
+    <div class="chart-container w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]" style="height: calc(100% - 1rem); max-height: 18vh;">
       <v-chart class="chart" :option="chartOption" autoresize />
     </div>
   </div>
@@ -67,21 +67,26 @@ const chartOption = computed(() => ({
   legend: {
     data: ['计划销售数量', '实际销售数量'],
     textStyle: {
-      color: '#fff'
+      color: '#fff',
+      fontSize: 10
     },
-    top: 10
+    top: 5,
+    itemWidth: 15,
+    itemHeight: 10
   },
   grid: {
-    left: '3%',
+    left: '8%',
     right: '4%',
-    bottom: '3%',
+    top: '20%',
+    bottom: '15%',
     containLabel: true
   },
   xAxis: {
     type: 'category',
     data: processedData.value.categories,
     axisLabel: {
-      color: '#fff'
+      color: '#fff',
+      fontSize: 10
     }
   },
   yAxis: {
@@ -89,6 +94,7 @@ const chartOption = computed(() => ({
     name: '数量',
     axisLabel: {
       color: '#fff',
+      fontSize: 10,
       formatter: (value: number) => value.toLocaleString('en-US')
     },
     splitLine: {
@@ -105,7 +111,7 @@ const chartOption = computed(() => ({
       name: '计划销售数量',
       type: 'bar',
       data: processedData.value.planData,
-      barWidth: '25%',
+      barWidth: '20%',
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: 'rgba(0,238,255,0.8)' },
@@ -116,7 +122,8 @@ const chartOption = computed(() => ({
         show: true,
         position: 'top',
         formatter: (params: any) => params.value.toLocaleString('en-US'),
-        color: '#fff'
+        color: '#fff',
+        fontSize: 9
       }
     },
     {
@@ -134,7 +141,8 @@ const chartOption = computed(() => ({
         show: true,
         position: 'top',
         formatter: (params: any) => params.value.toLocaleString('en-US'),
-        color: '#fff'
+        color: '#fff',
+        fontSize: 9
       }
     }
   ]

@@ -39,8 +39,6 @@ const Alldata = ref<ServiceRequest>({
     monthly_domestic_customer_complaint: null
 })
 
-
-
 interface ServiceRequest {
     // 月度客诉目标
     monthly_customer_complaint: number
@@ -76,7 +74,7 @@ const fetchData = () => {
         getServiceRequest(null,null,1,null).then(res =>{
             Alldata.value.monthly_accessory_complaint = res.data
 })
-        getServiceRequest(null,0,1,'HZ20000').then(res =>{
+        getServiceRequest(null,0,0,'HZ20000').then(res =>{
             Alldata.value.monthly_domestic_customer_complaint = res.data
 })
 }

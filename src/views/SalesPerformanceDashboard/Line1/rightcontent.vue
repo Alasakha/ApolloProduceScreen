@@ -1,7 +1,7 @@
 <template>
-  <div class="h-full w-full p-2 3xl:p-1 4xl:p-2">
+  <div class="h-full w-full p-1 3xl:p-1 4xl:p-2">
     <!-- 修改容器样式 -->
-    <div class="chart-container w-full" style="height: 100%;">
+    <div class="chart-container w-full" style="height: calc(100% - 1rem); max-height: 20vh;">
       <v-chart class="chart" :option="chartOption" autoresize />
     </div>
   </div>
@@ -89,29 +89,37 @@ const chartOption = computed(() => ({
   legend: {
     data: ['年度预算金额', '再次预算金额', '已下单金额'],
     textStyle: {
-      color: '#fff'
+      color: '#fff',
+      fontSize: 10  // 减小图例字体
     },
-    top: 10
+    top: 5,  // 减小顶部距离
+    itemWidth: 15,  // 减小图例项宽度
+    itemHeight: 10  // 减小图例项高度
   },
   grid: {
-    left: '10%',      // 增加左边距
-    right: '5%',      // 增加右边距
-    top: '15%',       // 增加顶部边距
-    bottom: '10%',    // 增加底部边距
+    left: '8%',       // 减小左边距
+    right: '4%',      // 减小右边距
+    top: '20%',       // 为图例留出空间
+    bottom: '15%',    // 为X轴标签留出空间
     containLabel: true
   },
   xAxis: {
     type: 'category',
     data: chartData.value.categories,
     axisLabel: {
-      color: '#fff'
+      color: '#fff',
+      fontSize: 10  // 减小X轴标签字体
     }
   },
   yAxis: {
     type: 'value',
+    max: function(value) {
+      return Math.ceil(value.max * 1.2);  // 限制Y轴最大值，压缩图表高度
+    },
     axisLabel: {
       color: '#fff',
-      formatter: (value: number) => `${value.toFixed(2)}万`
+      fontSize: 10,  // 减小Y轴标签字体
+      formatter: (value: number) => `${value.toFixed(0)}万`
     },
     splitLine: {
       lineStyle: {
@@ -125,7 +133,7 @@ const chartOption = computed(() => ({
       type: 'line',
       data: chartData.value.ysAmtYear,
       symbol: 'circle',
-      symbolSize: 8,
+      symbolSize: 6,  // 减小点的大小
       lineStyle: {
         width: 2,
         color: '#00eeff'
@@ -137,7 +145,8 @@ const chartOption = computed(() => ({
         show: true,
         position: 'top',
         formatter: '{c}$',
-        color: '#fff'
+        color: '#fff',
+        fontSize: 9  // 减小标签字体
       }
     },
     {
@@ -145,7 +154,7 @@ const chartOption = computed(() => ({
       type: 'line',
       data: chartData.value.ysAmtAgain,
       symbol: 'circle',
-      symbolSize: 8,
+      symbolSize: 6,  // 减小点的大小
       lineStyle: {
         width: 2,
         color: '#00ff9d'
@@ -157,14 +166,15 @@ const chartOption = computed(() => ({
         show: true,
         position: 'top',
         formatter: '{c}$',
-        color: '#fff'
+        color: '#fff',
+        fontSize: 9  // 减小标签字体
       }
     },
     {
       name: '已下单金额',
       type: 'bar',
       data: chartData.value.xdTotal,
-      barWidth: '20%',
+      barWidth: '10%',  // 进一步减小柱状图宽度
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
           { offset: 0, color: 'rgba(0,238,255,0.8)' },
@@ -175,7 +185,8 @@ const chartOption = computed(() => ({
         show: true,
         position: 'top',
         formatter: '{c}',
-        color: '#fff'
+        color: '#fff',
+        fontSize: 9  // 减小标签字体
       }
     }
   ]

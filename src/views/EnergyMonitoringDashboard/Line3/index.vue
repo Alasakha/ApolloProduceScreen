@@ -2,8 +2,8 @@
   <div class="h-[10vh] w-full ">
     <dv-border-box-2 >
         <div class="flex w-full h-full justify-between">
-            <div v-for="item in data" class=" flex flex-col items-center justify-center h-full ">
-                  <div class="text-[#00eeff] text-base sm:text-lg md:text-xl 3xl:text-sm 4xl:text-lg  flex items-center">
+            <div v-for="item in data" class=" flex flex-col items-center justify-center h-full  ">
+                  <div class="text-[#00eeff] flex items-center text-base sm:text-lg md:text-xl 3xl:text-sm 4xl:text-lg  ">
             {{item.category}}
             <span :class="{'text-red-500': item.ratio.startsWith('↑'), 'text-green-500': item.ratio.startsWith('↓')}" class="ml-2">
               {{item.ratio}}
@@ -45,26 +45,29 @@ import { useEnergyStore } from '@/store/energy'
 
 const energyStore = useEnergyStore()
 
-// 电表设备代码到显示名称的映射
+// 电表设备代码到显示名称的映射（按正确顺序）
 const DEVICE_MAPPING = {
-  '616506210001': '空压机',
-  '616506210002': '注塑', 
-  '616506210003': '焊接',
-  '616506210004': '金工一楼',
-  '616506210006': '金工四楼',
-  '616506210007': '冲压',
-  '616506210008': '宿舍',
-  '616506210009': '包装',
-  '616506210005': '装配'
+  '616506210001': '空压机',        // 序号1
+  '616506210002': '注塑',          // 序号2
+  '616506210007': '冲压',          // 序号3
+  '616506210003': '焊接',          // 序号4
+  '616506210010': '总装一课装配',   // 序号5
+  '616506210009': '总装一课包装',   // 序号6
+  '616506210005': '总装二课',       // 序号7
+  '616506210004': '金工二部一楼',   // 序号8
+  '616506210006': '金工二部四楼',   // 序号9
+  '616506210008': '宿舍'           // 序号10
 }
 
-// 使用计算属性基于真实数据生成显示数据 - 使用当月数据
+// 使用计算属性基于真实数据生成显示数据 - 使用当月数据，按正确顺序
 const data = computed(() => {
   const electricData = energyStore.monthlyElectricData
   
-  return Object.entries(DEVICE_MAPPING).map(([machCode, category]) => {
-    const deviceData = electricData.find(item => item.machCode === machCode)
-    const actualConsumption = deviceData ? Math.round(deviceData.numberPower) : 0
+  // 按照 MACHINE_CODES.ELECTRIC 的顺序处理数据，确保显示顺序正确
+  return electricData.map((deviceData) => {
+    const machCode = deviceData.machCode
+    const category = DEVICE_MAPPING[machCode] || machCode
+    const actualConsumption = Math.round(deviceData.numberPower) || 0
     const standardConsumption = 0 // 标准数据暂时设为0
     
     // 计算比率

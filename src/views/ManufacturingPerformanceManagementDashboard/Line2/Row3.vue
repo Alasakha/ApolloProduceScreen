@@ -64,37 +64,54 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useTopIssueWorkshopStore } from '@/store/modules/topIssueWorkshop'
 
-// Mock数据
-const customerData = ref({
-  // A类一部涂装 - 直通率未达标，显示红色警示
-  painting: {
-    passRateReached: false, // 直通率未达标
-    topIssues: [
-      { name: '漆面流挂缺陷', percentage: 18.5 },
-      { name: '色差问题', percentage: 15.2 },
-      { name: '涂层厚度不均', percentage: 12.8 }
-    ]
-  },
-  // A类总装一课 - 直通率达标
-  assemblyCourse1: {
-    passRateReached: true, // 直通率达标
-    topIssues: [
-      { name: '零件装配偏差', percentage: 8.3 },
-      { name: '螺栓扭矩不足', percentage: 6.7 },
-      { name: '密封件老化', percentage: 5.9 }
-    ]
-  },
-  // A类总装二课 - 直通率未达标，显示红色警示
-  assemblyCourse2: {
-    passRateReached: false, // 直通率未达标
-    topIssues: [
-      { name: '电气连接故障', percentage: 14.6 },
-      { name: '管路泄漏', percentage: 11.4 },
-      { name: '传感器失效', percentage: 9.8 }
-    ]
+const topIssueStore = useTopIssueWorkshopStore()
+
+// 计算总问题数，用于计算百分比
+const calculatePercentage = (issues) => {
+  if (!issues || issues.length === 0) return []
+  
+  const totalCount = issues.reduce((sum, issue) => sum + issue.total, 0)
+  
+  return issues.map(issue => ({
+    name: issue.ngName,
+    percentage: totalCount > 0 ? ((issue.total / totalCount) * 100).toFixed(1) : 0
+  }))
+}
+
+// 计算数据
+const customerData = computed(() => {
+  const workshop1004 = topIssueStore.workshop1004Data
+  const workshop2004 = topIssueStore.workshop2004Data
+  
+  return {
+    // A类一部涂装 - 使用模拟数据（没有涂装车间的真实数据）
+    painting: {
+      passRateReached: false, // 直通率未达标
+      topIssues: [
+        { name: '漆面流挂缺陷', percentage: 18.5 },
+        { name: '色差问题', percentage: 15.2 },
+        { name: '涂层厚度不均', percentage: 12.8 }
+      ]
+    },
+    // A类总装一课 - 使用1004工作中心的真实数据
+    assemblyCourse1: {
+      passRateReached: !(workshop1004?.A类?.some(issue => issue.total > 15)), // 有高严重问题说明未达标
+      topIssues: calculatePercentage(workshop1004?.A类?.slice(0, 3) || [])
+    },
+    // A类总装二课 - 使用2004工作中心的真实数据
+    assemblyCourse2: {
+      passRateReached: !(workshop2004?.A类?.some(issue => issue.total > 15)), // 有高严重问题说明未达标
+      topIssues: calculatePercentage(workshop2004?.A类?.slice(0, 3) || [])
+    }
   }
+})
+
+// 组件挂载时获取数据
+onMounted(async () => {
+  await topIssueStore.fetchTopIssueWorkshopData()
 })
 </script>
 

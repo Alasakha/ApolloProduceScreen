@@ -8,14 +8,22 @@
     @close="emit('close')"
   >
     <div class="table-wrapper">
-      <el-table :data="paginatedData" v-loading="loading" max-height="60vh" style="width: 100%">
+      <el-table :data="paginatedData" v-loading="loading" max-height="90vh" style="width: 100%">
         <template v-for="col in columns" :key="col.prop">
           <el-table-column
             v-if="col.prop !== 'action'"
             :prop="col.prop"
             :label="col.label"
-            :width="col.width+'px'"
-          />
+            :width="col.width || undefined"
+            :min-width="col.width ? undefined : '200'"
+            :show-overflow-tooltip="false"
+          >
+            <template #default="scope">
+              <div class="cell-content" :style="{ whiteSpace: 'pre-wrap', wordBreak: 'break-word' }">
+                {{ scope.row[col.prop] }}
+              </div>
+            </template>
+          </el-table-column>
         </template>
         <el-table-column
           v-if="columns.some(col => col.prop === 'action')"
@@ -65,7 +73,7 @@ const props = defineProps<{
 
 const emit = defineEmits(['update:modelValue', 'close'])
 
-const dialogWidth = '90%'
+const dialogWidth = computed(() => props.width || '90%')
 
 // 分页状态
 const currentPage = ref(1)
@@ -107,6 +115,7 @@ const handleFill = async (row: any) => {
   overflow: auto;
   display: flex;
   flex-direction: column;
+  width: 100%;
 }
 
 .pagination-wrapper {
@@ -115,6 +124,31 @@ const handleFill = async (row: any) => {
   align-items: center;
   padding: 12px 0;
   font-size: 16px; /* 默认字体大小加大 */
+}
+
+/* 确保表格占满宽度 */
+:deep(.el-table) {
+  width: 100% !important;
+}
+
+:deep(.el-table__body-wrapper) {
+  width: 100% !important;
+}
+
+/* 单元格内容换行样式 */
+:deep(.cell-content) {
+  line-height: 1.4;
+  padding: 4px 0;
+}
+
+/* 表格行高度自适应 */
+:deep(.el-table__row) {
+  height: auto !important;
+}
+
+:deep(.el-table__cell) {
+  padding: 8px 0;
+  vertical-align: top;
 }
 
 /* 可选：分页组件字体大小更大一些 */

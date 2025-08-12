@@ -5,27 +5,15 @@
       <div class="box-content h-[30%]">
         <el-carousel trigger="click" height="100%" :interval="5000" indicator-position="none">
           <el-carousel-item>
-            <!-- 样式1：科技感十足 -->
-            <!-- <div class="text-center text-[#00eeff] text-3xl font-bold tracking-wider transform hover:scale-105 transition-transform duration-300 mb-2 title-tech">
-              今日电表
-            </div> -->
-            
-            <!-- 样式2：优雅现代 -->
-            <!-- <div class="text-center text-[#00eeff] text-3xl font-light tracking-widest mb-2 title-elegant">
-              今日电表
-            </div> -->
-            
-            <!-- 样式3：未来科幻 -->
-            <!-- <div class="text-center text-[#00eeff] text-3xl font-bold uppercase tracking-[0.2em] mb-2 title-future">
-              今日电表
-            </div> -->
-
+            <!-- 序号1：本年电表 -->
             <Today />
           </el-carousel-item>
           <el-carousel-item>
+            <!-- 序号2：总生产一趟 -->
             <Month />
           </el-carousel-item>
           <el-carousel-item>
+            <!-- 序号3：当月电表 -->
             <Year />
           </el-carousel-item>
         </el-carousel>

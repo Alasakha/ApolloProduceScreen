@@ -1,7 +1,11 @@
 <template>
   <div class="row1-container flex-1">
     <!-- A类客户合计 -->
-    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">A类客户合计</div>
+    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+      A类客户合计
+      <span v-if="loading" class="loading-indicator">加载中...</span>
+      <span v-if="error" class="error-indicator" :title="error">❌</span>
+    </div>
     
     <!-- 月度数据 -->
     <div class="data-section">
@@ -60,20 +64,29 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useProductionDataStore } from '@/store/productionData'
 
-// Mock数据
-const customerData = ref({
-  monthly: {
-    target: 95.0,
-    actual: 92.5,
-    achievement: 97.4
-  },
-  yearly: {
-    target: 94.0,
-    cumulative: 91.8,
-    achievement: 97.7
+// 使用 Pinia store
+const productionStore = useProductionDataStore()
+
+// 计算属性：处理后的客户数据
+const customerData = computed(() => {
+  // 月度数据 - 使用store中的数据
+  const monthly = {
+    target: productionStore.monthlyNormalTarget,
+    actual: productionStore.monthlyNormalActual,
+    achievement: productionStore.monthlyNormalAchievement
   }
+
+  // 年度数据 - 使用store中的数据
+  const yearly = {
+    target: productionStore.yearlyATarget,
+    cumulative: productionStore.yearlyAActual,  
+    achievement: productionStore.yearlyAAchievement
+  }
+
+  return { monthly, yearly }
 })
 
 // 获取达成率样式类
@@ -107,6 +120,16 @@ const showYearlyReasonDialog = () => {
   console.log('填写年度原因/对策')
   // 这里可以打开原因/对策填写弹窗
 }
+
+// 组件挂载时启动store的自动刷新
+onMounted(() => {
+  productionStore.startAutoRefresh()
+})
+
+// 组件卸载时停止自动刷新
+onUnmounted(() => {
+  productionStore.stopAutoRefresh()
+})
 </script>
 
 <style scoped>
@@ -234,5 +257,23 @@ const showYearlyReasonDialog = () => {
 
 .achievement-warning {
   color: #ff4444;
+}
+
+.loading-indicator {
+  color: #00d4ff;
+  font-size: 10px;
+  margin-left: 8px;
+  animation: pulse 1.5s infinite;
+}
+
+.error-indicator {
+  margin-left: 8px;
+  cursor: pointer;
+}
+
+@keyframes pulse {
+  0% { opacity: 1; }
+  50% { opacity: 0.5; }
+  100% { opacity: 1; }
 }
 </style>

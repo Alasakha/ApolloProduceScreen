@@ -20,16 +20,51 @@
           :data="card"
           @click-running="handleRunningClick"
           @click-completed="handleCompletedClick"
+          @click-total-qty="handleTotalQtyClick"
+          @click-device-group="handleDeviceGroupClick"
+          @click-waiting="handleWaitingClick"
         />
       </div>
     </div>
 
-    <!-- 工序详情弹窗 -->
+    <!-- 正在进行的工序详情弹窗 -->
     <ProcessDialog 
-      v-model:visible="dialogVisible" 
+      v-model:visible="processDialogVisible" 
       :selected-card="selectedCard"
       :prod-line="prodLine"
       :type="selectedCard?.type"
+    />
+    
+    <!-- 已完成的工序详情弹窗 -->
+    <CompletedDialog 
+      v-model:visible="completedDialogVisible" 
+      :selected-card="selectedCard"
+      :prod-line="prodLine"
+      :type="selectedCard?.type"
+    />
+    
+    <!-- 任务总数量详情弹窗 -->
+    <TotalQtyDialog 
+      v-model:visible="totalQtyDialogVisible" 
+      :data="selectedCard ? [selectedCard] : []"
+      :prod-line="prodLine"
+      :type="selectedCard?.type"
+    />
+    
+    <!-- 设备组详情弹窗 -->
+    <DeviceGroupDialog 
+      v-model:visible="deviceGroupDialogVisible" 
+      :data="selectedCard"
+      :type="selectedCard?.type?.toString() || ''"
+      ref="deviceGroupDialogRef"
+    />
+    
+    <!-- 待机设备详情弹窗 -->
+    <WaitingDialog 
+      v-model:visible="waitingDialogVisible" 
+      :data="selectedCard ? [selectedCard] : []"
+      :prod-line="prodLine"
+      :type="selectedCard?.type?.toString() || ''"
     />
   </div>
 </template>   
@@ -38,15 +73,24 @@
 import { ref, onMounted, computed } from 'vue'
 import DataCard3 from '../components/DataCard3.vue'
 import ProcessDialog from './components/ProcessDialog.vue'
+import CompletedDialog from './components/CompletedDialog.vue'
+import TotalQtyDialog from './components/TotalQtyDialog.vue'
+import DeviceGroupDialog from './components/DeviceGroupDialog.vue'
+import WaitingDialog from './components/WaitingDialog.vue'
 import { getStampingDoingIndex, type StampingDoingIndex } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
 const prodLine = route.query.prodLine as string
 
-// 弹窗控制
-const dialogVisible = ref(false)
+// 弹窗控制 - 分别控制各个弹窗
+const processDialogVisible = ref(false)  // 控制ProcessDialog（正在进行的工序）
+const completedDialogVisible = ref(false)  // 控制CompletedDialog（已完成的工序）
+const totalQtyDialogVisible = ref(false)  // 控制TotalQtyDialog（任务总数量）
+const deviceGroupDialogVisible = ref(false)  // 控制DeviceGroupDialog（设备组详情）
+const waitingDialogVisible = ref(false)  // 控制WaitingDialog（待机设备）
 const selectedCard = ref<any>(null)
+const deviceGroupDialogRef = ref<any>(null)
 
 // API数据状态
 const loading = ref(false)
@@ -61,13 +105,13 @@ const mockStampingData = ref([
 
 // 设备组名称映射
 const deviceGroupNames = {
-  SG_ALL: '冲压设备组',
-  CHH_ALL: '冲孔设备组', 
+  SG_ALL: '缩管设备组',
+  CHH_ALL: '冲弧设备组', 
   WG_ALL: '弯管设备组',
   GH_ALL: '滚花设备组',
   CHC_ALL: '冲床设备组',
   YJ_ALL: '压机设备组',
-  TZ_ALL: '调直设备组'
+  TZ_ALL: '台钻设备组'
 }
 
 // 获取API数据
@@ -165,40 +209,121 @@ onMounted(() => {
 
 
 
-// 点击开机数量事件处理
+// 点击开机数量事件处理 - 打开ProcessDialog显示正在进行的工序
 const handleRunningClick = (cardData) => {
-
-  console.log('卡片数据:', cardData)
-
-  
-  // 这里可以添加开机数量相关的逻辑
-  // 例如：显示开机设备详情、开机状态等
-  
+  // 设置选中的卡片数据
   selectedCard.value = {
     ...cardData,
-    title: `${cardData.orderName} - 开机设备详情`,
+    title: `${cardData.orderName} - 正在进行的设备详情`,
     orderName: cardData.orderName,
   }
-  dialogVisible.value = true
+  
+  // 打开ProcessDialog
+  processDialogVisible.value = true
 }
 
-// 点击已完成数事件处理
+// 点击已完成数事件处理 - 打开CompletedDialog显示已完成的工序
 const handleCompletedClick = (cardData) => {
-
-
-  // 获取对应的type参数
-
+  console.log('点击已完成数量，卡片数据:', cardData)
   
-  // 这里可以添加已完成数相关的逻辑
-  // 例如：显示完成详情、进度分析等
-  
+  // 设置选中的卡片数据
   selectedCard.value = {
     ...cardData,
-    title: `${cardData.orderName} - 完成进度详情`,
+    title: `${cardData.orderName} - 已完成工序详情`,
     orderName: cardData.orderName,
   }
-  dialogVisible.value = true
+  
+  // 打开CompletedDialog
+  completedDialogVisible.value = true
 }
+
+// 点击任务总数量事件处理
+const handleTotalQtyClick = (cardData) => {
+  console.log('点击任务总数量，卡片数据:', cardData)
+  
+  // 设置选中的卡片数据
+  selectedCard.value = {
+    ...cardData,
+    title: `${cardData.orderName} - 任务总数量详情`,
+    orderName: cardData.orderName,
+  }
+  
+  console.log('设置 selectedCard:', selectedCard.value)
+  
+  // 打开TotalQtyDialog
+  totalQtyDialogVisible.value = true
+  console.log('设置 totalQtyDialogVisible:', totalQtyDialogVisible.value)
+}
+
+// 点击设备组数量事件处理
+const handleDeviceGroupClick = (cardData) => {
+  console.log('点击设备组数量，卡片数据:', cardData)
+  
+  // 设置选中的卡片数据
+  selectedCard.value = {
+    ...cardData,
+    title: `${cardData.orderName} - 设备组详情`,
+    orderName: cardData.orderName,
+  }
+  
+  // 打开DeviceGroupDialog
+  deviceGroupDialogVisible.value = true
+}
+
+// 点击待机数量事件处理
+const handleWaitingClick = (cardData) => {
+  console.log('点击待机数量，卡片数据:', cardData)
+  
+  // 设置选中的卡片数据
+  selectedCard.value = {
+    ...cardData,
+    title: `${cardData.orderName} - 待机设备详情`,
+    orderName: cardData.orderName,
+  }
+  
+  // 打开WaitingDialog
+  waitingDialogVisible.value = true
+}
+
+// 根据设备组代码查看设备
+const viewDevicesByGroupCode = (groupCode: string) => {
+  if (deviceGroupDialogRef.value) {
+    const devices = deviceGroupDialogRef.value.getDevicesByGroupCode(groupCode)
+    const groupName = deviceGroupDialogRef.value.getGroupNameByCode(groupCode)
+    
+    console.log(`查看设备组 ${groupCode} (${groupName}) 的设备:`, devices)
+    
+    // 设置选中的卡片数据
+    selectedCard.value = {
+      orderName: groupName,
+      title: `${groupName} - 设备详情`,
+      deviceGroup: devices,
+      type: 'deviceGroup'
+    }
+    
+    // 打开设备组对话框
+    deviceGroupDialogVisible.value = true
+  }
+}
+
+// 测试Dialog函数
+// const testDialog = () => {
+//   console.log('测试Dialog函数被调用')
+//   selectedCard.value = {
+//     orderName: '测试设备组',
+//     qty_total: 1000,
+//     num_total: 500,
+//     title: '测试 - 任务总数量详情'
+//   }
+//   totalQtyDialogVisible.value = true
+//   console.log('测试数据设置完成，selectedCard:', selectedCard.value)
+//   console.log('测试状态设置完成，totalQtyDialogVisible:', totalQtyDialogVisible.value)
+// }
+
+// 暴露方法供外部调用
+defineExpose({
+  viewDevicesByGroupCode
+})
 </script>
 
 <style scoped>

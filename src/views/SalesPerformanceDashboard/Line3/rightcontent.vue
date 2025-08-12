@@ -1,6 +1,6 @@
 <template>
-    <div class="h-full w-full p-4">
-      <div class="chart-container h-full w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]">
+    <div class="h-full w-full p-1 3xl:p-1 4xl:p-2">
+      <div class="chart-container w-full border border-[#00eeff] rounded-lg bg-[rgba(0,19,47,0.95)]" style="height: calc(100% - 1rem); max-height: 20vh;">
         <v-chart class="chart" :option="chartOption"  autoresize />
       </div>
     </div>
@@ -79,23 +79,29 @@
     legend: {
       data: ['年度预算数量', '再次预算数量', '已下单金额'],
       textStyle: {
-        color: '#fff'
+        color: '#fff',
+        fontSize: 10
       },
+      top: 5,
+      itemWidth: 15,
+      itemHeight: 10,
       formatter: (name: string) => {
         return name + '$'
       }
     },
     grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '3%',
+      left: '8%',
+      right: '8%',
+      top: '20%',
+      bottom: '15%',
       containLabel: true
     },
     xAxis: {
       type: 'category',
       data: chartData.value.categories,
       axisLabel: {
-        color: '#fff'
+        color: '#fff',
+        fontSize: 10
       }
     },
     yAxis: [
@@ -105,7 +111,8 @@
         position: 'left',
         axisLabel: {
           color: '#fff',
-          formatter: (value: number) => `${value.toFixed(2)}$`
+          fontSize: 10,
+          formatter: (value: number) => `${value.toFixed(0)}$`
         },
         splitLine: {
           lineStyle: {
@@ -122,6 +129,7 @@
         position: 'right',
         axisLabel: {
           color: '#fff',
+          fontSize: 10,
           formatter: (value: number) => `${value.toFixed(0)}个`
         },
         splitLine: {

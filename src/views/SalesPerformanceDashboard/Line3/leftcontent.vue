@@ -1,18 +1,18 @@
 <template>
-    <div class="content w-full h-full p-4">
-        <h1 class="text-2xl font-bold text-[#00eeff]">爆品接单达成</h1>
+    <div class="content w-full h-full p-2 3xl:p-1 4xl:p-2">
+        <h1 class="text-lg 3xl:text-sm 4xl:text-2xl font-bold text-[#00eeff] mb-1">爆品接单达成</h1>
         <div class="table-container overflow-auto rounded-lg border border-[#00eeff] shadow-[0_0_20px_rgba(0,238,255,0.3)]">
             <table class="w-full text-sm text-center border-collapse text-[#00eeff]">
                 <thead>
                     <tr class="border-b border-[#00eeff40] bg-[#001122]">
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">组别</th>
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">配件接单(美元)</th> -->
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算数量</th>
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">年度预算金额(万)</th> -->
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算数量</th> -->
-                        <!-- <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">再次预算金额(万)</th> -->
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单数量</th>
-                        <th class="px-4 py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider">已下单金额(美元)</th>
+                        <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">组别</th>
+                        <!-- <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">配件接单(美元)</th> -->
+                        <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">年度预算数量</th>
+                        <!-- <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">年度预算金额(万)</th> -->
+                        <!-- <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">再次预算数量</th> -->
+                        <!-- <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">再次预算金额(万)</th> -->
+                        <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">已下单数量</th>
+                        <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">已下单金额(美元)</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -22,12 +22,12 @@
                         idx % 2 === 0 ? 'bg-[rgba(0,245,255,0.4)]' : 'bg-[rgba(0,238,255,0.1)]',
                         'hover:bg-[rgba(0,238,255,0.2)]'
                     ]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ item.empCategory }}</td>
+                        <td class="px-2 py-1 text-left border-x border-[#00eeff40] text-xs 3xl:text-sm 4xl:text-base">{{ item.empCategory }}</td>
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.pjTotal }}</td> -->
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-2 py-1 border-x border-[#00eeff40] relative group text-xs 3xl:text-sm 4xl:text-base">
                             <input 
                                 v-model="item.ysQuantityYear" 
-                                class="w-full bg-transparent outline-none text-center"
+                                class="w-full bg-transparent outline-none text-center text-xs 3xl:text-sm 4xl:text-base"
                                 @change="updateBudget(item, 'ysQuantityYear', ($event.target as HTMLInputElement).value)"
                             >
                             <span class="comparison-icon" v-if="item.ysQuantityYearComparison">
@@ -37,7 +37,7 @@
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysAmtYear" 
-                                class="w-full bg-transparent outline-none text-center"
+                                class="w-full bg-transparent outline-none text-center text-xs 3xl:text-sm 4xl:text-base"
                                 @change="updateBudget(item, 'ysAmtYear', ($event.target as HTMLInputElement).value)"
                             >
                             <span class="comparison-icon" v-if="item.ysAmtYearComparison">
@@ -47,7 +47,7 @@
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysQuantityAgain" 
-                                class="w-full bg-transparent outline-none text-center"
+                                class="w-full bg-transparent outline-none text-center text-xs 3xl:text-sm 4xl:text-base"
                                 @change="updateBudget(item, 'ysQuantityAgain', ($event.target as HTMLInputElement).value)"
                             >
                             <span class="comparison-icon" v-if="item.ysQuantityAgainComparison">
@@ -57,7 +57,7 @@
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
                             <input 
                                 v-model="item.ysAmtAgain" 
-                                class="w-full bg-transparent outline-none text-center"
+                                class="w-full bg-transparent outline-none text-center text-xs 3xl:text-sm 4xl:text-base"
                                 @change="updateBudget(item, 'ysAmtAgain', ($event.target as HTMLInputElement).value)"
                             >
                             <span class="comparison-icon" v-if="item.ysAmtAgainComparison">

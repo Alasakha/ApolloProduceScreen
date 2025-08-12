@@ -1,5 +1,5 @@
 <template>
-    <div class="flex">
+    <div class="flex h-[25vh] 3xl:h-[25vh] 4xl:h-[25vh]">
       <div class="w-2/3">
         <LeftContent @data-updated="updateTableData" />
       </div>

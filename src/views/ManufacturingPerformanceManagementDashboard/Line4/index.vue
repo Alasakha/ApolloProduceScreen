@@ -20,7 +20,7 @@
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.aCustomer.onTimeRate)">
-              {{ deliveryData.aCustomer.onTimeRate }}%
+              {{ deliveryData.aCustomer.onTimeRate.toFixed(1) }}%
             </div>
           </div>
         </div>
@@ -36,7 +36,7 @@
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.aCustomer.todayRate)">
-              {{ deliveryData.aCustomer.todayRate }}%
+              {{ deliveryData.aCustomer.todayRate.toFixed(1) }}%
             </div>
           </div>
           <div class="action-item">
@@ -68,7 +68,7 @@
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.regularCustomer.onTimeRate)">
-              {{ deliveryData.regularCustomer.onTimeRate }}%
+              {{ deliveryData.regularCustomer.onTimeRate.toFixed(1) }}%
             </div>
           </div>
         </div>
@@ -84,7 +84,7 @@
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.regularCustomer.todayRate)">
-              {{ deliveryData.regularCustomer.todayRate }}%
+              {{ deliveryData.regularCustomer.todayRate.toFixed(1) }}%
             </div>
           </div>
           <div class="action-item">
@@ -133,27 +133,45 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useProductionDataStore } from '@/store/productionData'
 
-// Mock数据
-const deliveryData = ref({
+// 使用生产数据store
+const productionStore = useProductionDataStore()
+
+// 启动数据获取和自动刷新
+onMounted(() => {
+  productionStore.startAutoRefresh()
+})
+
+// 清理定时器
+onUnmounted(() => {
+  productionStore.stopAutoRefresh()
+})
+
+// 准交率数据 - 使用store中的真实数据
+const deliveryData = computed(() => ({
   aCustomer: {
-    target: 95.0,
-    stockOrders: 125,
-    onTimeOrders: 118,
-    onTimeRate: 94.4,
-    plannedToday: 45,
-    actualToday: 42,
-    todayRate: 93.3
+    target: 95.0, // 目标值暂时使用固定值，后续可以从配置获取
+    // 月度数据（第一行）
+    stockOrders: productionStore.onTimeMonthlyATotal, // 月度工单总数
+    onTimeOrders: productionStore.onTimeMonthlyACompleteNum, // 月度已入库工单数
+    onTimeRate: productionStore.onTimeMonthlyARate, // 月度准交率
+    // 今日数据（第二行）
+    plannedToday: productionStore.onTimeDailyATotal, // 今日工单总数
+    actualToday: productionStore.onTimeDailyACompleteNum, // 今日已入库工单数
+    todayRate: productionStore.onTimeDailyARate // 今日准交率
   },
   regularCustomer: {
-    target: 90.0,
-    stockOrders: 89,
-    onTimeOrders: 82,
-    onTimeRate: 92.1,
-    plannedToday: 32,
-    actualToday: 29,
-    todayRate: 90.6
+    target: 90.0, // 目标值暂时使用固定值
+    // 月度数据（第一行）
+    stockOrders: productionStore.onTimeMonthlyNormalTotal, // 月度工单总数
+    onTimeOrders: productionStore.onTimeMonthlyNormalCompleteNum, // 月度已入库工单数
+    onTimeRate: productionStore.onTimeMonthlyNormalRate, // 月度准交率
+    // 今日数据（第二行）
+    plannedToday: productionStore.onTimeDailyNormalTotal, // 今日工单总数
+    actualToday: productionStore.onTimeDailyNormalCompleteNum, // 今日已入库工单数
+    todayRate: productionStore.onTimeDailyNormalRate // 今日准交率
   },
   manufacturingCost: {
     target: 12.5,
@@ -161,7 +179,9 @@ const deliveryData = ref({
     actualRevenue: 1453.2,
     actualRatio: 12.8
   }
-})
+}))
+
+// 去掉旧的ref定义，现在使用computed
 
 // 获取交货率样式类
 const getDeliveryClass = (value) => {

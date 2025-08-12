@@ -1,5 +1,5 @@
 <template>
-  <div class="flex gap-4 h-[20vh]">
+  <div class="flex gap-4 h-[20vh] 3xl:h-[25vh] 4xl:h-[20vh]">
     <div class="w-2/3 ">
       <LeftContent @update:chartData="updateChartData" />
     </div>

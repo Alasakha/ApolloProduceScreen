@@ -1,5 +1,4 @@
 <template>
-    111
     <el-dialog
       :model-value="visible"
       @update:model-value="handleClose"
@@ -108,14 +107,14 @@
   
   <script setup lang="ts">
   import { ref, watch, computed } from 'vue'
-  import { getStampingDoing  } from '@/api/getStampWeldinfo'
+  import { getStampingAll, type StampingAllItem } from '@/api/getStampWeldinfo'
   
   interface ProcessCard {
     // 基础信息
     processName: string        // 工序名称
     status: string            // 状态
     progress: number          // 进度百分比
-    plan_qty: number
+    plan_qty: number | string
     // 九个关键参数
     macNo: string            // 设备编号
     machineName: string      // 设备名称  
@@ -126,7 +125,6 @@
     workNo: string           // 工单号
     employeeName: string     // 操作员工
     orderNo: string          // 订单号
-  
     // API原始数据字段
     isDoing?: string         // 是否在做
     num?: string            // 数量
@@ -140,7 +138,7 @@
       // 其他卡片信息
     }
     prodLine?: string
-    type?: string  // 新增 type 参数
+    type?: string | number  // 新增 type 参数
   }
   
   const props = defineProps<Props>()
@@ -152,7 +150,7 @@
   // API数据状态
   const loading = ref(false)
   const error = ref('')
-  const apiProcessData = ref([])
+  const apiProcessData = ref<StampingAllItem[]>([])
   
   
   
@@ -166,10 +164,14 @@
     error.value = ''
     
     try {
-      const response = await getStampingDoing(props.prodLine, props.type)
-      console.log('response', response)
-      apiProcessData.value = response.data || []
-  
+      const response = await getStampingAll(props.prodLine, String(props.type))
+      console.log('CompletedDialog API response:', response)
+      // API返回的是包含data属性的对象，需要提取data数组
+      const responseData = response?.data || []
+      // 过滤出已完成的工序（isDoing为"0"表示已完成）
+      const completedData = responseData.filter(item => item.isDoing === '0')
+      apiProcessData.value = completedData
+
     } catch (err) {
       error.value = '获取工序数据失败'
       console.error('获取工序数据失败:', err)
@@ -200,7 +202,7 @@
       return {
         // 基础信息
         processName: item.processName || '未知工序',
-        status: status,
+        status: item.isDoing === '0' ? '已完成' : '进行中',
         progress: progress,
         
         // 九个关键参数
@@ -213,7 +215,7 @@
         workNo: item.workNo || '-',                         // 工单号
         employeeName: item.employeeName || '-',             // 操作员工
         orderNo: item.te001te002 || '-',                    // 订单号，使用te001te002字段
-        plan_qty:item.plan_qty || 0,
+        plan_qty: parseFloat(item.plan_qty) || 0,
         // API原始数据字段
         isDoing: item.isDoing,
         num: item.num
@@ -223,8 +225,6 @@
   
   // 计算最终显示的工序卡片数据
   const processCards = computed<ProcessCard[]>(() => {
-  console.log('是否执行')
-  console.log('apiProcessData.value', apiProcessData.value.length)
     if (apiProcessData.value.length > 0) {
       console.log('convertApiDataToCards', convertApiDataToCards(apiProcessData.value))
       return convertApiDataToCards(apiProcessData.value)

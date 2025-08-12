@@ -1,7 +1,30 @@
 <template>
   <div class="row2-container flex-1">
     <!-- A类客户各部门直通率 -->
-    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">A类客户各部门直通率</div>
+    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+      A类客户各部门直通率
+      <span v-if="manufacturingStore.state.loading" class="loading-indicator">加载中...</span>
+      <span v-if="manufacturingStore.state.error" class="error-indicator" :title="manufacturingStore.state.error">❌</span>
+    </div>
+    
+    <!-- 月度/年度切换 -->
+    <div class="period-toggle">
+      <button 
+        class="toggle-btn" 
+        :class="{ active: currentPeriod === 'monthly' }"
+        @click="currentPeriod = 'monthly'"
+      >
+        月度
+      </button>
+      <button 
+        class="toggle-btn" 
+        :class="{ active: currentPeriod === 'yearly' }"
+        @click="currentPeriod = 'yearly'"
+      >
+        年度
+      </button>
+    </div>
+    
     <div class="departments-grid">
       <!-- A类客户金工一部涂装 -->
       <div class="department-section">
@@ -9,16 +32,16 @@
         <div class="metrics-row">
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.painting.target }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentPaintingData.target }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.painting.actual }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentPaintingData.actual }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(customerData.painting.achievement)">
-              {{ customerData.painting.achievement }}%
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentPaintingData.achievement)">
+              {{ currentPaintingData.achievement }}%
             </div>
           </div>
         </div>
@@ -30,16 +53,16 @@
         <div class="metrics-row">
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.assemblyCourse1.target }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse1Data.target }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.assemblyCourse1.actual }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse1Data.actual }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(customerData.assemblyCourse1.achievement)">
-              {{ customerData.assemblyCourse1.achievement }}%
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentAssemblyCourse1Data.achievement)">
+              {{ currentAssemblyCourse1Data.achievement }}%
             </div>
           </div>
         </div>
@@ -51,16 +74,16 @@
         <div class="metrics-row">
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.assemblyCourse2.target }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse2Data.target }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.assemblyCourse2.actual }}%</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse2Data.actual }}%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(customerData.assemblyCourse2.achievement)">
-              {{ customerData.assemblyCourse2.achievement }}%
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentAssemblyCourse2Data.achievement)">
+              {{ currentAssemblyCourse2Data.achievement }}%
             </div>
           </div>
         </div>
@@ -70,28 +93,32 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useManufacturingPerformanceStore } from '@/store/manufacturingPerformance'
 
-// Mock数据
-const customerData = ref({
-  // A类客户金工一部涂装直通率
-  painting: {
-    target: 96.0,
-    actual: 94.2,
-    achievement: 98.1
-  },
-  // A类客户总装一课直通率
-  assemblyCourse1: {
-    target: 95.5,
-    actual: 96.8,
-    achievement: 101.4
-  },
-  // A类客户总装二课直通率
-  assemblyCourse2: {
-    target: 94.5,
-    actual: 91.3,
-    achievement: 96.6
-  }
+// 使用制造绩效store
+const manufacturingStore = useManufacturingPerformanceStore()
+
+// 当前显示周期 (月度/年度)
+const currentPeriod = ref('monthly')
+
+// 当前显示的数据
+const currentPaintingData = computed(() => {
+  return currentPeriod.value === 'monthly' 
+    ? manufacturingStore.aCustomerPaintingMonthlyData
+    : manufacturingStore.aCustomerPaintingYearlyData
+})
+
+const currentAssemblyCourse1Data = computed(() => {
+  return currentPeriod.value === 'monthly'
+    ? manufacturingStore.aCustomerAssemblyCourse1MonthlyData
+    : manufacturingStore.aCustomerAssemblyCourse1YearlyData
+})
+
+const currentAssemblyCourse2Data = computed(() => {
+  return currentPeriod.value === 'monthly'
+    ? manufacturingStore.aCustomerAssemblyCourse2MonthlyData
+    : manufacturingStore.aCustomerAssemblyCourse2YearlyData
 })
 
 // 获取达成率样式类
@@ -101,6 +128,16 @@ const getAchievementClass = (value) => {
   if (value >= 95) return 'achievement-normal'
   return 'achievement-warning'
 }
+
+// 组件挂载时启动数据获取
+onMounted(() => {
+  manufacturingStore.startAutoRefresh()
+})
+
+// 组件卸载时停止自动刷新
+onUnmounted(() => {
+  manufacturingStore.stopAutoRefresh()
+})
 </script>
 
 <style scoped>
@@ -119,17 +156,61 @@ const getAchievementClass = (value) => {
 .section-title {
   font-weight: bold;
   color: #00d4ff;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   text-align: center;
   border-bottom: 1px solid rgba(0, 150, 255, 0.3);
   padding-bottom: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.loading-indicator {
+  color: #ffd700;
+  font-size: 10px;
+}
+
+.error-indicator {
+  color: #ff4444;
+  font-size: 12px;
+  cursor: help;
+}
+
+.period-toggle {
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  margin-bottom: 6px;
+}
+
+.toggle-btn {
+  padding: 2px 8px;
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  background: rgba(0, 0, 0, 0.2);
+  color: #8cc8ff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 10px;
+}
+
+.toggle-btn:hover {
+  background: rgba(0, 150, 255, 0.2);
+  color: #00d4ff;
+}
+
+.toggle-btn.active {
+  background: rgba(0, 150, 255, 0.4);
+  color: #00d4ff;
+  border-color: #00d4ff;
 }
 
 .departments-grid {
   display: flex;
   flex-direction: column;
-  gap: 6px;
-  height: calc(100% - 30px);
+  gap: 4px;
+  height: calc(100% - 70px);
   flex: 1;
 }
 

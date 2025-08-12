@@ -13,6 +13,7 @@
         <!-- 内容区域 -->
         <div class="flex-1 flex justify-between px-20">
           <!-- 年度排放 -->
+           <div class="flex w-full">
           <div class="w-[33%] flex flex-col">
             <div class="text-[#00eeff] text-xl mb-4">年度用气</div>
             <div class="flex gap-4 items-start h-full">
@@ -23,13 +24,16 @@
                 </div>
                 <div class="text-red-500 text-sm">同比：{{yearDiff.toFixed(1)}}m³</div>
               </div>
-              <div class="relative">
-                <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
-              </div>
+
             </div>
           </div>
+            <div class="relative">
+                <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
+              </div>
+          </div>
 
-          <!-- 月度排放 -->
+          <!-- 月度用气 -->
+           <div class="flex w-full">
           <div class="w-[33%] flex flex-col">
             <div class="text-[#00eeff] text-xl mb-4">月度用气</div>
             <div class="flex gap-4 items-start h-full">
@@ -40,13 +44,16 @@
                 </div>
                 <div class="text-red-500 text-sm">同比：{{monthDiff.toFixed(1)}}m³</div>
               </div>
-              <div class="relative">
-                <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
-              </div>
+
             </div>
           </div>
+            <div class="relative">
+                <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
+              </div>
+          </div>
 
-          <!-- 日排放 -->
+          <!-- 日用气 -->
+           <div class="flex w-full">
           <div class="w-[33%] flex flex-col">
             <div class="text-[#00eeff] text-xl mb-4">日用气</div>
             <div class="flex gap-4 items-start h-full">
@@ -57,10 +64,12 @@
                 </div>
                 <div class="text-red-500 text-sm">同比：{{dayDiff.toFixed(1)}}m³</div>
               </div>
-              <div class="relative">
+
+            </div>
+          </div>
+            <div class="relative">
                 <dv-water-level-pond :config="waterConfig3" style="width:140px;height:140px" />
               </div>
-            </div>
           </div>
         </div>
       </div>

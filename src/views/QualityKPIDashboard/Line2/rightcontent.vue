@@ -7,25 +7,26 @@
           </div>
       </div> -->
       <div class="w-full h-full flex justify-center items-center">
-        <h1>质量改善计划暂未导入4N系统,8月起导入核算达成率</h1>
+        <div ref="qualityIndicators" class="chart-container w-full h-[85%]"></div>
+        <!-- <h1>质量改善计划暂未导入4N系统,8月起导入核算达成率</h1> -->
       </div>
   </dv-border-box10>
   <!-- getAtopDayInspector -->
 
    <!-- 弹窗 -->
-  <TableDialog
-  v-model="dialogTableVisible"
-  :title= dialogTitle
-  width="60vw"
-  :tableData="gridData"
-  :columns="gridColumns"
-/>
+     <TableDialog
+   v-model="dialogTableVisible"
+   :title= dialogTitle
+   width="90vw"
+   :tableData="gridData"
+   :columns="gridColumns"
+ />
 </template>
 
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
-import { getComplaintPie2 ,getComplaint} from '@/api/getQuiltyinfo'
+import { getPlan4nPie,getPlan4n} from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus';
 import TableDialog from '../components/dialog.vue';
 import { createChartOption } from './piecharts';
@@ -46,15 +47,17 @@ const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicato
 
 const gridData = ref([]);
 const gridColumns = [
-{ prop: 'documentName', label: '客户等级' , width: '120'},
-{ prop: 'documentValue', label: '单据类型', width: '150' },
-{ prop: 'doc_no', label: '订单号',width: '150' },
-{ prop: 'description', label: '问题点1',width: '500' },
-{ prop: 'udf021', label: '问题点2',width: '300' },
-{ prop: 'remark', label: '备注',width: '250' },
-{ prop: 'reqTime', label: '单据日期',width: '250' },
-{ prop: 'respTime', label: '处理时间' },
-{ prop: 'pf', label: '处理情况' },
+  { prop: 'id', label: 'ID', width: '80' },
+  { prop: '计划编号', label: '计划编号', width: '150' },
+  { prop: '行动举措', label: '行动举措', width: '' }, // 不设置宽度，自动填充剩余空间
+  { prop: '成果要求', label: '成果要求', width: '200' },
+  { prop: '状态描述', label: '状态', width: '80' },
+  { prop: '负责人名称', label: '负责人', width: '100' },
+  { prop: '所属部门', label: '所属部门', width: '120' },
+  { prop: '计划完成时间', label: '计划完成时间', width: '120' },
+  { prop: '实际完成时间', label: '实际完成时间', width: '120' },
+  { prop: '重要紧急等级', label: '重要紧急等级', width: '120' },
+  { prop: '建立时间', label: '建立时间', width: '100' }
 ];
 
 
@@ -70,20 +73,23 @@ const gridColumns = [
 
 
 const fetchData = () => {
-  getComplaintPie2( )
+  getPlan4nPie( )
   .then(res => {
     
     isLoading.value = false;
    const data = res.data
+   const chartData = data.map(data =>({
+    name: data.状态描述,
+    value: data.total
+   }))
+   rawData.value = chartData
 
-   const result = [
-    { value: data.greenCount, name: '及时处理', itemStyle: { color: '#28a745' } }, // 绿色
-    { value: data.yellowCount, name: '客诉响应', itemStyle: { color: '#ffc107' } }, // 黄色
-    { value: data.orangeCount, name: '处理预警', itemStyle: { color: '#fd7e14' } }, // 橙色
-    { value: data.redCount, name: '未及时处理', itemStyle: { color: '#dc3545' } }  // 红色
-  ];
-
-rawData.value=result    
+  //  const result = [
+  //   { value: data.greenCount, name: '及时处理', itemStyle: { color: '#28a745' } }, // 绿色
+  //   { value: data.yellowCount, name: '客诉响应', itemStyle: { color: '#ffc107' } }, // 黄色
+  //   { value: data.orangeCount, name: '处理预警', itemStyle: { color: '#fd7e14' } }, // 橙色
+  //   { value: data.redCount, name: '未及时处理', itemStyle: { color: '#dc3545' } }  // 红色
+  // ];
   })
   .catch(() => {
     isLoading.value = false;
@@ -97,26 +103,26 @@ const clickedName = params.name;
 dialogTitle.value = `${clickedName}的详细数据`;
 dialogTableVisible.value = true;
   console.log(clickedName)
-getComplaint(null,isColor(clickedName)) // 假设 API 接口第三个参数是问题名
+  getPlan4n(clickedName) // 假设 API 接口第三个参数是问题名
   .then(res => {
     gridData.value = res.data;
   });
 };
 
-const isColor =(name)=>{
-  switch (name) {
-      case '及时处理':
-          return 'green'
-      case '客诉响应':
-          return 'yellow'
-      case '处理预警':
-          return 'orange'
-      case '未及时处理':
-          return 'red'
-      default:
-          return null
-  }
-}
+// const isColor =(name)=>{
+//   switch (name) {
+//       case '及时处理':
+//           return 'green'
+//       case '客诉响应':
+//           return 'yellow'
+//       case '处理预警':
+//           return 'orange'
+//       case '未及时处理':
+//           return 'red'
+//       default:
+//           return null
+//   }
+// }
 
 
 

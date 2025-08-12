@@ -2,6 +2,8 @@ export const getGaugeBaseOption = (name, min, max, value, unit, color) => {
     return {
     series: [{
       type: 'gauge',
+      center: ['50%', '50%'],
+      radius: '90%',
       min,
       max,
       progress: {
@@ -56,7 +58,7 @@ export const getGaugeBaseOption = (name, min, max, value, unit, color) => {
         }
       },
       axisLabel: {
-        distance: -17,
+        distance: -12,
         formatter: (value) => Math.floor(value), // 添加formatter去掉小数点
         color: '#fff',
         fontSize: 12
@@ -71,7 +73,7 @@ export const getGaugeBaseOption = (name, min, max, value, unit, color) => {
       },
       title: {
         show: true,
-        offsetCenter: [0, '40%'],
+        offsetCenter: [0, '50%'],
         color: '#fff',
         fontSize: 14
       },

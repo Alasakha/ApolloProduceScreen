@@ -2,7 +2,7 @@
   <div class="h-[10vh] w-full">
     <div class="flex w-full h-full justify-between gap-2">
       <!-- 标准累计总电量 -->
-      <dv-border-box-2 class="flex-1">
+      <!-- <dv-border-box-2 class="flex-1">
         <div class="flex flex-col items-center justify-center h-full">
           <div class="text-[#00eeff] text-xl mb-2 flex items-center">
             当日累计总电量
@@ -25,7 +25,7 @@
             </div>
           </div>
         </div>
-      </dv-border-box-2>
+      </dv-border-box-2> -->
 
       <!-- 电流电压检测 -->
       <dv-border-box-2 class="flex-1">
@@ -56,7 +56,7 @@
       </dv-border-box-2>
 
       <!-- 峰谷用电 -->
-      <dv-border-box-2 class="flex-1">
+      <!-- <dv-border-box-2 class="flex-1">
         <div class="flex flex-col items-center justify-center h-full">
           <div class="text-[#00eeff] text-xl mb-2 flex items-center">
             当年累计总电量
@@ -70,7 +70,7 @@
             </div>
           </div>
         </div>
-      </dv-border-box-2>
+      </dv-border-box-2> -->
 
 
     </div>
@@ -84,26 +84,26 @@ import { useEnergyStore } from '@/store/energy'
 const energyStore = useEnergyStore()
 
 // 计算当日累计总电量（使用store中的当日数据）
-const dailyTotalPower = computed(() => {
-  const dailyData = energyStore.dailyElectricData
-  if (!dailyData || dailyData.length === 0) {
-    return { standard: 0, actual: 0, diff: 0 }
-  }
+// const dailyTotalPower = computed(() => {
+//   const dailyData = energyStore.dailyElectricData
+//   if (!dailyData || dailyData.length === 0) {
+//     return { standard: 0, actual: 0, diff: 0 }
+//   }
   
-  // 计算当日所有电表的总和
-  const actualTotal = dailyData.reduce((sum, device) => {
-    return sum + (device.numberPower || 0)
-  }, 0)
+//   // 计算当日所有电表的总和
+//   const actualTotal = dailyData.reduce((sum, device) => {
+//     return sum + (device.numberPower || 0)
+//   }, 0)
   
-  const standardTotal = 0 // 标准数据暂时设为0
-  const diff = Math.round(actualTotal - standardTotal)
+//   const standardTotal = 0 // 标准数据暂时设为0
+//   const diff = Math.round(actualTotal - standardTotal)
   
-  return {
-    standard: standardTotal,
-    actual: actualTotal,
-    diff: diff
-  }
-})
+//   return {
+//     standard: standardTotal,
+//     actual: actualTotal,
+//     diff: diff
+//   }
+// })
 
 // 计算当月累计总电量（使用store中的当月数据）
 const monthlyTotalPower = computed(() => {
@@ -141,47 +141,47 @@ const monthlyTotalPower = computed(() => {
 })
 
 // 计算当年累计总电量（使用store中的当月数据进行峰谷用电分析）
-const yearlyTotalPower = computed(() => {
-  const monthlyData = energyStore.monthlyElectricData
-  if (!monthlyData || monthlyData.length === 0) {
-    return { peak: 0, normal: 0, valley: 0, ratio: '峰0% 平0% 谷0%' }
-  }
+// const yearlyTotalPower = computed(() => {
+//   const monthlyData = energyStore.monthlyElectricData
+//   if (!monthlyData || monthlyData.length === 0) {
+//     return { peak: 0, normal: 0, valley: 0, ratio: '峰0% 平0% 谷0%' }
+//   }
   
-  // 计算当月所有电表的总和
-  const totalPower = monthlyData.reduce((sum, device) => {
-    return sum + (device.numberPower || 0)
-  }, 0)
+//   // 计算当月所有电表的总和
+//   const totalPower = monthlyData.reduce((sum, device) => {
+//     return sum + (device.numberPower || 0)
+//   }, 0)
   
-  // 模拟峰谷用电分配（实际应该从接口获取）
-  const peak = Math.floor(totalPower * 0.4) // 40%高峰
-  const normal = Math.floor(totalPower * 0.35) // 35%平段
-  const valley = Math.floor(totalPower * 0.25) // 25%低谷
+//   // 模拟峰谷用电分配（实际应该从接口获取）
+//   const peak = Math.floor(totalPower * 0.4) // 40%高峰
+//   const normal = Math.floor(totalPower * 0.35) // 35%平段
+//   const valley = Math.floor(totalPower * 0.25) // 25%低谷
   
-  const total = peak + normal + valley
-  const ratio = total > 0 ? 
-    `峰${(peak/total*100).toFixed(1)}% 平${(normal/total*100).toFixed(1)}% 谷${(valley/total*100).toFixed(1)}%` :
-    '峰0% 平0% 谷0%'
+//   const total = peak + normal + valley
+//   const ratio = total > 0 ? 
+//     `峰${(peak/total*100).toFixed(1)}% 平${(normal/total*100).toFixed(1)}% 谷${(valley/total*100).toFixed(1)}%` :
+//     '峰0% 平0% 谷0%'
   
-  return {
-    peak: peak,
-    normal: normal,
-    valley: valley,
-    ratio: ratio
-  }
-})
+//   return {
+//     peak: peak,
+//     normal: normal,
+//     valley: valley,
+//     ratio: ratio
+//   }
+// })
 
-// 当日累计总电量配置
-const standardTotalConfig = computed(() => ({
-  number: [dailyTotalPower.value.standard],
-  content: '{nt}kW',
-  style: { fontSize: 24, fill: '#00eeff' }
-}))
+// // 当日累计总电量配置
+// const standardTotalConfig = computed(() => ({
+//   number: [dailyTotalPower.value.standard],
+//   content: '{nt}kW',
+//   style: { fontSize: 24, fill: '#00eeff' }
+// }))
 
-const actualTotalConfig = computed(() => ({
-  number: [dailyTotalPower.value.actual],
-  content: '{nt}kW',
-  style: { fontSize: 24, fill: '#00eeff' }
-}))
+// const actualTotalConfig = computed(() => ({
+//   number: [dailyTotalPower.value.actual],
+//   content: '{nt}kW',
+//   style: { fontSize: 24, fill: '#00eeff' }
+// }))
 
 // 当月累计总电量配置
 const standardConfig = computed(() => ({
@@ -196,18 +196,7 @@ const actualConfig = computed(() => ({
   style: { fontSize: 24, fill: '#00eeff' }
 }))
 
-// 峰谷用电配置
-const peakConfig = computed(() => ({
-  number: [yearlyTotalPower.value.peak],
-  content: '{nt}kW/h',
-  style: { fontSize: 20, fill: '#ff4d4f' }
-}))
 
-const valleyConfig = computed(() => ({
-  number: [yearlyTotalPower.value.valley],
-  content: '{nt}kW/h',
-  style: { fontSize: 20, fill: '#52c41a' }
-}))
 
 // Line4组件现在只负责显示数据，不再独立获取数据
 // 数据由主组件统一管理和刷新

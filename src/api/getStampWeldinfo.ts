@@ -185,7 +185,11 @@ export interface StampingAllItem {
   itemList: any[] | null       // 物料列表
 }
 
-export type StampingAllResponse = StampingAllItem[]
+export type StampingAllResponse = {
+  code: number
+  message: string
+  data: StampingAllItem[]
+}
 
 // /stampingWelding/stampingAll
 export const getStampingAll = (prodLine: string, type: string): Promise<StampingAllResponse> => {
@@ -226,3 +230,21 @@ export interface StampingDoingIndex {
   TZ_ALL?: DeviceGroupData   // 套丝设备组
 }
 
+// /stampingWelding/stampingTaskAll
+export const getStampingTaskAll = (prodLine,type) => {
+  return request({
+    url: '/stampingWelding/stampingTaskAll',
+    method: 'get',
+    params: { prodLine,type }
+  })
+}
+
+
+// /stampingWelding/stampingStandb
+export const getStampingStandb = (prodLine,type) => {
+  return request({
+    url: '/stampingWelding/stampingStandby',
+    method: 'get',
+    params: { prodLine,type }
+  })
+}

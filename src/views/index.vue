@@ -70,6 +70,7 @@ const lines = ref([
   { id: "BudgetvsActualPerformanceDashboard", name: "预算与实际达成对比",router:"/BudgetvsActualPerformanceDashboard" },
   { id: "EnergyMonitoringDashboard", name: "能源监控看板",router:"/EnergyMonitoringDashboard" },
   { id: "ManufacturingPerformanceManagementDashboard", name: "制造绩效管理看板",router:"/ManufacturingPerformanceManagementDashboard" },
+  { id: "PurchasePerformanceManagementDashboard", name: "采购绩效管理看板",router:"/PurchasePerformanceManagementDashboard" },
 ]);
 
 // 获取 lines 中指定范围的数据

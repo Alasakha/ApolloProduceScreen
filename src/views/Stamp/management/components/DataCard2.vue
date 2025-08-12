@@ -3,6 +3,7 @@
     <!-- 标题 -->
     <div class="w-full h-7 flex items-center justify-center text-white text-lg font-bold tracking-wider bg-gradient-to-r from-blue-600 to-cyan-400 rounded-t-2xl shadow-md relative z-10">
       <span class="truncate">{{ orderName }}</span>
+      <span class="absolute left-2 text-xs text-white">设备编号: {{ workNo }}</span>
     </div>
     <!-- 右上角角标 -->
     <div v-if="status" class="absolute top-2 right-4 bg-yellow-400 text-white font-bold text-xs px-3 py-1 rounded-lg shadow rotate-6 border border-yellow-100 z-20">
@@ -168,6 +169,10 @@ const props = defineProps({
   device: {
     type: Object,
     default: () => ({})
+  },
+  workNo: {
+    type: [Number, String],
+    default: "暂无"
   }
 });
 

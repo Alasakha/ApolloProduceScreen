@@ -51,43 +51,68 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { useTopIssueWorkshopStore } from '@/store/modules/topIssueWorkshop'
 
-// Mock数据
-const regularData = ref({
-  // 涂装部门直通率状态
-  painting: {
-    passRateStatus: 'below_target' // 直通率未达标
-  },
-  // 总装一课直通率状态
-  assemblyCourse1: {
-    passRateStatus: 'meet_target' // 直通率达标
-  },
-  // 总装二课直通率状态
-  assemblyCourse2: {
-    passRateStatus: 'below_target' // 直通率未达标
-  },
+const topIssueStore = useTopIssueWorkshopStore()
+
+// 计算总问题数，用于计算百分比
+const calculateIssuesWithPercentage = (issues) => {
+  if (!issues || issues.length === 0) return []
   
-  // 常规一部涂装TOP前三问题占比
-  paintingIssues: [
-    { name: '涂层厚度不均', status: 'major', percentage: 28.5 },
-    { name: '颜色偏差', status: 'minor', percentage: 15.2 },
-    { name: '表面缺陷', status: 'minor', percentage: 12.8 }
-  ],
+  const totalCount = issues.reduce((sum, issue) => sum + issue.total, 0)
   
-  // 常规总装一课TOP前三问题占比
-  assemblyCourse1Issues: [
-    { name: '零件装配精度', status: 'minor', percentage: 18.3 },
-    { name: '螺栓扭矩不足', status: 'minor', percentage: 14.7 },
-    { name: '密封件老化', status: 'minor', percentage: 11.2 }
-  ],
+  return issues.map(issue => {
+    const percentage = totalCount > 0 ? ((issue.total / totalCount) * 100).toFixed(1) : 0
+    // 根据问题数量判断严重程度
+    const status = issue.total > 20 ? 'major' : 'minor'
+    
+    return {
+      name: issue.ngName,
+      status: status,
+      percentage: parseFloat(percentage)
+    }
+  })
+}
+
+// 计算数据
+const regularData = computed(() => {
+  const workshop1004 = topIssueStore.workshop1004Data
+  const workshop2004 = topIssueStore.workshop2004Data
   
-  // 常规总装二课TOP前三问题占比
-  assemblyCourse2Issues: [
-    { name: '电气连接问题', status: 'major', percentage: 25.6 },
-    { name: '功能测试失败', status: 'major', percentage: 19.4 },
-    { name: '外观检查不合格', status: 'minor', percentage: 13.8 }
-  ]
+  // 根据问题数量判断直通率状态
+  const getPressRateStatus = (issues) => {
+    if (!issues || issues.length === 0) return 'meet_target'
+    return issues.some(issue => issue.total > 15) ? 'below_target' : 'meet_target'
+  }
+
+  return {
+    // 涂装部门直通率状态 - 使用模拟数据
+    painting: {
+      passRateStatus: 'below_target' // 直通率未达标
+    },
+    // 总装一课直通率状态 - 基于1004工作中心数据
+    assemblyCourse1: {
+      passRateStatus: getPressRateStatus(workshop1004?.常规类)
+    },
+    // 总装二课直通率状态 - 基于2004工作中心数据
+    assemblyCourse2: {
+      passRateStatus: getPressRateStatus(workshop2004?.常规类)
+    },
+    
+    // 常规一部涂装TOP前三问题占比 - 使用模拟数据
+    paintingIssues: [
+      { name: '涂层厚度不均', status: 'major', percentage: 28.5 },
+      { name: '颜色偏差', status: 'minor', percentage: 15.2 },
+      { name: '表面缺陷', status: 'minor', percentage: 12.8 }
+    ],
+    
+    // 常规总装一课TOP前三问题占比 - 使用1004工作中心的常规类数据
+    assemblyCourse1Issues: calculateIssuesWithPercentage(workshop1004?.常规类?.slice(0, 3) || []),
+    
+    // 常规总装二课TOP前三问题占比 - 使用2004工作中心的常规类数据
+    assemblyCourse2Issues: calculateIssuesWithPercentage(workshop2004?.常规类?.slice(0, 3) || [])
+  }
 })
 
 // 获取问题状态样式类
@@ -100,6 +125,11 @@ const getIssueClass = (issueStatus, passRateStatus) => {
   // 如果直通率达标，根据问题严重程度显示颜色
   return issueStatus === 'major' ? 'issue-major' : 'issue-normal'
 }
+
+// 组件挂载时获取数据
+onMounted(async () => {
+  await topIssueStore.fetchTopIssueWorkshopData()
+})
 </script>
 
 <style scoped>

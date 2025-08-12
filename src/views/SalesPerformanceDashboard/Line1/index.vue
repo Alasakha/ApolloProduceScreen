@@ -1,5 +1,5 @@
 <template>
-  <div class="flex h-[25vh] 3xl:h-[25vh] 4xl:h-[20vh]">
+  <div class="flex h-[25vh] 3xl:h-[20vh] 4xl:h-[20vh]">
     <!-- 左侧表格 -->
     <div class="w-2/3">
       <LeftContent @data-updated="updateTableData" />

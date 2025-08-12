@@ -286,3 +286,21 @@ export const getCheckTotalDone = ( ) => {
   })
 }
 
+// /quality/plan4nPie
+export const getPlan4nPie = () =>{
+  return request({
+    url: '/quality/plan4nPie',
+    method: 'get',
+  })
+}
+
+// /quality/plan4n
+export const getPlan4n = (status) =>{
+  return request({
+    url:'/quality/plan4n',
+    method:'get',
+    params:{
+      status
+    }
+  })
+}

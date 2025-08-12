@@ -1,10 +1,10 @@
 <template>
-    <div class="content w-full h-full p-2 ">
+    <div class="content w-full h-full p-1 3xl:p-1 4xl:p-2">
         <h1 class="
-            text-sm sm:text-lg md:text-xl lg:text-2xl xl:text-3xl 
+            text-xs sm:text-sm md:text-base lg:text-lg xl:text-xl 
             font-bold text-[#00eeff] 
             text-center sm:text-left 
-            3xl:text-sm 4xl:text-xl
+            3xl:text-sm 4xl:text-sm
         ">月度接单达成</h1>
         <div class="
 
@@ -13,20 +13,20 @@
             border border-[#00eeff] 
             shadow-[0_0_10px_rgba(0,238,255,0.2)] sm:shadow-[0_0_15px_rgba(0,238,255,0.25)] md:shadow-[0_0_20px_rgba(0,238,255,0.3)]
             max-h-[calc(100vh-8rem)] sm:max-h-[calc(100vh-10rem)] md:max-h-[calc(100vh-12rem)]
-            3xl:max-h-[calc(20vh-2rem)] 4xl:max-h-[calc(20vh-2.5rem)]
+            3xl:h-[80%] 4xl:max-h-[calc(20vh-2.5rem)]
             
         ">
-            <table class="w-full  text-center border-collapse text-[#00eeff] 3xl:text-[12px] 4xl:text-xs
-            2xl:text-[10px] xl:text-[10px] lg:text-[10px] md:text-[10px] sm:text-[10px]">
+            <table class="w-full text-center border-collapse text-[#00eeff] 
+            text-[10px] sm:text-[10px] md:text-[10px] lg:text-[10px] xl:text-[10px] 2xl:text-[10px] 3xl:text-[9px] 4xl:text-[10px]">
                 <thead>
                     <tr class="border-b border-[#00eeff40] bg-[#001122]">
                         <th 
                             v-for="header in tableHeaders" 
                             :key="header.key"
                             class="
-                                px-1 py-1 
+                                px-1 py-0.5 
                                 border-x border-[#00eeff40] text-[#00FFFF] font-normal 
-
+                                3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5
                             "
                         >
                             <!-- XL屏幕显示 -->
@@ -47,9 +47,9 @@
                         idx % 2 === 0 ? 'bg-[rgba(0,245,255,0.4)]' : 'bg-[rgba(0,238,255,0.1)]',
                         'hover:bg-[rgba(0,238,255,0.2)]'
                     ]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ item.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.pjTotal }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-1 py-1 text-left border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.empCategory }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.pjTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] relative group 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">
                             <input 
                                 v-model="item.ysQuantityYear" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -59,7 +59,7 @@
                                 {{ item.ysQuantityYearComparison }}
                             </span>
                         </td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-1 py-1 border-x border-[#00eeff40] relative group 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">
                             <input 
                                 v-model="item.ysAmtYear" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -69,7 +69,7 @@
                                 {{ item.ysAmtYearComparison }}
                             </span>
                         </td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-1 py-1 border-x border-[#00eeff40] relative group 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">
                             <input 
                                 v-model="item.ysQuantityAgain" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -79,7 +79,7 @@
                                 {{ item.ysQuantityAgainComparison }}
                             </span>
                         </td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40] relative group">
+                        <td class="px-1 py-1 border-x border-[#00eeff40] relative group 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">
                             <input 
                                 v-model="item.ysAmtAgain" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -89,32 +89,32 @@
                                 {{ item.ysAmtAgainComparison }}
                             </span>
                         </td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdCount }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.xdCount }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.xdTotal }}</td>
                     </tr>
                     
                     <!-- 合计行 -->
                     <tr class="bg-[rgba(0,238,255,0.15)] font-semibold border-b border-[#00eeff40]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ total.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.pjTotal }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysQuantityYear }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysAmtYear }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysQuantityAgain }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysAmtAgain }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdCount }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdTotal }}</td>
+                        <td class="px-1 py-1 text-left border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.empCategory }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.pjTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.ysQuantityYear }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.ysAmtYear }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.ysQuantityAgain }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.ysAmtAgain }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.xdCount }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.xdTotal }}</td>
                     </tr>
 
                     <!-- 阶段性汇总行 -->
                     <tr v-if="summaryData" class="bg-[rgba(0,238,255,0.1)] font-semibold border-b border-[#00eeff40]">
-                        <td class="px-4 py-2 text-left border-x border-[#00eeff40]">{{ summaryData.empCategory }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.pjTotal }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysQuantityYear }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysAmtYear }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysQuantityAgain }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysAmtAgain }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdCount }}</td>
-                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdTotal }}</td>
+                        <td class="px-1 py-1 text-left border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.empCategory }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.pjTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysQuantityYear }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysAmtYear }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysQuantityAgain }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysAmtAgain }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.xdCount }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.xdTotal }}</td>
                     </tr>
                 </tbody>
             </table>
