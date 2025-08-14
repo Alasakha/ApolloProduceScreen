@@ -11,65 +11,105 @@
         </div>
 
         <!-- 内容区域 -->
-        <div class="flex-1 flex justify-between px-20">
-          <!-- 年度排放 -->
-           <div class="flex w-full">
-          <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">年度用气</div>
-            <div class="flex gap-4 items-start h-full">
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center">
-                  <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualYear.toFixed(1)}}m³</span>
+        <div class="flex-1 flex  justify-between px-20">
+          <!-- 主要用气数据行 -->
+          <div class="flex w-full">
+            <!-- 年度排放 -->
+            <div class="w-[33%] flex flex-col">
+              <div class="text-[#00eeff] text-xl mb-4">年度用气</div>
+              <div class="flex gap-4 items-start h-full">
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center">
+                    <span class="text-[#00eeff] w-14">实际：</span>
+                    <span class="text-[#00eeff] text-2xl">{{actualYear.toFixed(1)}}m³</span>
+                  </div>
+                  <div class="text-red-500 text-sm">同比：{{yearDiff.toFixed(1)}}m³</div>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{yearDiff.toFixed(1)}}m³</div>
               </div>
-
             </div>
-          </div>
             <div class="relative">
-                <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
-              </div>
+              <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
+            </div>
           </div>
 
           <!-- 月度用气 -->
-           <div class="flex w-full">
-          <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">月度用气</div>
-            <div class="flex gap-4 items-start h-full">
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center">
-                  <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualMonth.toFixed(1)}}m³</span>
+          <div class="flex w-full">
+            <div class="w-[33%] flex flex-col">
+              <div class="text-[#00eeff] text-xl mb-4">月度用气</div>
+              <div class="flex gap-4 items-start h-full">
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center">
+                    <span class="text-[#00eeff] w-14">实际：</span>
+                    <span class="text-[#00eeff] text-2xl">{{actualMonth.toFixed(1)}}m³</span>
+                  </div>
+                  <div class="text-red-500 text-sm">同比：{{monthDiff.toFixed(1)}}m³</div>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{monthDiff.toFixed(1)}}m³</div>
               </div>
-
             </div>
-          </div>
             <div class="relative">
-                <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
-              </div>
+              <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
+            </div>
           </div>
 
           <!-- 日用气 -->
-           <div class="flex w-full">
-          <div class="w-[33%] flex flex-col">
-            <div class="text-[#00eeff] text-xl mb-4">日用气</div>
-            <div class="flex gap-4 items-start h-full">
-              <div class="flex flex-col gap-2">
-                <div class="flex items-center">
-                  <span class="text-[#00eeff] w-14">实际：</span>
-                  <span class="text-[#00eeff] text-2xl">{{actualDay.toFixed(1)}}m³</span>
+          <div class="flex w-full">
+            <div class="w-[33%] flex flex-col">
+              <div class="text-[#00eeff] text-xl mb-4">日用气</div>
+              <div class="flex gap-4 items-start h-full">
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center">
+                    <span class="text-[#00eeff] w-14">实际：</span>
+                    <span class="text-[#00eeff] text-2xl">{{actualDay.toFixed(1)}}m³</span>
+                  </div>
+                  <div class="text-red-500 text-sm">同比：{{dayDiff.toFixed(1)}}m³</div>
                 </div>
-                <div class="text-red-500 text-sm">同比：{{dayDiff.toFixed(1)}}m³</div>
               </div>
-
+            </div>
+            <div class="relative">
+              <dv-water-level-pond :config="waterConfig3" style="width:140px;height:140px" />
             </div>
           </div>
-            <div class="relative">
-                <dv-water-level-pond :config="waterConfig3" style="width:140px;height:140px" />
+          
+          <!-- 平均每台用气数据行 -->
+          <div class="flex w-full mt-4">
+            <!-- 平均每台日气量 -->
+            <div class="w-[50%] flex flex-col">
+              <div class="text-[#00eeff] text-lg mb-2">平均每台日气量</div>
+              <div class="flex items-center">
+                <span class="text-[#00eeff] w-20">数值：</span>
+                <span class="text-[#00eeff] text-xl">{{averageDailyGasPower.toFixed(2)}}m³/台</span>
               </div>
+            </div>
+            
+            <!-- 平均每台月气量 -->
+            <div class="w-[50%] flex flex-col">
+              <div class="text-[#00eeff] text-lg mb-2">平均每台月气量</div>
+              <div class="flex items-center">
+                <span class="text-[#00eeff] w-20">数值：</span>
+                <span class="text-[#00eeff] text-xl">{{averageMonthlyGasPower.toFixed(2)}}m³/台</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- 产量数据行 -->
+          <div class="flex w-full mt-4">
+            <!-- 当日产量 -->
+            <div class="w-[50%] flex flex-col">
+              <div class="text-[#00eeff] text-lg mb-2">当日产量</div>
+              <div class="flex items-center">
+                <span class="text-[#00eeff] w-20">数值：</span>
+                <span class="text-[#00eeff] text-xl">{{dailyProduction}}台</span>
+              </div>
+            </div>
+            
+            <!-- 当月产量 -->
+            <div class="w-[50%] flex flex-col">
+              <div class="text-[#00eeff] text-lg mb-2">当月产量</div>
+              <div class="flex items-center">
+                <span class="text-[#00eeff] w-20">数值：</span>
+                <span class="text-[#00eeff] text-xl">{{monthlyProduction}}台</span>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -113,6 +153,14 @@ const actualDay = computed(() => {
 const yearDiff = computed(() => actualYear.value - standardYear.value)
 const monthDiff = computed(() => actualMonth.value - standardMonth.value)
 const dayDiff = computed(() => actualDay.value - standardDay.value)
+
+// 计算平均每台用气量
+const averageDailyGasPower = computed(() => energyStore.getAverageDailyGasPower)
+const averageMonthlyGasPower = computed(() => energyStore.getAverageMonthlyGasPower)
+
+// 计算产量
+const dailyProduction = computed(() => energyStore.getDailyProduction)
+const monthlyProduction = computed(() => energyStore.getMonthlyProduction)
 
 // 数据更新时间
 const lastUpdateTime = ref(new Date())

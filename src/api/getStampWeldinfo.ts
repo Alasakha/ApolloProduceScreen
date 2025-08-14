@@ -158,6 +158,7 @@ export const getStampingDoing = (prodLine ,type): Promise<{data: StampingDoingRe
 
 // 冲压焊接工序详情数据接口
 export interface StampingAllItem {
+  udf021: string               // 客户单号
   te001te002: string           // 工单号
   machineName: string | null   // 机器名称
   employeeName: string         // 员工姓名

@@ -66,16 +66,17 @@
       </div>
     </div>
     <!-- 警告区域 -->
-    <div v-if="allWarnings.length > 0" class="absolute left-2 top-2 bg-yellow-100/80 border border-yellow-400 rounded-lg px-3 py-2 text-yellow-800 text-xs z-30 shadow">
+    <!-- <div v-if="allWarnings.length > 0" class="absolute left-2 top-2 bg-yellow-100/80 border border-yellow-400 rounded-lg px-3 py-2 text-yellow-800 text-xs z-30 shadow">
       <div class="font-bold mb-1 flex items-center gap-1"><span>⚠</span>警告</div>
       <ul class="list-disc pl-4">
         <li v-for="(warning, index) in allWarnings" :key="index">{{ warning }}</li>      </ul>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { watch } from "vue";
+import { computed, ref } from "vue";
 
 const props = defineProps({
   orderName: {
@@ -124,7 +125,7 @@ const props = defineProps({
   // 添加标准参数
   stdTemperature: {
     type: [Number, String],
-    default: null
+    default: "暂无"
   },
   stdPressure: {
     type: [Number, String],
@@ -176,69 +177,32 @@ const props = defineProps({
   }
 });
 
-//判断是否有数据
-// 判断是否有标准数据
-const hasStrandData = value => {
-  const num = Number(value);
-  if (!num) return "暂无标准";
-  return "标准：" + num.toFixed(1);
-};
 
-// 判断是否有实际数据
-const hasActualData = value => {
-  const num = Number(value);
-  if (!num) return "暂无数据";
-  return "实际值：" + num.toFixed(1);
-};
-
-// 合并的警告逻辑
-const allWarnings = computed(() => {
-  if (props.status !== "加工中") {
-    return [];
-  }
-
-  const warnings = [];
-
-  // 检查温度
-  if (hasStrandData(props.stdTemperature) === "暂无标准") {
-    warnings.push("温度：暂无标准");
-  } else if (props.temperature) {
-    const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
-    if (diff > 20) {
-      warnings.push(`温度超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
-    }
-  }
-
-  // 检查压力
-  if (hasStrandData(props.stdPressure) === "暂无标准") {
-    warnings.push("压力：暂无标准");
-  } else if (props.pressure) {
-    const diff = Math.abs(Number(props.pressure) - Number(props.stdPressure));
-    if (diff > 20) {
-      warnings.push(`压力超出偏差 (偏差: ${diff.toFixed(1)}MPa)`);
-    }
-  }
-
-  // 检查射速
-  if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
-    warnings.push("射速：暂无标准");
-  } else if (props.maxspeed) {
-    const diff = Math.abs(Number(props.maxspeed) - Number(props.stdMaxspeed));
-    if (diff > 20) {
-      warnings.push(`射速超出偏差 (偏差: ${diff.toFixed(1)}mm/s)`);
-    }
-  }
-
-  // 检查保压时间
-  if (hasStrandData(props.stdKeeptime) === "暂无标准") {
-    warnings.push("保压时间：暂无标准");
-  } else if (props.keeptime) {
-    const diff = Math.abs(Number(props.keeptime) - Number(props.stdKeeptime));
-    if (diff > 20) {
-      warnings.push(`保压时间超出偏差 (偏差: ${diff.toFixed(1)}s)`);
-    }
-  }
-  return warnings;
-});
+// // 改用计算属性
+// const allWarnings = computed(() => {
+//   const warnings = [];
+  
+//   // 检查激光功率
+//   if (props.stdTemperature === "暂无") {
+//     warnings.push("激光功率：暂无标准");
+//   } else if (props.temperature && props.stdTemperature) {
+//     const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
+//     if (diff > 20) {
+//       warnings.push(`激光功率超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
+//     }
+//   }
+  
+//   // 检查切割速度
+//   if (props.stdMaxspeed === "暂无") {
+//     warnings.push("切割速度：暂无标准");
+//   } else if (props.maxspeed && props.stdMaxspeed) {
+//     const diff = Math.abs(Number(props.maxspeed) - Number(props.stdMaxspeed));
+//     if (diff > 20) {
+//       warnings.push(`切割速度超出偏差 (偏差: ${diff.toFixed(1)}mm/s)`);
+//     }
+//   }
+  
+//   return warnings;
+// });
 </script>
 

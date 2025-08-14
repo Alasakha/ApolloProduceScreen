@@ -19,12 +19,12 @@
         <div class="flex flex-col items-center bg-blue-900/60 border-2 border-cyan-400/50 rounded-xl px-3 py-3 shadow-lg cursor-pointer hover:bg-blue-800/70 hover:border-cyan-300/70 transition-all duration-200"
              @click="handleTotalQtyClick">
           <div class="text-sm text-cyan-200 mb-1">任务总数量</div>
-          <div class="text-3xl font-bold text-white drop-shadow-lg">{{ totalQty }}</div>
+          <div class="text-3xl font-bold text-white drop-shadow-lg 3xl:text-xl 2xl:text-xl xl:text-sm">{{ totalQty }}</div>
         </div>
         <div class="flex flex-col items-center bg-blue-900/60 border-2 border-cyan-400/50 rounded-xl px-3 py-3 shadow-lg cursor-pointer hover:bg-blue-800/70 hover:border-cyan-300/70 transition-all duration-200" 
              @click="handleCompletedClick">
           <div class="text-sm text-cyan-200 mb-1">已完成数量</div>
-          <div class="text-3xl font-bold text-white drop-shadow-lg">{{ doneQty }}</div>
+          <div class="text-3xl font-bold text-white drop-shadow-lg  3xl:text-xl  2xl:text-xl xl:text-sm">{{ doneQty }}</div>
         </div>
       </div>
       

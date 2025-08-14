@@ -11,3 +11,14 @@ export const getElectricPower = (monthDay) => {
         }
       })
 }
+
+// /energy/gasPower
+export const getGasPower = (monthDay) => {
+    return request({
+        url: '/energy/gasPower',
+        method: 'get',
+        params: {
+            monthDay
+        }
+      })
+}

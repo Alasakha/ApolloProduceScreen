@@ -23,6 +23,7 @@ import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanc
 import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
 import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard/index.vue'
 import PurchasePerformanceManagementDashboard from '@/views/PurchasePerformanceManagementDashboard/index.vue'
+import AdvancedEarthDemo from '@/views/ControlBoard/advanced-demo.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -174,6 +175,22 @@ const routes: RouteRecordRaw[] = [
     component: PurchasePerformanceManagementDashboard,
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
+  {
+    path: '/',
+    name: 'PurchasePerformanceManagementDashboard',
+    component: PurchasePerformanceManagementDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
+  },
+  {
+    path: '/control-board', // URL地址
+    name: 'ControlBoard',   // 路由名
+    component: () => import('@/views/ControlBoard/index.vue')
+  },
+  {
+    path: '/advanced-earth-demo', // 高级地球演示页面
+    name: 'AdvancedEarthDemo',
+    component: AdvancedEarthDemo
+  }
 ];
 
 

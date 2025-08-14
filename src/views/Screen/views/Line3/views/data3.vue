@@ -15,6 +15,7 @@
     width="800px"
     :tableData="gridData"
     :columns="gridColumns"
+        @refresh="refreshDialogData"
   />
   </template>
   
@@ -47,14 +48,17 @@ const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicato
   const gridData = ref([]);
 
 const gridColumns = [
-  { prop: 'ngName', label: '不良问题' },
+{ prop: 'ngName', label: '不良问题' },
   { prop: 'createDate', label: '发现时间' },
   { prop: 'ta002', label: '工单单号' },
   { prop: 'ta006', label: '品号' },
-  { prop: 'mb002', label: '车型' },
+  { prop: 'mb002', label: '车型' }, 
   { prop: 'peopleName', label: '发现人' },
   { prop: 'admin_UNIT_NAME', label: '责任部门'},
-  { prop: 'ngResponPeople', label: '责任人'}
+  { prop: 'ngResponPeople', label: '责任人'},
+  { prop: 'ngReason', label: '异常原因'},
+  { prop: 'ngHandle', label: '异常处理方式'},
+  { prop: 'uid', label: 'uid' }
 ];
 
 
@@ -126,6 +130,17 @@ watch(rawData, () => {
     window.removeEventListener('resize', resizeChart); // 移除监听器
   });
 
+  const refreshDialogData = () => {
+  // 重新获取对话框数据
+  if (dialogTableVisible.value) {
+    getAbnormalDetail(prodLine, reasonType)
+      .then(res => {
+        gridData.value = res.data;
+      });
+  }
+  // 同时刷新图表数据
+  fetchData();
+};
     </script>
     
     

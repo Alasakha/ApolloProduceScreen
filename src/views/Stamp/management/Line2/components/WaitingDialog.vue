@@ -3,7 +3,7 @@
    :model-value="visible"
   @update:model-value="handleClose"
     title="待机设备详情"
-    width="800px"
+    width="60vw"
     class="waiting-dialog"
     :before-close="handleClose"
     destroy-on-close
@@ -47,9 +47,9 @@
                   <div class="status-indicator waiting"></div>
                   <span class="status-text">待机中</span>
                 </div>
-                <div class="device-id">设备编号{{ device.macNo }}</div>
-                <div class="device-id">{{ device.machineName || `设备${index + 1}` }}</div>
-                <div class="device-id">任务总量  {{ device.num || `设备${index + 1}` }}</div>
+                <div class="device-id">设备编号：{{ device.macNo }}</div>
+                <div class="device-id">设备名称：{{ device.machineName || '暂无' }}</div>
+                <div class="device-id">任务总量：{{ device.num || '暂无' }}</div>
 
               </div>
 
@@ -242,7 +242,7 @@ const handleClose = () => {
 
 .devices-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(450px, 1fr));
   gap: 20px;
   margin-bottom: 32px;
 }

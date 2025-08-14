@@ -92,9 +92,9 @@ const staticDeviceData = [
   
     // 滚花设备组 (GH_ALL) - 2台设备
   { groupName: '滚花设备组', groupCode: 4, macNo: 'LP-2008', manufacturer: '常州龙鹏机械有限公司', storage: '1001/2001' },
-  { groupName: '滚花设备组', groupCode: 4, macNo: 'ML-CH502', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
   
   // 冲弧设备组 (CHH_ALL) - 4台设备
+  { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-CH502', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
   { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
   { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
   { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-425', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
@@ -107,10 +107,9 @@ const staticDeviceData = [
   { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
   { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
   { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  
+  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },  
   // 冲床设备组 (CHC_ALL) - 12台设备
+  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
   { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
   { groupName: '冲床设备组', groupCode: 7, macNo: 'JB23-40T', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
   { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海机床有限公司', storage: '1001/2001' },
@@ -160,12 +159,18 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 
 <style scoped>
 .device-group-dialog :deep(.el-dialog) {
+  max-height: 90vh; /* 最大高度占屏幕90% - 从80vh调整到90vh */
   background: #1a1a1a;
   border: 1px solid #333;
   border-radius: 12px;
+  overflow: hidden; /* 防止内部溢出 */
+
 }
 
 .device-group-dialog :deep(.el-dialog__header) {
+  overflow-y: auto;
+
+  max-height: calc(90vh - 100px); /* 减去 header/footer 高度 - 从80vh调整到90vh */
   background: linear-gradient(135deg, #2a2a2a, #333);
   border-bottom: 1px solid #444;
   padding: 20px 24px;
@@ -359,7 +364,7 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 
 .info-label {
   font-size: 13px;
-  color: #999;
+  color: #ffffff;
   font-weight: 500;
 }
 
@@ -504,7 +509,7 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
   grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
   gap: 20px;
   margin-top: 20px;
-  max-height: 400px;
+  max-height: 70vh; /* 从400px调整到500px，增加显示高度 */
   overflow-y: auto;
   padding-right: 10px;
 }

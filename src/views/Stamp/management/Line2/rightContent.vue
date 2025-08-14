@@ -106,7 +106,7 @@ const mockStampingData = ref([
 // 设备组名称映射
 const deviceGroupNames = {
   SG_ALL: '缩管设备组',
-  CHH_ALL: '冲弧设备组', 
+  CHH_ALL: '冲弧锯管设备组', 
   WG_ALL: '弯管设备组',
   GH_ALL: '滚花设备组',
   CHC_ALL: '冲床设备组',

@@ -55,14 +55,17 @@ const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicato
 const gridData = ref([]);
 
 const gridColumns = [
-  { prop: 'ngName', label: '不良问题' },
+{ prop: 'ngName', label: '不良问题' },
   { prop: 'createDate', label: '发现时间' },
   { prop: 'ta002', label: '工单单号' },
   { prop: 'ta006', label: '品号' },
-  { prop: 'mb002', label: '车型' },
+  { prop: 'mb002', label: '车型' }, 
   { prop: 'peopleName', label: '发现人' },
   { prop: 'admin_UNIT_NAME', label: '责任部门'},
-  { prop: 'ngResponPeople', label: '责任人'}
+  { prop: 'ngResponPeople', label: '责任人'},
+  { prop: 'ngReason', label: '异常原因'},
+  { prop: 'ngHandle', label: '异常处理方式'},
+  { prop: 'uid', label: 'uid' }
 ];
 
 const opendialog = () => {

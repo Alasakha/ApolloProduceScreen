@@ -1,7 +1,7 @@
 <template>
     <div class="w-full h-full flex">
-        <dv-border-box13>
-            <div ref="chartRef1" class="w-full h-full"></div>
+        <dv-border-box13 class="chart-container">
+            <div ref="chartRef1" class="chart-content"></div>
         </dv-border-box13>
     </div>
 
@@ -142,5 +142,26 @@ onBeforeUnmount(() => {
 .custom-dialog :deep(.el-table td) {
     background-color: transparent;
     color: #fff;
+}
+
+/* 图表容器样式 */
+.chart-container {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.chart-content {
+    width: 100%;
+    height: 100%;
+    min-height: 300px; /* 确保最小高度 */
+}
+
+/* 确保图表在容器中正确显示 */
+:deep(.dv-border-box13) {
+    width: 100% !important;
+    height: 100% !important;
 }
 </style>

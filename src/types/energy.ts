@@ -8,6 +8,8 @@ export interface EnergyData {
   flatNumber: string;
   valleyNumber: string;
   numberPower: number;
+  doneMonth?: number; // 月产量
+  doneDay?: number;   // 日产量
 }
 
 export enum EnergyType {

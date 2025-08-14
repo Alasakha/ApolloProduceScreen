@@ -71,6 +71,8 @@ const lines = ref([
   { id: "EnergyMonitoringDashboard", name: "能源监控看板",router:"/EnergyMonitoringDashboard" },
   { id: "ManufacturingPerformanceManagementDashboard", name: "制造绩效管理看板",router:"/ManufacturingPerformanceManagementDashboard" },
   { id: "PurchasePerformanceManagementDashboard", name: "采购绩效管理看板",router:"/PurchasePerformanceManagementDashboard" },
+  { id: "ControlBoard", name: "中控看板",router:"/control-board" },
+  { id: "AdvancedEarthDemo", name: "🌍 高级3D地球演示",router:"/advanced-earth-demo" },
 ]);
 
 // 获取 lines 中指定范围的数据

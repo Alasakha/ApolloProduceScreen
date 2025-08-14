@@ -17,36 +17,6 @@
             </div>
           </div>
 
-          <!-- 右侧两个仪表盘 -->
-          <div class="line flex-2 flex">
-            <!-- 标准人效 -->
-            <div class="biaozhun flex-1">
-              <div ref="Indicators3" class="w-full h-[100%]"></div>
-            </div>
-            <!-- 实际人效 -->
-            <div class="shiji flex-1">
-              <div 
-                ref="Indicators4" 
-                class="w-full h-[100%]"
-                @click="openReasonDialog"
-                style="cursor: pointer;"
-              ></div>
-              <!-- 警告图标 -->
-              <div v-if="showWarning" class="warning-icon-container">
-                <el-tooltip
-                  :content="EfficentData.reason || '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等'"
-                  placement="left"
-                  effect="dark"
-                >
-                  <svg class="warn-icon" width="38" height="38" viewBox="0 0 24 24">
-                    <polygon points="12,3 22,20 2,20" fill="#FFD600" stroke="#FFA000" stroke-width="2"/>
-                    <rect x="11" y="9" width="2" height="5" fill="#FFA000"/>
-                    <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
-                  </svg>
-                </el-tooltip>
-              </div>
-            </div>
-          </div>
         </div>
       </dv-border-box12>
 

@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getElectricPower } from '@/api/enery';
+import { getElectricPower,getGasPower } from '@/api/enery';
 import type { EnergyData } from '@/types/energy';
 import { EnergyType, MACHINE_CODES, ELECTRIC_METER_CONFIG } from '@/types/energy';
 
@@ -12,6 +12,12 @@ export const useEnergyStore = defineStore('energy', {
     lastMonthlyFetch: '', // 最后获取当月数据的日期
     isRetrying: false, // 是否正在重试
     retryCount: 0, // 当前重试次数
+    averageMonGasPower: 0, // 平均每台月气量
+    averageDaGasPower: 0, // 平均每台日气量
+    // 新增：产量数据
+    dailyProduction: 0, // 当日产量
+    monthlyProduction: 0, // 当月产量
+    lastProductionFetch: '', // 最后获取产量数据的日期
   }),
 
   getters: {
@@ -117,6 +123,36 @@ export const useEnergyStore = defineStore('energy', {
     // 获取当月水表数据
     monthlyWaterData(): EnergyData[] {
       return this.monthlyData.filter(item => MACHINE_CODES.WATER.includes(item.machCode));
+    },
+
+    // 获取当日气表数据
+    dailyGasData(): EnergyData[] {
+      return this.dailyData.filter(item => MACHINE_CODES.GAS.includes(item.machCode));
+    },
+
+    // 获取当月气表数据
+    monthlyGasData(): EnergyData[] {
+      return this.monthlyData.filter(item => MACHINE_CODES.GAS.includes(item.machCode));
+    },
+
+    // 获取平均每台日气量
+    getAverageDailyGasPower(): number {
+      return this.averageDaGasPower;
+    },
+
+    // 获取平均每台月气量
+    getAverageMonthlyGasPower(): number {
+      return this.averageMonGasPower;
+    },
+
+    // 获取当日产量
+    getDailyProduction(): number {
+      return this.dailyProduction;
+    },
+
+    // 获取当月产量
+    getMonthlyProduction(): number {
+      return this.monthlyProduction;
     }
   },
 
@@ -124,6 +160,45 @@ export const useEnergyStore = defineStore('energy', {
     // 延时函数
     async delay(ms: number) {
       return new Promise(resolve => setTimeout(resolve, ms));
+    },
+
+    // 获取产量数据（从getGasPower接口）
+    async fetchProductionData(date: string) {
+      // 如果已经有相同日期的产量数据，直接返回
+      if (this.lastProductionFetch === date && (this.dailyProduction > 0 || this.monthlyProduction > 0)) {
+        console.log('📦 使用缓存的产量数据:', date);
+        return true;
+      }
+
+      try {
+        const res = await this.callApiWithRetry(
+          () => getGasPower(date),
+          5,
+          `获取产量数据(${date})`
+        );
+        
+        if (res.code === 200 && res.data) {
+          // 根据日期判断是当日还是当月数据
+          const isToday = date === new Date().toISOString().split('T')[0];
+          
+          if (isToday) {
+            this.dailyProduction = Number(res.data.doneDay) || 0;
+            this.monthlyProduction = Number(res.data.doneMonth) || 0;
+            console.log('✅ 当日产量数据获取成功:', this.dailyProduction);
+          } else {
+           
+          }
+          
+          this.lastProductionFetch = date;
+          return true;
+        } else {
+          console.warn('获取产量数据失败：', res.message);
+          return false;
+        }
+      } catch (err) {
+        console.error('获取产量数据异常（重试后仍失败）：', err);
+        return false;
+      }
     },
 
     // 带重试机制的API调用核心方法
@@ -190,6 +265,54 @@ export const useEnergyStore = defineStore('energy', {
       this.retryCount = 0;
       
       throw lastError || new Error(`${operation}在${maxRetries}次尝试后失败`);
+    },
+
+    // 计算平均每台日气量（气量来自getElectricPower，产量来自getGasPower）
+    calculateDailyGasAverage() {
+      try {
+        console.log('🔥 计算当日气表平均值...');
+        
+        // 从当日数据中查找气表数据（气量）
+        const gasData = this.dailyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
+        
+        if (gasData && this.dailyProduction > 0) {
+          this.averageDaGasPower = Number(gasData.numberPower) / this.dailyProduction;
+          console.log(`📊 平均每台日气量: ${this.averageDaGasPower.toFixed(2)} (气量: ${gasData.numberPower}, 日产量: ${this.dailyProduction})`);
+          return true;
+        } else {
+          console.warn('⚠️ 当日气表数据或产量数据无效，无法计算平均每台日气量');
+          this.averageDaGasPower = 0;
+          return false;
+        }
+      } catch (err) {
+        console.error('计算当日气表平均值异常：', err);
+        this.averageDaGasPower = 0;
+        return false;
+      }
+    },
+
+    // 计算平均每台月气量（气量来自getElectricPower，产量来自getGasPower）
+    calculateMonthlyGasAverage() {
+      try {
+        console.log('🔥 计算当月气表平均值...');
+        
+        // 从当月数据中查找气表数据（气量）
+        const gasData = this.monthlyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
+        
+        if (gasData && this.monthlyProduction > 0) {
+          this.averageMonGasPower = Number(gasData.numberPower) / this.monthlyProduction;
+          console.log(`📊 平均每台月气量: ${this.averageMonGasPower.toFixed(2)} (气量: ${gasData.numberPower}, 月产量: ${this.monthlyProduction})`);
+          return true;
+        } else {
+          console.warn('⚠️ 当月气表数据或产量数据无效，无法计算平均每台月气量');
+          this.averageMonGasPower = 0;
+          return false;
+        }
+      } catch (err) {
+        console.error('计算当月气表平均值异常：', err);
+        this.averageMonGasPower = 0;
+        return false;
+      }
     },
 
     // 获取能源数据 - 保持向后兼容（已添加重试机制）
@@ -297,19 +420,56 @@ export const useEnergyStore = defineStore('energy', {
       const today = new Date();
       const todayStr = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`;
       const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`;
-      
-      console.log('🚀 初始化能源数据...');
-      console.log('📅 当日日期:', todayStr);
-      console.log('📅 当月第一天:', firstDayOfMonth);
-      
+     
       // 并行获取当日和当月数据
       const [dailyResult, monthlyResult] = await Promise.all([
         this.fetchDailyData(todayStr),
         this.fetchMonthlyData(firstDayOfMonth)
       ]);
       
-      console.log('✅ 数据初始化完成 - 当日:', dailyResult, '当月:', monthlyResult);
-      return dailyResult && monthlyResult;
+      // 获取产量数据
+      const productionResult = await this.fetchProductionData(todayStr);
+      
+      // 计算气表平均值
+      if (dailyResult && productionResult) {
+        this.calculateDailyGasAverage();
+      }
+      if (monthlyResult && productionResult) {
+        this.calculateMonthlyGasAverage();
+      }
+      
+      console.log('✅ 数据初始化完成 - 当日:', dailyResult, '当月:', monthlyResult, '产量:', productionResult);
+      return dailyResult && monthlyResult && productionResult;
+    },
+
+    // 测试气表数据计算（用于调试）
+    testGasCalculation() {
+
+      
+      // 查找气表数据
+      const dailyGasData = this.dailyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
+      const monthlyGasData = this.monthlyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
+      
+      if (dailyGasData) {
+        console.log('  - 当日气表数据:', dailyGasData);
+        if (this.dailyProduction > 0) {
+          const avgDaily = Number(dailyGasData.numberPower) / this.dailyProduction;
+          console.log(`  - 计算平均每台日气量: ${dailyGasData.numberPower} ÷ ${this.dailyProduction} = ${avgDaily.toFixed(2)}`);
+        }
+      }
+      
+      if (monthlyGasData) {
+        console.log('  - 当月气表数据:', monthlyGasData);
+        if (this.monthlyProduction > 0) {
+          const avgMonthly = Number(monthlyGasData.numberPower) / this.monthlyProduction;
+          console.log(`  - 计算平均每台月气量: ${monthlyGasData.numberPower} ÷ ${this.monthlyProduction} = ${avgMonthly.toFixed(2)}`);
+        }
+      }
+      
+      // 手动触发计算
+      console.log('🔄 手动触发计算...');
+      this.calculateDailyGasAverage();
+      this.calculateMonthlyGasAverage();
     }
   }
 });

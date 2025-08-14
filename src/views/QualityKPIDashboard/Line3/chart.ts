@@ -6,9 +6,10 @@ export function createOption(title, data) {
       title: {
           text: title,
           left: 'center',
-          top: 20,
+          top: 10,
           textStyle: {
-              color: '#ccc'
+              color: '#ccc',
+              fontSize: 16
           }
       },
       tooltip: {
@@ -19,46 +20,44 @@ export function createOption(title, data) {
           {
               name: 'title',
               type: 'pie',
-              radius: '65%',
-              center: ['50%', '50%'],
+              radius: ['40%', '60%'], // 改为环形图，节省空间
+              center: ['50%', '55%'], // 稍微向下移动
               data: data,
               label: {
                 show: true,
                 color: '#fff',
-                fontSize: 14,
+                fontSize: 12, // 减小字体
                 formatter: function (params) {
-                  // 占比保留1位小数
+                  // 简化标签内容，节省空间
                   const percent = typeof params.percent === 'number'
                     ? params.percent.toFixed(1)
                     : params.percent;
               
-                  const value = typeof params.value === 'number'
-                    ? params.value.toFixed(0) // 可选：数量保留 2 位小数
-                    : params.value;
-              
-                  return `${params.name}\n${percent}%\n数量：${value}`;
-                }
+                  return `${params.name}\n${percent}%`;
+                },
+                position: 'outside' // 确保标签在外部
               },
               labelLine: {
                   show: true,
                   lineStyle: {
-                      color: '#fff'
+                      color: '#fff',
+                      width: 1
                   },
                   smooth: 0.2,
-                  length: 10,
-                  length2: 20
+                  length: 8,  // 减少连接线长度
+                  length2: 15
               },
               itemStyle: {
                   color: function(params) {
-                      const colors = ['#00ffff', '#0077ff'];
-                      return colors[params.dataIndex];
+                      const colors = ['#00ffff', '#0077ff', '#ff6b6b']; // 增加第三个颜色
+                      return colors[params.dataIndex % colors.length];
                   },
-                  shadowBlur: 10,
+                  shadowBlur: 5,
                   shadowColor: 'rgba(0, 0, 0, 0.3)'
               },
-              emphasis: {  // 添加鼠标悬停效果
+              emphasis: {
                   scale: true,
-                  scaleSize: 10
+                  scaleSize: 5
               },
               animationType: 'scale',
               animationEasing: 'elasticOut',

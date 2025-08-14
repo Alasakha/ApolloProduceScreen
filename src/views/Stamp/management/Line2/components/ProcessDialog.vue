@@ -30,7 +30,7 @@
           <!-- 卡片头部 -->
           <div class="detail-header">
         
-            <h3 class="detail-title">{{ item.processName }}</h3>
+            <h3 class="detail-title">工单号：{{ item.workNo }}</h3>
           </div>
           
           <!-- 九个参数网格 -->
@@ -46,13 +46,37 @@
               <div class="param-label">设备名称</div>
               <div class="param-value">{{ item.machineName || '-' }}</div>
             </div>
+            <!-- 任务总数量 -->
+            <div class="param-box">
+              <div class="param-label">任务总数量</div>
+              <div class="param-value">{{ item.Tasktotal || '-' }}</div>
+            </div>
             
+ 
             <!-- 品名 -->
             <div class="param-box">
+              <div class="param-label">加工工序名称</div>
+              <div class="param-value">{{ item.processName || '-' }}</div>
+            </div>
+
+             <!-- 客户单号 -->
+              <div class="param-box">
+              <div class="param-label">客户单号</div>
+              <div class="param-value">{{ item.udf021 || '-' }}</div>
+            </div>
+
+                        <!-- 工单号 -->
+                        <div class="param-box">
+              <div class="param-label">工单数量</div>
+              <div class="param-value">{{ item.planQty || '-' }}</div>
+            </div>
+            
+      <!-- 规格 -->
+      <div class="param-box">
               <div class="param-label">品名</div>
               <div class="param-value">{{ item.itemName || '-' }}</div>
             </div>
-            
+
             <!-- 规格 -->
             <div class="param-box">
               <div class="param-label">规格</div>
@@ -60,35 +84,33 @@
             </div>
             
             <!-- 工单数量 -->
-            <div class="param-box">
+            <!-- <div class="param-box">
               <div class="param-label">任务总数量</div>
               <div class="param-value">{{ item.planQty || '-' }}</div>
-            </div>
+            </div> -->
             
               <!-- 加工工序 -->
-              <div class="param-box">
+              <!-- <div class="param-box">
                 <div class="param-label">已完成数量</div>
                 <div class="param-value">{{ item.num || '-' }}</div>
               </div>
-            
-            <!-- 工单号 -->
-            <div class="param-box">
-              <div class="param-label">工单号</div>
-              <div class="param-value">{{ item.workNo || '-' }}</div>
-            </div>
+             -->
+
             
 
 
             
-            <!-- 订单号 -->
-            <div class="param-box">
-              <div class="param-label">订单号</div>
-              <div class="param-value">{{ item.orderNo || '-' }}</div>
+
+
+                        <!-- 订单号 -->
+             <div class="param-box">
+              <div class="param-label">操作员工</div>
+              <div class="param-value">{{ item.employeeName || '-' }}</div>
             </div>
           </div>
           
           <!-- 进度条区域 -->
-          <div class="progress-area">
+          <!-- <div class="progress-area">
             <div class="progress-label">进度条</div>
             <div class="progress-container">
               <div class="progress-bar">
@@ -99,7 +121,7 @@
               </div>
               <div class="progress-text">{{ item.progress }}%</div>
             </div>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -113,7 +135,7 @@ import { getStampingDoing, type StampingAllItem } from '@/api/getStampWeldinfo'
 interface ProcessCard {
   // 基础信息
   processName: string        // 工序名称
-  status: string            // 状态
+  // status: string            // 状态
   progress: number          // 进度百分比
   plan_qty: number | string
   // 九个关键参数
@@ -126,10 +148,11 @@ interface ProcessCard {
   workNo: string           // 工单号
   employeeName: string     // 操作员工
   orderNo: string          // 订单号
-
+  Tasktotal: string        // 任务总数量
   // API原始数据字段
   isDoing?: string         // 是否在做
   num?: string            // 数量
+  udf021?: string         // 客户单号
 }
 
 interface Props {
@@ -215,18 +238,20 @@ const convertApiDataToCards = (apiData: StampingAllItem[]): ProcessCard[] => {
       processName: item.processName || '未知工序',
       status: item.isDoing === '1' ? '进行中' : '待机',
       progress: progress,
+      plan_qty: parseFloat(item.plan_qty) || 0,
       
       // 九个关键参数
       macNo: item.macNo || '-',                           // 设备编号
       machineName: item.machineName || item.macNo || '-', // 设备名称，如果为空则使用设备编号
-      itemName: item.processName  || '-', // 品名，优先使用item_description
+      itemName: item.item_description  || '-',            // 品名，优先使用item_description
       itemSpec: item.item_specification || '-',           // 规格  
-      planQty: item.plan_qty || '-',                      // 任务总数量
-      workOrder: item.processName || '-',                 // 加工工序，使用processName
+      planQty: item.num || '-',                            // 工单数量
+      workOrder: item.processName || '-',                 // 加工工序
       workNo: item.workNo || '-',                         // 工单号
       employeeName: item.employeeName || '-',             // 操作员工
-      orderNo: item.te001te002 || '-',                    // 订单号，使用te001te002字段
-      plan_qty: parseFloat(item.plan_qty) || 0,
+      orderNo: item.udf021 || '-',                        // 订单号
+      Tasktotal: item.plan_qty || '-', 
+      udf021: item.udf021 || '-',                   // 任务总数量
       // API原始数据字段
       isDoing: item.isDoing,
       num: item.num

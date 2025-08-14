@@ -37,7 +37,7 @@ const queryDate = getYesterday(); // 昨天的日期
 // 原始 header
 const fullHeader = [
   '采购内勤', '供应商','到货单号','品名', '品号','规格',
-  '不合格数量','检验日期', '问题点', '判断结果' ,'处理时长','完成期限','处理结果',
+  '不合格数量','检验日期', '问题点', '备注','判断结果' ,'处理时长','完成期限','处理结果',
 ]
 
 // 轮播图 header（去掉"处理结果"）
@@ -124,6 +124,7 @@ const refreshData = async () => {
         getResultNumber(item), //不合格数量
         formatDate(item.startTime),// 检验日期
         item.description || '--',// 问题点
+        item.remark || '--',// 备注
         getResultLabel(item),//判断结果
         item.hoursBetweenReturnAndAccept|| '--',// 处理时长
         item.completeDate || '--', // 完成期限
