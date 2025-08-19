@@ -1,6 +1,6 @@
 import { defineStore } from 'pinia'
-import { getFty, getOnTime } from '@/api/produceperformance'
-import type { TodayProduction, OnTime } from '@/api/produceperformance'
+import { getFty, getOnTime,getManufacturingCost } from '@/api/produceperformance'
+import type { TodayProduction, OnTime, ManufacturingCostData } from '@/api/produceperformance'
 
 export const useProductionDataStore = defineStore('productionData', {
   state: () => ({
@@ -12,6 +12,7 @@ export const useProductionDataStore = defineStore('productionData', {
     error: '',
     lastFetchTime: null as Date | null,
     autoRefreshTimer: null as ReturnType<typeof setInterval> | null,
+    manufacturingCost: null as ManufacturingCostData | null,
   }),
 
   getters: {
@@ -23,7 +24,7 @@ export const useProductionDataStore = defineStore('productionData', {
       return target <= 1 ? (target * 100).toFixed(1) : target.toString()
     },
     monthlyNormalActual(): number {
-      if (!this.monthlyData?.actual_normal) return 0
+      if (!this.monthlyData?.target_normal) return 0
       const actual = this.monthlyData.actual_normal
       // 如果是小数比率(0-1之间)，转换为百分比数值
       return actual <= 1 ? actual * 100 : actual
@@ -67,33 +68,98 @@ export const useProductionDataStore = defineStore('productionData', {
       return actual <= 1 ? actual * 100 : actual
     },
 
-    // 月度达成率计算 - 如果actual是小数比率(如0.11=11%)，直接乘以100
+    // 月度达成率计算 - 通过目标值和实际值计算达成率
     monthlyNormalAchievement(): number {
-      if (!this.monthlyData?.actual_normal) return 0
-      // 如果actual_normal是小数比率(0-1之间)，直接乘以100转换为百分比
-      // 如果actual_normal已经是百分比数值(>1)，则直接使用
+      if (!this.monthlyData?.actual_normal || !this.monthlyData?.target_normal) return 0
       const actual = this.monthlyData.actual_normal
-      return actual <= 1 ? actual * 100 : actual
+      const target = Number(this.monthlyData.target_normal)
+      
+      // 如果actual和target都是小数比率(0-1之间)，先转换为百分比再计算
+      const actualPercent = actual <= 1 ? actual * 100 : actual
+      const targetPercent = target <= 1 ? target * 100 : target
+      
+      const achievement = (actualPercent / targetPercent) * 100
+      
+      // 保留一位小数
+      return Number(achievement.toFixed(1))
     },
 
     monthlyAAchievement(): number {
-      if (!this.monthlyData?.actual_a) return 0
+      if (!this.monthlyData?.actual_a || !this.monthlyData?.target_a) return 0
       const actual = this.monthlyData.actual_a
-      return actual <= 1 ? actual * 100 : actual
+      const target = Number(this.monthlyData.target_a)
+      
+      // 如果actual和target都是小数比率(0-1之间)，先转换为百分比再计算
+      const actualPercent = actual <= 1 ? actual * 100 : actual
+      const targetPercent = target <= 1 ? target * 100 : target
+      
+      const achievement = (actualPercent / targetPercent) * 100
+      
+
+      // 保留一位小数
+      return Number(achievement.toFixed(1))
     },
 
-    // 年度达成率计算 - 如果actual是小数比率(如0.11=11%)，直接乘以100  
+    // 年度达成率计算 - 通过目标值和实际值计算达成率
     yearlyNormalAchievement(): number {
-      if (!this.yearlyData?.actual_normal) return 0
+      if (!this.yearlyData?.actual_normal || !this.yearlyData?.target_normal) return 0
       const actual = this.yearlyData.actual_normal
-      return actual <= 1 ? actual * 100 : actual
+      const target = Number(this.yearlyData.target_normal)
+      
+      // 如果actual和target都是小数比率(0-1之间)，先转换为百分比再计算
+      const actualPercent = actual <= 1 ? actual * 100 : actual
+      const targetPercent = target <= 1 ? target * 100 : target
+      
+      const achievement = (actualPercent / targetPercent) * 100
+      
+      // 保留一位小数
+      return Number(achievement.toFixed(1))
     },
 
     yearlyAAchievement(): number {
-      if (!this.yearlyData?.actual_a) return 0
+      if (!this.yearlyData?.actual_a || !this.yearlyData?.target_a) return 0
       const actual = this.yearlyData.actual_a
-      return actual <= 1 ? actual * 100 : actual
+      const target = Number(this.yearlyData.target_a)
+      
+      // 如果actual和target都是小数比率(0-1之间)，先转换为百分比再计算
+      const actualPercent = actual <= 1 ? actual * 100 : actual
+      const targetPercent = target <= 1 ? target * 100 : target
+      
+      const achievement = (actualPercent / targetPercent) * 100
+      
+      // 保留一位小数
+      return Number(achievement.toFixed(1))
     },
+    // 制造费用达成率计算 - 通过实际制造费和营业收入计算达成率
+    costAchievement(): number {
+      if (!this.manufacturingCost?.实际制造费 || !this.manufacturingCost?.营业收入) return 0
+      const actual = this.manufacturingCost.实际制造费
+      const target = this.manufacturingCost.营业收入
+      return (actual / target) * 100
+    },
+
+    // 制造费用实际占比 - 实际制造费占营业收入的百分比
+    manufacturingCostRatio(): number {
+      if (!this.manufacturingCost?.实际制造费 || !this.manufacturingCost?.营业收入) return 0
+      const actual = this.manufacturingCost.实际制造费
+      const revenue = this.manufacturingCost.营业收入
+      return Number(((actual / revenue) * 100).toFixed(2))
+    },
+
+    // 制造费用数据格式化
+    formattedManufacturingCost() {
+      if (!this.manufacturingCost) return null
+      const ratio = this.manufacturingCost.实际制造费 && this.manufacturingCost.营业收入 
+        ? Number(((this.manufacturingCost.实际制造费 / this.manufacturingCost.营业收入) * 100).toFixed(2))
+        : 0
+      return {
+        营业收入: this.manufacturingCost.营业收入?.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        实际制造费: this.manufacturingCost.实际制造费?.toLocaleString('zh-CN', { minimumFractionDigits: 2, maximumFractionDigits: 2 }),
+        占比: ratio
+      }
+    },
+
+
 
     // 月度准交率相关数据
     onTimeMonthlyACompleteNum(): number {
@@ -139,26 +205,6 @@ export const useProductionDataStore = defineStore('productionData', {
       return (this.onTimeDailyData.normal.completeNum / this.onTimeDailyData.normal.total) * 100
     },
 
-    // 为了向后兼容，保留原有的getter（使用月度数据）
-    onTimeACompleteNum(): number {
-      return this.onTimeMonthlyACompleteNum
-    },
-    onTimeATotal(): number {
-      return this.onTimeMonthlyATotal
-    },
-    onTimeARate(): number {
-      return this.onTimeMonthlyARate
-    },
-    onTimeNormalCompleteNum(): number {
-      return this.onTimeMonthlyNormalCompleteNum
-    },
-    onTimeNormalTotal(): number {
-      return this.onTimeMonthlyNormalTotal
-    },
-    onTimeNormalRate(): number {
-      return this.onTimeMonthlyNormalRate
-    },
-
     // 数据是否可用
     hasData: (state) => !!(state.monthlyData || state.yearlyData || state.onTimeMonthlyData || state.onTimeDailyData),
     
@@ -168,6 +214,28 @@ export const useProductionDataStore = defineStore('productionData', {
       const now = new Date()
       const timeDiff = now.getTime() - state.lastFetchTime.getTime()
       return timeDiff > 30 * 60 * 1000 // 30分钟
+    },
+
+    // 为了向后兼容，保留原有的getter（使用月度数据）
+    onTimeACompleteNum(): number {
+      return this.onTimeMonthlyData?.a?.completeNum || 0
+    },
+    onTimeATotal(): number {
+      return this.onTimeMonthlyData?.a?.total || 0
+    },
+    onTimeARate(): number {
+      if (!this.onTimeMonthlyData?.a?.total || this.onTimeMonthlyData.a.total === 0) return 0
+      return (this.onTimeMonthlyData.a.completeNum / this.onTimeMonthlyData.a.total) * 100
+    },
+    onTimeNormalCompleteNum(): number {
+      return this.onTimeMonthlyData?.normal?.completeNum || 0
+    },
+    onTimeNormalTotal(): number {
+      return this.onTimeMonthlyData?.normal?.total || 0
+    },
+    onTimeNormalRate(): number {
+      if (!this.onTimeMonthlyData?.normal?.total || this.onTimeMonthlyData.normal.total === 0) return 0
+      return (this.onTimeMonthlyData.normal.completeNum / this.onTimeMonthlyData.normal.total) * 100
     }
   },
 
@@ -204,12 +272,13 @@ export const useProductionDataStore = defineStore('productionData', {
         
         console.log('正在获取生产数据...', { monthParam, yearParam, todayParam })
         
-        // 同时获取月度、年度和准交率数据
-        const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse] = await Promise.all([
+        // 同时获取月度、年度、准交率和制造费用数据
+        const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse] = await Promise.all([
           getFty(monthParam),        // 本月1号获取月度数据
           getFty(yearParam),         // 本年1月1号获取年度数据
           getOnTime(monthParam),     // 本月1号获取月度准交率
-          getOnTime(todayParam)      // 今日数据获取今日准交率
+          getOnTime(todayParam),     // 今日数据获取今日准交率
+          getManufacturingCost()     // 获取制造费用数据
         ])
         
         if (monthlyResponse && monthlyResponse.data) {
@@ -230,6 +299,11 @@ export const useProductionDataStore = defineStore('productionData', {
         if (onTimeDailyResponse && onTimeDailyResponse.data) {
           this.onTimeDailyData = onTimeDailyResponse.data
           console.log('今日准交率数据获取成功:', onTimeDailyResponse.data)
+        }
+
+        if (manufacturingCostResponse && manufacturingCostResponse.data) {
+          this.manufacturingCost = manufacturingCostResponse.data
+          console.log('制造费用数据获取成功:', manufacturingCostResponse.data)
         }
         
         // 更新最后获取时间

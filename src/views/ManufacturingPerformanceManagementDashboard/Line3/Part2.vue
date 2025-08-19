@@ -19,6 +19,11 @@
           </div>
         </div>
       </div>
+      <!-- <div class="action-buttons">
+        <button class="reason-btn" @click="showReasonDialog('painting')">
+          填写原因/对策
+        </button>
+      </div> -->
     </div>
 
     <!-- 常规客户总装一课直通率 -->
@@ -40,6 +45,11 @@
           </div>
         </div>
       </div>
+      <!-- <div class="action-buttons">
+        <button class="reason-btn" @click="showReasonDialog('assembly1')">
+          填写原因/对策
+        </button>
+      </div> -->
     </div>
 
     <!-- 常规客户总装二课直通率 -->
@@ -61,12 +71,26 @@
           </div>
         </div>
       </div>
+      <!-- <div class="action-buttons">
+        <button class="reason-btn" @click="showReasonDialog('assembly2')">
+          填写原因/对策
+        </button> -->
+      </div>
     </div>
-  </div>
+    
+    <!-- 填写原因对话框 -->
+    <ReasonDialog
+      :visible="reasonDialogVisible"
+      :metric-info="currentMetricInfo"
+      @close="reasonDialogVisible = false"
+      @submit="handleReasonSubmit"
+    />
+
 </template>
 
 <script setup>
 import { ref } from 'vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 
 // Mock数据
 const regularData = ref({
@@ -96,6 +120,47 @@ const getAchievementClass = (value) => {
   if (value >= 98) return 'achievement-good'
   if (value >= 95) return 'achievement-normal'
   return 'achievement-warning'
+}
+
+// 填写原因对话框状态
+const reasonDialogVisible = ref(false)
+const currentMetricInfo = ref({})
+
+// 显示填写原因对话框
+const showReasonDialog = (type) => {
+  let data, name
+  
+  switch (type) {
+    case 'painting':
+      data = regularData.value.painting
+      name = '常规客户金工一部涂装'
+      break
+    case 'assembly1':
+      data = regularData.value.assemblyCourse1
+      name = '常规客户总装一课'
+      break
+    case 'assembly2':
+      data = regularData.value.assemblyCourse2
+      name = '常规客户总装二课'
+      break
+  }
+  
+  currentMetricInfo.value = {
+    name: `${name}直通率`,
+    period: '月度',
+    target: data.target,
+    actual: data.actual,
+    achievement: data.achievement
+  }
+  
+  reasonDialogVisible.value = true
+}
+
+// 处理原因提交
+const handleReasonSubmit = (data) => {
+  console.log('提交的原因/对策数据:', data)
+  // 这里可以调用API保存数据
+  // 可以显示成功提示
 }
 </script>
 
@@ -182,5 +247,29 @@ const getAchievementClass = (value) => {
 
 .achievement-warning {
   color: #ff4444;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.reason-btn {
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.reason-btn:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #0088b3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
 }
 </style>

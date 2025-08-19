@@ -5,39 +5,98 @@
           订单准交率
         </div>
 
+        <!-- 加载中遮罩 -->
+        <div v-if="productionStore.loading" class="loading-overlay">
+          <div class="spinner"></div>
+          <div class="loading-text">加载中...</div>
+        </div>
 
-    <div class="flex  items-center">
-      
-    <div class="desc2">本月累计</div>
-    <div class="rate-row">  
-      本月准交率：
-      <span v-if="loadingMonth">加载中...</span>
-      <span v-else>{{ monthData?.rate ?? '--' }}</span>
+
+    <div class="flex justify-end">
+      <dv-button
+        class=" text-white text-lg font-semibold tracking-wide"
+        :bg="false"
+        @click="openDialog"
+        color="#00eaff"
+      >
+        详细信息
+      </dv-button>
     </div>
- 
-<div class="flex justify-end">
-  <dv-button
-  class=" text-white text-lg font-semibold tracking-wide"
-  :bg="false"
-  @click="openDialog"
-  color="#00eaff"
->
-  详细信息
-</dv-button>
-</div>
 
-</div>
-      
-<div ref="monthBarChart" class="bar-chart"></div>
-
-        <div class='flex items-center'>
-        <div class="desc2">今日</div>
-        <div class="rate-row">
-          今日准交率：<span v-if="loadingToday">加载中...</span>
-          <span v-else>{{ todayData?.rate ?? '--' }}</span>
+    <!-- A类/常规客户订单准交率（移植自制造绩效看板Line4，适配紧凑布局） -->
+    <div class="metrics-content">
+      <div class="part-section">
+        <div class="section-title">A类客户订单准交率</div>
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label">本月目标</div>
+            <div class="metric-value target">{{ deliveryData.aCustomer.target }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月已入库工单数</div>
+            <div class="metric-value">{{ deliveryData.aCustomer.stockOrders }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月准交工单数</div>
+            <div class="metric-value">{{ deliveryData.aCustomer.onTimeOrders }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月准交率</div>
+            <div class="metric-value" :class="getDeliveryClass(deliveryData.aCustomer.onTimeRate)">{{ deliveryData.aCustomer.onTimeRate.toFixed(1) }}%</div>
+          </div>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label">今日计划准交数</div>
+            <div class="metric-value">{{ deliveryData.aCustomer.plannedToday }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">实际准交数</div>
+            <div class="metric-value">{{ deliveryData.aCustomer.actualToday }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">今日准交率</div>
+            <div class="metric-value" :class="getDeliveryClass(deliveryData.aCustomer.todayRate)">{{ deliveryData.aCustomer.todayRate.toFixed(1) }}%</div>
+          </div>
         </div>
       </div>
-        <div ref="dayBarChart" class="bar-chart"></div>
+
+      <div class="part-section">
+        <div class="section-title">常规客户订单准交率</div>
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label">本月目标</div>
+            <div class="metric-value target">{{ deliveryData.regularCustomer.target }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月已入库工单数</div>
+            <div class="metric-value">{{ deliveryData.regularCustomer.stockOrders }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月准交工单数</div>
+            <div class="metric-value">{{ deliveryData.regularCustomer.onTimeOrders }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">本月准交率</div>
+            <div class="metric-value" :class="getDeliveryClass(deliveryData.regularCustomer.onTimeRate)">{{ deliveryData.regularCustomer.onTimeRate.toFixed(1) }}%</div>
+          </div>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label">今日计划准交数</div>
+            <div class="metric-value">{{ deliveryData.regularCustomer.plannedToday }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">实际准交数</div>
+            <div class="metric-value">{{ deliveryData.regularCustomer.actualToday }}</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label">今日准交率</div>
+            <div class="metric-value" :class="getDeliveryClass(deliveryData.regularCustomer.todayRate)">{{ deliveryData.regularCustomer.todayRate.toFixed(1) }}%</div>
+          </div>
+        </div>
+      </div>
+    </div>
 
            <!-- 弹窗 -->
      <TableDialog
@@ -55,144 +114,74 @@
   
 
   <script setup lang="ts">
-  import { ref, onMounted, watch, nextTick } from 'vue'
-  import * as echarts from 'echarts'
-  import { getDeliveryRateMonthInfo, getDeliveryRateTodayInfo,getAbnormalUnfinishedList } from '@/api/getPmcinfo'
+  import { ref, computed, onMounted, onUnmounted } from 'vue'
+  import { useProductionDataStore } from '@/store/productionData'
+  import { getAbnormalUnfinishedList } from '@/api/getPmcinfo'
   import TableDialog from './dialog.vue'
-  const monthData = ref<any>(null)
-  const todayData = ref<any>(null)
-  const loadingMonth = ref(true)
-  const loadingToday = ref(true)  
-  const prodLine = '1005' // 这里写死包装产线，如需动态可用props或route
-  const monthBarChart = ref()
-  const dayBarChart = ref()
+
+  // 生产数据 store
+  const productionStore = useProductionDataStore()
+
+  // 启动/停止自动刷新
+  onMounted(() => {
+    productionStore.startAutoRefresh()
+  })
+  onUnmounted(() => {
+    productionStore.stopAutoRefresh()
+  })
+
+      // 准交率数据（A类/常规）
+    const deliveryData = computed(() => ({
+      aCustomer: {
+        target: 95.0,
+        stockOrders: productionStore.onTimeMonthlyData?.a?.total || 0,
+        onTimeOrders: productionStore.onTimeMonthlyData?.a?.completeNum || 0,
+        onTimeRate: productionStore.onTimeMonthlyData?.a?.total ? (productionStore.onTimeMonthlyData.a.completeNum / productionStore.onTimeMonthlyData.a.total * 100) : 0,
+        plannedToday: productionStore.onTimeDailyData?.a?.total || 0,
+        actualToday: productionStore.onTimeDailyData?.a?.completeNum || 0,
+        todayRate: productionStore.onTimeDailyData?.a?.total ? (productionStore.onTimeDailyData.a.completeNum / productionStore.onTimeDailyData.a.total * 100) : 0,
+      },
+      regularCustomer: {
+        target: 90.0,
+        stockOrders: productionStore.onTimeMonthlyData?.normal?.total || 0,
+        onTimeOrders: productionStore.onTimeMonthlyData?.normal?.completeNum || 0,
+        onTimeRate: productionStore.onTimeMonthlyData?.normal?.total ? (productionStore.onTimeMonthlyData.normal.completeNum / productionStore.onTimeMonthlyData.normal.total * 100) : 0,
+        plannedToday: productionStore.onTimeDailyData?.normal?.total || 0,
+        actualToday: productionStore.onTimeDailyData?.normal?.completeNum || 0,
+        todayRate: productionStore.onTimeDailyData?.normal?.total ? (productionStore.onTimeDailyData.normal.completeNum / productionStore.onTimeDailyData.normal.total * 100) : 0,
+      },
+    }))
+
+  const getDeliveryClass = (value: number) => {
+    if (value >= 95) return 'delivery-excellent'
+    if (value >= 90) return 'delivery-good'
+    if (value >= 85) return 'delivery-normal'
+    return 'delivery-warning'
+  }
+
+  // 弹窗与表格（沿用原有）
   const dialogVisible = ref(false)
-  const dialogTitle = ref('订单准交率');
-  const gridData = ref([]);
+  const dialogTitle = ref('订单准交率')
+  const gridData = ref<any[]>([])
   const gridColumns = [
-  { prop: 'docNo', label: '工单单号' , width: '220'},
-  // { prop: 'docId', label: '单据类型', width: '150' },
-  { prop: 'customerOrderNo', label: '客户单号',width: '250' },
-  { prop: 'planDate', label: '计划完成日期',width: '500' },
-  { prop: 'completeDate', label: '实际完成日期',width: '300' },
-  // { prop: 'planStatus', label: '备注',width: '250' },
-];
+    { prop: 'docNo', label: '工单单号', width: '220' },
+    { prop: 'customerOrderNo', label: '客户单号', width: '250' },
+    { prop: 'planDate', label: '计划完成日期', width: '500' },
+    { prop: 'completeDate', label: '实际完成日期', width: '300' },
+  ]
 
-
-
-  const renderMonthChart = () => {
-    if (!monthBarChart.value || !monthData.value) return
-    const chart = echarts.init(monthBarChart.value)
-    const option = {
-      color: ['#00eaff'],
-      tooltip: { show: true },
-      grid: { left: '8%', right: '8%', top: '12%', },
-      xAxis: {
-        type: 'category',
-        data: ['计划数', '已完成'],
-        axisLabel: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
-        axisTick: { show: false },
-        axisLine: { lineStyle: { color: '#00eaff', width: 2 } }
-      },
-      yAxis: {
-        type: 'value',
-        minInterval: 1,
-        axisLabel: { color: '#fff', fontSize: 16 }
-      },
-      series: [
-        {
-          type: 'bar',
-          barWidth: '40%',
-          data: [
-            monthData.value.total ?? 0,
-            monthData.value.completeNum ?? 0
-          ],
-          label: {
-            show: true,
-            position: 'top',
-            color: '#fff',
-            fontSize: 18
-          }
-        }
-      ]
-    }
-    chart.setOption(option)
-  }
-  
-  const renderDayChart = () => {
-    if (!dayBarChart.value || !todayData.value) return
-    const chart = echarts.init(dayBarChart.value)
-    const option = {
-      color: ['#00eaff'],
-      tooltip: { show: true },
-      grid: { left: '8%', right: '8%', top: '12%'},
-      xAxis: {
-        type: 'category',
-        data: ['计划数', '已完成'],
-        axisLabel: { color: '#fff', fontSize: 22, fontWeight: 'bold' },
-        axisTick: { show: false },
-        axisLine: { lineStyle: { color: '#00eaff', width: 2 } }
-      },
-      yAxis: {
-        type: 'value',
-        minInterval: 1,
-        axisLabel: { color: '#fff', fontSize: 16 }
-      },
-      series: [
-        {
-          type: 'bar',
-          barWidth: '40%',
-          data: [
-            todayData.value.total ?? 0,
-            todayData.value.completeNum ?? 0
-          ],
-          label: {
-            show: true,
-            position: 'top',
-            color: '#fff',
-            fontSize: 18
-          }
-        }
-      ]
-    }
-    chart.setOption(option)
-  }
-  
-  const fetchData = async () => {
-    loadingMonth.value = true
-    loadingToday.value = true
-    try {
-      const [monthRes, todayRes] = await Promise.all([
-        getDeliveryRateMonthInfo(prodLine),
-        getDeliveryRateTodayInfo(prodLine)
-      ])
-      monthData.value = monthRes.data
-      todayData.value = todayRes.data
-      await nextTick()
-      renderMonthChart()
-      renderDayChart()
-    } catch (e) {
-      monthData.value = null
-      todayData.value = null
-    } finally {
-      loadingMonth.value = false
-      loadingToday.value = false
-    }
-  }
-  
-  const openDialog = () =>{
+  const openDialog = () => {
     dialogVisible.value = true
-    getAbnormalUnfinishedList()
-    .then(res =>{
+    getAbnormalUnfinishedList().then((res: any) => {
       gridData.value = res.data
     })
   }
-  onMounted(fetchData)
-  watch(monthData, () => nextTick(renderMonthChart))
-  watch(todayData, () => nextTick(renderDayChart))
   </script>
   
   <style scoped>
+  .left {
+    position: relative;
+  }
   .day-title {
     display: flex;
     justify-content: center;
@@ -206,6 +195,101 @@
     text-shadow: 0 0.3vh 1vw #000, 0 0 0.2vw #00bfff;
     border-bottom: 0.4vh solid #00bfff;
     padding:0.5vh 0  0vh 0;
+  }
+  /* 准交率指标样式 */
+  .metrics-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5vh;
+    padding: 0.5vh 1vw;
+  }
+  .part-section {
+    background: rgba(0,32,64,0.25);
+    border: 1px solid rgba(0,191,255,0.3);
+    border-radius: 0.6vw;
+    padding: 0.6vh 0.8vw;
+    display: flex;
+    flex-direction: column;
+    gap: 0.6vh;
+  }
+  .section-title {
+    font-size: 0.9vw;
+    font-weight: bold;
+    color: #00d4ff;
+    text-align: center;
+    border-bottom: 1px solid rgba(0,191,255,0.3);
+    padding-bottom: 0.4vh;
+  }
+  .metrics-row {
+    display: flex;
+    gap: 0.5vw;
+  }
+  .metric-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding: 0.6vh 0.4vw;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 0.4vw;
+    border-left: 0.2vw solid #00d4ff;
+  }
+  .metric-label {
+    font-size: 0.7vw;
+    color: #8cc8ff;
+    margin-bottom: 0.2vh;
+    text-align: center;
+    line-height: 1.2;
+  }
+  .metric-value {
+    font-size: 0.9vw;
+    font-weight: bold;
+    color: #fff;
+    text-align: center;
+    line-height: 1.1;
+  }
+  .metric-value.target {
+    color: #00d4ff;
+  }
+  .delivery-excellent { color: #00ff88; }
+  .delivery-good { color: #00d4ff; }
+  .delivery-normal { color: #ffffff; }
+  .delivery-warning { color: #ff4444; }
+  
+  /* 加载遮罩与指示器 */
+  .loading-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.45);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 9;
+  }
+  .spinner {
+    width: 3.2vw;
+    height: 3.2vw;
+    border: 0.35vw solid rgba(0, 191, 255, 0.25);
+    border-top-color: #00eaff;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+    box-shadow: 0 0 1vw rgba(0, 191, 255, 0.3);
+  }
+  .loading-text {
+    margin-top: 1vh;
+    color: #00eaff;
+    font-size: 0.9vw;
+    letter-spacing: 0.1vw;
+    text-shadow: 0 0.3vh 0.8vh #003366;
+  }
+  @keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
   }
   .desc2 {
     font-size: 0.8vw;

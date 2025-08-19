@@ -21,7 +21,7 @@
 
     </div>
 
-    <div class="grid grid-cols-6 gap-2 h-full">
+    <div class="grid grid-cols-3 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
       <Datacard title="今日排产产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
       </dv-border-box-12>
@@ -33,7 +33,7 @@
       <Datacard title="达成率" EnlishTitle="QualifiedToday" :value="productionData.rate+'%'" />
       </dv-border-box-12>
 
-      <dv-border-box-12 class="data-box ">
+      <!-- <dv-border-box-12 class="data-box ">
       <Datacard title="检验数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.checkTotal" />
       </dv-border-box-12>
 
@@ -42,7 +42,7 @@
       </dv-border-box-12>
       <dv-border-box-12 class="data-box ">
       <Datacard title="合格率" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
-      </dv-border-box-12>
+      </dv-border-box-12> -->
 
     </div>
     <Dialog 

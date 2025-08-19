@@ -5,9 +5,9 @@
       <div class="w-full h-full flex flex-col pl-4 pr-4 gap-4">
         <Header class="h-[20vh]"></Header>
         <Line2 class="h-[18vh]"></Line2>
-        <Line3 class="h-[12vh]"></Line3>
-        <Line4 class="h-[18vh]"></Line4>
-        <Bottom class="h-[20vh]"></Bottom>
+        <Line3 class="h-[10vh]"></Line3>
+        <Line4 class="h-[12vh]"></Line4>
+        <!-- <Bottom class="h-[20vh]"></Bottom> -->
       </div>
     </dv-border-box11>
   </dv-full-screen-container>

@@ -1,19 +1,50 @@
 <template>
-  <div ref="container" class="earth-container"></div>
+  <div ref="container" class="earth-container">
+    <!-- 添加模型切换按钮 -->
+    <div class="model-switcher">
+      <button 
+        @click="switchToEarth" 
+        :class="{ active: currentModelType === 'earth' }"
+        class="switch-btn"
+      >
+        地球模型
+      </button>
+      <button 
+        @click="switchToMotorcycle" 
+        :class="{ active: currentModelType === 'motorcycle' }"
+        class="switch-btn"
+      >
+        摩托车模型
+      </button>
+    </div>
+  </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, watch } from 'vue'
 import * as THREE from 'three'
-import earthTextureUrl from '../../../assets/earth.png'
+import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+// import earthTextureUrl from '../../../assets/earth.png'
+import appoloEarthTextureUrl from '../../../assets/appoloEarth.png'
 // 光环贴图 - 如果没有专门的图片，可以使用一个简单的径向渐变
 const glowTextureUrl = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjU2IiBoZWlnaHQ9IjI1NiIgdmlld0JveD0iMCAwIDI1NiAyNTYiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxyYWRpYWxHcmFkaWVudCBpZD0iZ3JhZGllbnQiIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCI+CjxzdG9wIG9mZnNldD0iMCIgc3RvcC1jb2xvcj0iIzAwRkZGRiIgc3RvcC1vcGFjaXR5PSIwLjgiLz4KPHN0b3Agb2Zmc2V0PSIwLjMiIHN0b3AtY29sb3I9IiMwMEZGRkYiIHN0b3Atb3BhY2l0eT0iMC40Ii8+CjxzdG9wIG9mZnNldD0iMC42IiBzdG9wLWNvbG9yPSIjMDBGRkZGIiBzdG9wLW9wYWNpdHk9IjAuMiIvPgo8c3RvcCBvZmZzZXQ9IjEiIHN0b3AtY29sb3I9IiMwMEZGRkYiIHN0b3Atb3BhY2l0eT0iMCIvPgo8L3JhZGlhbEdyYWRpZW50Pgo8Y2lyY2xlIGN4PSIxMjgiIGN5PSIxMjgiIHI9IjEyOCIgZmlsbD0idXJsKCNncmFkaWVudCkiLz4KPC9zdmc+'
 
+// 定义props
+const props = defineProps({
+  modelType: {
+    type: String,
+    default: 'earth',
+    validator: (value) => ['earth', 'motorcycle'].includes(value)
+  }
+})
+
 const container = ref(null)
-let scene, camera, renderer, earth, clouds
+let scene, camera, renderer, earth, clouds, motorcycle
 let tradeLines = [], cityMarkers = [], particles = []
 let animationId = null
 let mouseX = 0, mouseY = 0
+let controls
 
 // 鼠标拖拽控制变量
 let isMouseDown = false
@@ -21,8 +52,115 @@ let mouseDownX = 0, mouseDownY = 0
 let earthRotationX = 0, earthRotationY = 0
 let targetRotationX = 0, targetRotationY = 0
 
+// 当前模型类型
+const currentModelType = ref(props.modelType)
+
 // 固定地球大小 - 设置为占据画面75%
 const earthScale = 2.5
+
+// 摩托车缩放比例
+const motorcycleScale = 0.15
+
+// 模型切换函数
+const switchToEarth = () => {
+  currentModelType.value = 'earth'
+  switchModel('earth')
+}
+
+const switchToMotorcycle = () => {
+  currentModelType.value = 'motorcycle'
+  switchModel('motorcycle')
+}
+
+// 模型切换逻辑
+const switchModel = (type) => {
+  console.log(`切换到模型类型: ${type}`)
+  
+  if (type === 'earth') {
+    console.log('切换到地球模型...')
+    // 隐藏摩托车，显示地球
+    if (motorcycle) {
+      motorcycle.visible = false
+      console.log('隐藏摩托车模型')
+    }
+    if (earth) {
+      earth.visible = true
+      console.log('显示地球模型')
+    }
+    // 重新创建地球相关元素
+    createTradeLines()
+    createCityMarkers()
+    createStarField()
+    // 调整相机到地球视角
+    camera.position.set(0, 0, 8)
+    camera.lookAt(0, 0, 0)
+    // 重置OrbitControls
+    if (controls) {
+      controls.reset()
+    }
+    console.log('相机调整到地球视角')
+  } else {
+    console.log('切换到摩托车模型...')
+    // 隐藏地球，显示摩托车
+    if (earth) {
+      earth.visible = false
+      console.log('隐藏地球模型')
+    }
+    
+    // 如果摩托车不存在，创建它
+    if (!motorcycle) {
+      console.log('摩托车模型不存在，开始创建...')
+      createMotorcycle()
+    } else {
+      motorcycle.visible = true
+      console.log('显示已存在的摩托车模型')
+    }
+    
+    // 清除地球相关元素
+    clearEarthElements()
+    
+    // 调整相机到摩托车视角，让模型在画面中央
+    camera.position.set(0, 2, 6)
+    camera.lookAt(0, 0, 0)
+    // 重置OrbitControls
+    if (controls) {
+      controls.reset()
+    }
+    console.log('相机调整到摩托车视角')
+  }
+  
+  // 打印调试信息
+  setTimeout(() => {
+    debugScene()
+  }, 100)
+}
+
+// 清除地球相关元素
+const clearEarthElements = () => {
+  // 清除贸易飞线
+  tradeLines.forEach(line => {
+    if (line.parent) {
+      line.parent.remove(line)
+    }
+  })
+  tradeLines = []
+  
+  // 清除城市标记
+  cityMarkers.forEach(marker => {
+    if (marker.parent) {
+      marker.parent.remove(marker)
+    }
+  })
+  cityMarkers = []
+  
+  // 清除粒子系统
+  particles.forEach(particle => {
+    if (particle.parent) {
+      particle.parent.remove(particle)
+    }
+  })
+  particles = []
+}
 
  // 贸易路线数据 - 统一使用蓝色
   const tradeRoutes = [
@@ -65,13 +203,13 @@ const initThree = () => {
   scene.fog = new THREE.Fog(0x000000, 50, 200)
   
      // 创建相机
-   camera = new THREE.PerspectiveCamera(
-     60,
-     container.value.clientWidth / container.value.clientHeight,
-     0.1,
-     1000
-   )
-   camera.position.set(0, 0, 8) // 调整相机距离，适应固定地球大小
+  camera = new THREE.PerspectiveCamera(
+    60,
+    container.value.clientWidth / container.value.clientHeight,
+    0.1,
+    1000
+  )
+  camera.position.set(0, 0, 8) // 调整相机距离，适应固定地球大小
   
   // 创建渲染器
   renderer = new THREE.WebGLRenderer({ 
@@ -87,35 +225,40 @@ const initThree = () => {
   renderer.toneMappingExposure = 1.2
   container.value.appendChild(renderer.domElement)
   
+  // 创建OrbitControls
+  controls = new OrbitControls(camera, renderer.domElement)
+  controls.enableDamping = true // 启用阻尼效果
+  controls.dampingFactor = 0.05
+  controls.enableZoom = true // 启用缩放
+  controls.enablePan = true // 启用平移
+  controls.enableRotate = true // 启用旋转
+  controls.autoRotate = false // 禁用自动旋转
+  controls.autoRotateSpeed = 2.0
+  controls.minDistance = 2 // 最小距离
+  controls.maxDistance = 20 // 最大距离
+  
   // 创建光照系统
   createLighting()
   
-  // 创建真实地球
-  createRealEarth()
+  // 根据当前模型类型创建相应的模型
+  if (currentModelType.value === 'earth') {
+    createRealEarth()
+    createTradeLines()
+    createCityMarkers()
+    createStarField()
+  } else {
+    // 确保摩托车模型被创建
+    createMotorcycle()
+  }
   
-     // 创建云层
-   // createClouds()
+  // 初始化元素位置
+  initializeElementPositions()
   
-     // 创建贸易飞线
-   createTradeLines()
-   
-   // 创建城市标记
-   createCityMarkers()
-   
-      // 创建粒子系统
-    // createParticleSystem()
-    
-    // 添加星空背景
-   createStarField()
-   
-   // 初始化元素位置
-   initializeElementPositions()
-   
-   // 添加鼠标交互
-   addMouseInteraction()
-   
-   // 开始动画
-   animate()
+  // 添加鼠标交互
+  addMouseInteraction()
+  
+  // 开始动画
+  animate()
   
   // 添加窗口大小调整监听
   window.addEventListener('resize', onWindowResize)
@@ -159,7 +302,8 @@ const createRealEarth = () => {
   
   // 使用真实的地球贴图
   const textureLoader = new THREE.TextureLoader()
-  const earthTexture = textureLoader.load(earthTextureUrl)
+  // const earthTexture = textureLoader.load(earthTextureUrl) // 注释掉原来的贴图
+  const earthTexture = textureLoader.load(appoloEarthTextureUrl) // 使用新的 appoloEarth 贴图
   
      // 创建地球材质
    const earthMaterial = new THREE.MeshPhongMaterial({
@@ -268,6 +412,131 @@ const createEarthGrid = () => {
     
     const line = new THREE.Line(geometry, material)
     scene.add(line)
+  }
+}
+
+// 创建摩托车模型
+const createMotorcycle = () => {
+  console.log('开始创建摩托车模型...')
+  
+  const loader = new STLLoader()
+  
+  // 加载FROG_x_t.stl文件
+  loader.load('/FROG_x_t.stl', (geometry) => {
+    console.log('STL文件加载成功，开始创建网格...')
+    
+    // 创建材质
+    const material = new THREE.MeshPhongMaterial({
+      color: 0x666666,
+      shininess: 100,
+      specular: 0x222222
+    })
+    
+    // 创建网格
+    motorcycle = new THREE.Mesh(geometry, material)
+    
+    // 设置摩托车位置和缩放
+    motorcycle.position.set(0, 0, 0)
+    motorcycle.scale.setScalar(motorcycleScale)
+    
+    // 启用阴影
+    motorcycle.castShadow = true
+    motorcycle.receiveShadow = true
+    
+    // 添加到场景
+    scene.add(motorcycle)
+    
+    console.log('摩托车模型创建成功，已添加到场景')
+    
+    // 初始化摩托车位置
+    initializeMotorcyclePosition()
+    
+    // 确保模型可见
+    motorcycle.visible = true
+  }, 
+  // 进度回调
+  (progress) => {
+    console.log('摩托车加载进度:', (progress.loaded / progress.total * 100) + '%')
+  },
+  // 错误回调
+  (error) => {
+    console.error('摩托车加载失败:', error)
+    console.log('创建占位符模型...')
+    // 如果加载失败，创建一个简单的摩托车占位符
+    createMotorcyclePlaceholder()
+  })
+}
+
+// 创建摩托车占位符（如果STL文件加载失败）
+const createMotorcyclePlaceholder = () => {
+  console.log('创建占位符摩托车模型...')
+  
+  // 创建一个简单的摩托车形状作为占位符
+  const group = new THREE.Group()
+  
+  // 车身
+  const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 1)
+  const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 })
+  const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
+  body.position.y = 0.5
+  group.add(body)
+  
+  // 车轮
+  const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 16)
+  const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x111111 })
+  
+  const frontWheel = new THREE.Mesh(wheelGeometry, wheelMaterial)
+  frontWheel.position.set(0.8, 0.4, 0)
+  frontWheel.rotation.z = Math.PI / 2
+  group.add(frontWheel)
+  
+  const backWheel = new THREE.Mesh(wheelGeometry, wheelMaterial)
+  backWheel.position.set(-0.8, 0.4, 0)
+  backWheel.rotation.z = Math.PI / 2
+  group.add(backWheel)
+  
+  // 车头
+  const headGeometry = new THREE.BoxGeometry(0.5, 0.3, 0.8)
+  const headMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 })
+  const head = new THREE.Mesh(headGeometry, headMaterial)
+  head.position.set(1.2, 0.8, 0)
+  group.add(head)
+  
+  motorcycle = group
+  motorcycle.scale.setScalar(motorcycleScale)
+  
+  // 启用阴影
+  motorcycle.castShadow = true
+  motorcycle.receiveShadow = true
+  
+  // 添加到场景
+  scene.add(motorcycle)
+  
+  console.log('占位符摩托车模型创建成功，已添加到场景')
+  
+  // 初始化摩托车位置
+  initializeMotorcyclePosition()
+  
+  // 确保模型可见
+  motorcycle.visible = true
+}
+
+// 初始化摩托车位置
+const initializeMotorcyclePosition = () => {
+  if (motorcycle) {
+    console.log('初始化摩托车位置和相机...')
+    
+    // 确保摩托车在场景中心
+    motorcycle.position.set(0, 0, 0)
+    
+    // 调整相机位置，让模型在画面中央显示
+    camera.position.set(0, 1.5, 8)
+    camera.lookAt(0, 0, 0)
+    
+    // 确保摩托车可见
+    motorcycle.visible = true
+    
+    console.log('摩托车位置初始化完成')
   }
 }
 
@@ -813,128 +1082,130 @@ const addMouseInteraction = () => {
 const animate = () => {
   animationId = requestAnimationFrame(animate)
   
+  // 更新OrbitControls
+  if (controls) {
+    controls.update()
+  }
+  
   const time = Date.now() * 0.001
   
-     // 地球拖拽旋转 - 平滑过渡
-   if (earth) {
-     // 平滑过渡到目标旋转角度
-     earthRotationX += (targetRotationX - earthRotationX) * 0.1
-     earthRotationY += (targetRotationY - earthRotationY) * 0.1
-     
-     // 应用旋转
-     earth.rotation.x = earthRotationX
-     earth.rotation.y = earthRotationY
-     
-     // 地球大小固定，不需要缩放
-     earth.scale.setScalar(1)
-     
-     // 如果没有拖拽，添加轻微的自转
-     if (!isMouseDown) {
-       earth.rotation.y += 0.001
-     }
-   }
-  
-     // 云层旋转
-   // if (clouds) {
-   //   clouds.rotation.y += 0.002
-   // }
-  
-     // 光环轻微旋转
-   // if (earthGlow) {
-   //   earthGlow.rotation.z += 0.001
-   // }
-  
-  // 贸易飞线动画
-  tradeLines.forEach(line => {
-    if (line.userData && line.userData.curve) {
-      // ===== 移动光点动画样式调整位置 =====
-      // 移动光点动画 - 沿着贝塞尔曲线移动
-      line.userData.progress += line.userData.speed
-      if (line.userData.progress > 1) {
-        line.userData.progress = 0
-      }
+  // 根据当前模型类型执行不同的动画
+  if (currentModelType.value === 'earth') {
+    // 地球拖拽旋转 - 平滑过渡
+    if (earth && earth.visible) {
+      // 平滑过渡到目标旋转角度
+      earthRotationX += (targetRotationX - earthRotationX) * 0.1
+      earthRotationY += (targetRotationY - earthRotationY) * 0.1
       
-      const t = line.userData.progress
-      const curve = line.userData.curve
-      const position = curve.getPointAt(t)
+      // 应用旋转
+      earth.rotation.x = earthRotationX
+      earth.rotation.y = earthRotationY
       
-      // 更新光点位置
-      line.position.copy(position)
+      // 地球大小固定，不需要缩放
+      earth.scale.setScalar(1)
       
-      // 光点闪烁效果
-      line.material.opacity = 0.7 + Math.sin(time * 8) * 0.3 // 🔵 光点闪烁频率和强度 - 可调整
-      
-      // 光晕也跟随移动
-      if (line.userData.glow) {
-        line.userData.glow.position.copy(position)
-        line.userData.glow.material.opacity = 0.3 + Math.sin(time * 6) * 0.2 // 🔵 光晕闪烁频率和强度 - 可调整
-      }
-    } else if (line.userData && line.userData.material) {
-      // 更新着色器材质的uniforms（保留兼容性）
-      line.userData.material.uniforms.time.value = time
-    } else if (line.children && line.children.length > 0) {
-      // 处理飞线组（包含主飞线和发光飞线）
-      if (line.children.length === 2 && line.children[0].userData && line.children[0].userData.curve) {
-        // 这是飞线组，为每个子线条添加动画效果
-        line.children.forEach((child, childIndex) => {
-          if (child.userData && child.userData.curve) {
-            // 飞线轻微闪烁效果
-            if (child.material) {
-              const baseOpacity = childIndex === 0 ? 0.9 : 0.4 // 主飞线0.9，发光飞线0.4
-              const flickerIntensity = childIndex === 0 ? 0.05 : 0.1 // 发光飞线闪烁更明显
-              child.material.opacity = baseOpacity + Math.sin(time * 3 + childIndex) * flickerIntensity
-            }
-          }
-        })
-      } else {
-        // ===== 光柱动画样式调整位置 =====
-        // 光柱动画效果
-        line.children.forEach((mesh, index) => {
-          // 光柱轻微旋转
-          mesh.rotation.z += 0.001 * (index + 1) // 🔵 光柱旋转速度 - 可调整
-          
-          // 光柱透明度变化
-          if (mesh.material) {
-            mesh.material.opacity = 0.3 + Math.sin(time * 2 + index) * 0.1 // 🔵 光柱闪烁频率和强度 - 可调整
-          }
-          
-          // 中心光点闪烁效果
-          if (index === 2) { // 第三个子对象是中心光点
-            mesh.material.opacity = 0.6 + Math.sin(time * 6) * 0.4 // 🔵 中心光点闪烁频率和强度 - 可调整
-          }
-        })
-      }
+      // 地球完全由用户控制，不自动旋转
     }
-  })
-  
-  // ===== 城市标记动画样式调整位置 =====
-  // 城市标记闪烁效果
-  cityMarkers.forEach((marker, index) => {
-    if (index % 2 === 0) {
-      marker.material.opacity = 0.7 + Math.sin(time * 2 + index) * 0.2 // 🔵 城市标记闪烁频率和强度 - 可调整
-    }
-  })
-  
-  // 粒子系统动画 - 包括星空
-  particles.forEach((particle) => {
-    // ===== 星空动画样式调整位置 =====
-    // 星空整体缓慢旋转
-    particle.rotation.y += 0.0003 // 🔵 星空Y轴旋转速度 - 可调整
-    particle.rotation.x += 0.0001 // 🔵 星空X轴旋转速度 - 可调整
     
-    // 为每个星星添加闪烁效果
-    particle.children.forEach((star, starIndex) => {
-      if (star.material) {
-        star.material.opacity = 0.3 + Math.sin(time * 1.5 + starIndex * 0.1) * 0.2 // 🔵 星星闪烁频率和强度 - 可调整
+    // 贸易飞线动画
+    tradeLines.forEach(line => {
+      if (line.userData && line.userData.curve) {
+        // ===== 移动光点动画样式调整位置 =====
+        // 移动光点动画 - 沿着贝塞尔曲线移动
+        line.userData.progress += line.userData.speed
+        if (line.userData.progress > 1) {
+          line.userData.progress = 0
+        }
+        
+        const t = line.userData.progress
+        const curve = line.userData.curve
+        const position = curve.getPointAt(t)
+        
+        // 更新光点位置
+        line.position.copy(position)
+        
+        // 光点闪烁效果
+        line.material.opacity = 0.7 + Math.sin(time * 8) * 0.3 // 🔵 光点闪烁频率和强度 - 可调整
+        
+        // 光晕也跟随移动
+        if (line.userData.glow) {
+          line.userData.glow.position.copy(position)
+          line.userData.glow.material.opacity = 0.3 + Math.sin(time * 6) * 0.2 // 🔵 光晕闪烁频率和强度 - 可调整
+        }
+      } else if (line.userData && line.userData.material) {
+        // 更新着色器材质的uniforms（保留兼容性）
+        line.userData.material.uniforms.time.value = time
+      } else if (line.children && line.children.length > 0) {
+        // 处理飞线组（包含主飞线和发光飞线）
+        if (line.children.length === 2 && line.children[0].userData && line.children[0].userData.curve) {
+          // 这是飞线组，为每个子线条添加动画效果
+          line.children.forEach((child, childIndex) => {
+            if (child.userData && child.userData.curve) {
+              // 飞线轻微闪烁效果
+              if (child.material) {
+                const baseOpacity = childIndex === 0 ? 0.9 : 0.4 // 主飞线0.9，发光飞线0.4
+                const flickerIntensity = childIndex === 0 ? 0.05 : 0.1 // 发光飞线闪烁更明显
+                child.material.opacity = baseOpacity + Math.sin(time * 3 + childIndex) * flickerIntensity
+              }
+            }
+          })
+        } else {
+          // ===== 光柱动画样式调整位置 =====
+          // 光柱动画效果
+          line.children.forEach((mesh, index) => {
+            // 光柱轻微旋转
+            mesh.rotation.z += 0.001 * (index + 1) // 🔵 光柱旋转速度 - 可调整
+            
+            // 光柱透明度变化
+            if (mesh.material) {
+              mesh.material.opacity = 0.3 + Math.sin(time * 2 + index) * 0.1 // 🔵 光柱闪烁频率和强度 - 可调整
+            }
+            
+            // 中心光点闪烁效果
+            if (index === 2) { // 第三个子对象是中心光点
+              mesh.material.opacity = 0.6 + Math.sin(time * 6) * 0.4 // 🔵 中心光点闪烁频率和强度 - 可调整
+            }
+          })
+        }
       }
     })
-  })
-  
-           // 相机轻微摆动（跟随鼠标）
-   camera.position.x = Math.sin(time * 0.5) * 0.3 + mouseX * 0.5
-   camera.position.y = Math.cos(time * 0.5) * 0.2 + mouseY * 0.3
-   camera.position.z = 8 // 固定相机距离
-   camera.lookAt(0, 0, 0)
+    
+    // ===== 城市标记动画样式调整位置 =====
+    // 城市标记闪烁效果
+    cityMarkers.forEach((marker, index) => {
+      if (index % 2 === 0) {
+        marker.material.opacity = 0.7 + Math.sin(time * 2 + index) * 0.2 // 🔵 城市标记闪烁频率和强度 - 可调整
+      }
+    })
+    
+    // 粒子系统动画 - 包括星空
+    particles.forEach((particle) => {
+      // ===== 星空动画样式调整位置 =====
+      // 星空整体缓慢旋转
+      particle.rotation.y += 0.0003 // 🔵 星空Y轴旋转速度 - 可调整
+      particle.rotation.x += 0.0001 // 🔵 星空X轴旋转速度 - 可调整
+      
+      // 为每个星星添加闪烁效果
+      particle.children.forEach((star, starIndex) => {
+        if (star.material) {
+          star.material.opacity = 0.3 + Math.sin(time * 1.5 + starIndex * 0.1) * 0.2 // 🔵 星星闪烁频率和强度 - 可调整
+        }
+      })
+    })
+    
+    // 相机轻微摆动（跟随鼠标）
+    camera.position.x = Math.sin(time * 0.5) * 0.3 + mouseX * 0.5
+    camera.position.y = Math.cos(time * 0.5) * 0.2 + mouseY * 0.3
+    camera.position.z = 8 // 固定相机距离
+    camera.lookAt(0, 0, 0)
+  } else if (currentModelType.value === 'motorcycle') {
+    // 摩托车保持静止，不自动旋转
+    // 相机位置保持固定，由 OrbitControls 控制
+    if (controls && controls.enabled) {
+      // 让 OrbitControls 完全控制相机
+      // 不在这里手动设置相机位置
+    }
+  }
   
   renderer.render(scene, camera)
 }
@@ -954,12 +1225,46 @@ const cleanup = () => {
     cancelAnimationFrame(animationId)
   }
   
+  if (controls) {
+    controls.dispose()
+  }
+  
   if (renderer) {
     renderer.dispose()
   }
   
   window.removeEventListener('resize', onWindowResize)
 }
+
+// 调试函数：打印场景信息
+const debugScene = () => {
+  console.log('=== 场景调试信息 ===')
+  console.log('当前模型类型:', currentModelType.value)
+  console.log('地球模型:', earth)
+  console.log('摩托车模型:', motorcycle)
+  console.log('场景中的对象数量:', scene.children.length)
+  console.log('相机位置:', camera.position)
+  console.log('相机朝向:', camera.getWorldDirection(new THREE.Vector3()))
+  
+  if (motorcycle) {
+    console.log('摩托车位置:', motorcycle.position)
+    console.log('摩托车可见性:', motorcycle.visible)
+    console.log('摩托车缩放:', motorcycle.scale)
+  }
+  
+  if (earth) {
+    console.log('地球位置:', earth.position)
+    console.log('地球可见性:', earth.visible)
+  }
+}
+
+// 监听props变化
+watch(() => props.modelType, (newType) => {
+  if (newType !== currentModelType.value) {
+    currentModelType.value = newType
+    switchModel(newType)
+  }
+})
 
 onMounted(() => {
   initThree()
@@ -980,15 +1285,19 @@ onUnmounted(() => {
 }
 
 .earth-container::before {
-  content: "拖拽旋转";
+  content: "鼠标拖拽旋转 | 滚轮缩放 | 右键平移";
   position: absolute;
   top: 10px;
   right: 10px;
-  color: rgba(255, 255, 255, 0.6);
+  color: rgba(255, 255, 255, 0.8);
   font-size: 12px;
   font-family: Arial, sans-serif;
   pointer-events: none;
   z-index: 10;
+  background: rgba(0, 0, 0, 0.5);
+  padding: 5px 10px;
+  border-radius: 15px;
+  white-space: nowrap;
 }
 
 .earth-container:active {
@@ -1003,5 +1312,44 @@ onUnmounted(() => {
   -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
+}
+
+/* 模型切换按钮样式 */
+.model-switcher {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  gap: 10px;
+}
+
+.switch-btn {
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.7);
+  color: white;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.switch-btn:hover {
+  background: rgba(0, 128, 255, 0.8);
+  border-color: rgba(0, 128, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.switch-btn.active {
+  background: rgba(0, 128, 255, 1);
+  border-color: rgba(0, 128, 255, 1);
+  box-shadow: 0 0 20px rgba(0, 128, 255, 0.5);
+}
+
+.switch-btn:active {
+  transform: translateY(0);
 }
 </style> 

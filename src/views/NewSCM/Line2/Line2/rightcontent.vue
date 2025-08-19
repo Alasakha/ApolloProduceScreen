@@ -123,8 +123,8 @@ const refreshData = async () => {
         item.item_specification || '--',// 规格型号
         getResultNumber(item), //不合格数量
         formatDate(item.startTime),// 检验日期
-        item.description || '--',// 问题点
-        item.remark || '--',// 备注
+        item.description+'-'+item.remark  || '--',// 问题点
+        // item.remark || '--',// 备注
         getResultLabel(item),//判断结果
         item.hoursBetweenReturnAndAccept|| '--',// 处理时长
         item.completeDate || '--', // 完成期限

@@ -62,13 +62,17 @@ const DEVICE_MAPPING = {
 // 使用计算属性基于真实数据生成显示数据 - 使用当月数据，按正确顺序
 const data = computed(() => {
   const electricData = energyStore.monthlyElectricData
+  const standardData = energyStore.monthlyStandardData
   
   // 按照 MACHINE_CODES.ELECTRIC 的顺序处理数据，确保显示顺序正确
   return electricData.map((deviceData) => {
     const machCode = deviceData.machCode
     const category = DEVICE_MAPPING[machCode] || machCode
     const actualConsumption = Math.round(deviceData.numberPower) || 0
-    const standardConsumption = 0 // 标准数据暂时设为0
+    
+    // 从标准数据中查找对应的标准值
+    const standardItem = standardData.find(item => item.machCode === machCode)
+    const standardConsumption = standardItem ? Math.round(Number(standardItem.number)) : 0
     
     // 计算比率
     let ratio = ''

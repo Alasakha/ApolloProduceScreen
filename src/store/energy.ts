@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { getElectricPower,getGasPower } from '@/api/enery';
+import { getElectricPower,getElectricPowerYear,getGasPower, getElectricStandard } from '@/api/enery';
 import type { EnergyData } from '@/types/energy';
 import { EnergyType, MACHINE_CODES, ELECTRIC_METER_CONFIG } from '@/types/energy';
 
@@ -8,6 +8,7 @@ export const useEnergyStore = defineStore('energy', {
     rawData: [] as EnergyData[], // 保持兼容性，主要用于当前数据
     dailyData: [] as EnergyData[], // 当日数据
     monthlyData: [] as EnergyData[], // 当月数据
+    yearlyData: [] as EnergyData[], // 当年数据
     lastDailyFetch: '', // 最后获取当日数据的日期
     lastMonthlyFetch: '', // 最后获取当月数据的日期
     isRetrying: false, // 是否正在重试
@@ -18,6 +19,9 @@ export const useEnergyStore = defineStore('energy', {
     dailyProduction: 0, // 当日产量
     monthlyProduction: 0, // 当月产量
     lastProductionFetch: '', // 最后获取产量数据的日期
+    // 新增：月标准用电量数据
+    monthlyStandardData: [] as EnergyData[], // 月标准用电量数据
+    lastStandardFetch: '', // 最后获取标准数据的日期
   }),
 
   getters: {
@@ -153,6 +157,21 @@ export const useEnergyStore = defineStore('energy', {
     // 获取当月产量
     getMonthlyProduction(): number {
       return this.monthlyProduction;
+    },
+
+    // 获取当年数据
+    getYearlyData(): EnergyData[] {
+      return this.yearlyData;
+    },
+
+    // 获取月标准用电量数据
+    getMonthlyStandardData(): EnergyData[] {
+      return this.monthlyStandardData;
+    },
+
+    // 获取最后获取标准数据的日期
+    getLastStandardFetch(): string {
+      return this.lastStandardFetch;
     }
   },
 
@@ -415,6 +434,36 @@ export const useEnergyStore = defineStore('energy', {
       }
     },
 
+    // 获取月标准用电量数据（智能缓存 + 重试机制）
+    async fetchMonthlyStandardData() {
+      // 如果已经有标准数据，直接返回
+      if (this.monthlyStandardData.length > 0) {
+        console.log('📦 使用缓存的月标准用电量数据');
+        return true;
+      }
+
+      try {
+        const res = await this.callApiWithRetry(
+          () => getElectricStandard(),
+          5,
+          '获取月标准用电量数据'
+        );
+        
+        if (res.code === 200 && Array.isArray(res.data)) {
+          this.monthlyStandardData = res.data;
+          this.lastStandardFetch = new Date().toISOString().split('T')[0];
+          console.log('✅ 月标准用电量数据获取成功，共', res.data.length, '条记录');
+          return true;
+        } else {
+          console.warn('获取月标准用电量数据失败：', res.message);
+          return false;
+        }
+      } catch (err) {
+        console.error('获取月标准用电量数据异常（重试后仍失败）：', err);
+        return false;
+      }
+    },
+
     // 初始化所有数据 - 在主组件中调用
     async initializeData() {
       const today = new Date();
@@ -430,6 +479,9 @@ export const useEnergyStore = defineStore('energy', {
       // 获取产量数据
       const productionResult = await this.fetchProductionData(todayStr);
       
+             // 获取月标准用电量数据
+       const standardResult = await this.fetchMonthlyStandardData();
+      
       // 计算气表平均值
       if (dailyResult && productionResult) {
         this.calculateDailyGasAverage();
@@ -438,8 +490,8 @@ export const useEnergyStore = defineStore('energy', {
         this.calculateMonthlyGasAverage();
       }
       
-      console.log('✅ 数据初始化完成 - 当日:', dailyResult, '当月:', monthlyResult, '产量:', productionResult);
-      return dailyResult && monthlyResult && productionResult;
+      console.log('✅ 数据初始化完成 - 当日:', dailyResult, '当月:', monthlyResult, '产量:', productionResult, '标准:', standardResult);
+      return dailyResult && monthlyResult && productionResult && standardResult;
     },
 
     // 测试气表数据计算（用于调试）
@@ -470,6 +522,14 @@ export const useEnergyStore = defineStore('energy', {
       console.log('🔄 手动触发计算...');
       this.calculateDailyGasAverage();
       this.calculateMonthlyGasAverage();
+    },
+    
+
+    async fetchYearlyData(){
+      const res = await getElectricPowerYear();
+      if (res.code === 200 && Array.isArray(res.data)) {
+        this.yearlyData = res.data;
+      }
     }
   }
 });

@@ -1,20 +1,17 @@
 <template>
   <div class="row3-container flex-1">
     <!-- A类TOP前三问题占比 -->
-    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">A类TOP前三问题占比</div>
+    <!-- <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">A类TOP前三问题占比</div> -->
     <div class="departments-content">
       <!-- A类一部涂装 -->
-      <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base" :class="{ 'warning': !customerData.painting.passRateReached }">
-          A类一部涂装TOP前三问题占比
-          <span v-if="!customerData.painting.passRateReached" class="warning-indicator text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs">直通率未达标</span>
-        </div>
-        <div class="issues-list">
+      <div class="issues-section">
+        <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类一部涂装TOP前三问题占比</div>
+        <div class="issues-grid">
           <div 
             v-for="(issue, index) in customerData.painting.topIssues" 
             :key="index"
             class="issue-item"
-            :class="{ 'warning-item': !customerData.painting.passRateReached }"
+            :class="getIssueClass(issue.status, customerData.painting.passRateReached)"
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
@@ -23,17 +20,14 @@
       </div>
 
       <!-- A类总装一课 -->
-      <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base" :class="{ 'warning': !customerData.assemblyCourse1.passRateReached }">
-          A类总装一课TOP前三问题占比
-          <span v-if="!customerData.assemblyCourse1.passRateReached" class="warning-indicator text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs">直通率未达标</span>
-        </div>
-        <div class="issues-list">
+      <div class="issues-section">
+        <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类总装一课TOP前三问题占比</div>
+        <div class="issues-grid">
           <div 
             v-for="(issue, index) in customerData.assemblyCourse1.topIssues" 
             :key="index"
             class="issue-item"
-            :class="{ 'warning-item': !customerData.assemblyCourse1.passRateReached }"
+            :class="getIssueClass(issue.status, customerData.assemblyCourse1.passRateReached)"
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
@@ -42,17 +36,14 @@
       </div>
 
       <!-- A类总装二课 -->
-      <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base" :class="{ 'warning': !customerData.assemblyCourse2.passRateReached }">
-          A类总装二课TOP前三问题占比
-          <span v-if="!customerData.assemblyCourse2.passRateReached" class="warning-indicator text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs">直通率未达标</span>
-        </div>
-        <div class="issues-list">
+      <div class="issues-section">
+        <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类总装二课TOP前三问题占比</div>
+        <div class="issues-grid">
           <div 
             v-for="(issue, index) in customerData.assemblyCourse2.topIssues" 
             :key="index"
             class="issue-item"
-            :class="{ 'warning-item': !customerData.assemblyCourse2.passRateReached }"
+            :class="getIssueClass(issue.status, customerData.assemblyCourse2.passRateReached)"
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
@@ -73,12 +64,18 @@ const topIssueStore = useTopIssueWorkshopStore()
 const calculatePercentage = (issues) => {
   if (!issues || issues.length === 0) return []
   
-  const totalCount = issues.reduce((sum, issue) => sum + issue.total, 0)
-  
-  return issues.map(issue => ({
-    name: issue.ngName,
-    percentage: totalCount > 0 ? ((issue.total / totalCount) * 100).toFixed(1) : 0
-  }))
+  return issues.map(issue => {
+    // 直接使用接口返回的ratio字段，转换为百分比
+    const percentage = issue.ratio ? (issue.ratio * 100).toFixed(1) : 0
+    // 根据问题数量判断严重程度
+    const status = issue.total > 20 ? 'major' : 'minor'
+    
+    return {
+      name: issue.ngName,
+      status: status,
+      percentage: parseFloat(percentage)
+    }
+  })
 }
 
 // 计算数据
@@ -91,9 +88,9 @@ const customerData = computed(() => {
     painting: {
       passRateReached: false, // 直通率未达标
       topIssues: [
-        { name: '漆面流挂缺陷', percentage: 18.5 },
-        { name: '色差问题', percentage: 15.2 },
-        { name: '涂层厚度不均', percentage: 12.8 }
+        { name: '漆面流挂缺陷', status: 'major', percentage: 18.5 },
+        { name: '色差问题', status: 'minor', percentage: 15.2 },
+        { name: '涂层厚度不均', status: 'minor', percentage: 12.8 }
       ]
     },
     // A类总装一课 - 使用1004工作中心的真实数据
@@ -108,6 +105,17 @@ const customerData = computed(() => {
     }
   }
 })
+
+// 获取问题状态样式类
+const getIssueClass = (issueStatus, passRateReached) => {
+  // 如果直通率未达标，所有问题都显示红色警示
+  if (!passRateReached) {
+    return 'issue-warning'
+  }
+  
+  // 如果直通率达标，根据问题严重程度显示颜色
+  return issueStatus === 'major' ? 'issue-major' : 'issue-normal'
+}
 
 // 组件挂载时获取数据
 onMounted(async () => {
@@ -129,7 +137,6 @@ onMounted(async () => {
 }
 
 .section-title {
-  /* font-size: 12px; */
   font-weight: bold;
   color: #00d4ff;
   margin-bottom: 8px;
@@ -140,55 +147,33 @@ onMounted(async () => {
 
 .departments-content {
   display: flex;
+  flex-direction: column;
   gap: 6px;
   height: calc(100% - 30px);
   flex: 1;
 }
 
-.department-section {
+.issues-section {
+  background: rgba(0, 30, 60, 0.3);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  border-radius: 6px;
+  padding: 6px;
+  backdrop-filter: blur(5px);
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.department-title {
-  /* font-size: 9px;     */
-  color: #00d4ff;
-  text-align: center;
-  margin-bottom: 4px;
+.issues-section .section-title {
   font-weight: bold;
-  padding: 4px;
-  border-radius: 3px;
-  background: rgba(0, 0, 0, 0.1);
-  position: relative;
-  transition: all 0.3s ease;
+  color: #00d4ff;
+  margin-bottom: 4px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+  padding-bottom: 3px;
 }
 
-.department-title.warning {
-  color: #ff4444;
-  background: rgba(255, 68, 68, 0.1);
-  border: 1px solid rgba(255, 68, 68, 0.3);
-  animation: pulse-warning 2s infinite;
-}
-
-.warning-indicator {
-  display: block;
-  /* font-size: 7px; */
-  color: #ff4444;
-  margin-top: 1px;
-  font-weight: normal;
-}
-
-@keyframes pulse-warning {
-  0%, 100% {
-    box-shadow: 0 0 0 0 rgba(255, 68, 68, 0.4);
-  }
-  50% {
-    box-shadow: 0 0 0 4px rgba(255, 68, 68, 0.1);
-  }
-}
-
-.issues-list {
+.issues-grid {
   display: flex;
   flex-direction: column;
   gap: 3px;
@@ -199,50 +184,81 @@ onMounted(async () => {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 4px 6px;
+  padding: 4px 8px;
+  border-radius: 4px;
   background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  border-left: 2px solid #00d4ff;
   transition: all 0.3s ease;
-  flex: 1;
-}
-
-.issue-item.warning-item {
-  background: rgba(255, 68, 68, 0.1);
-  border-left-color: #ff4444;
-  border: 1px solid rgba(255, 68, 68, 0.2);
+  position: relative;
 }
 
 .issue-item:hover {
   background: rgba(0, 0, 0, 0.3);
-  transform: translateX(2px);
+  transform: translateX(3px);
 }
 
-.issue-item.warning-item:hover {
-  background: rgba(255, 68, 68, 0.15);
+/* 正常状态 */
+.issue-normal {
+  border-left: 3px solid #00d4ff;
 }
+
+/* 重大问题 */
+.issue-major {
+  border-left: 3px solid #ffa500;
+  background: rgba(255, 165, 0, 0.1);
+}
+
+/* 警告状态（直通率未达标时的红色警示） */
+.issue-warning {
+  border-left: 3px solid #ff4444;
+  background: rgba(255, 68, 68, 0.15);
+  animation: warning-pulse 2s infinite;
+}
+
+/* 警示动画 */
+@keyframes warning-pulse {
+  0%, 100% {
+    box-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
+  }
+}
+
+/* .issue-warning::before {
+  content: '⚠';
+  position: absolute;
+  left: -15px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #ff4444;
+  animation: warning-blink 1s infinite;
+} */
+
+/* @keyframes warning-blink {
+  0%, 50% {
+    opacity: 1;
+  }
+  51%, 100% {
+    opacity: 0.3;
+  }
+} */
 
 .issue-name {
-  /* font-size: 8px; */
   color: #8cc8ff;
   flex: 1;
-  margin-right: 4px;
 }
 
-.warning-item .issue-name {
+.issue-warning .issue-name {
   color: #ffcccc;
+  font-weight: bold;
 }
 
 .issue-percentage {
-  /* font-size: 10px; */
   font-weight: bold;
   color: #fff;
-  min-width: 35px;
-  text-align: right;
 }
 
-.warning-item .issue-percentage {
-  color: #ff4444;
-  font-weight: 900;
+.issue-warning .issue-percentage {
+  color: #ff8888;
 }
 </style>

@@ -44,7 +44,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, reactive, nextTick, computed } from 'vue';
+import { ref, onMounted, onBeforeUnmount, reactive, nextTick } from 'vue';
 import { getEfficiencyToday, getEfficiencyBelowAdd } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
@@ -63,7 +63,7 @@ const EfficentData = reactive({
   reason: '',
 });
 
-const showWarning = computed(() => EfficentData.warning === 1);
+// const showWarning = computed(() => EfficentData.warning === 1);
 
 const Indicators1 = ref(null);
 const Indicators2 = ref(null);
@@ -111,7 +111,7 @@ const drawChart = () => {
 };
 
 const fetchData = async () => {
-  const res = await getEfficiencyToday('1003');
+  const res = await getEfficiencyToday('1001');
   console.log('res:', res);
   
   EfficentData.standardEfficiency = Number(res.data.standardEfficiency) || 0;
@@ -145,10 +145,10 @@ onBeforeUnmount(() => {
 const reasonDialogVisible = ref(false);
 const customReason = ref('');
 
-function openReasonDialog() {
-  reasonDialogVisible.value = true;
-  customReason.value = '';
-}
+// function openReasonDialog() {
+//   reasonDialogVisible.value = true;
+//   customReason.value = '';
+// }
 
 async function submitReason() {
   await getEfficiencyBelowAdd(prodLine, customReason.value);

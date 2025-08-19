@@ -7,66 +7,86 @@
       <span v-if="error" class="error-indicator" :title="error">❌</span>
     </div>
     
-    <!-- 月度数据 -->
-    <div class="data-section">
-      <div class="period-title">
-        <span class="text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-sm">月度总直通率</span>
-        <div class="action-buttons">
-          <button class="detail-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showMonthlyDetail">查看详情</button>
-          <button class="reason-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showReasonDialog">填写原因/对策</button>
+    <!-- 年度和月度数据放在同一行 -->
+    <div class="data-row h-[50%]">
+
+      <!-- 月度数据 -->
+      <div class="data-section">
+        <div class="period-title">
+          <span class="text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-sm">月度总直通率</span>
+          <div class="action-buttons">
+            <button class="detail-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showMonthlyDetail">查看详情</button>
+            <button class="reason-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showMonthlyReasonDialog">填写原因/对策</button>
+          </div>
+        </div>
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.monthly.target }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.monthly.actual }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold" :class="getAchievementClass(customerData.monthly.achievement)">
+              {{ customerData.monthly.achievement }}%
+            </div>
+          </div>
         </div>
       </div>
-      <div class="metrics-row">
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.monthly.target }}%</div>
+
+      <!-- 年度数据 -->
+      <div class="data-section">
+        <div class="period-title">
+          <span class="text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">年度总直通率</span>
+          <!-- <div class="action-buttons">
+            <button class="detail-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showYearlyDetail">查看详情</button>
+            <button class="reason-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showYearlyReasonDialog">填写原因/对策</button>
+          </div> -->
         </div>
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.monthly.actual }}%</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(customerData.monthly.achievement)">
-            {{ customerData.monthly.achievement }}%
+        <div class="metrics-row">
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度目标</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.yearly.target }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度累计</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.yearly.cumulative }}%</div>
+          </div>
+          <div class="metric-item">
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold" :class="getAchievementClass(customerData.yearly.achievement)">
+              {{ customerData.yearly.achievement }}%
+            </div>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- 年度数据 -->
-    <div class="data-section">
-      <div class="period-title">
-        <span class="text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">年度总直通率</span>
-        <div class="action-buttons">
-          <button class="detail-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showYearlyDetail">查看详情</button>
-          <button class="reason-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showYearlyReasonDialog">填写原因/对策</button>
-        </div>
-      </div>
-      <div class="metrics-row">
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度目标</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.yearly.target }}%</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度累计</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ customerData.yearly.cumulative }}%</div>
-        </div>
-        <div class="metric-item">
-          <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-          <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(customerData.yearly.achievement)">
-            {{ customerData.yearly.achievement }}%
-          </div>
-        </div>
-      </div>
+    <div class="data-row h-full w-full">
+      <chart></chart>
     </div>
+    
+    <!-- 填写原因对话框 -->
+    <ReasonDialog
+      :visible="reasonDialogVisible"
+      :metric-info="currentMetricInfo"
+      @close="reasonDialogVisible = false"
+      @submit="handleReasonSubmit"
+      :code="code"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, onMounted, onUnmounted, computed } from 'vue'
 import { useProductionDataStore } from '@/store/productionData'
-
+import ReasonDialog from '@/components/ReasonDialog.vue'
+import { fillInReason } from '@/api/produceperformance'
+import Chart from '../Bottom/Chart1.vue'
+const code = 'FTY_A_MONTH'
 // 使用 Pinia store
 const productionStore = useProductionDataStore()
 
@@ -74,9 +94,9 @@ const productionStore = useProductionDataStore()
 const customerData = computed(() => {
   // 月度数据 - 使用store中的数据
   const monthly = {
-    target: productionStore.monthlyNormalTarget,
-    actual: productionStore.monthlyNormalActual,
-    achievement: productionStore.monthlyNormalAchievement
+    target: productionStore.monthlyATarget,
+    actual: productionStore.monthlyAActual,
+    achievement: productionStore.monthlyAAchievement
   }
 
   // 年度数据 - 使用store中的数据
@@ -110,15 +130,42 @@ const showYearlyDetail = () => {
 }
 
 // 填写月度原因/对策
-const showReasonDialog = () => {
-  console.log('填写月度原因/对策')
-  // 这里可以打开原因/对策填写弹窗
+const showMonthlyReasonDialog = () => {
+  reasonDialogVisible.value = true
+  currentMetricInfo.value = {
+    name: 'A类客户月度总直通率',
+    period: '月度',
+    target: customerData.value.monthly.target,
+    actual: customerData.value.monthly.actual,
+    achievement: customerData.value.monthly.achievement
+  }
 }
 
 // 填写年度原因/对策
 const showYearlyReasonDialog = () => {
-  console.log('填写年度原因/对策')
-  // 这里可以打开原因/对策填写弹窗
+  reasonDialogVisible.value = true
+  currentMetricInfo.value = {
+    name: 'A类客户年度总直通率',
+    period: '年度',
+    target: customerData.value.yearly.target,
+    actual: customerData.value.yearly.cumulative,
+    achievement: customerData.value.yearly.achievement
+  }
+}
+
+// 对话框状态
+const reasonDialogVisible = ref(false)
+const currentMetricInfo = ref({})
+
+// 处理原因提交
+const handleReasonSubmit = (data) => {
+  fillInReason(code, data.reason, data.solution).then(res => {
+    if (res.code === 200) {
+      ElMessage.success('提交成功')
+    } else {
+      ElMessage.error('提交失败')
+    }
+  })
 }
 
 // 组件挂载时启动store的自动刷新
@@ -155,12 +202,14 @@ onUnmounted(() => {
   padding-bottom: 4px;
 }
 
-.data-section {
-  flex: 1;
-  margin-bottom: 6px;
+.data-row {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 3px;
 }
 
-.data-section:last-child {
+.data-section {
+  flex: 1;
   margin-bottom: 0;
 }
 
@@ -217,6 +266,7 @@ onUnmounted(() => {
 }
 
 .metrics-row {
+  height: 100%;   
   display: flex;
   justify-content: space-between;
   gap: 6px;
@@ -229,18 +279,24 @@ onUnmounted(() => {
   padding: 4px;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
+  height: 70%;
 }
 
 .metric-label {
   /* font-size: 9px; */
+  height: 30%;
   color: #8cc8ff;
   margin-bottom: 2px;
 }
 
 .metric-value {
   /* font-size: 13px; */
+  height: 70%;
   font-weight: bold;
   color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .achievement-excellent {

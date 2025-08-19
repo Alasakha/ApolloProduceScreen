@@ -63,7 +63,6 @@ export function createChartOption(title: string, rawData: any, options: ChartOpt
             position: 'outside',
             formatter: (params) => {
               const isUnWrite = highlightLegend && highlightNames && highlightNames.includes(params.name);
-              console.log(params.name, isUnWrite);
               const nameTag = isUnWrite ? 'red' : 'name';
               const icon = isUnWrite ? '❗' : '';
               if (isEmpty) return `{name|暂无异常}`;

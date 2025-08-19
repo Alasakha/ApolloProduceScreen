@@ -1,28 +1,30 @@
 <template>
   <div class="row2-container flex-1">
     <!-- A类客户各部门直通率 -->
-    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
-      A类客户各部门直通率
-      <span v-if="manufacturingStore.state.loading" class="loading-indicator">加载中...</span>
-      <span v-if="manufacturingStore.state.error" class="error-indicator" :title="manufacturingStore.state.error">❌</span>
-    </div>
-    
-    <!-- 月度/年度切换 -->
-    <div class="period-toggle">
-      <button 
-        class="toggle-btn" 
-        :class="{ active: currentPeriod === 'monthly' }"
-        @click="currentPeriod = 'monthly'"
-      >
-        月度
-      </button>
-      <button 
-        class="toggle-btn" 
-        :class="{ active: currentPeriod === 'yearly' }"
-        @click="currentPeriod = 'yearly'"
-      >
-        年度
-      </button>
+    <div class="section-header">
+      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+        <!-- A类客户各部门直通率 -->
+        <span v-if="manufacturingStore.state.loading" class="loading-indicator">加载中...</span>
+        <span v-if="manufacturingStore.state.error" class="error-indicator" :title="manufacturingStore.state.error">❌</span>
+      </div>
+      
+      <!-- 月度/年度切换 -->
+      <div class="period-toggle">
+        <button 
+          class="toggle-btn" 
+          :class="{ active: currentPeriod === 'monthly' }"
+          @click="currentPeriod = 'monthly'"
+        >
+          月度
+        </button>
+        <button 
+          class="toggle-btn" 
+          :class="{ active: currentPeriod === 'yearly' }"
+          @click="currentPeriod = 'yearly'"
+        >
+          年度
+        </button>
+      </div>
     </div>
     
     <div class="departments-grid">
@@ -45,6 +47,11 @@
             </div>
           </div>
         </div>
+        <!-- <div class="action-buttons">
+          <button class="reason-btn" @click="showReasonDialog('painting')">
+            填写原因/对策
+          </button>
+        </div> -->
       </div>
 
       <!-- A类客户总装一课 -->
@@ -66,6 +73,11 @@
             </div>
           </div>
         </div>
+        <!-- <div class="action-buttons">
+          <button class="reason-btn" @click="showReasonDialog('assembly1')">
+            填写原因/对策
+          </button>
+        </div> -->
       </div>
 
       <!-- A类客户总装二课 -->
@@ -87,14 +99,28 @@
             </div>
           </div>
         </div>
+        <!-- <div class="action-buttons">
+          <button class="reason-btn" @click="showReasonDialog('assembly2')">
+            填写原因/对策
+          </button>
+        </div> -->
       </div>
     </div>
+    
+    <!-- 填写原因对话框 -->
+    <ReasonDialog
+      :visible="reasonDialogVisible"
+      :metric-info="currentMetricInfo"
+      @close="reasonDialogVisible = false"
+      @submit="handleReasonSubmit"
+    />
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useManufacturingPerformanceStore } from '@/store/manufacturingPerformance'
+import ReasonDialog from '@/components/ReasonDialog.vue'
 
 // 使用制造绩效store
 const manufacturingStore = useManufacturingPerformanceStore()
@@ -138,6 +164,48 @@ onMounted(() => {
 onUnmounted(() => {
   manufacturingStore.stopAutoRefresh()
 })
+
+// 填写原因对话框状态
+const reasonDialogVisible = ref(false)
+const currentMetricInfo = ref({})
+
+// 显示填写原因对话框
+const showReasonDialog = (type) => {
+  let data, name
+  const period = currentPeriod.value === 'monthly' ? '月度' : '年度'
+  
+  switch (type) {
+    case 'painting':
+      data = currentPaintingData.value
+      name = 'A类客户金工一部涂装'
+      break
+    case 'assembly1':
+      data = currentAssemblyCourse1Data.value
+      name = 'A类客户总装一课'
+      break
+    case 'assembly2':
+      data = currentAssemblyCourse2Data.value
+      name = 'A类客户总装二课'
+      break
+  }
+  
+  currentMetricInfo.value = {
+    name: `${name}${period}直通率`,
+    period: period,
+    target: data.target,
+    actual: data.actual,
+    achievement: data.achievement
+  }
+  
+  reasonDialogVisible.value = true
+}
+
+// 处理原因提交
+const handleReasonSubmit = (data) => {
+  console.log('提交的原因/对策数据:', data)
+  // 这里可以调用API保存数据
+  // 可以显示成功提示
+}
 </script>
 
 <style scoped>
@@ -153,17 +221,26 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
+.section-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+  padding-bottom: 4px;
+  position: relative;
+}
+
 .section-title {
   font-weight: bold;
   color: #00d4ff;
-  margin-bottom: 6px;
   text-align: center;
-  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
-  padding-bottom: 4px;
   display: flex;
   align-items: center;
-  justify-content: center;
   gap: 8px;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
 }
 
 .loading-indicator {
@@ -179,9 +256,11 @@ onUnmounted(() => {
 
 .period-toggle {
   display: flex;
-  justify-content: center;
   gap: 4px;
-  margin-bottom: 6px;
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .toggle-btn {
@@ -280,5 +359,29 @@ onUnmounted(() => {
 
 .achievement-warning {
   color: #ff4444;
+}
+
+.action-buttons {
+  display: flex;
+  justify-content: center;
+  margin-top: 4px;
+}
+
+.reason-btn {
+  padding: 2px 6px;
+  background: linear-gradient(135deg, #00d4ff 0%, #0099cc 100%);
+  color: #fff;
+  border: none;
+  border-radius: 3px;
+  font-size: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-weight: 500;
+}
+
+.reason-btn:hover {
+  background: linear-gradient(135deg, #00b8e6 0%, #0088b3 100%);
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
 }
 </style>

@@ -3,7 +3,7 @@
       <div class="text-center text-[#00eeff] text-3xl 
   3xl:text-xl 
   4xl:text-3xl font-light tracking-widest mb-2 title-elegant w-full">
-  当月电表
+  本年电表
 </div>
       
       <!-- 样式3：未来科幻 -->
@@ -25,66 +25,42 @@
     
     
     <script setup lang="ts">
-    import { ref, onMounted, onUnmounted } from 'vue'
+    import { computed, onMounted } from 'vue'
     import { use } from 'echarts/core'
     import { CanvasRenderer } from 'echarts/renderers'
     import { GaugeChart } from 'echarts/charts'
     import { TitleComponent, TooltipComponent } from 'echarts/components'
     import VChart from 'vue-echarts'
     import { getGaugeBaseOption } from './echarts'
-    
+    import { useEnergyStore } from '@/store/energy'
+    import { MACHINE_CODES, ELECTRIC_METER_CONFIG } from '@/types/energy'
+    const energyStore = useEnergyStore()
     
     use([CanvasRenderer, GaugeChart, TitleComponent, TooltipComponent])
-    // 定义每个仪表盘的初始配置
-    const TodaygaugeOptions = ref({
-      compressor: getGaugeBaseOption('空压机', 0, 100, 65.5, 'kW', ['#00eeff', '#0066ff']),
-      injection: getGaugeBaseOption('注塑', 0, 150, 85.5, 'kW', ['#00ff9f', '#00eeff']),
-      welding: getGaugeBaseOption('焊接', 0, 80, 45.5, 'kW', ['#ff9f00', '#ff0000']),
-      metalwork1: getGaugeBaseOption('金工一楼', 0, 120, 75.5, 'kW', ['#00eeff', '#0066ff']),
-      assembly2: getGaugeBaseOption('总装二课', 0, 90, 55.5, 'kW', ['#00ff9f', '#00eeff']),
-      metalwork4: getGaugeBaseOption('金工四楼', 0, 100, 60.5, 'kW', ['#ff9f00', '#ff0000']),
-      stamping: getGaugeBaseOption('冲压', 0, 200, 125.5, 'kW', ['#00eeff', '#0066ff']),
-      dormitory: getGaugeBaseOption('宿舍', 0, 50, 25.5, 'kW', ['#00ff9f', '#00eeff']),
-      packaging: getGaugeBaseOption('包装', 0, 70, 35.5, 'kW', ['#ff9f00', '#ff0000']),
-      assembly1: getGaugeBaseOption('装配', 0, 110, 70.5, 'kW', ['#00eeff', '#0066ff'])
-    })
-    
-    
-    // 模拟数据更新
-    let timer = null
-    
-    // 生成随机波动值
-    const getRandomFluctuation = (baseValue, range) => {
-      return (baseValue + Math.random() * range - range/2).toFixed(1)
-    }
-    
-    // 更新所有仪表盘数据
-    const updateGaugeData = () => {
-      const baseValues = {
-        compressor: 65.5,
-        injection: 85.5,
-        welding: 45.5,
-        metalwork1: 75.5,
-        assembly2: 55.5,
-        metalwork4: 60.5,
-        stamping: 125.5,
-        dormitory: 25.5,
-        packaging: 35.5,
-        assembly1: 70.5
-      }
-    
-      Object.keys(TodaygaugeOptions.value).forEach(key => {
-        TodaygaugeOptions.value[key].series[0].data[0].value = getRandomFluctuation(baseValues[key], 10)
+    // 年度数据（响应式）
+    const yearlyData = computed(() => energyStore.getYearlyData)
+
+    // 根据当年数据构建每个表的仪表盘配置
+    const TodaygaugeOptions = computed<Record<string, any>>(() => {
+      const dataMap = new Map(yearlyData.value.map(item => [item.machCode, item]))
+      const options: Record<string, any> = {}
+      MACHINE_CODES.ELECTRIC.forEach(code => {
+        const cfg = ELECTRIC_METER_CONFIG[code]
+        const value = Number(dataMap.get(code)?.numberPower ?? 0)
+        options[code] = getGaugeBaseOption(
+          cfg?.name || code,
+          0,
+          Math.max(100, value * 1.2),
+          value,
+          'kW·h',
+          cfg?.colors || ['#00eeff', '#0066ff']
+        )
       })
-    }
-    
-    
-    onMounted(() => {
-      timer = setInterval(updateGaugeData, 2000)
+      return options
     })
-    
-    onUnmounted(() => {
-      if (timer) clearInterval(timer)
+
+    onMounted(() => {
+      energyStore.fetchYearlyData()
     })
     </script>
     

@@ -304,3 +304,22 @@ export const getPlan4n = (status) =>{
     }
   })
 }
+
+
+// checkTotalDoneJcx 一课装配检验线 需检测数 /已检测数
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": {
+//     "workCenterID": null,
+//     "workCenterName": null,
+//     "total": 40,
+//     "checkTotal": 22
+//   }
+// }
+export const getCheckTotalDoneJcx = () => {
+  return request({
+    url: '/quality/checkTotalDoneJcx',
+    method: 'get',
+  })
+}

@@ -60,10 +60,9 @@ const topIssueStore = useTopIssueWorkshopStore()
 const calculateIssuesWithPercentage = (issues) => {
   if (!issues || issues.length === 0) return []
   
-  const totalCount = issues.reduce((sum, issue) => sum + issue.total, 0)
-  
   return issues.map(issue => {
-    const percentage = totalCount > 0 ? ((issue.total / totalCount) * 100).toFixed(1) : 0
+    // 直接使用接口返回的ratio字段，转换为百分比
+    const percentage = issue.ratio ? (issue.ratio * 100).toFixed(1) : 0
     // 根据问题数量判断严重程度
     const status = issue.total > 20 ? 'major' : 'minor'
     
@@ -213,25 +212,25 @@ onMounted(async () => {
   }
 }
 
-.issue-warning::before {
+/* .issue-warning::before {
   content: '⚠';
   position: absolute;
   left: -15px;
   top: 50%;
   transform: translateY(-50%);
   color: #ff4444;
-  /* font-size: 16px; */
+  font-size: 16px;
   animation: warning-blink 1s infinite;
-}
+} */
 
-@keyframes warning-blink {
+/* @keyframes warning-blink {
   0%, 50% {
     opacity: 1;
   }
   51%, 100% {
     opacity: 0.3;
   }
-}
+} */
 
 .issue-name {
   /* font-size: 9px; */

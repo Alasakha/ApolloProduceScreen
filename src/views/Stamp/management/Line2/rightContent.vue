@@ -1,5 +1,5 @@
 <template>
-  <div class="line2-container h-[100%]">
+  <div class="line2-container">
     <!-- 加载状态 -->
     <div v-if="loading" class="flex items-center justify-center h-full">
       <div class="text-cyan-400 text-lg">正在加载冲压设备数据...</div>
@@ -24,6 +24,9 @@
           @click-device-group="handleDeviceGroupClick"
           @click-waiting="handleWaitingClick"
         />
+      </div>
+      <div class="carousel-wrapper">
+        <Abnormal />
       </div>
     </div>
 
@@ -66,6 +69,8 @@
       :prod-line="prodLine"
       :type="selectedCard?.type?.toString() || ''"
     />
+
+ 
   </div>
 </template>   
 
@@ -79,7 +84,7 @@ import DeviceGroupDialog from './components/DeviceGroupDialog.vue'
 import WaitingDialog from './components/WaitingDialog.vue'
 import { getStampingDoingIndex, type StampingDoingIndex } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
-
+import Abnormal from './Abnormal.vue'
 const route = useRoute()
 const prodLine = route.query.prodLine as string
 
@@ -338,7 +343,7 @@ defineExpose({
   width: 100%;
   height: 100%;
   display: flex;
-  flex-flow: row wrap;  /* 改为水平方向排列 */
+  flex-flow: row wrap;  /* 水平方向排列，允许换行 */
   gap: 1rem;  /* 使用 gap 替代单独设置 margin */
   padding-right: 0.5rem; /* 为滚动条预留空间 */
   overflow-y: auto;  /* 添加垂直滚动条 */
@@ -348,6 +353,13 @@ defineExpose({
   width: calc(33.33% - 0.67rem);
   cursor: pointer;
   transition: transform 0.2s ease;
+}
+
+/* 右侧轮播容器：占两列宽度，抵消 gap 影响，避免换行 */
+.carousel-wrapper {
+  width: calc(66.66% - 0.33rem);
+  display: flex;
+  align-items: stretch;
 }
 
 .card-wrapper:hover {
@@ -372,10 +384,16 @@ defineExpose({
   .card-wrapper {
     width: calc(50% - 0.5rem);
   }
+  .carousel-wrapper {
+    width: calc(50% - 0.5rem);
+  }
 }
 
 @media (max-width: 900px) {
   .card-wrapper {
+    width: 100%;
+  }
+  .carousel-wrapper {
     width: 100%;
   }
 }

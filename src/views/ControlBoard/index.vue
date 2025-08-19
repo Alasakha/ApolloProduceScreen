@@ -30,11 +30,30 @@
           <!-- 中间地球模型区域 -->
           <div class="center-section">
             <div class="earth-container">
-              <EarthModel />
+              <EarthModel :modelType="currentModelType" />
             </div>
             <div class="center-info">
               <h2 class="company-title">阿波罗摩托车贸易</h2>
               <p class="company-slogan">全球摩托车贸易领导者</p>
+              
+              <!-- 模型切换控制 -->
+              <div class="model-control">
+                <button 
+                  @click="currentModelType = 'earth'" 
+                  :class="{ active: currentModelType === 'earth' }"
+                  class="model-btn"
+                >
+                  🌍 地球模型
+                </button>
+                <button 
+                  @click="currentModelType = 'motorcycle'" 
+                  :class="{ active: currentModelType === 'motorcycle' }"
+                  class="model-btn"
+                >
+                  🏍️ 摩托车模型
+                </button>
+              </div>
+              
               <div class="real-time-data">
                 <div class="data-item">
                   <span class="label">实时订单:</span>
@@ -108,6 +127,9 @@ const totalDevices = ref(28)
 const inventoryWarnings = ref(3)
 const realTimeOrders = ref(12)
 const onlineCustomers = ref(89)
+
+// 模型类型控制
+const currentModelType = ref('earth')
 
 // 进度数据
 const orderCompletionRate = ref(94)
@@ -240,6 +262,43 @@ onUnmounted(() => {
   color: #00ffff;
   font-size: 18px;
   font-weight: bold;
+}
+
+/* 模型控制按钮样式 */
+.model-control {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 20px;
+  justify-content: center;
+}
+
+.model-btn {
+  padding: 8px 16px;
+  background: rgba(0, 0, 0, 0.6);
+  color: white;
+  border: 2px solid rgba(0, 255, 255, 0.3);
+  border-radius: 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.model-btn:hover {
+  background: rgba(0, 255, 255, 0.2);
+  border-color: rgba(0, 255, 255, 0.8);
+  transform: translateY(-2px);
+}
+
+.model-btn.active {
+  background: rgba(0, 255, 255, 0.3);
+  border-color: rgba(0, 255, 255, 1);
+  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+}
+
+.model-btn:active {
+  transform: translateY(0);
 }
 
 .left-section {

@@ -29,6 +29,7 @@ import Part3 from './Part3.vue'
   gap: 8px;
   height: 100%;
   color: #fff;
+  height: 100%;
 }
 
 .part-section {

@@ -143,3 +143,74 @@ export const getOnTimeChart = () => {
     method: 'post',
   })
 }
+
+
+/**
+ * 提交人效原因说明
+ * @param code 代码（如：FTY_A_MONTH）
+ * @param reason 原因说明
+ * @param solve 解决措施
+ * @returns Promise
+ * "FTY_A_MONTH";        // A类月度直通通率 
+"FTY_NORMAL_MONTH";   // 常规类月度直通通率 
+"ONTIME_A_MONTH";     // A类月度准交率 
+"ONTIME_A_DAY";       // A类每日准交率 
+"ONTIME_NORMAL_MONTH"; // 常规类月度准交率 
+"ONTIME_NORMAL_DAY";   // 常规类每日准交率 
+COST"： 制造费用
+ */
+
+
+export const fillInReason = (code: string, reason: string, solve: string) => {
+  return request({
+    url: '/manufacturing/fillIn',
+    method: 'post',
+    params: {
+      code,
+      reason,
+      solve,
+    },
+    // 这里不需要传递data，body为空
+    data: ''
+  })
+}
+
+
+/**
+ * 获取人效原因说明数据
+ * @param code 代码（如：FTY_A_MONTH）
+ * @returns Promise
+ */
+export const getFillInData = (code: string) => {
+  return request({
+    url: '/manufacturing/getFillInData',
+    method: 'post',
+    params: {
+      code,
+    },
+    data: ''
+  })
+}
+
+
+
+// /manufacturing/manufacturingCost
+export const getManufacturingCost = () => {
+  return request({
+    url: '/manufacturing/manufacturingCost',
+    method: 'post',
+  })
+}
+
+
+// 制造费用相关类型定义
+export interface ManufacturingCostResponse {
+  code: number
+  message: string
+  data: ManufacturingCostData
+}
+
+export interface ManufacturingCostData {
+  营业收入: number
+  实际制造费: number
+}

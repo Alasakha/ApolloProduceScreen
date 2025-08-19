@@ -6,21 +6,21 @@
       <div class="metrics-content">
         <div class="metrics-row">
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月目标</div>
             <div class="metric-value target text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.aCustomer.target }}%</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">已入库工单数</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月已入库工单数</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.aCustomer.stockOrders }}</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交工单数</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月准交工单数</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.aCustomer.onTimeOrders }}</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.aCustomer.onTimeRate)">
-              {{ deliveryData.aCustomer.onTimeRate.toFixed(1) }}%
+              {{ deliveryData.aCustomer.onTimeRate.toFixed(1)}}%
             </div>
           </div>
         </div>
@@ -40,8 +40,13 @@
             </div>
           </div>
           <div class="action-item">
-            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="viewDetails('aCustomer')">
-              查看详情/填写原因对策
+            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showDailyReasonDialog">
+              填写今日原因/对策
+            </button>
+          </div>
+          <div class="action-item">
+            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showMonthlyReasonDialog">
+              填写本月原因/对策
             </button>
           </div>
         </div>
@@ -54,19 +59,19 @@
       <div class="metrics-content">
         <div class="metrics-row">
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月目标</div>
             <div class="metric-value target text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.regularCustomer.target }}%</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">已入库工单数</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月已入库工单数</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.regularCustomer.stockOrders }}</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交工单数</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月准交工单数</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.regularCustomer.onTimeOrders }}</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">准交率</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">本月准交率</div>
             <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getDeliveryClass(deliveryData.regularCustomer.onTimeRate)">
               {{ deliveryData.regularCustomer.onTimeRate.toFixed(1) }}%
             </div>
@@ -88,8 +93,13 @@
             </div>
           </div>
           <div class="action-item">
-            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="viewDetails('regularCustomer')">
-              查看详情/填写原因对策
+            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showNormalDailyReasonDialog">
+              填写今日原因/对策
+            </button>
+          </div>
+          <div class="action-item">
+            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showNormalMonthlyReasonDialog">
+              填写本月原因/对策
             </button>
           </div>
         </div>
@@ -107,11 +117,11 @@
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际制费</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.manufacturingCost.actualCost }}万</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">¥{{ deliveryData.manufacturingCost.actualCost }}</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际收入</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.manufacturingCost.actualRevenue }}万</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">¥{{ deliveryData.manufacturingCost.actualRevenue }}</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际占比</div>
@@ -122,23 +132,45 @@
         </div>
         <div class="metrics-row single-row">
           <div class="action-item full-width">
-            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="viewDetails('manufacturingCost')">
+            <button class="action-btn text-[8px] 2xl:text-[9px] 3xl:text-[10px] 4xl:text-xs" @click="showManufacturingCostDailyReasonDialog()">
               查看详情/填写原因对策
             </button>
           </div>
         </div>
       </div>
-    </div>
+    </div>  
   </div>
+  <ReasonDialog
+      :visible="reasonDialogVisible"
+      :metric-info="currentMetricInfo"
+      :code="codeRef"
+      @close="reasonDialogVisible = false"
+      @submit="handleReasonSubmit"
+    />
+    <ReasonDialog_produce
+      :visible="reasonDialogVisible_produce"
+      :metric-info="currentMetricInfo_produce"
+      :code="codeRef_produce"
+      @close="reasonDialogVisible_produce = false"
+      @submit="handleReasonSubmitProduce"
+    />
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ElMessage } from 'element-plus'
 import { useProductionDataStore } from '@/store/productionData'
-
+import ReasonDialog from '../component/ReasonDialog.vue'
+import ReasonDialog_produce from '../component/ReasonDialog_produce.vue'
+import { fillInReason } from '@/api/produceperformance'
+const reasonDialogVisible = ref(false)
+const reasonDialogVisible_produce = ref(false)
+const codeRef = ref('')
+const codeRef_produce = ref('')
 // 使用生产数据store
 const productionStore = useProductionDataStore()
-
+const currentMetricInfo = ref({})
+const currentMetricInfo_produce = ref({})
 // 启动数据获取和自动刷新
 onMounted(() => {
   productionStore.startAutoRefresh()
@@ -175,9 +207,9 @@ const deliveryData = computed(() => ({
   },
   manufacturingCost: {
     target: 12.5,
-    actualCost: 186.7,
-    actualRevenue: 1453.2,
-    actualRatio: 12.8
+    actualCost: productionStore.manufacturingCost?.实际制造费 ? productionStore.manufacturingCost.实际制造费.toLocaleString() : '--',
+    actualRevenue: productionStore.manufacturingCost?.营业收入 ? productionStore.manufacturingCost.营业收入.toLocaleString() : '--',
+    actualRatio: productionStore.manufacturingCostRatio || 0
   }
 }))
 
@@ -204,14 +236,108 @@ const viewDetails = (type) => {
   console.log(`查看${type}详情和填写原因对策`)
   // 这里可以实现跳转到详情页面或打开模态框的逻辑
 }
+
+// 填写今日原因/对策（A类准交率）
+const showDailyReasonDialog = () => {
+  currentMetricInfo.value = {
+    name: 'A类客户订单准交率',
+    period: '今日',
+    target: deliveryData.value.aCustomer.target,
+    actual: Number(deliveryData.value.aCustomer.onTimeRate.toFixed(1)),
+  }
+  codeRef.value = 'ONTIME_A_DAY'
+  reasonDialogVisible.value = true
+}
+
+// 填写本月原因/对策（A类准交率）
+const showMonthlyReasonDialog = () => {
+  currentMetricInfo.value = {
+    name: 'A类客户订单准交率',
+    period: '本月',
+    target: deliveryData.value.aCustomer.target,
+    actual: Number(deliveryData.value.aCustomer.onTimeRate.toFixed(1)),
+  }
+  codeRef.value = 'ONTIME_A_MONTH'
+  reasonDialogVisible.value = true
+}
+
+// 填写今日原因/对策（常规准交率）
+const showNormalDailyReasonDialog = () => {
+  currentMetricInfo.value = {
+    name: '常规客户订单准交率',
+    period: '今日',
+    target: deliveryData.value.regularCustomer.target,
+    actual: Number(deliveryData.value.regularCustomer.onTimeRate.toFixed(1)),
+  }
+  codeRef.value = 'ONTIME_NORMAL_DAY'
+  reasonDialogVisible.value = true
+}
+const showNormalMonthlyReasonDialog = () => {
+  currentMetricInfo.value = {
+    name: '常规客户订单准交率',
+    period: '本月',
+    target: deliveryData.value.regularCustomer.target,
+    actual: Number(deliveryData.value.regularCustomer.onTimeRate.toFixed(1)),
+  }
+  codeRef.value = 'ONTIME_NORMAL_MONTH'
+  reasonDialogVisible.value = true
+}
+
+// 填写今日原因/对策（制造费用占比）
+const showManufacturingCostDailyReasonDialog = () => {
+  currentMetricInfo_produce.value = {
+    name: '制造费用占比',
+    period: '今日',
+    target: deliveryData.value.manufacturingCost.target,
+    actual: Number(deliveryData.value.manufacturingCost.actualRatio.toFixed(1)),
+  }
+  codeRef_produce.value = 'COST'
+  reasonDialogVisible_produce.value = true
+}
+
+
+
+
+
+
+
+// 提交原因/对策
+const handleReasonSubmit = (data) => {
+  fillInReason(codeRef.value, data.reason, data.solution)
+    .then((res) => {
+      if (res.code === 200) {
+        ElMessage.success('提交成功')
+      } else {
+        ElMessage.error('提交失败')
+      }
+    })
+    .catch(() => {
+      ElMessage.error('提交失败')
+    })
+}
+
+// 提交制造费用占比原因/对策
+const handleReasonSubmitProduce = (data) => {
+  fillInReason(codeRef_produce.value, data.reason, data.solution)
+    .then((res) => {
+      if (res.code === 200) {
+        ElMessage.success('提交成功')
+      } else {
+        ElMessage.error('提交失败')
+      }
+    })
+    .catch(() => {
+      ElMessage.error('提交失败')
+    })
+}
 </script>
 
 <style scoped>
 .line4-container {
   display: flex;
   gap: 8px;
-  height: 100%;
   color: #fff;
+  height: 100%;
 }
 
 .part-section {
@@ -337,11 +463,11 @@ const viewDetails = (type) => {
 /* 响应式调整 */
 @media (max-width: 1200px) {
   .metric-label {
-    /* font-size: 7px; */
+    line-height: 1.2;
   }
   
   .metric-value {
-    /* font-size: 10px; */
+    line-height: 1.1;
   }
   
   .action-btn {

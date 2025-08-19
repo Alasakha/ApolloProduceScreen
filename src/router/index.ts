@@ -187,9 +187,10 @@ const routes: RouteRecordRaw[] = [
     component: () => import('@/views/ControlBoard/index.vue')
   },
   {
-    path: '/advanced-earth-demo', // 高级地球演示页面
-    name: 'AdvancedEarthDemo',
-    component: AdvancedEarthDemo
+    // /test-scale
+    path: '/test-scale',
+    name: 'TestScale',
+    component: () => import('@/views/TestScreenScale.vue')
   }
 ];
 

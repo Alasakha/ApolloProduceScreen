@@ -16,7 +16,7 @@
 import Header from './Header/index.vue'
 import Line1 from './Line1/index.vue'
 import Line2 from './Line2/index.vue'
-import Line3 from './line3.vue'
+import Line3 from './Line3/index.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { eventBus } from '@/utils/eventbus'
 

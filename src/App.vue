@@ -1,56 +1,51 @@
 <script setup lang="ts">
-import { onMounted, onUnmounted, nextTick } from 'vue'
-import { eventBus } from './utils/eventbus'
-import { useDeviceStatusStore } from '@/store/deviceStatus';
-import { useZoomClass } from '@/composables/useZoomClass'
- useZoomClass()
-const store = useDeviceStatusStore();
-let intervalId:any = null;
+import { ref, onMounted, onUnmounted } from 'vue'
+import ScaleScreenWrapper from '@/components/ScaleScreenWrapper.vue'
+import { getEnvironmentConfig } from '@/config/environment'
 
+// 获取环境配置
+const envConfig = ref(getEnvironmentConfig())
 
-onMounted(async () => {
- 
-  await nextTick(); // 确保 `#app` 已经挂载
-  store.startPolling();
-  // 避免 `intervalId` 被多次创建
-  if (!intervalId) {
-    intervalId = setInterval(() => {
-      console.log("🔄 触发全局更新事件");
-      eventBus.emit("refreshData");
-    }, 1000*60*5);
-  }
-});
+// 更新环境配置
+const updateEnvConfig = () => {
+  envConfig.value = getEnvironmentConfig()
+}
+
+onMounted(() => {
+  // 设置body样式
+  document.body.style.overflow = 'hidden'
+  
+  // 初始化环境配置
+  updateEnvConfig()
+  
+  // 监听窗口大小变化
+  window.addEventListener('resize', updateEnvConfig)
+})
 
 onUnmounted(() => {
-    store.stopPolling();
-
-  // 清除定时器
-  if (intervalId) {
-    clearInterval(intervalId);
-    intervalId = null;
-  }
-});
+  // 移除事件监听器
+  window.removeEventListener('resize', updateEnvConfig)
+})
 </script>
 
 <template>
+  <ScaleScreenWrapper>
     <router-view />
+  </ScaleScreenWrapper>
 </template>
 
-<style >
-/* 让整个 App.vue 充满屏幕并居中 */
+<style>
+/* 全局样式 */
 #app {
-  width: 100vw;
-  height: 100vh;
-  display: flex;
-  justify-content: center; /* 水平居中 */
-  align-items: center; /* 垂he直居中 */
-}
-/* 全屏基础样式 */
-html, body {
-  margin: 0;
   width: 100vw;
   height: 100vh;
   overflow: hidden;
 }
 
+/* 确保body样式 */
+body {
+  overflow: hidden !important;
+  margin: 0;
+  padding: 0;
+}
 </style>

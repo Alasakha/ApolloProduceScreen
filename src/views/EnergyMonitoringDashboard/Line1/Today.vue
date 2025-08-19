@@ -62,7 +62,7 @@ const getGaugeOption = (item: EnergyData) => {
     0,
     Math.max(200, item.numberPower * 1.2), // 动态设置最大值
     item.numberPower,
-    'kW',
+    'kW·h',
     config.colors
   );
   

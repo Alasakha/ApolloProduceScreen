@@ -22,3 +22,20 @@ export const getGasPower = (monthDay) => {
         }
       })
 }
+
+//获取本年数据(暂取去年八月份) electricPowerYear 
+export const getElectricPowerYear = () => {
+    return request({
+        url: '/energy/electricPowerYear',
+        method: 'get',
+      })
+}
+
+
+// electricStandard 每月标准用电量
+export const getElectricStandard = () => {
+    return request({
+        url: '/energy/electricStandard',
+        method: 'get',
+      })
+}

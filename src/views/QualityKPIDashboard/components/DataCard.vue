@@ -222,13 +222,14 @@ const getRequestParams = () => {
       params.customer_name = 'GW';
       break;
     case '月度跨境投诉目标':
-      params.isCrossBorder = 1;
+      params.isCrossBorder = 0;
+      params.hasAccessory = 1;
       break;
     case '月度配件投诉目标':
       params.hasAccessory = 1;
       break;
     case '月度国内客户投诉目标':
-      params.hasAccessory = 1;
+      params.hasAccessory = 0;
       params.customer_name = 'HZ20000';
       break;
   }

@@ -249,3 +249,149 @@ export const getStampingStandb = (prodLine,type) => {
     params: { prodLine,type }
   })
 }
+
+
+// /stamping"elding/stampingAbnormal
+export const getStampingAbnormal = () => {
+  return request({
+    url: '/stampingWelding/stampingAbnormal',
+    method: 'get',
+  })
+} 
+
+
+// /stampingWelding/weldingPass
+export const getWeldingPass = (): Promise<{data: WeldingPass}> => {
+  return request({
+    url: '/stampingWelding/weldingPass',
+    method: 'get',
+  })
+} 
+
+export interface WeldingPass {
+  cjTotal: number   // 车架检验总数
+  cjPass: number    // 车架检验合格数
+  hchTotal: number  // 后叉检验总数
+  hchPass: number   // 后叉检验合格数
+  wjTotal: number   // 尾架检验总数
+  wjPass: number    // 尾架检验合格数
+}
+
+// /stampingWelding/weldingProduction
+export const getWeldingProduction = (): Promise<{data: WeldingProduction}> => {
+  return request({
+    url: '/stampingWelding/weldingProduction',
+    method: 'get',
+  })
+}
+export interface WeldingProduction {
+  wjDone: number   // 尾架完成数
+  cjTotal: number  // 车架总数
+  hchTotal: number // 后叉总数
+  wjTotal: number  // 尾架总数
+  hchDone: number   // 后叉完成数
+  cjDone: number    // 车架完成数
+}
+
+
+// /stampingWelding/weldingPassDetail
+export const getWeldingPassDetail = (): Promise<{data: WeldingPassDetail}> => {
+  return request({
+    url: '/stampingWelding/weldingPassDetail',
+    method: 'get',
+  })
+}
+
+export interface WeldingPassDetail {
+  uid: string  // 日期
+  ta001: string // ta001 + ta002 为工单号
+  ta002: string
+  ta006: string //品号
+  udf021: string //客户单号
+  mb002: string //类型
+  mb003: string //规格
+  bhgNum: number //不合格数
+  updateTime: string // 更新时间
+  detailList: {
+    ngNO: string // 不合格代码
+    ngName: string // 不合格名称
+    admin_unit_name: string // 责任部门
+    ngResponPeople: string // 责任人
+  }[]
+}
+
+
+// stampingWelding/todayBadIssues 今日不良TOP5问题
+export const getTodayBadIssues = (prodLine: string): Promise<{data: TodayBadIssues[]}> => {
+  return request({
+    url: '/stampingWelding/todayBadIssues',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+export interface TodayBadIssues {
+  ngName: string
+  total: number
+} 
+
+
+// /stampingWelding/sprayFty 喷涂直通率详细 获取接口
+export const getSprayFty = (): Promise<{data: SprayFty[]}> => {
+  return request({
+    url: '/stampingWelding/sprayFty',
+    method: 'get',
+  })
+}
+
+export interface SprayFty {
+  po_arrival_inspection_id: string //用于上传数据的id
+  inventory_qty: string // 送检数量
+  item_description: string // 品名
+  item_code: string // 客户单号
+  doc_no: string // 检验单号
+  udf021: string // 品号
+  okCount: number // 合格数
+  firstOkCount: number // 首次合格数
+  issueList: {
+    problemPoint: string // 问题点
+    dutyPeople: string // 责任人
+  }[]
+  //不合格数就是 送检数量-合格数量
+}
+
+// /stampingWelding/sprayFtyFillin 数据填写
+export const getSprayFtyFillin = (data: SprayFty): Promise<{data: SprayFty}> => {
+  return request({
+    url: '/stampingWelding/sprayFtyFillin',
+    method: 'post',
+    data: data
+  })
+}
+
+export interface SprayFtyFillin {
+  po_arrival_inspection_id: string
+  okCount: number
+  issueList: {
+    problemPoint: string
+    dutyPeople: string
+  }[]
+}
+
+// /stampingWelding/automaticWelding
+export const getAutomaticWelding = (code: string): Promise<{data: AutomaticWelding}> => {
+  return request({
+    url: '/stampingWelding/automaticWelding',
+    method: 'get',
+    params: { code }
+  })
+}
+
+export interface AutomaticWelding {
+  po_arrival_inspection_id: string
+  okCount: number
+  issueList: {
+    problemPoint: string
+    dutyPeople: string
+  }[]
+}

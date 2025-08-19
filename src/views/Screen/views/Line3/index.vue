@@ -4,6 +4,7 @@
         <Data2></Data2>
         <Data3></Data3>
         <Data4></Data4>
+        <Data5></Data5>
     </div>
   </template>
   
@@ -12,6 +13,7 @@
     import Data2 from './views/data2.vue'
     import Data3 from './views/data3.vue'
     import Data4 from './views/data4.vue'
+    import Data5 from './views/data5.vue'
   </script>
   
   <style scoped>
