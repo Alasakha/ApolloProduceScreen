@@ -56,5 +56,11 @@ export const getPurchaseDeliveryRate = (type ) => {
   })
 }
 
-
-
+// /injection/rawMaterialMonitoringAdd
+export const getRawMaterialMonitoringAdd = (zhsCode,reason ) => {
+  return request({
+    url: '/injection/rawMaterialMonitoringAdd',
+    method: 'get',
+    params: { zhsCode , reason } // 传递 prodLine 参数
+  })
+}

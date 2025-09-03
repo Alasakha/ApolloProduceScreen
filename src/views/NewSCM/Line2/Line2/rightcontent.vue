@@ -37,7 +37,7 @@ const queryDate = getYesterday(); // 昨天的日期
 // 原始 header
 const fullHeader = [
   '采购内勤', '供应商','到货单号','品名', '品号','规格',
-  '不合格数量','检验日期', '问题点', '备注','判断结果' ,'处理时长','完成期限','处理结果',
+  '不合格数量','检验日期', '问题点','判断结果' ,'处理时长','完成期限','处理结果',
 ]
 
 // 轮播图 header（去掉"处理结果"）
@@ -62,7 +62,6 @@ const config = reactive({
   oddRowBGC: '#1565c0',
   evenRowBGC: '#1976d2',
   fullHeader: fullHeader,
-
 })
 
 function formatDate(dateStr?: string): string {

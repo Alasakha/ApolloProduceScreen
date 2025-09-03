@@ -12,8 +12,8 @@
     <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
         <Header></Header>
         <Line1></Line1>
-        <Line3></Line3>
-        <line4></line4>
+        <Line3 :data="energyStore.monthlyData"></Line3>
+        <!-- <line4></line4> -->
         <Line2></Line2>
         <Line5></Line5>
     </dv-border-box11>

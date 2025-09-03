@@ -4,7 +4,7 @@
   <div style="color:#fff;font-size:20px;">这里是内容</div>
 </TechBorderBox> -->
       <dv-border-box-12 class="chart-box">
-          <div class="box-title">次日生产欠料</div>
+          <div class="box-title">焊接次日生产欠料</div>
         <AbnormalList></AbnormalList>
       </dv-border-box-12>
       

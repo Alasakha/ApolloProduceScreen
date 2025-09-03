@@ -1,59 +1,59 @@
 <template>
   <div class="line1-container flex flex-col ">
     <div class="grid grid-cols-4 gap-2 h-full">
-      <dv-border-box-12 class="data-box ">
+      <BluePanel class="data-box">
         <Datacard title="今日排产工单单数" EnlishTitle="TodayPlanned" :value="productionData.pcGdTotal" />
-      </dv-border-box-12>
+      </BluePanel>
 
       <!-- 已派工单数 -->
-      <dv-border-box-12 class="data-box">
+      <BluePanel class="data-box">
         <Datacard 
           title="已派工单数" 
           EnlishTitle="ProducedToday" 
           :value="productionData.gdPg"
           @click="() => handleClick('已派工单数', 'getStampingPgAbnormal')"
         />
-      </dv-border-box-12>
+      </BluePanel>
 
       <!-- 已报工单数 -->
-      <dv-border-box-12 class="data-box">
+      <BluePanel class="data-box">
         <Datacard 
           title="已报工单数" 
           EnlishTitle="ProducedRate" 
           :value="productionData.gdDone"
           @click="() => handleClick('已报工单数', 'getStampingBgAbnormal')"
         />
-      </dv-border-box-12>
+      </BluePanel>
 
-      <dv-border-box-12 class="data-box ">  
+      <BluePanel class="data-box">  
       <Datacard title="达成率" EnlishTitle="PassRateToday" :value="productionData.gdRate+'%'" />
-      </dv-border-box-12>
+      </BluePanel>
     </div>
 
     <div class="grid grid-cols-7 gap-2 h-full">
-      <dv-border-box-12 class="data-box ">
+      <BluePanel class="data-box">
       <Datacard title="今日排产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
-      </dv-border-box-12>
-      <dv-border-box-12 class="data-box ">
+      </BluePanel>
+      <BluePanel class="data-box">
         <Datacard title="已报工产量" EnlishTitle="InspectionsToday" :value="productionData.done" />
-      </dv-border-box-12>
-      <dv-border-box-12 class="data-box ">
+      </BluePanel>
+      <BluePanel class="data-box">
         <Datacard title="达成率" EnlishTitle="InspectionsToday" :value="productionData.rate+'%'" />
-      </dv-border-box-12>
-      <dv-border-box-12 class="data-box ">
+      </BluePanel>
+      <BluePanel class="data-box">
       <Datacard title="检验工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.checkTotal" />
-      </dv-border-box-12>
+      </BluePanel>
 
-      <dv-border-box-12 class="data-box ">
+      <BluePanel class="data-box">
       <Datacard title="合格工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.firstHgTotal" />
-      </dv-border-box-12>
+      </BluePanel>
   
-      <dv-border-box-12 class="data-box ">
+      <BluePanel class="data-box">
       <Datacard title="已报工待检验工单数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.toBeInspected" />
-      </dv-border-box-12>
-      <dv-border-box-12 class="data-box ">
+      </BluePanel>
+      <BluePanel class="data-box">
       <Datacard title="合格数" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
-      </dv-border-box-12>
+      </BluePanel>
 
 
     </div>
@@ -76,6 +76,7 @@ import { getStampingPgAbnormal,getStampingBgAbnormal } from '@/api/getStampWeldi
 import { header } from './header'
 import Datacard from '../components/Datacard.vue'
 import Dialog from '../components/Dialog.vue'
+import BluePanel from '../components/BluePanel.vue'
 
 const route = useRoute()
 const prodLine = route.query.prodLine as string

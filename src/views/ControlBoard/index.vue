@@ -1,174 +1,122 @@
 <template>
   <div class="control-board">
     <dv-full-screen-container>
-      <dv-border-box11 title="浙江阿波罗科技运动有限公司 - 中控大屏" :title-width="500">
         <div class="board-container">
-          <!-- 顶部数据区域 -->
-          <div class="top-section">
-            <DataCard 
-              title="今日订单" 
-              :value="todayOrders" 
-              color="#00FFFF"
-            />
-            <DataCard 
-              title="生产进度" 
-              :value="`${productionProgress}%`" 
-              color="#00FF00"
-            />
-            <DataCard 
-              title="设备状态" 
-              :value="`${activeDevices}/${totalDevices}`" 
-              color="#FFA500"
-            />
-            <DataCard 
-              title="库存预警" 
-              :value="inventoryWarnings" 
-              color="#FF0000"
-            />
-          </div>
-
-          <!-- 中间地球模型区域 -->
-          <div class="center-section">
-            <div class="earth-container">
-              <EarthModel :modelType="currentModelType" />
-            </div>
-            <div class="center-info">
-              <h2 class="company-title">阿波罗摩托车贸易</h2>
-              <p class="company-slogan">全球摩托车贸易领导者</p>
-              
-              <!-- 模型切换控制 -->
-              <div class="model-control">
-                <button 
-                  @click="currentModelType = 'earth'" 
-                  :class="{ active: currentModelType === 'earth' }"
-                  class="model-btn"
-                >
-                  🌍 地球模型
-                </button>
-                <button 
-                  @click="currentModelType = 'motorcycle'" 
-                  :class="{ active: currentModelType === 'motorcycle' }"
-                  class="model-btn"
-                >
-                  🏍️ 摩托车模型
-                </button>
-              </div>
-              
-              <div class="real-time-data">
-                <div class="data-item">
-                  <span class="label">实时订单:</span>
-                  <span class="value">{{ realTimeOrders }}</span>
-                </div>
-                <div class="data-item">
-                  <span class="label">在线客户:</span>
-                  <span class="value">{{ onlineCustomers }}</span>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <!-- 左侧图表区域 -->
           <div class="left-section">
-            <ChartCard title="月度销售趋势" type="line" />
-            <ProgressCard title="生产线状态" :items="productionLines" />
+            <ErrorBoundary>
+              <EquipmentManagement />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <QualityMetrics />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <LaborProductivity />
+            </ErrorBoundary>
           </div>
-
-          <!-- 右侧图表区域 -->
+          
+          <div class="center-section">
+            <div class="earth-model-container" v-if="isModelVisible">
+              <ErrorBoundary>
+                <BeautifulEarth />
+              </ErrorBoundary>
+            </div>
+            <div class="model-placeholder" v-else>
+              <h3>🌍 3D地球模型</h3>
+              <p>点击"显示模型"按钮查看3D地球</p>
+            </div>
+            <div class="model-controls">
+              <button class="model-btn" @click="toggleModel">
+                {{ isModelVisible ? '隐藏模型' : '显示模型' }}
+              </button>
+              <button class="model-btn" @click="resetModel" v-if="isModelVisible">重置视角</button>
+            </div>
+          </div>
+          
           <div class="right-section">
-            <ChartCard title="全球市场分布" type="pie" />
-            <StatusCard title="设备运行状态" :items="deviceStatus" />
+            <ErrorBoundary>
+              <SalesData />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <EnergyConsumption />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <RDModule />
+            </ErrorBoundary>
           </div>
-
-          <!-- 底部进度区域 -->
+          
           <div class="bottom-section">
-            <div class="progress-grid">
-              <ProgressBar 
-                title="订单完成率" 
-                :progress="orderCompletionRate" 
-                color="success"
-              />
-              <ProgressBar 
-                title="质量合格率" 
-                :progress="qualityRate" 
-                color="warning"
-              />
-              <ProgressBar 
-                title="交付及时率" 
-                :progress="deliveryRate" 
-                color="info"
-              />
-              <ProgressBar 
-                title="客户满意度" 
-                :progress="satisfactionRate" 
-                color="primary"
-              />
+            <!-- <div class="video-controls">
+              <button class="camera-test-btn" @click="showCameraTest = !showCameraTest">
+                {{ showCameraTest ? '返回监控' : '摄像头测试' }}
+              </button>
+            </div> -->
+            <div class="video-monitors">
+              <H5PlayerMonitor  ip="192.168.20.86"/>
+            </div>
+            <div class="video-monitors">
+              <H5PlayerMonitor  ip="192.168.20.27"/>
+            </div>
+            <div class="video-monitors">
+              <H5PlayerMonitor  ip="192.168.10.87"/>
             </div>
           </div>
         </div>
-      </dv-border-box11>
+
     </dv-full-screen-container>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onUnmounted } from 'vue'
-import DataCard from '../../components/DataCard.vue'
-import EarthModel from './components/EarthModel.vue'
-import ChartCard from './components/ChartCard.vue'
-import ProgressCard from './components/ProgressCard.vue'
-import StatusCard from './components/StatusCard.vue'
-import ProgressBar from './components/ProgressBar.vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
+import BeautifulEarth from './components/BeautifulEarth.vue'
+import H5PlayerMonitor from './components/H5PlayerMonitor.vue'
 
-// 响应式数据
-const todayOrders = ref(156)
-const productionProgress = ref(87)
-const activeDevices = ref(23)
-const totalDevices = ref(28)
-const inventoryWarnings = ref(3)
-const realTimeOrders = ref(12)
-const onlineCustomers = ref(89)
+// import CameraTest from './components/CameraTest.vue'
+import EquipmentManagement from './components/EquipmentManagement.vue'
+import QualityMetrics from './components/QualityMetrics.vue'
+import LaborProductivity from './components/LaborProductivity.vue'
+import SalesData from './components/SalesData.vue'
+import EnergyConsumption from './components/EnergyConsumption.vue'
+import RDModule from './components/RDModule.vue'
+import ErrorBoundary from '@/components/ErrorBoundary.vue'
 
-// 模型类型控制
-const currentModelType = ref('earth')
+// 模型控制
+const isModelVisible = ref(true)
 
-// 进度数据
-const orderCompletionRate = ref(94)
-const qualityRate = ref(98)
-const deliveryRate = ref(96)
-const satisfactionRate = ref(95)
+// 摄像头测试控制
+const showCameraTest = ref(false)
 
-// 生产线数据
-const productionLines = ref([
-  { name: '生产线A', status: 'running', progress: 85 },
-  { name: '生产线B', status: 'running', progress: 72 },
-  { name: '生产线C', status: 'maintenance', progress: 0 },
-  { name: '生产线D', status: 'running', progress: 93 }
-])
 
-// 设备状态数据
-const deviceStatus = ref([
-  { name: '激光切割机', status: 'online', uptime: '98.5%' },
-  { name: '冲压设备', status: 'online', uptime: '96.2%' },
-  { name: '焊接设备', status: 'offline', uptime: '0%' },
-  { name: '检测设备', status: 'online', uptime: '99.1%' }
-])
 
-// 定时器
-let timer = null
+
+
+const toggleModel = () => {
+  isModelVisible.value = !isModelVisible.value
+}
+
+const resetModel = () => {
+  // 重置模型视角的逻辑
+  console.log('重置模型视角')
+}
+
+// 响应式设计
+const isMobile = ref(false)
+const isTablet = ref(false)
+
+const checkScreenSize = () => {
+  const width = window.innerWidth
+  isMobile.value = width < 768
+  isTablet.value = width >= 768 && width < 1024
+}
 
 onMounted(() => {
-  // 启动实时数据更新
-  timer = setInterval(() => {
-    // 模拟实时数据变化
-    realTimeOrders.value = Math.floor(Math.random() * 20) + 5
-    onlineCustomers.value = Math.floor(Math.random() * 30) + 70
-  }, 5000)
+  checkScreenSize()
+  window.addEventListener('resize', checkScreenSize)
 })
 
 onUnmounted(() => {
-  if (timer) {
-    clearInterval(timer)
-  }
+  window.removeEventListener('resize', checkScreenSize)
 })
 </script>
 
@@ -176,39 +124,99 @@ onUnmounted(() => {
 .control-board {
   width: 100vw;
   height: 100vh;
-  background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-  overflow: hidden;
+  background: var(--gradient-bg);
+  overflow-y: auto; /* 改为垂直滚动，允许内容超出时滚动 */
 }
 
 .board-container {
-  width: 100%;
-  height: 100%;
-  padding: 20px;
   display: grid;
-  grid-template-areas: 
-    "top top top top"
-    "left center center right"
-    "left center center right"
-    "bottom bottom bottom bottom";
-  grid-template-rows: 120px 1fr 1fr 150px;
-  grid-template-columns: 400px 1fr 1fr 400px;
+  grid-template-areas:
+    "left left center center center center center right right"
+    "left left center center center center center right right"
+    "left left center center center center center right right"
+    "bottom bottom bottom bottom bottom bottom bottom bottom bottom";
+  grid-template-rows: 1fr 1fr 1fr 400px;
+  grid-template-columns: repeat(9, 1fr);
   gap: 20px;
+  height: 100%;
 }
 
-.top-section {
-  grid-area: top;
+.left-section {
+  grid-area: left;
   display: flex;
-  gap: 20px;
-  align-items: center;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 10px;
 }
 
 .center-section {
   grid-area: center;
-  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
+  position: relative;
+}
+
+.right-section {
+  grid-area: right;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.bottom-section {
+  grid-area: bottom;
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+}
+
+.bottom-section > * {
+  flex: 1;
+}
+
+.video-controls {
+  position: relative;
+  margin-bottom: 15px;
+  z-index: 10;
+  display: flex;
+  justify-content: center;
+}
+
+.camera-test-btn {
+  padding: 12px 24px;
+  background: var(--gradient-primary);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  font-size: 16px;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 12px var(--shadow-primary);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+}
+
+.camera-test-btn:hover {
+  background: rgba(0, 212, 255, 0.3);
+  border-color: var(--primary-blue);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px var(--shadow-primary);
+}
+
+.video-monitors {
+  display: flex;
+  gap: 20px;
+  align-items: stretch;
+  width: 100%;
+}
+
+.camera-test-container {
+  width: 100%;
+  /* height: 2000px; */ /* 暂时注释掉高度限制，让内容自适应 */
+  overflow-y: auto; /* 添加垂直滚动条 */
+  max-height: 100vh; /* 设置最大高度为视口高度 */
 }
 
 .earth-container {
@@ -227,15 +235,15 @@ onUnmounted(() => {
 }
 
 .company-title {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 28px;
   font-weight: bold;
   margin: 0 0 10px 0;
-  text-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 20px var(--shadow-glow);
 }
 
 .company-slogan {
-  color: #00ffff;
+  color: var(--text-accent);
   font-size: 16px;
   margin: 0 0 15px 0;
   opacity: 0.8;
@@ -253,13 +261,13 @@ onUnmounted(() => {
 }
 
 .data-item .label {
-  color: #888;
+  color: var(--text-muted);
   font-size: 12px;
   margin-bottom: 5px;
 }
 
 .data-item .value {
-  color: #00ffff;
+  color: var(--text-accent);
   font-size: 18px;
   font-weight: bold;
 }
@@ -276,7 +284,7 @@ onUnmounted(() => {
   padding: 8px 16px;
   background: rgba(0, 0, 0, 0.6);
   color: white;
-  border: 2px solid rgba(0, 255, 255, 0.3);
+  border: 2px solid var(--border-primary);
   border-radius: 20px;
   cursor: pointer;
   font-size: 14px;
@@ -286,58 +294,183 @@ onUnmounted(() => {
 }
 
 .model-btn:hover {
-  background: rgba(0, 255, 255, 0.2);
-  border-color: rgba(0, 255, 255, 0.8);
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--border-hover);
   transform: translateY(-2px);
 }
 
 .model-btn.active {
-  background: rgba(0, 255, 255, 0.3);
-  border-color: rgba(0, 255, 255, 1);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.5);
+  background: rgba(0, 212, 255, 0.3);
+  border-color: var(--primary-blue);
+  box-shadow: 0 0 20px var(--shadow-glow);
 }
 
 .model-btn:active {
   transform: translateY(0);
 }
 
-.left-section {
-  grid-area: left;
+/* 摩托车占位符样式 */
+.motorcycle-placeholder {
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-direction: column;
-  gap: 20px;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-accent);
+  text-align: center;
+  background: rgba(0, 0, 0, 0.3);
+  border-radius: 12px;
+  border: 2px solid var(--border-primary);
 }
 
-.right-section {
-  grid-area: right;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.motorcycle-placeholder h3 {
+  font-size: 32px;
+  margin: 0 0 20px 0;
+  text-shadow: 0 0 20px var(--shadow-glow);
 }
 
-.bottom-section {
-  grid-area: bottom;
+.motorcycle-placeholder p {
+  font-size: 18px;
+  margin: 0;
+  opacity: 0.8;
+}
+
+.earth-model-container {
+  width: 100%;
+  height: 100%;
   display: flex;
   align-items: center;
+  justify-content: center;
 }
 
-.progress-grid {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 20px;
+.model-placeholder {
   width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 212, 255, 0.05);
+  border: 2px dashed var(--border-primary);
+  border-radius: 12px;
+  color: var(--text-accent);
+  text-align: center;
+}
+
+.model-placeholder h3 {
+  font-size: 24px;
+  margin-bottom: 12px;
+  color: var(--text-accent);
+}
+
+.model-placeholder p {
+  font-size: 14px;
+  color: var(--text-muted);
+}
+
+.model-controls {
+  position: absolute;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  display: flex;
+  gap: 12px;
+  z-index: 10;
+}
+
+.model-btn {
+  padding: 8px 16px;
+  background: rgba(0, 212, 255, 0.1);
+  border: 1px solid var(--border-primary);
+  border-radius: 6px;
+  color: var(--text-accent);
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.model-btn:hover {
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--border-hover);
+}
+
+.model-btn:active {
+  transform: scale(0.95);
 }
 
 /* 响应式设计 */
 @media (max-width: 1600px) {
   .board-container {
-    grid-template-columns: 350px 1fr 1fr 350px;
+    gap: 15px;
+    padding: 15px;
   }
 }
 
 @media (max-width: 1400px) {
   .board-container {
-    grid-template-columns: 300px 1fr 1fr 300px;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .company-title {
+    font-size: 24px;
+  }
+  
+  .company-slogan {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 1200px) {
+  .board-container {
+    grid-template-areas:
+      "left left left center center center right right right"
+      "left left left center center center right right right"
+      "left left left center center center right right right"
+      "bottom bottom bottom bottom bottom bottom bottom bottom bottom";
+    grid-template-columns: repeat(9, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .board-container {
+    grid-template-areas:
+      "left left left left left left left left left"
+      "center center center center center center center center center"
+      "right right right right right right right right right"
+      "bottom bottom bottom bottom bottom bottom bottom bottom bottom";
+    grid-template-rows: auto auto auto 150px;
+    grid-template-columns: repeat(9, 1fr);
+    gap: 15px;
+  }
+  
+  .left-section,
+  .right-section {
+    flex-direction: row;
+    overflow-x: auto;
+  }
+  
+  .left-section > *,
+  .right-section > * {
+    min-width: 300px;
+    flex-shrink: 0;
+  }
+  
+  .bottom-section {
+    flex-direction: column;
+  }
+  
+  .bottom-section > * {
+    /* min-height: 1220px; */ /* 暂时注释掉高度限制 */
+  }
+  
+  .model-controls {
+    position: relative;
+    bottom: auto;
+    left: auto;
+    transform: none;
+    margin-top: 15px;
   }
 }
 </style>

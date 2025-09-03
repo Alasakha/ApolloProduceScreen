@@ -25,15 +25,18 @@
                      <div class="device-number">设备 {{ index + 1 }}</div>
                      
                    </div>
-                   
                    <div class="device-card-content">
                      <div class="device-info-row">
                        <span class="info-label">设备组:</span>
                        <span class="info-value">{{ device.groupName }}</span>
                      </div>
                      <div class="device-info-row">
-                       <span class="info-label">设备编号:</span>
-                       <span class="info-value">{{ device.macNo }}</span>
+                       <span class="info-label">设备名称:</span>
+                       <span class="info-value">{{ device.deviceName }}</span>
+                     </div>
+                     <div class="device-info-row">
+                       <span class="info-label">型号:</span>
+                       <span class="info-value">{{ device.model }}</span>
                      </div>
                      <div class="device-info-row">
                        <span class="info-label">制造商:</span>
@@ -75,60 +78,70 @@ const emit = defineEmits<{
 
 
 
-// 写死的设备数据（严格按照Excel表格）
+// 设备数据（根据Excel表格数据）
 const staticDeviceData = [
-  // 弯管设备组 (WG_ALL) - 3台设备
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-39X4A-2S', manufacturer: '和和机械（张家港）有限公司', storage: '1001/2001'  },
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-39X4A-2S', manufacturer: '和和机械（张家港）有限公司', storage: '1001/2001' },
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-38NC', manufacturer: '张家港市兵丰机械制造有限公司', storage: '1001/2001'},
+  // 手工焊设备组 - 二氧化碳保护焊机
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020066', deviceName: '二氧化碳保护焊机1', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020067', deviceName: '二氧化碳保护焊机2', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020068', deviceName: '二氧化碳保护焊机3', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020070', deviceName: '二氧化碳保护焊机4', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020072', deviceName: '二氧化碳保护焊机5', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020078', deviceName: '二氧化碳保护焊机6', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020079', deviceName: '二氧化碳保护焊机7', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020084', deviceName: '二氧化碳保护焊机8', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020085', deviceName: '二氧化碳保护焊机9', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020086', deviceName: '二氧化碳保护焊机10', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020089', deviceName: '二氧化碳保护焊机11', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020090', deviceName: '二氧化碳保护焊机12', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020091', deviceName: '二氧化碳保护焊机13', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020092', deviceName: '二氧化碳保护焊机14', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020093', deviceName: '二氧化碳保护焊机15', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020094', deviceName: '二氧化碳保护焊机16', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020095', deviceName: '二氧化碳保护焊机17', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2004' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020096', deviceName: '二氧化碳保护焊机18', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2005' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020097', deviceName: '二氧化碳保护焊机19', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2006' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020098', deviceName: '二氧化碳保护焊机20', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2007' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020099', deviceName: '二氧化碳保护焊机21', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2008' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '1020100', deviceName: '二氧化碳保护焊机22', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2009' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '10201001', deviceName: '二氧化碳保护焊机23', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2010' },
+  { groupName: '手工焊设备组', groupCode: 8, macNo: '10201002', deviceName: '二氧化碳保护焊机24', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2011' },
   
-  // 压机设备组 (YJ_ALL) - 2台设备  
-  { groupName: '压机设备组', groupCode: 2, macNo: 'Y32-315T', manufacturer: '佛山市南海街金鑫液压机械有限公司', storage: '1001/2001' },
-  { groupName: '压机设备组', groupCode: 2, macNo: 'QC12Y-8*2500', manufacturer: '安徽中德机床股份有限公司', storage: '1001/2001' },
+  // 铁架焊接设备组
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020065', deviceName: '二氧化碳保护焊机1', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020087', deviceName: '二氧化碳保护焊机2', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020088', deviceName: '二氧化碳保护焊机3', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020082', deviceName: '二氧化碳保护焊机4', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020083', deviceName: '二氧化碳保护焊机5', model: 'NBC-350A', manufacturer: '广州超胜焊接设备有限公司', storage: '1003/2003' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020351', deviceName: '包装铁架冲剪一体机', model: '双头', manufacturer: '帕驰机械', storage: '' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020167', deviceName: '开式可倾压力机', model: 'JB23-40T', manufacturer: '浙江铸压机床厂', storage: '' },
+  { groupName: '铁架焊接设备组', groupCode: 11, macNo: '1020183', deviceName: '开式可倾压力机', model: 'JS-16', manufacturer: '浙江铸压机床厂', storage: '' },
+
   
-  // 缩管设备组 (SG_ALL) - 2台设备
-  { groupName: '缩管设备组', groupCode: 3, macNo: 'SAM-50', manufacturer: '广东省东莞市晨麒金属制品有限公司', storage: '1001/2001' },
-  { groupName: '缩管设备组', groupCode: 3, macNo: 'LP-3007', manufacturer: '常州龙鹏机械有限公司', storage: '1001/2001' },
+  // 自动焊1线设备组 - 安川焊接工作站
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020113', deviceName: '安川焊接工作站1', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020114', deviceName: '安川焊接工作站2', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020115', deviceName: '安川焊接工作站3', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020116', deviceName: '安川焊接工作站4', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020112', deviceName: '安川焊接工作站5', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020117', deviceName: '安川焊接工作站6', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
+  { groupName: '自动焊1线设备组', groupCode: 9, macNo: '1020118', deviceName: '安川焊接工作站7', model: 'YASKAWA', manufacturer: '武义鸿运机电设备有限公司', storage: '1003/2003' },
   
-    // 滚花设备组 (GH_ALL) - 2台设备
-  { groupName: '滚花设备组', groupCode: 4, macNo: 'LP-2008', manufacturer: '常州龙鹏机械有限公司', storage: '1001/2001' },
-  
-  // 冲弧设备组 (CHH_ALL) - 4台设备
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-CH502', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-425', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'MC-315B', manufacturer: '永康市志敏机电', storage: '1001/2001' },
-  
-  // 台钻设备组 (TZ_ALL) - 8台设备
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z5040A', manufacturer: '杭州双龙机械有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z4116/2', manufacturer: '浙江台康金宝塑机厂', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z4116', manufacturer: '浙江台康金宝塑机厂', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },  
-  // 冲床设备组 (CHC_ALL) - 12台设备
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JB23-40T', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海机床有限公司', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海机床有限公司', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海第二锻压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JB23-63', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JF21-100T', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JD23-35', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'ALP-160V', manufacturer: '金澳兰', storage: '1001/2001' }
+  // 自动焊2线设备组 - 松下焊接工作站
+  { groupName: '自动焊2线设备组', groupCode: 10, macNo: '1020286', deviceName: '松下焊接工作站1', model: '松下1.4', manufacturer: '广州瑞松智能科技股份有限公司', storage: '1003/2003' },
+  { groupName: '自动焊2线设备组', groupCode: 10, macNo: '10202861', deviceName: '松下焊接工作站2', model: '松下1.4', manufacturer: '广州瑞松智能科技股份有限公司', storage: '1003/2003' },
+  { groupName: '自动焊2线设备组', groupCode: 10, macNo: '10202862', deviceName: '松下焊接工作站3', model: '松下1.4', manufacturer: '广州瑞松智能科技股份有限公司', storage: '1003/2003' },
+  { groupName: '自动焊2线设备组', groupCode: 10, macNo: '10202863', deviceName: '松下焊接工作站4', model: '松下1.4', manufacturer: '广州瑞松智能科技股份有限公司', storage: '1003/2003' },
+  { groupName: '自动焊2线设备组', groupCode: 10, macNo: '10202864', deviceName: '松下焊接工作站5', model: '松下1.4', manufacturer: '广州瑞松智能科技股份有限公司', storage: '1003/2003' }
 ]
+
 
 // 计算设备列表 - 使用写死的数据，支持按组代码筛选
 
 const deviceList = computed(() => {
   return staticDeviceData.map((device, index) => ({
     macNo: device.macNo,
+    deviceName: device.deviceName,
+    model: device.model,
     machineName: device.manufacturer,
     workNo: `WO-${(index + 1).toString().padStart(4, '0')}`,
     itemName: `${device.groupName}产品`,
@@ -362,11 +375,7 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
   margin-bottom: 8px;
 }
 
-.info-label {
-  font-size: 13px;
-  color: #ffffff;
-  font-weight: 500;
-}
+
 
 .info-value {
   font-size: 13px;
@@ -587,7 +596,7 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 
 .info-label {
   font-size: 12px;
-  color: #999;
+  color: #ffffff;
   font-weight: 500;
   min-width: 70px;
 }

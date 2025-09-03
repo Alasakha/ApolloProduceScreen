@@ -95,8 +95,8 @@ const getEfficiency = (progress) => {
 
 <style scoped>
 .progress-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 12px;
   padding: 20px;
   height: 100%;
@@ -105,8 +105,8 @@ const getEfficiency = (progress) => {
 }
 
 .progress-card:hover {
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
 }
 
 .card-header {
@@ -117,7 +117,7 @@ const getEfficiency = (progress) => {
 }
 
 .card-title {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 600;
   margin: 0;
@@ -135,8 +135,8 @@ const getEfficiency = (progress) => {
 }
 
 .status-dot.running {
-  background: #00ff96;
-  box-shadow: 0 0 8px rgba(0, 255, 150, 0.6);
+  background: var(--success);
+  box-shadow: 0 0 8px rgba(0, 204, 122, 0.6);
 }
 
 .status-dot.maintenance {
@@ -161,19 +161,19 @@ const getEfficiency = (progress) => {
 
 .progress-item {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   padding: 15px;
   transition: all 0.3s ease;
 }
 
 .progress-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   transform: translateX(5px);
 }
 
 .progress-item.status-running {
-  border-color: rgba(0, 255, 150, 0.3);
+  border-color: rgba(0, 204, 122, 0.3);
 }
 
 .progress-item.status-maintenance {
@@ -192,7 +192,7 @@ const getEfficiency = (progress) => {
 }
 
 .item-name {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
 }
@@ -205,8 +205,8 @@ const getEfficiency = (progress) => {
 }
 
 .item-status.status-running {
-  background: rgba(0, 255, 150, 0.2);
-  color: #00ff96;
+  background: rgba(0, 204, 122, 0.2);
+  color: var(--success);
 }
 
 .item-status.status-maintenance {
@@ -229,7 +229,7 @@ const getEfficiency = (progress) => {
 .progress-bar {
   flex: 1;
   height: 8px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-secondary);
   border-radius: 4px;
   overflow: hidden;
 }
@@ -253,7 +253,7 @@ const getEfficiency = (progress) => {
 }
 
 .progress-fill.status-running {
-  background: linear-gradient(90deg, #00ff96, #00cc7a);
+  background: linear-gradient(90deg, var(--success), #00cc7a);
 }
 
 .progress-fill.status-maintenance {
@@ -270,7 +270,7 @@ const getEfficiency = (progress) => {
 }
 
 .progress-text {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   min-width: 40px;
@@ -290,11 +290,11 @@ const getEfficiency = (progress) => {
 }
 
 .detail-label {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
 }
 
 .detail-value {
-  color: #00ffff;
+  color: var(--primary-blue);
   font-weight: 500;
 }
 

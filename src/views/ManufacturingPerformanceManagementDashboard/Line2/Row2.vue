@@ -31,21 +31,40 @@
       <!-- A类客户金工一部涂装 -->
       <div class="department-section">
         <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户金工一部涂装</div>
-        <div class="metrics-row">
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentPaintingData.target }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentPaintingData.actual }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentPaintingData.achievement)">
-              {{ currentPaintingData.achievement }}%
-            </div>
-          </div>
+        <div class="data-cards-row">
+          <DataCard 
+            title="目标" 
+            :value="currentPaintingData.target" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="实际" 
+            :value="currentPaintingData.actual" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="达成率" 
+            :value="currentPaintingData.achievement" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            :backgroundcolor1="getAchievementColor(currentPaintingData.achievement).color1"
+            :backgroundcolor2="getAchievementColor(currentPaintingData.achievement).color2"
+            :color="getAchievementColor(currentPaintingData.achievement).textColor"
+          />
         </div>
         <!-- <div class="action-buttons">
           <button class="reason-btn" @click="showReasonDialog('painting')">
@@ -57,21 +76,40 @@
       <!-- A类客户总装一课 -->
       <div class="department-section">
         <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户总装一课</div>
-        <div class="metrics-row">
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse1Data.target }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse1Data.actual }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentAssemblyCourse1Data.achievement)">
-              {{ currentAssemblyCourse1Data.achievement }}%
-            </div>
-          </div>
+        <div class="data-cards-row">
+          <DataCard 
+            title="目标" 
+            :value="currentAssemblyCourse1Data.target" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="实际" 
+            :value="currentAssemblyCourse1Data.actual" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="达成率" 
+            :value="currentAssemblyCourse1Data.achievement" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            :backgroundcolor1="getAchievementColor(currentAssemblyCourse1Data.achievement).color1"
+            :backgroundcolor2="getAchievementColor(currentAssemblyCourse1Data.achievement).color2"
+            :color="getAchievementColor(currentAssemblyCourse1Data.achievement).textColor"
+          />
         </div>
         <!-- <div class="action-buttons">
           <button class="reason-btn" @click="showReasonDialog('assembly1')">
@@ -83,21 +121,40 @@
       <!-- A类客户总装二课 -->
       <div class="department-section">
         <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户总装二课</div>
-        <div class="metrics-row">
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse2Data.target }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ currentAssemblyCourse2Data.actual }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold" :class="getAchievementClass(currentAssemblyCourse2Data.achievement)">
-              {{ currentAssemblyCourse2Data.achievement }}%
-            </div>
-          </div>
+        <div class="data-cards-row">
+          <DataCard 
+            title="目标" 
+            :value="currentAssemblyCourse2Data.target" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="实际" 
+            :value="currentAssemblyCourse2Data.actual" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            backgroundcolor1="#23A7DC"
+            backgroundcolor2="#0a8ebd"
+            color="#00FFFF"
+          />
+          <DataCard 
+            title="达成率" 
+            :value="currentAssemblyCourse2Data.achievement" 
+            unit="%" 
+            :titleFontSize="0.6"
+            :valueFontSize="0.9"
+            :squareHeight="70"
+            :backgroundcolor1="getAchievementColor(currentAssemblyCourse2Data.achievement).color1"
+            :backgroundcolor2="getAchievementColor(currentAssemblyCourse2Data.achievement).color2"
+            :color="getAchievementColor(currentAssemblyCourse2Data.achievement).textColor"
+          />
         </div>
         <!-- <div class="action-buttons">
           <button class="reason-btn" @click="showReasonDialog('assembly2')">
@@ -121,6 +178,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useManufacturingPerformanceStore } from '@/store/manufacturingPerformance'
 import ReasonDialog from '@/components/ReasonDialog.vue'
+import DataCard from '@/components/DataCard.vue'
 
 // 使用制造绩效store
 const manufacturingStore = useManufacturingPerformanceStore()
@@ -153,6 +211,36 @@ const getAchievementClass = (value) => {
   if (value >= 98) return 'achievement-good'
   if (value >= 95) return 'achievement-normal'
   return 'achievement-warning'
+}
+
+// 获取达成率颜色配置
+const getAchievementColor = (value) => {
+  if (value >= 100) {
+    return {
+      color1: '#00ff88',
+      color2: '#00cc6a',
+      textColor: '#00ff88'
+    }
+  }
+  if (value >= 98) {
+    return {
+      color1: '#00d4ff',
+      color2: '#0099cc',
+      textColor: '#00d4ff'
+    }
+  }
+  if (value >= 95) {
+    return {
+      color1: '#ffffff',
+      color2: '#cccccc',
+      textColor: '#ffffff'
+    }
+  }
+  return {
+    color1: '#ff4444',
+    color2: '#cc3333',
+    textColor: '#ff4444'
+  }
 }
 
 // 组件挂载时启动数据获取
@@ -309,39 +397,10 @@ const handleReasonSubmit = (data) => {
   border-radius: 3px;
 }
 
-.metrics-row {
+.data-cards-row {
   display: flex;
   gap: 4px;
   flex: 1;
-}
-
-.metric-item {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  align-items: center;
-  padding: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 3px;
-  border-left: 2px solid #00d4ff;
-  transition: all 0.3s ease;
-}
-
-.metric-item:hover {
-  background: rgba(0, 0, 0, 0.3);
-  transform: translateY(-2px);
-}
-
-.metric-label {
-  color: #8cc8ff;
-  margin-bottom: 2px;
-  text-align: center;
-}
-
-.metric-value {
-  color: #fff;
-  text-align: center;
 }
 
 /* 达成率颜色样式 */

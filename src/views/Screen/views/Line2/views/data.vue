@@ -2,7 +2,7 @@
     <div class="data w-[25%] text-white">
         <dv-border-box12>
             <div class="content  w-full h-full flex flex-col p-4 gap-8  ">
-      <div class="row flex-1 flex gap-2 justify-around">
+      <div class="row flex-1 flex gap-1 justify-between">
         <DataCard  
           title="月计划" 
           :value="MonthlyData?.plan ??  '无数据'" 
@@ -22,7 +22,7 @@
           /> 
           <DataCard  
           title="待生产数" 
-          :value="MonthlyData?.incomplete ??  '无数据'"
+          :value="hascompleted(MonthlyData?.incomplete) ??  '无数据'"
           :titleFontSize="0.6"
           :valueFontSize="0.6"
           :squareHeight="70"
@@ -36,7 +36,7 @@
           :squareHeight="70"
           />
       </div> 
-      <div class="row flex-1 flex gap-2 justify-around">
+      <div class="row flex-1 flex gap-1 justify-between">
         <!-- <EffiectCard title="人时效率" 
           style="margin-left: 6vw;"
           :value1="KnowledgeEfficiencyData?.scanNum ??  '无数据'" 
@@ -67,7 +67,7 @@
           :squareHeight="70"
           />
       </div>
-      <div class="row flex-1 flex gap-2 justify-around">
+      <div class="row flex-1 flex gap-1 justify-between">
         <DataCard title="今日检验数" :value="passedInfo?.checkTotal ?? '无数据'"
           :titleFontSize="0.6"
           :valueFontSize="0.8"
@@ -167,6 +167,15 @@
   
   }
 
+  function hascompleted(num){
+    if(num < 0 ){
+      return 0
+    }else{
+      return num
+    }
+  }
+
+
   const qualifiedRate = computed(() => {
   if (!passedInfo.value?.passTotal || !passedInfo.value?.checkTotal) return '无数据';
   if (passedInfo.value.checkTotal === 0) return '0%';
@@ -213,9 +222,10 @@
   
   .row {
     display: flex;
-    justify-content: start; /* 让内容分散一点 */
+    justify-content: space-between; /* 改为space-between确保均匀分布 */
     height: 60%;
-    /* gap: 30px; 增大间距 */
+    width: 100%; /* 确保宽度100% */
+    gap: 0.5vw; /* 使用vw单位确保响应式间距 */
     /* margin-bottom: 2vh; 让两行之间间隔更大 */
   }
   .row{

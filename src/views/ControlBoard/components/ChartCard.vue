@@ -77,14 +77,14 @@ const chartData = ref([
 ])
 
 const pieData = ref([
-  { start: 0, end: 90, color: '#00ff96' },
+  { start: 0, end: 90, color: 'var(--success)' },
   { start: 90, end: 180, color: '#0096ff' },
   { start: 180, end: 270, color: '#ff9600' },
   { start: 270, end: 360, color: '#ff0066' }
 ])
 
 const barData = ref([
-  { height: 60, color: '#00ff96' },
+  { height: 60, color: 'var(--success)' },
   { height: 80, color: '#0096ff' },
   { height: 45, color: '#ff9600' },
   { height: 90, color: '#ff0066' },
@@ -94,19 +94,19 @@ const barData = ref([
 const legendData = computed(() => {
   if (props.type === 'line') {
     return [
-      { label: '销售额', value: '¥1.2M', color: '#00ff96' },
+      { label: '销售额', value: '¥1.2M', color: 'var(--success)' },
       { label: '订单量', value: '156', color: '#0096ff' }
     ]
   } else if (props.type === 'pie') {
     return [
-      { label: '亚洲市场', value: '45%', color: '#00ff96' },
+      { label: '亚洲市场', value: '45%', color: 'var(--success)' },
       { label: '欧洲市场', value: '30%', color: '#0096ff' },
       { label: '美洲市场', value: '20%', color: '#ff9600' },
       { label: '其他', value: '5%', color: '#ff0066' }
     ]
   } else {
     return [
-      { label: 'Q1', value: '¥300K', color: '#00ff96' },
+      { label: 'Q1', value: '¥300K', color: 'var(--success)' },
       { label: 'Q2', value: '¥400K', color: '#0096ff' },
       { label: 'Q3', value: '¥225K', color: '#ff9600' },
       { label: 'Q4', value: '¥450K', color: '#ff0066' }
@@ -143,8 +143,8 @@ onMounted(() => {
 
 <style scoped>
 .chart-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 12px;
   padding: 20px;
   height: 100%;
@@ -153,8 +153,8 @@ onMounted(() => {
 }
 
 .chart-card:hover {
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: var(--border-primary);
+  box-shadow: 0 0 20px var(--shadow-primary);
 }
 
 .chart-header {
@@ -165,7 +165,7 @@ onMounted(() => {
 }
 
 .chart-title {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 600;
   margin: 0;
@@ -177,19 +177,19 @@ onMounted(() => {
 }
 
 .action-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--bg-card-hover);
+  border: 1px solid var(--border-secondary);
   border-radius: 6px;
   padding: 6px;
-  color: #fff;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
 }
 
 .action-btn:hover {
-  background: rgba(0, 255, 255, 0.2);
-  border-color: #00ffff;
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--primary-blue);
 }
 
 .chart-content {
@@ -210,18 +210,18 @@ onMounted(() => {
   position: relative;
   width: 100%;
   height: 100%;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
-  border-left: 1px solid rgba(255, 255, 255, 0.2);
+  border-bottom: 1px solid var(--border-secondary);
+  border-left: 1px solid var(--border-secondary);
 }
 
 .line-point {
   position: absolute;
   width: 8px;
   height: 8px;
-  background: #00ffff;
+  background: var(--primary-blue);
   border-radius: 50%;
   transform: translate(-50%, 50%);
-  box-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  box-shadow: 0 0 10px var(--shadow-glow);
 }
 
 /* 饼图样式 */
@@ -264,7 +264,7 @@ onMounted(() => {
   top: -25px;
   left: 50%;
   transform: translateX(-50%);
-  color: #fff;
+  color: var(--text-primary);
   font-size: 12px;
   white-space: nowrap;
 }
@@ -275,14 +275,14 @@ onMounted(() => {
   flex-wrap: wrap;
   gap: 15px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-secondary);
 }
 
 .legend-item {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #fff;
+  color: var(--text-primary);
   font-size: 12px;
 }
 
@@ -293,11 +293,11 @@ onMounted(() => {
 }
 
 .legend-label {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
 }
 
 .legend-value {
-  color: #00ffff;
+  color: var(--primary-blue);
   font-weight: 600;
 }
 

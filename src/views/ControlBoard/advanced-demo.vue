@@ -260,7 +260,7 @@ const createSpecularTexture = () => {
   
   // 创建渐变效果
   const gradient = ctx.createRadialGradient(512, 256, 0, 512, 256, 512)
-  gradient.addColorStop(0, '#ffffff')
+  gradient.addColorStop(0, 'var(--text-primary)fff')
   gradient.addColorStop(0.3, '#cccccc')
   gradient.addColorStop(0.7, '#666666')
   gradient.addColorStop(1, '#000000')
@@ -568,11 +568,11 @@ onUnmounted(() => {
 }
 
 .info-card {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-secondary);
   backdrop-filter: blur(10px);
   border-radius: 15px;
   padding: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-secondary);
   transition: transform 0.3s ease;
 }
 
@@ -622,7 +622,7 @@ onUnmounted(() => {
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-secondary);
 }
 
 ::-webkit-scrollbar-thumb {

@@ -158,3 +158,13 @@ export const getEfficiencyReduceAdd = (prodLine,reduce_minute,reduce_count ,reas
     params:{prodLine,reduce_minute,reduce_count,reason ,reduce_type }
   })
 }
+
+
+// /production/signInMember
+export const getSignInMember = (prodLine) => {
+  return request({
+    url: '/production/signInMember',
+    method: 'get',
+    params: { prodLine } // 传递 prodLine 参数
+  })
+}

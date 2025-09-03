@@ -1,160 +1,116 @@
 <template>
-  <div class="line2-container h-[100%]">
-    <div class="cards-container">
-      <template v-if="allData.length">
-        <div v-for="(item, index) in allData" 
-             :key="index"
-             class="card-wrapper">
-          <DataCard
-            :catogory="item.processName || '工序'"
-            :frame="item.workNo"
-            :customer-no="item.productId"
-            :model-spec="formatSpec(item.item_specification)"
-            :planNum="handleNum(item.plan_qty)"
-            :process_list="formatProcessList(item.itemList)"
-          />
+  <div class="w-full h-full p-3">
+    <div class="text-xl font-bold text-white mb-3 text-center" style="letter-spacing: 2px;">
+      设备监控
+    </div>
+    
+    <div class="grid grid-cols-1 gap-3 h-[85%]">
+      <!-- 喷塑线监控 -->
+      <div class="  bg-opacity-20 rounded-lg p-2 border border-cyan-400 border-opacity-30">
+        <div class="text-base font-semibold text-cyan-300 mb-2 text-center" style="letter-spacing: 1px;">
+          喷塑线监控
         </div>
-      </template>
-      <template v-else>
-        <div class="card-wrapper">
-          <DataCard v-bind="emptyCardData" />
+        <DataCard
+          title1="标准烘烤温度"
+          title2="实际温度"
+          :data1="powderCoatingData.standardTemp"
+          :data2="{
+            data: powderCoatingData.actualTemp,
+            max: powderCoatingData.standardTemp + 100
+          }"
+          @update-data="handleDataUpdate"
+        />
+      </div>
+      
+      <!-- 喷漆线监控 -->
+      <div class="  bg-opacity-20 rounded-lg p-2 border border-cyan-400 border-opacity-30">
+        <div class="text-base font-semibold text-cyan-300 mb-2 text-center" style="letter-spacing: 1px;">
+          喷漆线监控
         </div>
-      </template>
+        <DataCard
+          title1="标准烘烤温度"
+          title2="实际温度"
+          :data1="paintLineData.standardTemp"
+          :data2="{
+            data: paintLineData.actualTemp,
+            max: paintLineData.standardTemp + 100
+          }"
+          @update-data="handleDataUpdate"
+        />
+      </div>
     </div>
   </div>
-</template>   
+</template>
 
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
-import DataCard from '@/components/Stamp/DataCard2.vue'
-import { getStampingGeneralData } from '@/api/getStampWeldinfo'
-import { useRoute } from 'vue-router'
+import { ref, onMounted, onUnmounted } from 'vue'
+import DataCard from '../components/monitroCard.vue'
 
-const route = useRoute();
-const prodLine = route.query.prodLine;
-
-const allData = ref([])
-
-const emptyCardData = {
-  catogory: '暂无',
-  frame: '暂无',
-  customerNo: '暂无',
-  modelSpec: '暂无',
-  planNum: 0,
-  process_list: [
-    {
-      name: '暂无',
-      current: 0,
-      total: 100,
-      isDoing: false,
-      mo_routing_d_id: '' // 添加必需的字段
-    }
-  ]
-}
-
-// 格式化进度条数据
-const formatProcessList = (itemList) => {
-  if (!itemList || !itemList.length) return [];
-  
-  // 获取父级的总数作为进度条的总量
-  const totalNum = Number(itemList[0].plan_qty || itemList[0].num);
-  
-  return itemList.map(item => ({
-
-    name: item.processName,
-    current: Number(item.num || 0), // 确保转换为数字，如果为空则默认0
-    total: totalNum,          // 使用父级的总数
-    isDoing: item.isDoing === '1',
-    mo_routing_d_id: item.mo_routing_d_id // 添加工序ID
-    // percentage: Math.round((Number(item.num) / totalNum) * 100) // 计算百分比
-  }));
-}
-
-const handleNum = (num:number) => {
-  return Math.round(num)
-}
-
-// // 将数据分成三列
-// const firstColumnData = computed(() => {
-//   return allData.value.filter((_, index) => index % 3 === 0)
-// })
-
-// const secondColumnData = computed(() => {
-//   return allData.value.filter((_, index) => index % 3 === 1)
-// })
-
-// const thirdColumnData = computed(() => {
-//   return allData.value.filter((_, index) => index % 3 === 2)
-// })
-
-const fetchData = async () => {
-  try {
-    const res = await getStampingGeneralData(prodLine)
-    if (res.code === 200) {
-      allData.value = res.data || []
-    }
-  } catch (error) {
-    console.error('获取数据失败:', error)
-    allData.value = []
-  }
-} 
-
-onMounted(() => {
-  fetchData()
+// 喷塑线数据
+const powderCoatingData = ref({
+  standardTemp: 180, // 标准烘烤温度
+  actualTemp: 175,   // 实际温度
+  alarmThreshold: 10 // 报警阈值
 })
 
-// 格式化规格文本
-const formatSpec = (spec: string) => {
-  if (!spec) return '';
-  return spec.length > 10 ? spec.slice(0, 10) + '...' : spec;
+// 喷漆线数据
+const paintLineData = ref({
+  standardTemp: 160, // 标准烘烤温度
+  actualTemp: 165,   // 实际温度
+  alarmThreshold: 10 // 报警阈值
+})
+
+// 模拟数据更新
+let dataTimer: NodeJS.Timeout | null = null
+
+const updateTemperatureData = () => {
+
+  
+  // 检查是否需要报警
+  checkAlarmConditions()
 }
+
+const checkAlarmConditions = () => {
+  const powderDiff = Math.abs(powderCoatingData.value.actualTemp - powderCoatingData.value.standardTemp)
+  const paintDiff = Math.abs(paintLineData.value.actualTemp - paintLineData.value.standardTemp)
+  
+  if (powderDiff > powderCoatingData.value.alarmThreshold) {
+    console.warn('喷塑线温度异常！', {
+      standard: powderCoatingData.value.standardTemp,
+      actual: powderCoatingData.value.actualTemp,
+      diff: powderDiff
+    })
+  }
+  
+  if (paintDiff > paintLineData.value.alarmThreshold) {
+    console.warn('喷漆线温度异常！', {
+      standard: paintLineData.value.standardTemp,
+      actual: paintLineData.value.actualTemp,
+      diff: paintDiff
+    })
+  }
+}
+
+const handleDataUpdate = (data: any) => {
+  console.log('数据更新:', data)
+  // 这里可以处理数据更新逻辑
+}
+
+// 组件挂载时启动数据更新
+onMounted(() => {
+  // 每5秒更新一次温度数据
+  dataTimer = setInterval(updateTemperatureData, 5000)
+})
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+  if (dataTimer) {
+    clearInterval(dataTimer)
+    dataTimer = null
+  }
+})
 </script>
 
 <style scoped>
-.line2-container {
-  padding: 0.2rem 0.2rem 0 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden; /* 防止外层出现滚动条 */
-}
-
-.cards-container {
-  width: 100%;
-  height: 100%;
-  display: flex;
-  flex-flow: row wrap;  /* 改为水平方向排列 */
-  gap: 1rem;  /* 使用 gap 替代单独设置 margin */
-  padding-right: 0.5rem; /* 为滚动条预留空间 */
-  overflow-y: auto;  /* 添加垂直滚动条 */
-}
-
-.card-wrapper {
-  width: calc(33.33% - 0.67rem);
-}
-
-/* 美化滚动条样式 */
-.cards-container::-webkit-scrollbar {
-  width: 6px;
-}
-
-.cards-container::-webkit-scrollbar-thumb {
-  background-color: rgba(0, 238, 255, 0.3);
-  border-radius: 3px;
-}
-
-.cards-container::-webkit-scrollbar-track {
-  background: transparent;
-}
-
-@media (max-width: 1400px) {
-  .card-wrapper {
-    width: calc(50% - 0.5rem);
-  }
-}
-
-@media (max-width: 900px) {
-  .card-wrapper {
-    width: 100%;
-  }
-}
-</style> 
+/* 可以添加一些自定义样式 */
+</style>

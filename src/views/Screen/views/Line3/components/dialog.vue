@@ -43,7 +43,7 @@
         <el-form-item label="不良问题">
           <el-input v-model="form.reason" />
         </el-form-item>
-        <el-form-item label="责任人">
+        <el-form-item label="处理方式">
           <el-input v-model="form.way" />
         </el-form-item>
       </el-form>

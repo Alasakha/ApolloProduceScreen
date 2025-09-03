@@ -1,168 +1,793 @@
 <template>
-  <div class="h-[10vh] w-full ">
-    <dv-border-box-2 >
-        <div class="flex w-full h-full justify-between">
-            <div v-for="item in data" class=" flex flex-col items-center justify-center h-full  ">
-                  <div class="text-[#00eeff] flex items-center text-base sm:text-lg md:text-xl 3xl:text-sm 4xl:text-lg  ">
-            {{item.category}}
-            <span :class="{'text-red-500': item.ratio.startsWith('↑'), 'text-green-500': item.ratio.startsWith('↓')}" class="ml-2">
-              {{item.ratio}}
+  <div class="line3-container">
+    <div class="header">
+      <div class="title">能耗监控</div>
+    </div>
+    
+    <div class="content">
+      <div class="energy-grid">
+        <!-- 有数据时显示能耗卡片 -->
+        <div 
+          v-for="(item, index) in energyData" 
+          :key="index"
+          class="energy-card"
+          :class="{ 'exceeded': item.actualPerUnit > item.standardPerUnit }"
+        >
+          <div class="card-header">
+            <div class="workshop-name">{{ item.workshopName }}</div>
+            <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0, 'saved': Number(item.ratio) < 0 }">
+              {{ Number(item.ratio) > 0 ? '+' : '' }}{{ item.ratio }}
+            </div>
+          </div>
+          
+
+          <div class="card-content">
+            <div class="flex items-center">
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">标准每台：</span>
+              <dv-digital-flop :config="{
+                number: [item.standardPerUnit],
+                content: '{nt}kW/h',
+                style: {
+                  fontSize: getFontSize(),
+                  fill: '#00eeff'
+                }
+              }" />
+            </div>
+            
+            <div class="flex items-center">
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台：</span>
+              <dv-digital-flop :config="{
+                number: [item.actualPerUnit],
+                content: '{nt}kW/h',
+                style: {
+                  fontSize: getFontSize(),
+                  fill: item.actualPerUnit > item.standardPerUnit ? '#ff0000' : '#00ff00'
+                }
+              }" />
+            </div>
+            
+            <div class="flex items-center">
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际总电：</span>
+              <dv-digital-flop :config="{
+                number: [item.actualTotal],
+                content: '{nt}kW/h',
+                style: {
+                  fontSize: getFontSize(),
+                  fill: '#ffaa00'
+                }
+              }" />
+            </div>
+            
+            <!-- 添加填写原因按钮 -->
+            <div class="reason-section" v-if="Number(item.ratio) > 0">
+              <div class="reason-info">
+                <span class="reason-label">超过原因：</span>
+                <span class="reason-text">{{ item.reason || '暂未填写' }}</span>
+              </div>
+              <button 
+                class="reason-btn"
+                @click="openReasonDialog(item)"
+              >
+                <span class="btn-icon">📝</span>
+                填写原因
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 没有数据时显示提示 -->
+        <div v-if="energyData.length === 0" class="no-data-container">
+          <div class="no-data-content">
+            <div class="no-data-icon">📊</div>
+            <div class="no-data-text">暂无能耗数据</div>
+            <div class="no-data-subtext">正在加载中...</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 填写原因弹窗 -->
+  <el-dialog
+    v-model="reasonDialogVisible"
+    title="填写超过原因"
+    width="50%"
+    :close-on-click-modal="false"
+    :before-close="handleReasonDialogClose"
+    destroy-on-close
+    append-to-body
+    class="reason-dialog"
+  >
+    <div class="reason-dialog-content">
+      <div class="dialog-header mb-6">
+        <div class="header-icon">📝</div>
+        <div class="header-text">
+          <h3 class="header-title">填写能耗超过原因</h3>
+          <p class="header-subtitle">请详细描述能耗超过标准的原因</p>
+        </div>
+      </div>
+      
+      <div class="form-content">
+        <!-- 车间信息 -->
+        <div class="workshop-info mb-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+          <div class="info-row flex items-center justify-between mb-2">
+            <span class="info-label text-blue-700 font-medium">车间名称：</span>
+            <span class="info-value text-blue-900 font-semibold">{{ selectedWorkshop?.workshopName || '未知' }}</span>
+          </div>
+          <div class="info-row flex items-center justify-between">
+            <span class="info-label text-blue-700 font-medium">超支/节省：</span>
+            <span 
+              class="info-value font-semibold"
+              :class="Number(selectedWorkshop?.ratio) > 0 ? 'text-red-600' : 'text-green-600'"
+            >
+              {{ Number(selectedWorkshop?.ratio) > 0 ? '+' : '' }}{{ selectedWorkshop?.ratio }}
             </span>
           </div>
-        <!-- <div class="flex justify-center items-center gap-8 felx-col"> -->
-          <div class="flex items-center">
-            <span class="text-white  text-sm sm:text-base md:text-lg xl:text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">标准耗电：</span>
-            <dv-digital-flop :config="{
-              number: [item.standardConsumption],
-              content: '{nt}kW/h',
-              style: {
-                fontSize: getFontSize(),
-                fill: '#00eeff'
-              }
-            }" />
-          </div>
-          <div class="flex items-center">
-            <span class="text-white  text-sm sm:text-base md:text-lg xl:text-sm  2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">实际耗电：</span>
-            <dv-digital-flop :config="{
-              number: [item.actualConsumption],
-              content: '{nt}kW/h',
-              style: {
-                fontSize: getFontSize(),
-                fill: '#00eeff'
-              }
-            }" />
-          </div>
-      </div>
         </div>
-
-    </dv-border-box-2>
-  </div>
+        
+        <!-- 原因输入 -->
+        <div class="reason-input-section mb-6">
+          <label class="input-label block text-gray-700 font-medium mb-3">超过原因说明 *</label>
+          <el-input
+            v-model="newReason"
+            type="textarea"
+            :rows="4"
+            placeholder="请详细描述能耗超过标准的原因，例如：设备老化、生产负荷增加、维护不当等..."
+            class="w-full"
+            :maxlength="500"
+            show-word-limit
+          />
+        </div>
+        
+        <!-- 提交状态 -->
+        <div v-if="feedbackMessage" class="feedback-section mb-4">
+          <div 
+            class="feedback-message"
+            :class="feedbackType === 'success' ? 'success' : 'error'"
+          >
+            {{ feedbackMessage }}
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <template #footer>
+      <div class="dialog-footer">
+        <el-button @click="closeReasonDialog" :disabled="submittingReason">
+          取消
+        </el-button>
+        <el-button 
+          type="primary" 
+          @click="submitReason"
+          :loading="submittingReason"
+          :disabled="!newReason.trim()"
+        >
+          提交
+        </el-button>
+      </div>
+    </template>
+  </el-dialog>
 </template>
 
 <script setup lang="ts">
-import { onMounted, onUnmounted, ref, computed } from 'vue'
+import { ref, computed } from 'vue'
+import { ElMessage } from 'element-plus'
+import { getRawMaterialMonitoringAdd } from '@/api/getnewInjection'
+import type { EnergyData } from '@/types/energy'
+import { MACHINE_CODES } from '@/types/energy'
+
+interface Props {
+  data: EnergyData[]
+}
+
+const props = withDefaults(defineProps<Props>(), {
+  data: () => []
+})
+
+// 响应式变量
+const reasonDialogVisible = ref(false)
+const selectedWorkshop = ref<any>(null)
+const newReason = ref('')
+const feedbackMessage = ref('')
+const feedbackType = ref<'success' | 'error'>('success')
+const submittingReason = ref(false)
+
 import { useEnergyStore } from '@/store/energy'
 
 const energyStore = useEnergyStore()
 
-// 电表设备代码到显示名称的映射（按正确顺序）
-const DEVICE_MAPPING = {
-  '616506210001': '空压机',        // 序号1
-  '616506210002': '注塑',          // 序号2
-  '616506210007': '冲压',          // 序号3
-  '616506210003': '焊接',          // 序号4
-  '616506210010': '总装一课装配',   // 序号5
-  '616506210009': '总装一课包装',   // 序号6
-  '616506210005': '总装二课',       // 序号7
-  '616506210004': '金工二部一楼',   // 序号8
-  '616506210006': '金工二部四楼',   // 序号9
-  '616506210008': '宿舍'           // 序号10
-}
 
-// 使用计算属性基于真实数据生成显示数据 - 使用当月数据，按正确顺序
-const data = computed(() => {
-  const electricData = energyStore.monthlyElectricData
-  const standardData = energyStore.monthlyStandardData
+// 计算属性
+const energyData = computed(() => {
+  console.log('🔍 Line3组件：接收到的原始数据:', props.data)
   
-  // 按照 MACHINE_CODES.ELECTRIC 的顺序处理数据，确保显示顺序正确
-  return electricData.map((deviceData) => {
-    const machCode = deviceData.machCode
-    const category = DEVICE_MAPPING[machCode] || machCode
-    const actualConsumption = Math.round(deviceData.numberPower) || 0
-    
-    // 从标准数据中查找对应的标准值
-    const standardItem = standardData.find(item => item.machCode === machCode)
-    const standardConsumption = standardItem ? Math.round(Number(standardItem.number)) : 0
-    
-    // 计算比率
-    let ratio = ''
-    if (standardConsumption > 0) {
-      const diff = actualConsumption - standardConsumption
-      if (diff > 0) {
-        ratio = `↑${diff}`
-      } else if (diff < 0) {
-        ratio = `↓${Math.abs(diff)}`
-      }
+  // 如果没有数据，使用测试数据
+  const testData: EnergyData[] = [
+    {
+      machCode: '616506210001',
+      machName: '空压机',
+      workshopName: '空压机',
+      monthDay: '2025-08-01',
+      number: '1000',        // 标准接口：标准总电
+      numberPower: 1200,     // 实际接口：实际总电
+      tipNumber: '0.0',
+      peakNumber: '0.0',
+      flatNumber: '1000.0',
+      valleyNumber: '0.0',
+      cl: 50,                // 台数
+      doneDay: 100,          // 日产量
+      reason: '设备老化导致能耗增加'
+    },
+    {
+      machCode: '616506210002',
+      machName: '注塑',
+      workshopName: '注塑',
+      monthDay: '2025-08-01',
+      number: '800',         // 标准接口：标准总电
+      numberPower: 750,      // 实际接口：实际总电
+      tipNumber: '0.0',
+      peakNumber: '0.0',
+      flatNumber: '800.0',
+      valleyNumber: '0.0',
+      cl: 30,                // 台数
+      doneDay: 80,           // 日产量
+      reason: ''
+    },
+    {
+      machCode: '616506210003',
+      machName: '焊接',
+      workshopName: '焊接',
+      monthDay: '2025-08-01',
+      number: '1500',        // 标准接口：标准总电
+      numberPower: 1800,     // 实际接口：实际总电
+      tipNumber: '0.0',
+      peakNumber: '0.0',
+      flatNumber: '1500.0',
+      valleyNumber: '0.0',
+      cl: 80,                // 台数
+      doneDay: 120,          // 日产量
+      reason: '生产负荷增加'
     }
+  ]
+  
+  const dataToProcess = props.data && props.data.length > 0 ? props.data : testData
+  
+  if (!dataToProcess || dataToProcess.length === 0) {
+    console.log('⚠️ Line3组件：没有接收到数据')
+    return []
+  }
+  
+  // 过滤数据：只保留电表数据，排除气表和水表
+  const filteredData = dataToProcess.filter(item => {
+    const isElectric = MACHINE_CODES.ELECTRIC.includes(item.machCode)
+    const isGas = MACHINE_CODES.GAS.includes(item.machCode)
+    const isWater = MACHINE_CODES.WATER.includes(item.machCode)
     
-    return {
-      category,
-      standardConsumption,
-      actualConsumption,
-      ratio,
-      machCode
-    }
+    console.log(`🔍 数据过滤 - ${item.machName}(${item.machCode}):`, {
+      isElectric,
+      isGas,
+      isWater,
+      willInclude: isElectric
+    })
+    
+    return isElectric
   })
+  
+  console.log('✅ 过滤后的电表数据:', filteredData.map(item => ({
+    machCode: item.machCode,
+    machName: item.machName,
+    type: '电表'
+  })))
+  
+  const processedData = filteredData.map(item => {
+    console.log('🔍 Line3组件：处理的数据:', item)
+    
+    // 从monthlyStandardData中获取标准数据（包含标准用电量和台数）
+    const standardItem = energyStore.monthlyStandardData.find(storeItem => storeItem.machCode === item.machCode)
+    
+    // 从monthlyData中获取实际数据
+    const actualItem = energyStore.monthlyData.find(storeItem => storeItem.machCode === item.machCode)
+    
+    // 标准总电：优先使用标准接口的number，其次使用实际接口的number
+    const standardTotal = Number(standardItem?.number || item.number) || 0
+    
+    // 实际总电：优先使用实际接口的numberPower
+    const actualTotal = actualItem?.numberPower || item.numberPower || 0
+    
+    // 台数：优先使用标准接口的cl，其次使用props的cl
+    const standardMachineCount = standardItem?.cl || item.cl || 1
+
+    // 实际台数：优先使用实际接口的cl，其次使用props的cl
+    const actualMachineCount = actualItem?.cl || item.cl || 1
+    
+
+    
+    // 标准每台 = 标准总电 ÷ 台数
+    const standardPerUnit = standardMachineCount > 0 ? standardTotal / standardMachineCount : 0
+    // 实际每台 = 实际总电 ÷ 台数
+    const actualPerUnit = actualMachineCount > 0 ? actualTotal / actualMachineCount : 0
+    
+    // 计算差异和比例
+    const difference = actualPerUnit - standardPerUnit
+    const ratio = difference.toFixed(1)
+    
+
+    
+    const result = {
+      ...item,
+      standardTotal,        // 标准总电
+      actualTotal,          // 实际总电
+      standardPerUnit,      // 标准每台
+      actualPerUnit,        // 实际每台
+      ratio,
+      workshopName: item.workshopName || item.machName || item.machCode
+    }
+    
+
+    return result
+  })
+  
+  // 按照 MACHINE_CODES.ELECTRIC 中定义的顺序排序
+  const sortedData = processedData.sort((a, b) => {
+    const indexA = MACHINE_CODES.ELECTRIC.indexOf(a.machCode)
+    const indexB = MACHINE_CODES.ELECTRIC.indexOf(b.machCode)
+    
+    // 如果两个都在数组中，按索引排序
+    if (indexA !== -1 && indexB !== -1) {
+      return indexA - indexB
+    }
+    
+    // 如果只有一个在数组中，在数组中的排在前面
+    if (indexA !== -1) return -1
+    if (indexB !== -1) return 1
+    
+    // 都不在数组中，按原始顺序
+    return 0
+  })
+  
+  console.log('✅ Line3组件：排序后的数据:', sortedData.map(item => ({
+    machCode: item.machCode,
+    workshopName: item.workshopName,
+    order: MACHINE_CODES.ELECTRIC.indexOf(item.machCode)
+  })))
+  
+  return sortedData
 })
 
-// 数据刷新相关
-const updateInterval = ref<number | null>(null)
-
-// Line3组件现在使用store中的当月数据，不再独立获取数据
-// 数据由主组件统一管理
-
-console.log('📊 Line3组件：使用store中的当月数据')
-
-// 获取当前窗口宽度
-const windowWidth = ref(window.innerWidth)
-
-// 计算数字翻牌器的字体大小
+// 字体大小计算
 const getFontSize = () => {
-  if (windowWidth.value >= 2500) { // 4xl
-    return 25
-  } else if (windowWidth.value >= 1850) { // 3xl
-    return 13
-  } else if (windowWidth.value >= 1536) { // 2xl
-    return 26
-  } else if (windowWidth.value >= 1280) { // xl
-    return 24
-  } else if (windowWidth.value >= 1024) { // lg
-    return 22
-  } else if (windowWidth.value >= 768) { // md
-    return 20
-  } else if (windowWidth.value >= 640) { // sm
-    return 18
-  } else {
-    return 16
-  }
+  const width = window.innerWidth
+  if (width >= 4000) return 18
+  if (width >= 3000) return 16
+  if (width >= 2500) return 14
+  if (width >= 2000) return 12
+  if (width >= 1500) return 10
+  return 8
 }
 
-// 监听窗口大小变化
-const updateWidth = () => {
-  windowWidth.value = window.innerWidth
+// 打开填写原因弹窗
+const openReasonDialog = (workshop: EnergyData) => {
+  selectedWorkshop.value = workshop
+  newReason.value = workshop.reason || ''
+  feedbackMessage.value = ''
+  feedbackType.value = 'success'
+  reasonDialogVisible.value = true
 }
 
-onMounted(() => {
-  window.addEventListener('resize', updateWidth)
-})
+// 关闭填写原因弹窗
+const closeReasonDialog = () => {
+  reasonDialogVisible.value = false
+  selectedWorkshop.value = null
+  newReason.value = ''
+  feedbackMessage.value = ''
+}
 
-onUnmounted(() => {
-  if (updateInterval.value) {
-    clearInterval(updateInterval.value)
-    updateInterval.value = null
+// 处理填写原因弹窗的关闭事件
+const handleReasonDialogClose = (done: () => void) => {
+  if (submittingReason.value) {
+    return
   }
-  window.removeEventListener('resize', updateWidth)
-})
+  
+  if (newReason.value.trim() && newReason.value !== selectedWorkshop.value?.reason) {
+    ElMessage.warning('有未保存的更改，请确认是否关闭')
+  }
+  
+  closeReasonDialog()
+  done()
+}
+
+// 提交原因
+const submitReason = async () => {
+  if (!selectedWorkshop.value || !newReason.value.trim()) return
+
+  submittingReason.value = true
+  try {
+    // 调用API接口提交原因
+    const res = await getRawMaterialMonitoringAdd(selectedWorkshop.value.workshopName, newReason.value)
+    if (res.code === 200) {
+      feedbackMessage.value = '提交成功！'
+      feedbackType.value = 'success'
+      
+      // 更新本地数据
+      if (selectedWorkshop.value) {
+        selectedWorkshop.value.reason = newReason.value
+      }
+      
+      // 延迟关闭弹窗
+      setTimeout(() => {
+        closeReasonDialog()
+      }, 2000)
+    } else {
+      feedbackMessage.value = '提交失败，请稍后再试。'
+      feedbackType.value = 'error'
+    }
+  } catch (error) {
+    feedbackMessage.value = '提交失败，请稍后再试。'
+    feedbackType.value = 'error'
+    console.error('提交原因失败:', error)
+  } finally {
+    submittingReason.value = false
+  }
+}
 </script>
 
 <style scoped>
+.line3-container {
+  height: 25vh;
+  width: 100%;
+}
+
+.header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.title {
+  color: #00eeff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.subtitle {
+  color: #666;
+  font-size: 12px;
+  margin-top: 2px;
+}
+
+.content {
+  height: calc(100% - 70px);
+}
+
+.energy-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  height: 100%;
+  padding: 0 10px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 238, 255, 0.3) transparent;
+}
+
+.energy-grid::-webkit-scrollbar {
+  width: 6px;
+}
+
+.energy-grid::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.energy-grid::-webkit-scrollbar-thumb {
+  background: rgba(0, 238, 255, 0.3);
+  border-radius: 3px;
+}
+
+.energy-grid::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 238, 255, 0.5);
+}
+
+.energy-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(0, 238, 255, 0.1);
+  border: 1px solid rgba(0, 238, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px;
+  transition: all 0.3s ease;
+  min-height: 120px;
+}
+
+.energy-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 238, 255, 0.2);
+}
+
+.energy-card.exceeded {
+  background: rgba(255, 0, 0, 0.1);
+  border-color: rgba(255, 0, 0, 0.3);
+}
+
+.energy-card.exceeded:hover {
+  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+  padding-bottom: 6px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.workshop-name {
+  color: #00eeff;
+  font-size: 11px;
+  font-weight: 600;
+  line-height: 1.2;
+  flex: 1;
+  margin-right: 8px;
+}
+
+.ratio {
+  color: #00ff00;
+  font-size: 11px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.ratio.exceeded {
+  color: #ff0000;
+}
+
+.ratio.saved {
+  color: #00ff00;
+}
+
+.card-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.card-content .flex {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.card-content .text-white {
+  color: #ffffff;
+  font-size: 10px;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.reason-section {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reason-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.reason-label {
+  color: #fff;
+  font-size: 9px;
+  margin-right: 4px;
+}
+
+.reason-text {
+  color: #ffaa00;
+  font-size: 9px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reason-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  color: white;
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.reason-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #ff7676);
+  transform: translateY(-1px);
+}
+
+.btn-icon {
+  margin-right: 3px;
+}
+
+/* 弹窗样式 */
+.reason-dialog :deep(.el-dialog) {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+}
+
+.reason-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #2a2a2a, #333);
+  border-bottom: 1px solid #444;
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+.reason-dialog :deep(.el-dialog__title) {
+  color: #fbbf24;
+  font-size: 20px;
+  font-weight: 600;
+}
+
+.reason-dialog :deep(.el-dialog__close) {
+  color: #999;
+  font-size: 18px;
+}
+
+.reason-dialog :deep(.el-dialog__close):hover {
+  color: #fbbf24;
+}
+
+.reason-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+  background: #1a1a1a;
+}
+
+.reason-dialog :deep(.el-dialog__footer) {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  padding: 16px 24px;
+  border-radius: 0 0 12px 12px;
+}
+
+.dialog-header {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.header-icon {
+  font-size: 24px;
+  color: #fbbf24;
+}
+
+.header-title {
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  margin: 0 0 4px 0;
+}
+
+.header-subtitle {
+  color: #999;
+  font-size: 14px;
+  margin: 0;
+}
+
+.workshop-info {
+  background: rgba(59, 130, 246, 0.1) !important;
+  border: 1px solid rgba(59, 130, 246, 0.3) !important;
+}
+
+.info-label {
+  color: #3b82f6 !important;
+  font-weight: 500;
+}
+
+.info-value {
+  color: #1e40af !important;
+  font-weight: 600;
+}
+
+.input-label {
+  color: #e5e7eb !important;
+  font-weight: 500;
+}
+
+.feedback-section {
+  margin-top: 16px;
+}
+
+.feedback-message {
+  padding: 12px 16px;
+  border-radius: 8px;
+  font-weight: 500;
+}
+
+.feedback-message.success {
+  background: rgba(34, 197, 94, 0.1);
+  border: 1px solid rgba(34, 197, 94, 0.3);
+  color: #22c55e;
+}
+
+.feedback-message.error {
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.3);
+  color: #ef4444;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+/* 空数据状态样式 */
+.no-data-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 238, 255, 0.05);
+  border: 1px solid rgba(0, 238, 255, 0.2);
+  border-radius: 8px;
+  padding: 20px;
+}
+
+.no-data-content {
+  text-align: center;
+}
+
+.no-data-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+  opacity: 0.6;
+}
+
+.no-data-text {
+  color: #00eeff;
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.no-data-subtext {
+  color: #666;
+  font-size: 12px;
+}
+
 :deep(.dv-digital-flop) {
-  width: 140px;
-  height: 40px;
+  width: 80px;
+  height: 20px;
 }
 
 /* 响应式调整数字翻牌器尺寸 */
 @media (min-width: 1850px) {
   :deep(.dv-digital-flop) {
-    width: 160px;
-    height: 45px;
+    width: 90px;
+    height: 22px;
   }
 }
 
 @media (min-width: 2500px) {
   :deep(.dv-digital-flop) {
-    width: 180px;
-    height: 50px;
+    width: 100px;
+    height: 25px;
+  }
+}
+
+@media (min-width: 3000px) {
+  :deep(.dv-digital-flop) {
+    width: 110px;
+    height: 28px;
   }
 }
 </style>

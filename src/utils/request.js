@@ -6,6 +6,7 @@ const baseURL =  'http://192.168.1.197:10999/apollo'; // 默认值可以设置�
 // http://192.168.1.101:10999/
 // http://192.168.1.197:10999/apollo/quality/passRanking
 // http://192.168.1.185:10999/apollo
+
 // 创建一个 axios 实例
 const service = axios.create({
   baseURL: baseURL, // 使用环境变量设置的 baseURL

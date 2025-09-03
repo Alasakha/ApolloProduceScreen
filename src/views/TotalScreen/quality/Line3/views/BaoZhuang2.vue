@@ -77,7 +77,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
-
+import { eventBus } from '@/utils/eventbus'
 import { getCheckTotalDone } from '@/api/getQuiltyinfo'
 
 const dialogTitle = ref('包装检验超时');
@@ -158,11 +158,11 @@ onMounted(async () => {
 
   await fetchData()
   // await fetchData3()
-
+  eventBus.on("refreshData", fetchData)
 })
 
 onBeforeUnmount(() => {
-
+  eventBus.off("refreshData", fetchData)
 })
 </script>
 

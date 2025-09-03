@@ -14,7 +14,7 @@ import PLM from '@/views/PLM/index.vue'
 import MaterialManagement from '@/views/MaterialsManagement/index.vue'
 import  PressBoard from '@/views/Stamp/management/index.vue'
 import  paint from '@/views/Paint/management/index.vue'
-import  welding2 from '@/views/Welding2/management/index.vue'
+import  welding2 from '@/views/Welding copy/management/index.vue'
 import StampManagement from '@/views/Welding/management/index.vue'
 import FinicialKpi from '@/views/Finance/index.vue'
 import Qualitykpi from '@/views/QualityKPIDashboard/index.vue'
@@ -23,7 +23,6 @@ import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanc
 import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
 import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard/index.vue'
 import PurchasePerformanceManagementDashboard from '@/views/PurchasePerformanceManagementDashboard/index.vue'
-import AdvancedEarthDemo from '@/views/ControlBoard/advanced-demo.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -186,12 +185,6 @@ const routes: RouteRecordRaw[] = [
     name: 'ControlBoard',   // 路由名
     component: () => import('@/views/ControlBoard/index.vue')
   },
-  {
-    // /test-scale
-    path: '/test-scale',
-    name: 'TestScale',
-    component: () => import('@/views/TestScreenScale.vue')
-  }
 ];
 
 

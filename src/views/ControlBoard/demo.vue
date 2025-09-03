@@ -161,7 +161,7 @@ const closeFeatures = () => {
 .demo-page {
   min-height: 100vh;
   background: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
-  color: #fff;
+  color: var(--text-primary);
   padding: 40px 20px;
 }
 
@@ -174,7 +174,7 @@ const closeFeatures = () => {
   font-size: 3rem;
   font-weight: bold;
   margin-bottom: 20px;
-  background: linear-gradient(45deg, #00ffff, #00ff96);
+  background: linear-gradient(45deg, var(--primary-blue), var(--success));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -200,8 +200,8 @@ const closeFeatures = () => {
 }
 
 .feature-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 16px;
   padding: 30px;
   text-align: center;
@@ -211,8 +211,8 @@ const closeFeatures = () => {
 
 .feature-card:hover {
   transform: translateY(-10px);
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: 0 20px 40px rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 20px 40px rgba(0, 212, 255, 0.1);
 }
 
 .feature-icon {
@@ -225,7 +225,7 @@ const closeFeatures = () => {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 15px;
-  color: #00ffff;
+  color: var(--primary-blue);
 }
 
 .feature-card p {
@@ -252,31 +252,31 @@ const closeFeatures = () => {
 }
 
 .demo-btn.primary {
-  background: linear-gradient(45deg, #00ffff, #00cc7a);
+  background: linear-gradient(45deg, var(--primary-blue), #00cc7a);
   color: #000;
-  box-shadow: 0 8px 25px rgba(0, 255, 255, 0.3);
+  box-shadow: 0 8px 25px rgba(0, 212, 255, 0.3);
 }
 
 .demo-btn.primary:hover {
   transform: translateY(-3px);
-  box-shadow: 0 12px 35px rgba(0, 255, 255, 0.4);
+  box-shadow: 0 12px 35px rgba(0, 212, 255, 0.4);
 }
 
 .demo-btn.secondary {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--border-secondary);
+  color: var(--text-primary);
   border: 2px solid rgba(255, 255, 255, 0.3);
 }
 
 .demo-btn.secondary:hover {
-  background: rgba(255, 255, 255, 0.2);
+  background: var(--border-secondary);
   border-color: rgba(255, 255, 255, 0.5);
   transform: translateY(-3px);
 }
 
 .demo-info {
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-secondary);
   border-radius: 16px;
   padding: 40px;
   backdrop-filter: blur(10px);
@@ -286,7 +286,7 @@ const closeFeatures = () => {
   text-align: center;
   font-size: 2rem;
   margin-bottom: 40px;
-  color: #00ffff;
+  color: var(--primary-blue);
 }
 
 .info-grid {
@@ -296,14 +296,14 @@ const closeFeatures = () => {
 }
 
 .info-item {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   border-radius: 12px;
   padding: 25px;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-secondary);
 }
 
 .info-item h4 {
-  color: #00ff96;
+  color: var(--success);
   font-size: 1.2rem;
   margin-bottom: 15px;
   display: flex;
@@ -320,7 +320,7 @@ const closeFeatures = () => {
 .info-item li {
   color: rgba(255, 255, 255, 0.8);
   padding: 8px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-secondary);
   position: relative;
   padding-left: 20px;
 }
@@ -329,7 +329,7 @@ const closeFeatures = () => {
   content: '▶';
   position: absolute;
   left: 0;
-  color: #00ffff;
+  color: var(--primary-blue);
   font-size: 0.8rem;
 }
 
@@ -354,7 +354,7 @@ const closeFeatures = () => {
 
 .modal-content {
   background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  border: 1px solid var(--border-secondary);
   border-radius: 16px;
   max-width: 800px;
   width: 90%;
@@ -368,11 +368,11 @@ const closeFeatures = () => {
   justify-content: space-between;
   align-items: center;
   padding: 25px 30px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  border-bottom: 1px solid var(--border-secondary);
 }
 
 .modal-header h3 {
-  color: #00ffff;
+  color: var(--primary-blue);
   margin: 0;
   font-size: 1.5rem;
 }
@@ -380,7 +380,7 @@ const closeFeatures = () => {
 .close-btn {
   background: none;
   border: none;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   font-size: 2rem;
   cursor: pointer;
   padding: 0;
@@ -394,8 +394,8 @@ const closeFeatures = () => {
 }
 
 .close-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  color: #fff;
+  background: var(--border-secondary);
+  color: var(--text-primary);
 }
 
 .modal-body {
@@ -407,7 +407,7 @@ const closeFeatures = () => {
 }
 
 .feature-detail h4 {
-  color: #00ff96;
+  color: var(--success);
   font-size: 1.3rem;
   margin-bottom: 15px;
 }
@@ -424,7 +424,7 @@ const closeFeatures = () => {
 }
 
 .feature-detail li {
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   padding: 8px 0;
   padding-left: 25px;
   position: relative;
@@ -434,7 +434,7 @@ const closeFeatures = () => {
   content: '✓';
   position: absolute;
   left: 0;
-  color: #00ff96;
+  color: var(--success);
   font-weight: bold;
 }
 

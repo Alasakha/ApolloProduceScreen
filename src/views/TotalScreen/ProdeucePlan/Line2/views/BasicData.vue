@@ -122,6 +122,13 @@ const fetchData = () => {
 
 }
 
+// function addfive(num){
+//   if(prodLine == 1004){
+//     return num - 5
+//   }else{
+//     return num
+//   }
+// }
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
   fetchData(); // 组件挂载时先请求一次

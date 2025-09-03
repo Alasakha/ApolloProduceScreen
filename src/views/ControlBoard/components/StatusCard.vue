@@ -115,8 +115,8 @@ const toggleDevice = (item) => {
 
 <style scoped>
 .status-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 12px;
   padding: 20px;
   height: 100%;
@@ -125,8 +125,8 @@ const toggleDevice = (item) => {
 }
 
 .status-card:hover {
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: var(--border-primary);
+  box-shadow: 0 0 20px var(--shadow-primary);
 }
 
 .card-header {
@@ -137,7 +137,7 @@ const toggleDevice = (item) => {
 }
 
 .card-title {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 16px;
   font-weight: 600;
   margin: 0;
@@ -152,7 +152,7 @@ const toggleDevice = (item) => {
   display: flex;
   align-items: center;
   gap: 6px;
-  color: rgba(255, 255, 255, 0.7);
+  color: var(--text-secondary);
   font-size: 12px;
 }
 
@@ -163,8 +163,8 @@ const toggleDevice = (item) => {
 }
 
 .summary-dot.online {
-  background: #00ff96;
-  box-shadow: 0 0 6px rgba(0, 255, 150, 0.6);
+  background: var(--success);
+  box-shadow: 0 0 6px rgba(0, 204, 122, 0.6);
 }
 
 .summary-dot.offline {
@@ -187,19 +187,19 @@ const toggleDevice = (item) => {
   align-items: center;
   gap: 15px;
   background: rgba(255, 255, 255, 0.03);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 1px solid var(--border-secondary);
   border-radius: 8px;
   padding: 15px;
   transition: all 0.3s ease;
 }
 
 .status-item:hover {
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--bg-card);
   transform: translateX(5px);
 }
 
 .status-item.status-online {
-  border-color: rgba(0, 255, 150, 0.3);
+  border-color: rgba(0, 204, 122, 0.3);
 }
 
 .status-item.status-offline {
@@ -225,8 +225,8 @@ const toggleDevice = (item) => {
 }
 
 .icon-circle.status-online {
-  background: rgba(0, 255, 150, 0.2);
-  border: 2px solid #00ff96;
+  background: rgba(0, 204, 122, 0.2);
+  border: 2px solid var(--success);
 }
 
 .icon-circle.status-offline {
@@ -250,7 +250,7 @@ const toggleDevice = (item) => {
 }
 
 .device-name {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 500;
   margin-bottom: 6px;
@@ -273,8 +273,8 @@ const toggleDevice = (item) => {
 }
 
 .status-badge.status-online {
-  background: rgba(0, 255, 150, 0.2);
-  color: #00ff96;
+  background: rgba(0, 204, 122, 0.2);
+  color: var(--success);
 }
 
 .status-badge.status-offline {
@@ -288,7 +288,7 @@ const toggleDevice = (item) => {
 }
 
 .uptime {
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
   font-size: 11px;
   font-family: monospace;
 }
@@ -300,11 +300,11 @@ const toggleDevice = (item) => {
 }
 
 .action-btn {
-  background: rgba(255, 255, 255, 0.1);
-  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: var(--border-secondary);
+  border: 1px solid var(--border-secondary);
   border-radius: 6px;
   padding: 6px;
-  color: #fff;
+  color: var(--text-primary);
   cursor: pointer;
   transition: all 0.2s ease;
   display: flex;
@@ -313,8 +313,8 @@ const toggleDevice = (item) => {
 }
 
 .action-btn:hover {
-  background: rgba(0, 255, 255, 0.2);
-  border-color: #00ffff;
+  background: rgba(0, 212, 255, 0.2);
+  border-color: var(--primary-blue);
   transform: scale(1.1);
 }
 

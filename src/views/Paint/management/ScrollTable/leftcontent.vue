@@ -1,50 +1,51 @@
 <template>
-  
-
-      <div class="wrapper flex flex-col h-full ">
-
-            
-       <!-- 如果没有数据，显示暂无数据 -->
-       <div v-if="!isLoading && isDataEmpty" class="empty-container">
-         暂无数据
-       </div>
-       
-       <!-- 数据加载完成且非空时显示图表 -->
-        <div class="tablebox w-full h-[90%]">
-           <!-- 如果正在加载，显示 loading -->
-         <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
-  
-          <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
+    <div class="abnormal-container w-full h-full">
+        <div class="abnormal-title">
+            <h3>异常信息</h3>
         </div>
-      </div>
-
-  
-    <!-- 弹窗部分 -->
-  <el-dialog v-model="dialogVisible" title="详细信息" width="50%">
-    <div v-for="(label, index) in config.header" :key="index" class="mb-2" :z-index="99999999">
-      <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
+        
+        <div class="wrapper flex flex-col h-full">
+            <!-- 如果没有数据，显示暂无数据 -->
+            <div v-if="!isLoading && isDataEmpty" class="empty-container">
+                暂无数据
+            </div>
+            
+            <!-- 数据加载完成且非空时显示图表 -->
+            <div class="tablebox w-full h-full">
+                <!-- 如果正在加载，显示 loading -->
+                <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
+                
+                <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" />
+            </div>
+        </div>
+        
+        <!-- 弹窗部分 -->
+        <el-dialog v-model="dialogVisible" title="详细信息" width="50%">
+            <div v-for="(label, index) in config.header" :key="index" class="mb-2" :z-index="99999999">
+                <strong>{{ label }}：</strong>{{ selectedItem[index+1] }}
+            </div>
+        </el-dialog>
     </div>
-  </el-dialog>
-  </template>
-  
-  <script setup>
-  import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
-  import * as echarts from 'echarts';
-  import { getWarningNextDay } from '@/api/getStampWeldinfo';
-  import { useRoute } from 'vue-router';
-  import { eventBus } from '@/utils/eventbus';
-  import ScrollBoard from '@/components/datav/ScrollBoard.vue'
-  const dialogVisible = ref(false);//弹窗控制
-  const selectedItem = ref({});
-  const route = useRoute();
-  const prodLine = route.query.prodLine;
-  const monthlyIndicators = ref(null);
-  const isLoading = ref(true);
-  const isDataEmpty = ref(false);
-  const categories = ref([]); // X 轴数据
-  const values = ref([]); // Y 轴数据
-  let chartInstance = null;
-  const config = reactive({
+</template>
+
+<script setup>
+import { ref, onMounted, watch, nextTick ,onBeforeUnmount,reactive} from 'vue';
+import * as echarts from 'echarts';
+import { getWarningNextDay } from '@/api/getStampWeldinfo';
+import { useRoute } from 'vue-router';
+import { eventBus } from '@/utils/eventbus';
+import ScrollBoard from '@/components/datav/ScrollBoard.vue'
+const dialogVisible = ref(false);//弹窗控制
+const selectedItem = ref({});
+const route = useRoute();
+const prodLine = route.query.prodLine;
+const monthlyIndicators = ref(null);
+const isLoading = ref(true);
+const isDataEmpty = ref(false);
+const categories = ref([]); // X 轴数据
+const values = ref([]); // Y 轴数据
+let chartInstance = null;
+const config = reactive({
     header: ['排产时间',
   '客户单号',
   // '供应商代号',
@@ -116,23 +117,55 @@ getWarningNextDay(param).then(res => {
   
   
   <style scoped>
-  .box1 {
+  .abnormal-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    width: 100%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    box-sizing: border-box;
+}
+
+.abnormal-title {
+    background: linear-gradient(135deg, #87CEEB, #98D8E8);
+    padding: 8px;
+    border-radius: 6px 6px 0 0;
+    flex-shrink: 0;
+}
+
+.abnormal-title h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 14px;
+    font-weight: 600;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.wrapper {
+    flex: 1;
+    min-height: 0;
+    padding: 8px;
+    box-sizing: border-box;
+}
+
+.tablebox {
+    flex: 1;
+    min-height: 0;
+}
+
+.empty-container {
     display: flex;
     justify-content: center;
     align-items: center;
-    font-size: 18px;
-    color: aliceblue;
-    padding: 20px;
-  }
-  
-  h2 {
-    top: 0.5vh;
-    left: 1vw;
-    margin: 0;
-    font-size: 1vw;
-    font-weight: bold;
-    margin-bottom: 10px;
-  }
+    height: 100%;
+    color: #909399;
+    font-size: 14px;
+}
 
-  </style>
+</style>
    

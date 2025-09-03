@@ -69,11 +69,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch,onUnmounted  } from 'vue'
+import { ref, onMounted, computed,onUnmounted  } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import EChartsPieChart from '@/components/EChartsPieChart.vue'
 import type { PieChartItem } from '@/components/EChartsPieChart.vue'
 import { getTodayBadIssues, type TodayBadIssues } from '@/api/getStampWeldinfo'
+import { useRoute } from 'vue-router'
+
+const route = useRoute()
+const prodLine = route.query.prodLine as string
 
 // 图表引用
 const pieChartRef = ref()
@@ -84,8 +88,6 @@ const detailData = ref<any[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
 
-// 生产线参数（根据实际情况调整）
-const prodLine = ref('1003') // 或者从props传入
 
 // 真实API数据
 const apiData = ref<TodayBadIssues[]>([])
@@ -137,9 +139,9 @@ const chartConfig = computed(() => ({
 // 获取今日不良TOP问题数据
 const fetchTodayBadIssues = async () => {
     try {
-        console.log('开始获取今日不良TOP问题数据，生产线:', prodLine.value)
+        console.log('开始获取今日不良TOP问题数据，生产线:', prodLine)
         
-        const response = await getTodayBadIssues(prodLine.value)
+        const response = await getTodayBadIssues(prodLine)
         console.log('API响应数据:', response)
         
         if (response && response.data) {
@@ -211,7 +213,7 @@ const startAutoRefresh = () => {
     refreshTimer = setInterval(() => {
         
         fetchTodayBadIssues()
-    }, 60000) // 每分钟刷新一次
+    }, 180000) // 每3分钟刷新一次
 }
 
 // 停止定时刷新
@@ -236,9 +238,9 @@ onUnmounted(() => {
 })
 
 // 监听生产线变化
-watch(prodLine, () => {
-    fetchTodayBadIssues()
-})
+// watch(prodLine, () => {
+//     fetchTodayBadIssues()
+// })
 
 
 </script>
@@ -248,7 +250,6 @@ watch(prodLine, () => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
     margin: 0 8px;
@@ -257,9 +258,8 @@ watch(prodLine, () => {
 
 .quality-title {
     background: linear-gradient(135deg, #87CEEB, #98D8E8);
-    padding: 8px 16px;
+    padding: 1px 1px;
     border-radius: 6px;
-    margin-bottom: 16px;
 }
 
 .quality-title h3 {

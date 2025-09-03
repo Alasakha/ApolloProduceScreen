@@ -5,7 +5,7 @@ import { ref, reactive, computed, watch } from 'vue';
 </script>
 
 <template>
-<div class="title title-main flex justify-center items-center">预算与实际达成对比（销售）</div>
+<div class="title title-main flex justify-center items-center">预算与实际达成对比</div>
 </template>
 
 <style scoped>

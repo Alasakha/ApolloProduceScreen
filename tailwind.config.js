@@ -13,6 +13,7 @@ export default {
       '2xl': '1536px',
       '3xl': '1850px',
       '4xl': '2500px',
+      '5xl': '3800px',
     },
     extend: {
       colors: {

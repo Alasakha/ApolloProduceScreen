@@ -7,63 +7,101 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { use } from 'echarts/core';
 import { CanvasRenderer } from 'echarts/renderers';
-import { BarChart } from 'echarts/charts';
-import { GridComponent, TooltipComponent, LegendComponent } from 'echarts/components';
+import { LineChart } from 'echarts/charts';
+import { GridComponent, TooltipComponent, LegendComponent, DataZoomComponent } from 'echarts/components';
 import VChart from 'vue-echarts';
-import { getFinanceQuantity } from '@/api/getIncomingInfo';
 import * as echarts from 'echarts/core';
 
-use([CanvasRenderer, BarChart, GridComponent, TooltipComponent, LegendComponent]);
+use([CanvasRenderer, LineChart, GridComponent, TooltipComponent, LegendComponent, DataZoomComponent]);
 
-const chartData = ref({
-    currentMonth: {
-        challenge: 0,
-        reasonable: 0,
-        forecast: 0
-    },
-    stage: {
-        challenge: 0,
-        reasonable: 0,
-        forecast: 0
-    }
+// 定义props接口
+interface Props {
+    tableData?: {
+        months: Record<string, any>;
+        total: any;
+        stage: any;
+    };
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    tableData: () => ({
+        months: {},
+        total: {},
+        stage: {}
+    })
 });
 
+const chartRef = ref(null);
+
+// 月份标签
+const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
+
+// 计算图表数据
+const chartData = computed(() => {
+    const data = {
+        budgetQuantity: [], // 年度挑战预算（数量）/台
+        actualQuantity: [], // 年度合理预算（数量）/台
+        monthlyForecast: [], // 月度预测（数量）/台
+        bgTotal: [] // 实际数量/台
+    };
+
+    months.forEach(month => {
+        const monthData = props.tableData.months[month];
+        if (monthData) {
+            data.budgetQuantity.push(monthData.budgetQuantity || 0);
+            data.actualQuantity.push(monthData.actualQuantity || 0);
+            data.monthlyForecast.push(monthData.monthlyForecast || 0);
+            data.bgTotal.push(monthData.bgTotal || 0);
+        } else {
+            data.budgetQuantity.push(0);
+            data.actualQuantity.push(0);
+            data.monthlyForecast.push(0);
+            data.bgTotal.push(0);
+        }
+    });
+
+    return data;
+});
+
+// 图表配置
 const chartOption = computed(() => ({
     tooltip: {
         trigger: 'axis',
         axisPointer: {
-            type: 'shadow'
-        }
-    },
-    legend: {
-        data: ['当月达成率', '阶段达成率'],
+            type: 'cross',
+            label: {
+                backgroundColor: '#6a7985'
+            }
+        },
+        backgroundColor: 'rgba(0, 19, 47, 0.9)',
+        borderColor: '#00eeff',
+        borderWidth: 1,
         textStyle: {
             color: '#00eeff'
         }
     },
+    legend: {
+        data: ['年度挑战预算', '年度合理预算', '月度预测', '实际数量'],
+        textStyle: {
+            color: '#00eeff',
+            fontSize: 12
+        },
+        top: 10,
+        right: 10
+    },
     grid: {
         left: '3%',
         right: '4%',
-        bottom: '3%',
+        bottom: '15%',
+        top: '20%',
         containLabel: true
     },
     xAxis: {
         type: 'category',
-        data: ['挑战目标', '合理目标', '预测目标'],
-        axisLine: {
-            lineStyle: {
-                color: '#00eeff'
-            }
-        },
-        axisLabel: {
-            color: '#00eeff'
-        }
-    },
-    yAxis: {
-        type: 'value',
+        data: months,
         axisLine: {
             lineStyle: {
                 color: '#00eeff'
@@ -71,7 +109,29 @@ const chartOption = computed(() => ({
         },
         axisLabel: {
             color: '#00eeff',
-            formatter: '{value}%'
+            fontSize: 10,
+            rotate: 45
+        },
+        axisTick: {
+            lineStyle: {
+                color: '#00eeff'
+            }
+        }
+    },
+    yAxis: {
+        type: 'value',
+        name: '数量/台',
+        nameTextStyle: {
+            color: '#00eeff'
+        },
+        axisLine: {
+            lineStyle: {
+                color: '#00eeff'
+            }
+        },
+        axisLabel: {
+            color: '#00eeff',
+            fontSize: 10
         },
         splitLine: {
             lineStyle: {
@@ -79,96 +139,131 @@ const chartOption = computed(() => ({
             }
         }
     },
+    dataZoom: [
+        {
+            type: 'inside',
+            start: 0,
+            end: 100
+        },
+        {
+            type: 'slider',
+            start: 0,
+            end: 100,
+            bottom: 10,
+            height: 20,
+            borderColor: '#00eeff',
+            fillerColor: 'rgba(0,238,255,0.1)',
+            handleStyle: {
+                color: '#00eeff'
+            },
+            textStyle: {
+                color: '#00eeff'
+            }
+        }
+    ],
     series: [
         {
-            name: '当月达成率',
-            type: 'bar',
-            data: [
-                chartData.value.currentMonth.challenge,
-                chartData.value.currentMonth.reasonable,
-                chartData.value.currentMonth.forecast
-            ],
-            itemStyle: {
-                color: {
-                    type: 'linear',
-                    x: 0,
-                    y: 0,
-                    x2: 0,
-                    y2: 1,
-                    colorStops: [{
-                        offset: 0,
-                        color: '#00eeff'
-                    }, {
-                        offset: 1,
-                        color: 'rgba(0,238,255,0.1)'
-                    }]
-                }
+            name: '年度挑战预算',
+            type: 'line',
+            data: chartData.value.budgetQuantity,
+            smooth: true,
+            lineStyle: {
+                color: '#8A2BE2',
+                width: 3
             },
-            label: {
-                show: true,
-                position: 'top',
-                formatter: '{c}%',
-                color: '#00eeff'
+            itemStyle: {
+                color: '#8A2BE2',
+                borderColor: '#8A2BE2',
+                borderWidth: 2
+            },
+            symbol: 'circle',
+            symbolSize: 6,
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(0,238,255,0.3)' },
+                    { offset: 1, color: 'rgba(0,238,255,0.05)' }
+                ])
             }
         },
         {
-            name: '阶段达成率',
-            type: 'bar',
-            data: [
-                chartData.value.stage.challenge,
-                chartData.value.stage.reasonable,
-                chartData.value.stage.forecast
-            ],
-            itemStyle: {
-                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-                    { offset: 0, color: '#00ff9f' },
-                    { offset: 1, color: 'rgba(0,255,159,0.1)' }
-                ])
+            name: '年度合理预算',
+            type: 'line',
+            data: chartData.value.actualQuantity,
+            smooth: true,
+            lineStyle: {
+                color: '#00ff9f',
+                width: 3
             },
-            label: {
-                show: true,
-                position: 'top',
-                formatter: '{c}%',
-                color: '#00ff9f'
+            itemStyle: {
+                color: '#00ff9f',
+                borderColor: '#00ff9f',
+                borderWidth: 2
+            },
+            symbol: 'diamond',
+            symbolSize: 6,
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(0,255,159,0.3)' },
+                    { offset: 1, color: 'rgba(0,255,159,0.05)' }
+                ])
+            }
+        },
+        {
+            name: '月度预测',
+            type: 'line',
+            data: chartData.value.monthlyForecast,
+            smooth: true,
+            lineStyle: {
+                color: '#ff6b6b',
+                width: 3
+            },
+            itemStyle: {
+                color: '#ff6b6b',
+                borderColor: '#ff6b6b',
+                borderWidth: 2
+            },
+            symbol: 'triangle',
+            symbolSize: 6,
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(255,107,107,0.3)' },
+                    { offset: 1, color: 'rgba(255,107,107,0.05)' }
+                ])
+            }
+        },
+        {
+            name: '实际数量',
+            type: 'line',
+            data: chartData.value.bgTotal,
+            smooth: true,
+            lineStyle: {
+                color: '#feca57',
+                width: 3
+            },
+            itemStyle: {
+                color: '#feca57',
+                borderColor: '#feca57',
+                borderWidth: 2
+            },
+            symbol: 'rect',
+            symbolSize: 6,
+            areaStyle: {
+                color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+                    { offset: 0, color: 'rgba(254,202,87,0.3)' },
+                    { offset: 1, color: 'rgba(254,202,87,0.05)' }
+                ])
             }
         }
     ]
 }));
 
-const getCurrentMonth = () => {
-    const date = new Date();
-    return `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}`;
-};
-
-const getChartData = async () => {
-    try {
-        const res = await getFinanceQuantity();
-        const currentMonthData = res.data.find(item => item.monthDay.startsWith(getCurrentMonth()));
-        const stageData = res.data.find(item => item.monthDay === '阶段性汇总');
-        const totalData = res.data.find(item => item.monthDay === '全年汇总');
-
-        if (currentMonthData && stageData && totalData) {
-            // 计算当月达成率
-            chartData.value.currentMonth = {
-                challenge: Number(((currentMonthData.ysChallengeYear / totalData.ysChallengeYear) * 100).toFixed(1)),
-                reasonable: Number(((currentMonthData.ysReasonableYear / totalData.ysReasonableYear) * 100).toFixed(1)),
-                forecast: Number(((currentMonthData.ysValueMonth / totalData.ysValueMonth) * 100).toFixed(1))
-            };
-
-            // 计算阶段达成率
-            chartData.value.stage = {
-                challenge: Number(((stageData.ysChallengeYear / totalData.ysChallengeYear) * 100).toFixed(1)),
-                reasonable: Number(((stageData.ysReasonableYear / totalData.ysReasonableYear) * 100).toFixed(1)),
-                forecast: Number(((stageData.ysValueMonth / totalData.ysValueMonth) * 100).toFixed(1))
-            };
-        }
-    } catch (error) {
-        console.error('获取数据失败:', error);
-    }
-};
+// 监听数据变化
+watch(() => props.tableData, () => {
+    // 数据变化时图表会自动更新
+}, { deep: true });
 
 onMounted(() => {
-    getChartData();
+    // 组件挂载完成
 });
 </script>
 

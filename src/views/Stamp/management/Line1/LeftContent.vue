@@ -68,7 +68,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { getTodayProduction, type TodayProduction, getApolloStampingWelding, type ApolloStampingWelding } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
@@ -176,7 +176,9 @@ onMounted(() => {
   // 订阅刷新事件
   eventBus.on('refreshData', () => fetchData(prodLine))
 })
-
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', () => fetchData(prodLine))
+})
 
 </script>
 

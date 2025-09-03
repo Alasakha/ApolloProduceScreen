@@ -1,0 +1,71 @@
+:root {
+  /* 主色调 - 蓝色系 */
+  --primary-blue: #00d4ff;
+  --primary-blue-dark: #0099cc;
+  --primary-blue-light: #33ddff;
+  --primary-blue-lighter: #66e6ff;
+  
+  /* 辅助蓝色 */
+  --secondary-blue: #0066ff;
+  --secondary-blue-dark: #0044cc;
+  --secondary-blue-light: #3388ff;
+  
+  /* 深蓝色系 */
+  --deep-blue: #1e3a8a;
+  --deep-blue-dark: #1e40af;
+  --deep-blue-light: #3b82f6;
+  
+  /* 背景色系 */
+  --bg-primary: #0c0c0c;
+  --bg-secondary: #1a1a2e;
+  --bg-tertiary: #16213e;
+  --bg-card: rgba(255, 255, 255, 0.05);
+  --bg-card-hover: rgba(255, 255, 255, 0.1);
+  
+  /* 边框色系 */
+  --border-primary: rgba(0, 212, 255, 0.3);
+  --border-secondary: rgba(255, 255, 255, 0.1);
+  --border-hover: rgba(0, 212, 255, 0.5);
+  
+  /* 文字色系 */
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.8);
+  --text-muted: rgba(255, 255, 255, 0.6);
+  --text-accent: #00d4ff;
+  
+  /* 渐变色系 */
+  --gradient-primary: linear-gradient(135deg, #00d4ff, #0066ff);
+  --gradient-secondary: linear-gradient(45deg, #00d4ff, #00cc7a);
+  --gradient-bg: linear-gradient(135deg, #0c0c0c 0%, #1a1a2e 50%, #16213e 100%);
+  
+  /* 阴影色系 */
+  --shadow-primary: rgba(0, 212, 255, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.2);
+  --shadow-glow: rgba(0, 212, 255, 0.5);
+  
+  /* 状态色系 */
+  --success: #00cc7a;
+  --warning: #ffaa00;
+  --error: #ff6b6b;
+  --info: #00d4ff;
+  
+  /* 图表颜色系 */
+  --chart-blue: #0096ff;
+  --chart-orange: #ff9600;
+  --chart-red: #ff0066;
+  --chart-purple: #9600ff;
+  --chart-green: #00ff96;
+  
+  /* 其他常用颜色 */
+  --black: #000000;
+  --white: #ffffff;
+  --gray-light: #cccccc;
+  --gray-medium: #666666;
+  --gray-dark: #333333;
+  
+  /* 透明度变量 */
+  --opacity-light: 0.1;
+  --opacity-medium: 0.3;
+  --opacity-heavy: 0.5;
+  --opacity-heavy-plus: 0.8;
+} 

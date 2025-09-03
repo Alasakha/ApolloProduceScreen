@@ -6,7 +6,7 @@ const formattedData = formatPieChartData(data, 'ngName', 'total');
 <template>
   <div v-if="prodLine === '1004A'" class="efficency w-[25%] ">
     <dv-border-box12>
-      <h1 class="text-white text-2xl font-bold ml-2 w-full flex justify-center items-cneter pt-4">上线检验数</h1>
+      <h1 class="text-white text-2xl font-bold ml-2 w-full flex justify-center items-cneter pt-4 5xl:text-4xl">上线检验数</h1>
       <div class="w-full h-full p-4" >
         <div class="cards-container flex-col">
           <div class="stat-card">

@@ -40,5 +40,6 @@ export function useEcharts(chartRef) {
     resizeChart,
     onClick,
     offClick,
+    getChart: () => chartInstance,
   };
 }

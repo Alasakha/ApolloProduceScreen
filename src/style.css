@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "./styles/theme.css";
 @theme {
   /* 重置所有默认断点 */
   --breakpoint-*: initial;

@@ -22,6 +22,10 @@ export const useEnergyStore = defineStore('energy', {
     // 新增：月标准用电量数据
     monthlyStandardData: [] as EnergyData[], // 月标准用电量数据
     lastStandardFetch: '', // 最后获取标准数据的日期
+    // 标准总台数（每次获取月标准用电量数据时统计电表台数）
+    starntotalCl: 0,
+    // 实际总台数（每次获取月实际用电量数据时统计电表台数）
+    actualtotalCl: 0
   }),
 
   getters: {
@@ -172,9 +176,96 @@ export const useEnergyStore = defineStore('energy', {
     // 获取最后获取标准数据的日期
     getLastStandardFetch(): string {
       return this.lastStandardFetch;
+    },
+
+    // 获取当月累计总电量（标准值）
+    getMonthlyTotalStandardPower(): number {
+      if (!this.monthlyStandardData || this.monthlyStandardData.length === 0) {
+        return 0;
+      }
+      
+
+      // 计算所有电表标准用电量的总和
+      const totalStandard = this.monthlyStandardData
+        .filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+        .reduce((sum, item) => {
+          return sum + (Number(item.number) || 0);
+        }, 0);
+      
+
+      console.log('📊 Store计算当月累计总电量（标准值）:', {
+        totalStandard,
+        meterCount: this.monthlyStandardData.filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode)).length,
+        data: this.monthlyStandardData.filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+      });
+      
+      return totalStandard;
+    },
+
+    // 获取当月累计总电量（实际值）
+    getMonthlyTotalActualPower(): number {
+      if (!this.monthlyData || this.monthlyData.length === 0) {
+        return 0;
+      }
+      
+      // 计算所有电表实际用电量的总和
+      const totalActual = this.monthlyData
+        .filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+        .reduce((sum, item) => {
+          return sum + (Number(item.numberPower) || 0);
+        }, 0);
+      
+      console.log('📊 Store计算当月累计总电量（实际值）:', {
+        totalActual,
+        meterCount: this.monthlyData.filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode)).length,
+        data: this.monthlyData.filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+      });
+      
+      return totalActual;
+    },
+
+
+    // 获取当月标准平均每台电量
+    getMonthlyAvgStandardPower(): number {
+      const totalPower = this.getMonthlyTotalStandardPower;
+      const totalCount = this.starntotalCl;
+      return totalCount > 0 ? totalPower / totalCount : 0;
+    },
+
+    // 获取当月实际平均每台电量
+    getMonthlyAvgActualPower(): number {
+      const totalPower = this.getMonthlyTotalActualPower;
+      
+      // 只计算特定编号的台数之和：616506210005 + 616506210009
+      const specificActualCount = this.monthlyData
+        .filter(item => ['616506210005', '616506210009'].includes(item.machCode))
+        .reduce((total, item) => total + (Number(item.cl) || 0), 0);
+      
+      return specificActualCount > 0 ? totalPower / specificActualCount : 0;
+    },
+
+    getActualTotalCl(): number {
+      return this.actualtotalCl;
+    },
+
+    getStandardTotalCl(): number {
+      return this.starntotalCl;
+    },
+
+    // 获取标准平均 ✖ 实际总台（用于比较）
+    getStandardAvgTimesActualCount(): number {
+      const standardAvg = this.getMonthlyAvgStandardPower;
+      
+      // 只计算特定编号的台数之和：616506210005 + 616506210009
+      const specificActualCount = this.monthlyData
+        .filter(item => ['616506210005', '616506210009'].includes(item.machCode))
+        .reduce((total, item) => total + (Number(item.cl) || 0), 0);
+      
+      return standardAvg * specificActualCount;
     }
   },
 
+  
   actions: {
     // 延时函数
     async delay(ms: number) {
@@ -189,6 +280,7 @@ export const useEnergyStore = defineStore('energy', {
         return true;
       }
 
+    
       try {
         const res = await this.callApiWithRetry(
           () => getGasPower(date),
@@ -422,7 +514,13 @@ export const useEnergyStore = defineStore('energy', {
         if (res.code === 200 && Array.isArray(res.data)) {
           this.monthlyData = res.data;
           this.lastMonthlyFetch = date;
-          console.log('✅ 当月数据获取成功，共', res.data.length, '条记录');
+          
+          // 计算实际总台数（从接口返回数据的cl字段获取）
+          this.actualtotalCl = res.data
+            .filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+            .reduce((total, item) => total + (Number(item.cl) || 0), 0);
+          
+          console.log('✅ 当月数据获取成功，共', res.data.length, '条记录，实际总台数:', this.actualtotalCl);
           return true;
         } else {
           console.warn('获取当月数据失败：', res.message);
@@ -452,7 +550,13 @@ export const useEnergyStore = defineStore('energy', {
         if (res.code === 200 && Array.isArray(res.data)) {
           this.monthlyStandardData = res.data;
           this.lastStandardFetch = new Date().toISOString().split('T')[0];
-          console.log('✅ 月标准用电量数据获取成功，共', res.data.length, '条记录');
+          
+          // 计算标准总台数（从接口返回数据的cl字段获取）
+          this.starntotalCl = res.data
+            .filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode))
+            .reduce((total, item) => total + (Number(item.cl) || 0), 0);
+          
+          console.log('✅ 月标准用电量数据获取成功，共', res.data.length, '条记录，标准总台数:', this.starntotalCl);
           return true;
         } else {
           console.warn('获取月标准用电量数据失败：', res.message);
@@ -461,6 +565,13 @@ export const useEnergyStore = defineStore('energy', {
       } catch (err) {
         console.error('获取月标准用电量数据异常（重试后仍失败）：', err);
         return false;
+      }
+    },
+
+    async fetchYearlyData(){
+      const res = await getElectricPowerYear();
+      if (res.code === 200 && Array.isArray(res.data)) {
+        this.yearlyData = res.data;
       }
     },
 
@@ -523,12 +634,51 @@ export const useEnergyStore = defineStore('energy', {
       this.calculateDailyGasAverage();
       this.calculateMonthlyGasAverage();
     },
-    
 
-    async fetchYearlyData(){
-      const res = await getElectricPowerYear();
-      if (res.code === 200 && Array.isArray(res.data)) {
-        this.yearlyData = res.data;
+    // 测试台数计算（用于调试）
+    testTotalCountCalculation() {
+      console.log('🔢 测试台数计算...');
+      
+      // 显示标准数据台数信息
+      const standardElectricData = this.monthlyStandardData.filter(item => 
+        MACHINE_CODES.ELECTRIC.includes(item.machCode)
+      );
+      
+      console.log('📊 标准数据台数信息:');
+      console.log('  - 标准总台数 (starntotalCl):', this.starntotalCl);
+      console.log('  - 标准数据条数:', standardElectricData.length);
+      standardElectricData.forEach(item => {
+        console.log(`    - ${item.machName} (${item.machCode}): cl=${item.cl}, number=${item.number}`);
+      });
+      
+      // 显示实际数据台数信息
+      const actualElectricData = this.monthlyData.filter(item => 
+        MACHINE_CODES.ELECTRIC.includes(item.machCode)
+      );
+      
+      console.log('📊 实际数据台数信息:');
+      console.log('  - 实际总台数 (actualtotalCl):', this.actualtotalCl);
+      console.log('  - 实际数据条数:', actualElectricData.length);
+      actualElectricData.forEach(item => {
+        console.log(`    - ${item.machName} (${item.machCode}): cl=${item.cl}, numberPower=${item.numberPower}`);
+      });
+      
+      // 验证计算逻辑
+      const calculatedStandardTotal = standardElectricData.reduce((total, item) => 
+        total + (Number(item.cl) || 0), 0
+      );
+      const calculatedActualTotal = actualElectricData.reduce((total, item) => 
+        total + (Number(item.cl) || 0), 0
+      );
+      
+      console.log('✅ 计算验证:');
+      console.log(`  - 标准总台数计算值: ${calculatedStandardTotal} (存储值: ${this.starntotalCl})`);
+      console.log(`  - 实际总台数计算值: ${calculatedActualTotal} (存储值: ${this.actualtotalCl})`);
+      
+      if (calculatedStandardTotal === this.starntotalCl && calculatedActualTotal === this.actualtotalCl) {
+        console.log('🎉 台数计算验证通过！');
+      } else {
+        console.warn('⚠️ 台数计算验证失败，可能存在数据不一致！');
       }
     }
   }

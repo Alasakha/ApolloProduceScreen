@@ -8,7 +8,7 @@
     </div>
     
     <!-- 年度和月度数据放在同一行 -->
-    <div class="data-row h-[50%]">
+    <div class="data-row h-[30%]">
 
       <!-- 月度数据 -->
       <div class="data-section">
@@ -66,7 +66,8 @@
     </div>
 
     <div class="data-row h-full w-full">
-      <chart></chart>
+      <chart2></chart2>
+      <!-- <chart3></chart3> -->
     </div>
     
     <!-- 填写原因对话框 -->
@@ -86,6 +87,8 @@ import { useProductionDataStore } from '@/store/productionData'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { fillInReason } from '@/api/produceperformance'
 import Chart from '../Bottom/Chart1.vue'
+import Chart2 from '../Bottom/Chart2.vue'
+// import Chart3 from '../Bottom/Chart3.vue'
 const code = 'FTY_A_MONTH'
 // 使用 Pinia store
 const productionStore = useProductionDataStore()
@@ -266,7 +269,6 @@ onUnmounted(() => {
 }
 
 .metrics-row {
-  height: 100%;   
   display: flex;
   justify-content: space-between;
   gap: 6px;
@@ -279,7 +281,6 @@ onUnmounted(() => {
   padding: 4px;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 3px;
-  height: 70%;
 }
 
 .metric-label {

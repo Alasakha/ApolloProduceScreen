@@ -25,7 +25,6 @@ interface Props {
     showLabel?: boolean
     showValue?: boolean
     showPointer?: boolean
-    theme?: 'light' | 'dark'
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -34,9 +33,13 @@ const props = withDefaults(defineProps<Props>(), {
     center: () => ['50%', '50%'],
     showLabel: true,
     showValue: true,
-    showPointer: true,
-    theme: 'light'
+    showPointer: true
 })
+
+// 定义事件
+const emit = defineEmits<{
+    click: [params: any]
+}>()
 
 // 图表引用
 const chartRef = ref<HTMLElement>()
@@ -59,11 +62,17 @@ const initChart = () => {
     }
     
     // 创建新实例
-    chartInstance = echarts.init(chartRef.value, props.theme)
+    chartInstance = echarts.init(chartRef.value)
     
     // 设置配置项
     const option: EChartsOption = getChartOption()
     chartInstance.setOption(option)
+    
+    // 绑定点击事件
+    chartInstance.on('click', (params: any) => {
+        console.log('ECharts点击事件:', params)
+        emit('click', params)
+    })
     
     // 监听窗口大小变化
     window.addEventListener('resize', handleResize)
@@ -77,7 +86,7 @@ const getChartOption = (): EChartsOption => {
             left: 'center',
             top: '5%',
             textStyle: {
-                color: props.theme === 'dark' ? '#fff' : '#333',
+                color: '#ffff',
                 fontSize: 16,
                 fontWeight: 'bold'
             }
@@ -88,10 +97,10 @@ const getChartOption = (): EChartsOption => {
             formatter: (params: any) => {
                 return `${params.name}: ${params.value} (${params.percent}%)`
             },
-            backgroundColor: props.theme === 'dark' ? 'rgba(0,0,0,0.9)' : 'rgba(255,255,255,0.95)',
-            borderColor: props.theme === 'dark' ? '#333' : '#ddd',
+            backgroundColor: 'rgba(255,255,255,0.95)',
+            borderColor: '#ddd',
             textStyle: {
-                color: props.theme === 'dark' ? '#fff' : '#333',
+                color: '#fff',
                 fontSize: 14,
                 fontWeight: 'bold'
             }
@@ -102,7 +111,7 @@ const getChartOption = (): EChartsOption => {
             left: 'left',
             top: 'middle',
             textStyle: {
-                color: props.theme === 'dark' ? '#fff' : '#333',
+                color: '#fff',
                 fontSize: 12,
                 fontWeight: 'bold'
             },
@@ -141,10 +150,10 @@ const getChartOption = (): EChartsOption => {
                     },
                     fontSize: 13,
                     fontWeight: 'bold',
-                    // 使用深色字体，确保高对比度
-                    color: '#1a1a1a',
+                    // 使用白色字体
+                    color: '#fff',
                     // 添加文字阴影，提高可读性
-                    textShadowColor: 'rgba(255, 255, 255, 0.8)',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
                     textShadowBlur: 2,
                     textShadowOffsetX: 1,
                     textShadowOffsetY: 1
@@ -172,8 +181,8 @@ const getChartOption = (): EChartsOption => {
                     label: {
                         fontSize: 15,
                         fontWeight: 'bold',
-                        color: '#000',
-                        textShadowColor: 'rgba(255, 255, 255, 1)',
+                        color: '#fff',
+                        textShadowColor: 'rgba(0, 0, 0, 1)',
                         textShadowBlur: 3,
                         textShadowOffsetX: 1,
                         textShadowOffsetY: 1
@@ -211,12 +220,7 @@ watch(() => props.data, () => {
     })
 }, { deep: true })
 
-// 监听主题变化
-watch(() => props.theme, () => {
-    nextTick(() => {
-        initChart()
-    })
-})
+
 
 // 组件挂载
 onMounted(() => {

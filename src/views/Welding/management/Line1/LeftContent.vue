@@ -23,10 +23,10 @@
 
     <div class="grid grid-cols-3 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-      <Datacard title="今日排产产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
+      <Datacard title="今日排产车架产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
       </dv-border-box-12>
       <dv-border-box-12 class="data-box ">
-        <Datacard title="已报工产量" EnlishTitle="InspectionsToday" :value="productionData.done" />
+        <Datacard title="已报工车架产量" EnlishTitle="InspectionsToday" :value="productionData.done" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
@@ -56,7 +56,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { getTodayProduction, type TodayProduction, getApolloStampingWelding, type ApolloStampingWelding } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
@@ -169,7 +169,9 @@ onMounted(() => {
 
 })
 
-
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', () => fetchData(prodLine))
+})
 </script>
 
 <style scoped>

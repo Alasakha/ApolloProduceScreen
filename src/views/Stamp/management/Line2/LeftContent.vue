@@ -50,18 +50,19 @@ const emptyCardData = {
   device: {
     hourBetween: "暂无",
     power: "暂无"
-  }
+  },
+  peopleName: "暂无"
 }
 
 const formatCardData = (item) => {
 
   return {
     orderName: item.machineName || "暂无",
-    totalQty: item.num ? Math.round(item.num) : "暂无",
-    doneQty: item.num || "暂无",
+    totalQty: item. total ? Math.round(item.total) : "暂无",
+    doneQty: item.total-item.num || "暂无",
     spec: item.processName || "暂无",
-    progress: item.workNo && item.num ? Number(((item.workNo / item.num) * 100).toFixed(0)) : 0,
-    status: item.deviceStateName || '暂无',
+    progress: item.total && item.num  ? Number((((item.total-item.num) / item.total) * 100).toFixed(0)) : 0,
+    status: getStatus(item),
     temperature: toFixedNumber(item.laserPower) || '暂无',
     pressure: '暂无',
     maxspeed: toFixedNumber(item.workSpeed) || '暂无',
@@ -72,12 +73,21 @@ const formatCardData = (item) => {
     stdKeeptime: 35,
     spen: item.item_specification || "暂无",
     ta006: item.productId || "暂无",
-    gdNum: 5,
+    gdNum: item.plan_qty,
     device: {
       hourBetween: "8.5",
       power: "75kw"
     },
-    workNo: item.macNo || "暂无"
+    workNo: item.macNo || "暂无",
+    peopleName: item.employeeName || "暂无"
+  }
+}
+
+const getStatus = (item) => {
+  if (item.isDoing === '1') {
+    return '运行中'
+  } else {
+    return '暂无'
   }
 }
 

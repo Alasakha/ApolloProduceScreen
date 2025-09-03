@@ -2,7 +2,7 @@
     <div class="line2-container">
       <!-- 加载状态 -->
       <div v-if="loading" class="flex items-center justify-center h-full">
-        <div class="text-cyan-400 text-lg">正在加载冲压设备数据...</div>
+        <div class="text-cyan-400 text-lg">正在加载焊接设备数据...</div>
       </div>
       
       <!-- 错误状态 -->
@@ -26,7 +26,9 @@
           />
         </div>
         <div class="carousel-wrapper">
-          <Abnormal />
+          <!-- <Abnormal /> -->
+          <OneProdLine />
+          <TwoProdLine />
         </div>
       </div>
   
@@ -84,7 +86,9 @@
   import WaitingDialog from './components/WaitingDialog.vue'
   import { getStampingDoingIndex, type StampingDoingIndex } from '@/api/getStampWeldinfo'
   import { useRoute } from 'vue-router'
-  import Abnormal from './Abnormal.vue'
+  // import Abnormal from './Abnormal.vue'
+  import OneProdLine from '../Line3/oneProdLine.vue'
+  import TwoProdLine from '../Line3/twoProdLine.vue'
   const route = useRoute()
   const prodLine = route.query.prodLine as string
   
@@ -110,13 +114,10 @@
   
   // 设备组名称映射
   const deviceGroupNames = {
-    SG_ALL: '缩管设备组',
-    CHH_ALL: '冲弧锯管设备组', 
-    WG_ALL: '弯管设备组',
-    GH_ALL: '滚花设备组',
-    CHC_ALL: '冲床设备组',
-    YJ_ALL: '压机设备组',
-    TZ_ALL: '台钻设备组'
+    ZDH1_ALL: '自动焊1线设备组',
+    ZDH2_ALL: '自动焊2线设备组',
+    SHGH_ALL: '手工焊设备组',
+    TJH_ALL: '铁架焊接设备组',
   }
   
   // 获取API数据
@@ -347,20 +348,24 @@
     gap: 1rem;  /* 使用 gap 替代单独设置 margin */
     padding-right: 0.5rem; /* 为滚动条预留空间 */
     overflow-y: auto;  /* 添加垂直滚动条 */
-  }
-  
-  .card-wrapper {
+    align-items: flex-start; /* 确保卡片从顶部对齐 */
+}
+
+.card-wrapper {
     width: calc(33.33% - 0.67rem);
     cursor: pointer;
     transition: transform 0.2s ease;
-  }
-  
-  /* 右侧轮播容器：占两列宽度，抵消 gap 影响，避免换行 */
-  .carousel-wrapper {
+    align-self: flex-start; /* 确保卡片从顶部对齐 */
+}
+
+/* 右侧轮播容器：占两列宽度，抵消 gap 影响，避免换行 */
+.carousel-wrapper {
     width: calc(66.66% - 0.33rem);
     display: flex;
     align-items: stretch;
-  }
+    align-self: flex-start; /* 确保从顶部对齐 */
+    height: fit-content; /* 自适应内容高度 */
+}
   
   .card-wrapper:hover {
     transform: translateY(-2px);

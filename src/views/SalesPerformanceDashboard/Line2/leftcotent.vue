@@ -14,9 +14,10 @@
                         <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">年度预算数量</th> -->
                         <th class="px-1 py-0.5 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5">年度预算金额(美元)</th>
                         <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">再次预算数量</th> -->
-                        <th class="px-1 py-0.5 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5">再次预算金额(美元)</th>
+                        <!-- <th class="px-1 py-0.5 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5">再次预算金额(美元)</th> -->
                         <!-- <th class="px-2 sm:px-3 md:px-4 py-2 sm:py-3 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-2 3xl:py-1 4xl:px-3 4xl:py-2">已下单数量</th> -->
                         <th class="px-1 py-0.5 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5">已下单金额(美元)</th>
+                        <th class="px-1 py-0.5 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-0.5">达成率</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -58,7 +59,7 @@
                                 {{ item.ysQuantityAgainComparison }}
                             </span>
                         </td> -->
-                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] relative group 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] relative group 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">
                             <input 
                                 v-model="item.ysAmtAgain" 
                                 class="w-full bg-transparent outline-none text-center"
@@ -67,9 +68,10 @@
                             <span class="comparison-icon" v-if="item.ysAmtAgainComparison">
                                 {{ item.ysAmtAgainComparison }}
                             </span>
-                        </td>
+                        </td> -->
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ item.xdCount }}</td> -->
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.xdTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ calculateCompletionRate(item) }}</td>
                     </tr>
                     
                     <!-- 合计行 -->
@@ -79,9 +81,10 @@
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysQuantityYear }}</td> -->
                         <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysAmtYear }}</td>
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysQuantityAgain }}</td> -->
-                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysAmtAgain }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.ysAmtAgain }}</td> -->
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.xdCount }}</td> -->
                         <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ total.xdTotal }}</td>
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ calculateTotalCompletionRate() }}</td>
                     </tr>
 
                     <!-- 阶段性汇总行 -->
@@ -91,9 +94,10 @@
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysQuantityYear }}</td> -->
                         <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysAmtYear }}</td>
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysQuantityAgain }}</td> -->
-                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysAmtAgain }}</td>
+                        <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.ysAmtAgain }}</td> -->
                         <!-- <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.xdCount }}</td> -->
                         <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ summaryData.xdTotal }}</td>
+                        <td class="px-2 sm:px-3 md:px-4 py-1 sm:py-2 border-x border-[#00eeff40] 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1">{{ calculateSummaryCompletionRate() }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -365,6 +369,41 @@ const compareValues = (item: TableItem) => {
     const actualAmt = Number(item.xdTotal);
     item.ysAmtYearComparison = amtYear > actualAmt ? '↓' : 
                                amtYear < actualAmt ? '↑' : '=';
+}
+
+// 计算达成率函数
+const calculateCompletionRate = (item: TableItem): string => {
+    const budget = Number(item.ysAmtYear);
+    const actual = Number(item.xdTotal);
+    
+    if (budget === 0) return '0.00%';
+    
+    const rate = (actual / budget) * 100;
+    return rate.toFixed(2) + '%';
+}
+
+// 计算合计达成率
+const calculateTotalCompletionRate = (): string => {
+    const totalBudget = Number(total.value.ysAmtYear);
+    const totalActual = Number(total.value.xdTotal);
+    
+    if (totalBudget === 0) return '0.00%';
+    
+    const rate = (totalActual / totalBudget) * 100;
+    return rate.toFixed(2) + '%';
+}
+
+// 计算汇总达成率
+const calculateSummaryCompletionRate = (): string => {
+    if (!summaryData.value) return '0.00%';
+    
+    const budget = Number(summaryData.value.ysAmtYear);
+    const actual = Number(summaryData.value.xdTotal);
+    
+    if (budget === 0) return '0.00%';
+    
+    const rate = (actual / budget) * 100;
+    return rate.toFixed(2) + '%';
 }
 
 onMounted(() => {

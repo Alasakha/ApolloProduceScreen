@@ -16,7 +16,7 @@
       <dv-button
         class=" text-white text-lg font-semibold tracking-wide"
         :bg="false"
-        @click="openDialog"
+        @click="openDialog('detail')"
         color="#00eaff"
       >
         详细信息
@@ -96,6 +96,41 @@
           </div>
         </div>
       </div>
+
+      <!-- 新增：接口 onTimePart 汇总（customer=1 常规；customer=2 A类） -->
+      <div class="part-section">
+        <div class="section-title relative" style="display: flex; justify-content: center; align-items: center;">
+          <span style="flex:1; text-align: center;">当月散件准交率</span>
+          <span style="font-size: 0.8vw; color: #8cc8ff; margin-left: 1vw; white-space: nowrap;" class="absolute right-0.5 ">点击卡片可查看详细信息</span>
+        </div>
+        <div class="metrics-row compact-row">
+          <div class="metric-item compact" @click="openDialog('1')" style="cursor:pointer;">
+            <div class="metric-label">A类客户-当月总数</div>
+            <div class="metric-value value-large">{{ onTimePartData.a.total }}</div>
+            <div class="metric-subtext">
+              准交 {{ onTimePartData.a.zjNum }}｜<span :class="getDeliveryClass(onTimePartRates.a)">{{ onTimePartRates.a.toFixed(1) }}%</span>
+            </div>
+          </div>
+          <div class="metric-item compact" @click="openDialog('2')" style="cursor:pointer;">
+            <div class="metric-label">常规客户-当月总数</div>
+            <div class="metric-value value-large">{{ onTimePartData.normal.total }}</div>
+            <div class="metric-subtext">
+              准交 {{ onTimePartData.normal.zjNum }}｜<span :class="getDeliveryClass(onTimePartRates.normal)">{{ onTimePartRates.normal.toFixed(1) }}%</span>
+            </div>
+          </div>
+          <div class="metric-item compact" @click="openDialog('1')" style="cursor:pointer;">
+            <div class="metric-label">A类客户-准交数</div>
+            <div class="metric-value value-large">{{ onTimePartData.a.zjNum }}</div>
+            <div class="metric-subtext">占比 <span :class="getDeliveryClass(onTimePartRates.a)">{{ onTimePartRates.a.toFixed(1) }}%</span></div>
+          </div>
+          <div class="metric-item compact" @click="openDialog('2')" style="cursor:pointer;">
+            <div class="metric-label">常规客户-准交数</div>
+            <div class="metric-value value-large">{{ onTimePartData.normal.zjNum }}</div>
+            <div class="metric-subtext">占比 <span :class="getDeliveryClass(onTimePartRates.normal)">{{ onTimePartRates.normal.toFixed(1) }}%</span></div>
+          </div>
+
+        </div>
+      </div>
     </div>
 
            <!-- 弹窗 -->
@@ -116,8 +151,10 @@
   <script setup lang="ts">
   import { ref, computed, onMounted, onUnmounted } from 'vue'
   import { useProductionDataStore } from '@/store/productionData'
-  import { getAbnormalUnfinishedList } from '@/api/getPmcinfo'
   import TableDialog from './dialog.vue'
+  import {getAbnormalUnfinishedList } from '@/api/getPmcinfo'
+  import { getOnTimePart, type OnTimePartResponse } from '@/api/produceperformance'
+  import { getOnTimePartDetail } from '@/api/produceperformance'
 
   // 生产数据 store
   const productionStore = useProductionDataStore()
@@ -159,22 +196,78 @@
     return 'delivery-warning'
   }
 
+  // 新增：接口 onTimePart 数据
+  const onTimePartData = ref<{ normal: { total: number; zjNum: number }; a: { total: number; zjNum: number } }>({
+    normal: { total: 0, zjNum: 0 },
+    a: { total: 0, zjNum: 0 }
+  })
+
+  const onTimePartRates = computed(() => ({
+    normal: onTimePartData.value.normal.total ? (onTimePartData.value.normal.zjNum / onTimePartData.value.normal.total * 100) : 0,
+    a: onTimePartData.value.a.total ? (onTimePartData.value.a.zjNum / onTimePartData.value.a.total * 100) : 0
+  }))
+
+  const fetchOnTimePart = async () => {
+    try {
+      const [normalRes, aRes] = await Promise.all([
+        getOnTimePart('2') as Promise<OnTimePartResponse>,
+        getOnTimePart('1') as Promise<OnTimePartResponse>
+      ])
+      onTimePartData.value.normal.total = normalRes.data?.total ?? 0
+      onTimePartData.value.normal.zjNum = normalRes.data?.zjNum ?? 0
+      onTimePartData.value.a.total = aRes.data?.total ?? 0
+      onTimePartData.value.a.zjNum = aRes.data?.zjNum ?? 0
+    } catch (e) {
+      // 静默失败，避免打断页面
+      console.error('获取 onTimePart 失败', e)
+    }
+  }
+
+  // 初次加载
+  fetchOnTimePart()
+
   // 弹窗与表格（沿用原有）
   const dialogVisible = ref(false)
   const dialogTitle = ref('订单准交率')
   const gridData = ref<any[]>([])
-  const gridColumns = [
+  // 准交率详细数据的列定义
+  const onTimeColumns = [
+    { prop: 'doc_no', label: '采购单号', width: '260' },
+    { prop: 'customer_order_no', label: '客户单号', width: '260' },
+    { prop: 'plan_delivery_date', label: '预到货数量', width: '260' },
+    { prop: 'business_qty', label: '业务总数量', width: '260' },
+    { prop: 'transaction_date2', label: '调拨单最大交易日期', width: '260' },
+    { prop: 'business_qty2', label: '调拨单业务总数量', width: '260' },
+  ]
+
+  // 工单异常数据的列定义
+  const abnormalColumns = [
     { prop: 'docNo', label: '工单单号', width: '220' },
     { prop: 'customerOrderNo', label: '客户单号', width: '250' },
     { prop: 'planDate', label: '计划完成日期', width: '500' },
     { prop: 'completeDate', label: '实际完成日期', width: '300' },
   ]
 
-  const openDialog = () => {
+  // 当前使用的列定义
+  const gridColumns = ref(onTimeColumns)
+
+  const openDialog = (customerType: string) => {
     dialogVisible.value = true
-    getAbnormalUnfinishedList().then((res: any) => {
-      gridData.value = res.data
-    })
+    if (customerType === '1' || customerType === '2') {
+      // 点击卡片时调用 getOnTimePartDetail
+      dialogTitle.value = customerType === '2' ? '常规客户准交率详情' : 'A类客户准交率详情'
+      gridColumns.value = onTimeColumns
+      getOnTimePartDetail(customerType).then((res: any) => {
+        gridData.value = Array.isArray(res.data) ? res.data : []
+      })
+    } else {
+      // 详细按钮调用 getAbnormalUnfinishedList
+      dialogTitle.value = '工单异常详情'
+      gridColumns.value = abnormalColumns
+      getAbnormalUnfinishedList().then((res: any) => {
+        gridData.value = Array.isArray(res.data) ? res.data : []
+      })
+    }
   }
   </script>
   
@@ -315,4 +408,11 @@
     text-shadow: 0 0 1vw #003366;
     letter-spacing: 0.1vw;
   }
+
+  /* 紧凑视图样式 */
+  .compact-row { gap: 0.4vw; }
+  .metric-item.compact { padding: 0.4vh 0.3vw; }
+  .value-large { font-size: 1.2vw; }
+  .metric-subtext { font-size: 0.65vw; color: #8cc8ff; margin-top: 0.2vh; }
+  
   </style>

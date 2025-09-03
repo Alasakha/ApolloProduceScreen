@@ -51,6 +51,8 @@ onMounted(() => {
   height: 100%;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.1);
+  min-width: 0; /* 允许组件收缩 */
+  flex-shrink: 1; /* 允许组件收缩 */
 }
 
 .title {

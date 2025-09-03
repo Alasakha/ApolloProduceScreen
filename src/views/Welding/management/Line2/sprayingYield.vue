@@ -1,7 +1,8 @@
 <template>
     <div class="yield-container" @click="openDialog">
         <div class="yield-title">
-            <h3>喷涂直通率</h3>
+            <h3 class="3xl:text-sm">喷涂直通率</h3>
+            <div class="click-note 3xl:text-xs ">(点击进入可以查看和编辑不合格问题明细)</div>
         </div>
         <div class="yield-content">
             <!-- 指标标签行 -->
@@ -13,7 +14,7 @@
                 <span class="metric-label">合格率</span>
             </div>
             
-            <div class="part-section">
+            <div class="part-section flex">
                 <div class="part-header">车架</div>
                 <div class="metrics-line">
                     <span class="metric">{{ frameData.inspectionCount }}</span>
@@ -24,7 +25,7 @@
                 </div>
             </div>
             
-            <div class="part-section">
+            <div class="part-section flex">
                 <div class="part-header">后叉</div>
                 <div class="metrics-line">
                     <span class="metric">{{ rearForkData.inspectionCount }}</span>
@@ -35,7 +36,7 @@
                 </div>
             </div>
             
-            <div class="part-section">
+            <div class="part-section flex">
                 <div class="part-header">尾架</div>
                 <div class="metrics-line">
                     <span class="metric">{{ tailFrameData.inspectionCount }}</span>
@@ -46,9 +47,7 @@
                 </div>
             </div>
         </div>
-        <div class="click-note">
-            <span>(点击进入可以查看和编辑不合格问题明细)</span>
-        </div>
+
 
         <!-- 喷涂直通率详情对话框 -->
         <SprayYieldDialog v-model="dialogVisible" />
@@ -56,7 +55,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { eventBus } from '@/utils/eventbus'
 import { getSprayFty } from '@/api/getStampWeldinfo'
 import type { SprayFty } from '@/api/getStampWeldinfo'
 import SprayYieldDialog from './SprayYieldDialog.vue'
@@ -104,7 +104,7 @@ const calculateMetrics = (items: SprayFty[]) => {
     const totalQualified = items.reduce((sum, item) => sum + item.okCount, 0)
     
     return {
-        inspectionCount: totalInspection.toString(),
+        inspectionCount: totalInspection.toString(),//今日检验数
         firstPassCount: totalFirstPass.toString(),
         firstPassRate: totalInspection > 0 ? ((totalFirstPass / totalInspection) * 100).toFixed(1) + '%' : '--',
         qualifiedCount: totalQualified.toString(),
@@ -129,7 +129,11 @@ const loadSprayData = async () => {
 
 // 组件挂载时加载数据
 onMounted(() => {
+    eventBus.on('refreshData', loadSprayData)
     loadSprayData()
+})
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', loadSprayData)
 })
 </script>
 
@@ -158,14 +162,29 @@ onMounted(() => {
     padding: 8px 12px;
     border-radius: 6px;
     margin-bottom: 8px;
-    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: relative;
 }
 
 .yield-title h3 {
     margin: 0;
     color: white;
-    font-size: 16px;
-    font-weight: 600;
+    flex: 1;
+    text-align: center;
+}
+
+.click-note {
+    color: rgba(255, 255, 255, 0.8);
+    font-style: italic;
+    padding: 2px 6px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 3px;
+    border: 1px dashed rgba(255, 255, 255, 0.5);
+    position: absolute;
+    right: 12px;
+    white-space: nowrap;
 }
 
 .yield-content {
@@ -176,9 +195,8 @@ onMounted(() => {
 }
 
 .metrics-labels {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     padding: 6px 8px;
     background: rgba(30, 144, 255, 0.1);
@@ -192,7 +210,6 @@ onMounted(() => {
     color: #1e90ff;
     font-weight: 600;
     text-align: center;
-    flex: 1;
 }
 
 .part-section {
@@ -214,14 +231,14 @@ onMounted(() => {
 }
 
 .metrics-line {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
     gap: 8px;
     padding: 6px 8px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
     border: 1px solid rgba(30, 144, 255, 0.3);
+    width: 90%;
 }
 
 .metric {
@@ -229,21 +246,7 @@ onMounted(() => {
     color: #e0e0e0;
     font-weight: 500;
     text-align: center;
-    flex: 1;
 }
 
-.click-note {
-    text-align: center;
-    margin-top: 8px;
-    padding: 6px;
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 4px;
-    border: 1px dashed #1e90ff;
-}
 
-.click-note span {
-    font-size: 11px;
-    color: #b0b0b0;
-    font-style: italic;
-}
 </style> 

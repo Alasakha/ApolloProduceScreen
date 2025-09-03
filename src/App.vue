@@ -2,6 +2,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import ScaleScreenWrapper from '@/components/ScaleScreenWrapper.vue'
 import { getEnvironmentConfig } from '@/config/environment'
+import { eventBus } from '@/utils/eventbus'
 
 // 获取环境配置
 const envConfig = ref(getEnvironmentConfig())
@@ -20,11 +21,21 @@ onMounted(() => {
   
   // 监听窗口大小变化
   window.addEventListener('resize', updateEnvConfig)
+  
+  // 启动全局自动刷新 (30秒刷新一次)
+  eventBus.startAutoRefresh(60000*3)
+  
+  console.log('🚀 应用启动，全局自动刷新已启用')
 })
 
 onUnmounted(() => {
   // 移除事件监听器
   window.removeEventListener('resize', updateEnvConfig)
+  
+  // 停止全局自动刷新
+  eventBus.stopAutoRefresh()
+  
+  console.log('🛑 应用卸载，全局自动刷新已停止')
 })
 </script>
 

@@ -378,7 +378,7 @@ export interface SprayFtyFillin {
   }[]
 }
 
-// /stampingWelding/automaticWelding
+// /stampingWelding/automaticWelding 获取自动焊1线 和 2线 小时产能  code=HJ1:自动焊1线  code=HJ2:自动焊2线
 export const getAutomaticWelding = (code: string): Promise<{data: AutomaticWelding}> => {
   return request({
     url: '/stampingWelding/automaticWelding',
@@ -388,10 +388,106 @@ export const getAutomaticWelding = (code: string): Promise<{data: AutomaticWeldi
 }
 
 export interface AutomaticWelding {
-  po_arrival_inspection_id: string
-  okCount: number
-  issueList: {
-    problemPoint: string
-    dutyPeople: string
+  code: string // code=HJ1:自动焊1线  code=HJ2:自动焊2线
+  monthDay: string // 日期
+  jsonStr: string // JSON字符串格式的小时数据
+  hourList: {
+    hour: number // 小时 (每次上传会覆盖原有的数据 因此上传要全部小时上传)
+    cj: number // 车架
+    hch: number // 后叉
+    wj: number // 尾架
+    plan: number // 计划
   }[]
+}
+
+// automaticWeldingFillin  自动焊1线2线小时产能填写) 
+export const automaticWeldingFillin = (data: AutomaticWeldingFillin): Promise<any> => {
+  return request({
+    url: '/stampingWelding/automaticWeldingFillin',
+    method: 'post',
+    data: data
+  })
+}
+
+export interface AutomaticWeldingFillin {
+  code: string // code=HJ1:自动焊1线  code=HJ2:自动焊2线
+  hourList: {
+    hour: number // 小时 (每次上传会覆盖原有的数据 因此上传要全部小时上传)
+    cj: number // 车架
+    hch: number // 后叉
+    wj: number // 尾架
+    plan: number // 计划
+  }[]
+}
+
+
+
+
+// /dataAcquisition
+export const getDataAcquisition = (workspace: string) => {
+  return request({
+    url: '/stampingWelding/dataAcquisition',
+    method: 'get',
+    params: { workspace }
+  })
+}
+
+// /stampingWelding/ruisongHourCl - 瑞松小时产能
+export interface RuisongHourCl {
+  prodLine: string | null
+  hour: number | null
+  hour2: number
+  date: string | null
+  reason: string | null
+  cl: string | null
+  total: number
+  duty: string | null
+}
+
+export const getRuisongHourCl = (): Promise<{data: RuisongHourCl[]}> => {
+  return request({
+    url: '/stampingWelding/ruisongHourCl',
+    method:'get'
+  })
+}
+
+// 提交瑞松小时产能数据
+export interface RuisongHourClSubmit {
+  hour2: number
+  total: number
+}
+
+export const submitRuisongHourCl = (data: RuisongHourClSubmit[]): Promise<any> => {
+  return request({
+    url: '/stampingWelding/ruisongHourCl',
+    method: 'post',
+    data: data
+  })
+}
+
+// /stampingWelding/paintingPassRate
+export const getPaintingPassRate = () => {
+  return request({
+    url: '/stampingWelding/paintingPassRate',
+    method: 'get',
+
+  })
+}
+
+export interface PaintingPassRate {
+  inspectionDate: string
+  cjTotal: number
+  hchTotal: number
+  wjTotal: number
+  cjNg: number
+  hchNg: number
+  wjNg: number
+  cjHg: number
+  hchHg: number
+  wjHg: number
+  cjFirstNg: number
+  hchFirstNg: number
+  wjFirstNg: number
+  rate: number
+  firstRate: number
 }

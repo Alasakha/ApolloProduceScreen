@@ -76,6 +76,8 @@ import { ref, onMounted, onBeforeUnmount, nextTick, watch, computed } from 'vue'
 import { useEcharts } from '@/utils/useEcharts'
 import { createOption } from './jindu'
 import { getCheckTotalDone, getCheckTotalDoneJcx } from '@/api/getQuiltyinfo'
+import { eventBus } from '@/utils/eventbus'
+
 
 const dialogTitle = ref('装配检验超时');
 const chartRef1 = ref(null)
@@ -168,17 +170,23 @@ const fetchData3 = async () => {
     console.error('获取今日其他不良数据失败:', error)
   }
 }
-
+// 创建一个组合函数来同时调用两个数据获取函数
+const refreshAllData = async () => {
+  await fetchData()
+  await fetchData3()
+}
 onMounted(async () => {
   await chart1.initChart()
   await chart2.initChart()
   await fetchData()
   await fetchData3()
   drawChart()
+  eventBus.on("refreshData", refreshAllData)
 })
 
 onBeforeUnmount(() => {
   if (cleanup) cleanup()
+  eventBus.off("refreshData", refreshAllData)
 })
 </script>
 

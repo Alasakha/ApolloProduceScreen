@@ -79,7 +79,6 @@ const tableColumns = [
 const rawData = ref([]);
 
 
-
 // 饼图数据加载
 const fetchData = () => {
   getQualityCheckPie({ type: 1 }).then(res => {

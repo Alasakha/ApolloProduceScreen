@@ -5,10 +5,12 @@ import DataVVue3 from '@kjgl77/datav-vue3'
 import ElementPlus from 'element-plus';
 import 'element-plus/dist/index.css';
 import { createPinia } from 'pinia'
+import '@/styles/dialog-fix.css';
 import Vue3Marquee from 'vue3-marquee'
 import Title from './components/title.vue'
 import ScrollBoard from './components/datav/ScrollBoard.vue'
 import '@/style.css'
+import '@/styles/theme.css'
 
 import VueDOMPurifyHTML from "vue-dompurify-html"
 

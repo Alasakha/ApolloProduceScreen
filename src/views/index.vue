@@ -7,6 +7,10 @@
   <div class="title">
     <h1>阿波罗管理看板</h1>
     <h2>请选择看板</h2>
+    <!-- 全局日期选择器 -->
+    <div class="global-date-control">
+      <CompactDateSelector />
+    </div>
   </div>
 
   <div class="button_box ">
@@ -39,6 +43,7 @@
 import motorImage from '../assets/Motor.jpg';
 import { ref } from "vue";
 import { useRouter } from "vue-router";
+import CompactDateSelector from '../components/GlobalDateSelector/CompactDateSelector.vue';
 
 const router = useRouter();
 
@@ -60,8 +65,8 @@ const lines = ref([
   { id: null, name: "生产计划看板",router:"/produceplan" },
   { id: null, name: "PLM看板",router:"/plm" },
   { id: "1001", name: "冲压生产管理看板",router:"/pressboard" },
-  { id: "2001", name: "金工二部焊接",router:"/welding2" },
-  { id: "2003", name: "涂装看板",router:"/paint" },
+  // { id: "2001", name: "金工二部焊接",router:"/welding2" },
+  { id: "2007", name: "涂装看板",router:"/paint" },
   { id: "1003", name: "焊接生产管理看板" ,router:"/stampmanagement" },
   { id: "finance", name: "财务绩效管理看板",router:"/financialkpi" },
   { id: "qualitykpi", name: "品质绩效管理看板",router:"/qualitykpidashboard" },
@@ -73,6 +78,7 @@ const lines = ref([
   { id: "PurchasePerformanceManagementDashboard", name: "采购绩效管理看板",router:"/PurchasePerformanceManagementDashboard" },
   { id: "ControlBoard", name: "中控看板",router:"/control-board" },
   { id: "AdvancedEarthDemo", name: "🌍 高级3D地球演示",router:"/advanced-earth-demo" },
+  { id: "2006", name: "金工二部焊接看板",router:"/welding2" },
 ]);
 
 // 获取 lines 中指定范围的数据
@@ -99,7 +105,6 @@ const selectLine = (line) => {
     router.push({ path: line.router, query: { prodLine: line.id } });
   }
 };
-
 </script>
 
 <style scoped>
@@ -108,6 +113,7 @@ body{
   display: flex;
   justify-content: center;
   align-items: center;
+  height: 100%;
 }
 .custom-btn {
   width: 10vw;
@@ -131,7 +137,7 @@ body{
   flex-direction: row;
   justify-content: space-around;
   align-items: center;
-  height: 40%;
+  height: 100%;
   width: 100%;
 }
 .title {
@@ -144,6 +150,15 @@ body{
   color:aliceblue;
   letter-spacing: 3em;
   font-family: 'Microsoft YaHei';
+}
+
+.global-date-control {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  z-index: 1000;
+  /* 确保在小屏幕上也能正常显示 */
+  max-width: 300px;
 }
 
 

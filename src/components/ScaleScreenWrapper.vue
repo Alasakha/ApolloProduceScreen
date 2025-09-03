@@ -44,9 +44,9 @@ onMounted(async () => {
 })
 
 // 监听配置变化
-const updateConfig = () => {
+// const updateConfig = () => {
   // 这里可以添加配置更新的逻辑
-}
+// }
 </script>
 
 <style scoped>
@@ -55,7 +55,5 @@ const updateConfig = () => {
   height: 100%;
 }
 
-.scale-screen-container {
-  /* 插件容器的样式 */
-}
+
 </style> 

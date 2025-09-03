@@ -18,7 +18,7 @@
                 size="small"
                 @change="val => onEdit(group, row.field, month, val)"
               >
-                <template #append>%</template>
+                <template #append></template>
               </el-input>
             </td>
           </tr>
@@ -61,7 +61,7 @@ const getFinanceListData = async () => {
       idTable.value[group][row.field] = {}
       for (const month of months) {
         const item = res.data.find(d => d.group === group && d.monthDay === month)
-        editTable.value[group][row.field][month] = item ? `${item[row.field]}%` : ''
+        editTable.value[group][row.field][month] = item ? `${item[row.field]}` : ''
         idTable.value[group][row.field][month] = item ? item.id : ''
       }
     }
@@ -77,7 +77,7 @@ const onEdit = (group, field, month, value) => {
   // 查找是否已存在
   let exist = editList.value.find(item => item.id === id)
   // 去除百分号并转换为数字
-  const numValue = parseFloat(value.replace('%', ''))
+  const numValue = parseFloat(value.replace('', ''))
   if (exist) {
     exist[field] = numValue
   } else {

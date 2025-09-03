@@ -10,51 +10,51 @@
                     <tr class="border-b border-[#00eeff40] bg-[#001122]">
                         <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">属性</th>
                         <th v-for="month in months" :key="month" class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ month }}</th>
-                        <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合计</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合计</th>
                         <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">阶段累计</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">挑战值年度预算（利润）<span class='text-xs'>(万)</span></td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">年度挑战值预算（利润）<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getData('challengeProfit', month)) }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('challengeProfit')) }}</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('challengeProfit')) }}</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getStage('challengeProfit')) }}</td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合理值年度预算（利润）<span class='text-xs'>(万)</span></td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">年度合理值预算（利润）<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getData('reasonableProfit', month)) }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('reasonableProfit')) }}</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('reasonableProfit')) }}</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getStage('reasonableProfit')) }}</td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">月度预测（利润）<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getData('monthlyForecast', month)) }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('monthlyForecast')) }}</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('monthlyForecast')) }}</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getStage('monthlyForecast')) }}</td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">实际利润<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getData('actualProfit', month)) }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('actualProfit')) }}</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getTotal('actualProfit')) }}</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ formatWan(getStage('actualProfit')) }}</td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">月度挑战目标达成率</td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getData('monthlyCompletionRate', month) !== '' ? getData('monthlyCompletionRate', month) + '%' : '' }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyCompletionRate') }}%</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyCompletionRate') }}%</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">月度合理目标达成率</td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getData('monthlyReasonableRate', month) !== '' ? getData('monthlyReasonableRate', month) + '%' : '' }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyReasonableRate') }}%</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyReasonableRate') }}%</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">月度预测目标达成率</td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getData('monthlyForecastRate', month) !== '' ? getData('monthlyForecastRate', month) + '%' : '' }}</td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyForecastRate') }}%</td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ getTotal('monthlyForecastRate') }}%</td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
                     </tr>
                 </tbody>
@@ -128,13 +128,13 @@ const getFinanceProfitData = async () => {
       }
       const month = item.monthDay.split('-')[1]
       if (monthMap[month]) {
-        // 计算各个比率
-        const monthlyCompletionRate = totalChallenge && item.ysChallengeYear ? 
-          ((item.ysChallengeYear / totalChallenge) * 100).toFixed(1) : null
-        const monthlyReasonableRate = totalReasonable && item.ysReasonableYear ? 
-          ((item.ysReasonableYear / totalReasonable) * 100).toFixed(1) : null
-        const monthlyForecastRate = totalForecast && item.ysValueMonth ? 
-          ((item.ysValueMonth / totalForecast) * 100).toFixed(1) : null
+        // 修正达成率计算：实际利润 / 目标利润
+        const monthlyCompletionRate = item.profit && item.ysChallengeYear ? 
+          ((item.profit / item.ysChallengeYear) * 100).toFixed(1) : 0
+        const monthlyReasonableRate = item.profit && item.ysReasonableYear ? 
+          ((item.profit / item.ysReasonableYear) * 100).toFixed(1) : 0
+        const monthlyForecastRate = item.profit && item.ysValueMonth ? 
+          ((item.profit / item.ysValueMonth) * 100).toFixed(1) : 0
 
         formattedData[monthMap[month]] = {
           challengeProfit: item.ysChallengeYear,
@@ -148,12 +148,13 @@ const getFinanceProfitData = async () => {
       }
     })
 
-    // 计算合计的比率
+    // 计算合计的比率 - 实际利润 / 目标利润
+    const totalActual = (totalData as any).actualProfit || 0
     totalData = {
       ...totalData,
-      monthlyCompletionRate: '100',
-      monthlyReasonableRate: '100',
-      monthlyForecastRate: ''
+      monthlyCompletionRate: totalChallenge ? ((totalActual / totalChallenge) * 100).toFixed(1) : '0',
+      monthlyReasonableRate: totalReasonable ? ((totalActual / totalReasonable) * 100).toFixed(1) : '0',
+      monthlyForecastRate: totalForecast ? ((totalActual / totalForecast) * 100).toFixed(1) : '0'
     }
 
     tableData.value = {
@@ -170,6 +171,7 @@ const getFinanceProfitData = async () => {
 
 const getData = (field: string, month: string) => {
   const value = tableData.value.months[month]?.[field];
+  // 如果值为0，也要返回0，不要返回空字符串
   if (value === null || value === undefined) return '';
   return value;
 };
@@ -191,8 +193,15 @@ const formatWan = (val: any) => {
   if (val === null || val === undefined || val === '') return '';
   const num = Number(val);
   if (isNaN(num)) return '';
+  // 如果值为0，也要显示0.00
   return (num / 10000).toFixed(2);
 };
+
+// 暴露数据给父组件
+defineExpose({
+  tableData,
+  getFinanceProfitData
+});
 
 onMounted(() => {
   getFinanceProfitData()

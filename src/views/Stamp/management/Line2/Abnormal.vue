@@ -45,14 +45,14 @@
   const values = ref([]); // Y 轴数据
   let chartInstance = null;
   const config = reactive({
-    header: ['故障类型', '故障描述', '呼叫时间','故障原因','责任人','故障解除人','品号'],
+    header: ['设备名称', '故障描述', '呼叫时间','故障原因','责任人','处理时长','结束码'],
     data: [
       ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
     ],
     index: true,
     columnWidth: [50],
     align: [],
-    rowNum:7,
+    rowNum:5,
     // showTooltip: true,
     showTooltip: true,
   })
@@ -60,24 +60,37 @@
   
   const fetchData = () => {
     getStampingAbnormal().then(res => {
-    isLoading.value = false;
+      isLoading.value = false;
       console.log('获取到的数据:', res.data.length);
-    if (res.data.length !== 0) {
-      const list = res.data;
-  
-      config.data = list.map(item => [
-        item.guZhangTypeName ?? '无',
-        item.startRemark ?? '无',
+      if (res.data && res.data.length > 0) {
+        const list = res.data;
+        isDataEmpty.value = false; // 有数据时设置为false
+        
+        config.data = list.map(item => [
+          item.deviceName ?? '无',
+          item.startRemark ?? '无',
           item.startTime ? item.startTime.slice(5, 16) : '无',
           item.startRemark ?? '无',
           // item.endTime ? item.endTime.slice(5, 16) : '无',
-        // item.guZhangTypeDuration,
-        item.dutyPeopleName ?? '无',
-        item.ta033 ?? '无'
-      ]);
-      console.log('config.data:', config.data)
-    }
-  });}
+          // item.guZhangTypeDuration,
+          item.dutyPeopleName ?? '无',
+          handleTime(item.startTime) ?? '无', // 修复函数调用
+          item.isFinish === 'X' ? '已响应' : '未结束'
+        ]);
+        console.log('config.data:', config.data);
+      } else {
+        // 没有数据时设置
+        isDataEmpty.value = true;
+        config.data = [
+          ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+        ];
+      }
+    }).catch(error => {
+      console.error('获取数据失败:', error);
+      isLoading.value = false;
+      isDataEmpty.value = true;
+    });
+  }
   
   // 在组件挂载时启动定时获取数据
   onMounted(() => {
@@ -95,6 +108,33 @@
     selectedItem.value = row.row; // 直接保存整行
     dialogVisible.value = true;
   };
+
+
+
+
+  const handleTime = (startTime) =>{
+  if (!startTime) return '无';
+  const start = new Date(startTime.replace(/-/g, '/'));
+  const now = new Date();
+  let diff = Math.floor((now - start) / 1000); // 秒
+
+  if (diff < 0) return '无';
+
+  const days = Math.floor(diff / (24 * 3600));
+  diff = diff % (24 * 3600);
+  const hours = Math.floor(diff / 3600);
+  diff = diff % 3600;
+  const minutes = Math.floor(diff / 60);
+  const seconds = diff % 60;
+
+  let result = '';
+  if (days > 0) result += `${days}天`;
+  if (hours > 0) result += `${hours}小时`;
+  if (minutes > 0) result += `${minutes}分`;
+  if (seconds > 0 || result === '') result += `${seconds}秒`;
+
+  return result;
+  }
   </script>
   
   
@@ -118,7 +158,14 @@
     line-height: 1;
   }
   
-  
+  .empty-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    font-size: 24px;
+    color: #909399;
+  }
   
   </style>
    

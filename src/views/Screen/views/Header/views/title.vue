@@ -69,14 +69,7 @@ onBeforeUnmount(() => {
   <div class="flex flex-col justify-center items-center">
     <div :class="zoomClass">
       <div
-        class="text-white font-bold tracking-wider flex "
-        :class="{
-          'text-[3.1vw]': zoomClass === 'zoom-75',
-          'text-[2.41vw]': zoomClass === 'zoom-100',
-          'text-[2.9vw]': zoomClass === 'zoom-125',
-          'text-[2.7vw]': zoomClass === 'zoom-150',
-          'text-[3vw]': zoomClass === 'zoom-200'
-        }"
+        class="text-white text-5xl font-bold tracking-wider flex  4xl:text-5xl"
       >
         {{ decideName(prodLine) }}线管理看板
       </div>

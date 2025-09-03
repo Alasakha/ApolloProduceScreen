@@ -1,0 +1,70 @@
+/* 全局Dialog闪烁问题修复 */
+
+/* 确保所有dialog都有正确的z-index层级 */
+.el-dialog__wrapper {
+    position: fixed !important;
+    z-index: 2000 !important;
+}
+
+.el-dialog {
+    position: relative !important;
+    z-index: 2001 !important;
+}
+
+.el-overlay {
+    position: fixed !important;
+    z-index: 1999 !important;
+}
+
+/* 修复特定组件的dialog */
+.capacity-fillin-dialog {
+    position: fixed !important;
+    z-index: 2000 !important;
+}
+
+.capacity-fillin-dialog .el-dialog {
+    position: fixed !important;
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    margin: 0 !important;
+    z-index: 2001 !important;
+}
+
+.capacity-fillin-dialog .el-dialog__wrapper {
+    position: fixed !important;
+    z-index: 2000 !important;
+}
+
+.capacity-fillin-dialog .el-overlay {
+    position: fixed !important;
+    z-index: 1999 !important;
+}
+
+/* 防止dialog在滚动时闪烁 */
+.el-dialog__wrapper {
+    overflow: hidden !important;
+}
+
+/* 确保dialog内容正确显示 */
+.el-dialog__body {
+    max-height: 70vh;
+    overflow-y: auto;
+}
+
+/* 修复可能的定位问题 */
+.el-dialog__header {
+    position: relative;
+    z-index: 2002;
+}
+
+.el-dialog__footer {
+    position: relative;
+    z-index: 2002;
+}
+
+/* 防止body滚动 */
+body.el-popup-parent--hidden {
+    overflow: hidden !important;
+    padding-right: 0 !important;
+} 

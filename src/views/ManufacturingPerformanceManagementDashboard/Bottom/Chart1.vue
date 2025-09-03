@@ -8,70 +8,25 @@
 <script setup>
 import { ref, onMounted, nextTick } from 'vue'
 import * as echarts from 'echarts'
+import { getOnTimeChart } from '@/api/produceperformance'
 
 const chartRef = ref(null)
 let chartInstance = null
 
 // 周直通率数据
-const weeklyPassRateData = ref([
-  {
-    "a": {
-      "completeNum": 74,
-      "total": 74,
-      "target": 0.95
-    },
-    "normal": {
-      "completeNum": 31,
-      "total": 31,
-      "target": 0.9
-    },
-    "sunday": "2025-08-10",
-    "monday": "2025-08-04"
-  },
-  {
-    "a": {
-      "completeNum": 99,
-      "total": 99,
-      "target": 0.95
-    },
-    "normal": {
-      "completeNum": 56,
-      "total": 56,
-      "target": 0.9
-    },
-    "sunday": "2025-08-03",
-    "monday": "2025-07-28"
-  },
-  {
-    "a": {
-      "completeNum": 73,
-      "total": 75,
-      "target": 0.95
-    },
-    "normal": {
-      "completeNum": 62,
-      "total": 65,
-      "target": 0.9
-    },
-    "sunday": "2025-07-27",
-    "monday": "2025-07-21"
-  },
-  {
-    "a": {
-      "completeNum": 54,
-      "total": 54,
-      "target": 0.95
-    },
-    "normal": {
-      "completeNum": 16,
-      "total": 16,
-      "target": 0.9
-    },
-    "sunday": "2025-07-20",
-    "monday": "2025-07-14"
-  }
-])
+const weeklyPassRateData = ref([])
 
+const fetchData = async () => {
+  const res = await getOnTimeChart()
+  weeklyPassRateData.value = res.data
+  console.log(weeklyPassRateData.value)
+  
+  // 数据获取完成后，更新图表数据并重新渲染图表
+  updateChartData()
+  if (chartInstance) {
+    updateChart()
+  }
+}
 // 计算直通率
 const calculatePassRate = (completeNum, total) => {
   if (total === 0) return 0
@@ -80,9 +35,10 @@ const calculatePassRate = (completeNum, total) => {
 
 // 获取周标签
 const getWeekLabel = (index) => {
-  if (index === 0) return '本周'
-  if (index === 1) return '上周'
-  return `前${index + 1}周`
+  if (index === 0) return '前3周'
+  if (index === 1) return '前2周'
+  if (index === 2) return '前1周'
+  return '本周'
 }
 
 // 处理图表数据
@@ -94,9 +50,14 @@ const chartData = ref({
 
 // 更新图表数据
 const updateChartData = () => {
-  chartData.value.categories = weeklyPassRateData.value.map((_, index) => getWeekLabel(index))
-  chartData.value.aClassData = weeklyPassRateData.value.map(week => calculatePassRate(week.a.completeNum, week.a.total))
-  chartData.value.normalData = weeklyPassRateData.value.map(week => calculatePassRate(week.normal.completeNum, week.normal.total))
+  // 反转数据顺序，让数据从上3周开始
+  const reversedData = [...weeklyPassRateData.value].reverse()
+  
+  chartData.value.categories = reversedData.map((_, index) => getWeekLabel(index))
+  chartData.value.aClassData = reversedData.map(week => calculatePassRate(week.a.completeNum, week.a.total))
+  chartData.value.normalData = reversedData.map(week => calculatePassRate(week.normal.completeNum, week.normal.total))
+  
+  console.log('图表数据已更新:', chartData.value)
 }
 
 // 初始化图表
@@ -104,7 +65,8 @@ const initChart = () => {
   if (!chartRef.value) return
   
   chartInstance = echarts.init(chartRef.value)
-  updateChart()
+  // 不在这里调用 updateChart()，因为数据还没有获取
+  // 数据获取完成后会自动调用 updateChart()
   
   // 监听窗口变化
   window.addEventListener('resize', resizeChart)
@@ -113,13 +75,15 @@ const initChart = () => {
 // 更新图表
 const updateChart = () => {
   if (!chartInstance) return
+  
+  console.log('开始更新图表，数据:', chartData.value)
 
   const option = {
     grid: {
       left: '10%',
       right: '8%',
       top: '25%',
-      bottom: '15%',
+      bottom: '0%',
       containLabel: true
     },
     legend: {
@@ -167,11 +131,13 @@ const updateChart = () => {
       {
         name: 'A类客户',
         type: 'bar',
+        // 在顶层设置颜色，图例会使用这个颜色
+        itemStyle: {
+          color: '#00d4ff' // 蓝色
+        },
         data: chartData.value.aClassData.map(value => ({
-          value,
-          itemStyle: {
-            color: getBarColor(value, '#00d4ff') // 蓝色系
-          }
+          value
+          // 删除这里的 itemStyle，因为已经在顶层设置了
         })),
         barWidth: '35%',
         label: {
@@ -186,11 +152,13 @@ const updateChart = () => {
       {
         name: '常规客户',
         type: 'bar',
+        // 在顶层设置颜色，图例会使用这个颜色
+        itemStyle: {
+          color: '#ffaa00' // 橙色
+        },
         data: chartData.value.normalData.map(value => ({
-          value,
-          itemStyle: {
-            color: getBarColor(value, '#ffaa00') // 橙色系
-          }
+          value
+          // 删除这里的 itemStyle，因为已经在顶层设置了
         })),
         barWidth: '35%',
         label: {
@@ -232,8 +200,8 @@ const resizeChart = () => {
 // 组件挂载时初始化图表
 onMounted(() => {
   nextTick(() => {
-    updateChartData()  // 先更新数据
-    initChart()        // 再初始化图表
+    initChart()        // 先初始化图表
+    fetchData()        // 再获取数据，数据获取完成后会自动更新图表
   })
 })
 </script>
@@ -255,7 +223,7 @@ onMounted(() => {
   font-weight: bold;
   color: #00d4ff;
   text-align: center;
-  padding: 12px;
+  padding: 5px;
   border-bottom: 1px solid rgba(0, 150, 255, 0.2);
 }
 

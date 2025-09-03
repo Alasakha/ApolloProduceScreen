@@ -32,8 +32,12 @@
                        <span class="info-value">{{ device.groupName }}</span>
                      </div>
                      <div class="device-info-row">
-                       <span class="info-label">设备编号:</span>
-                       <span class="info-value">{{ device.macNo }}</span>
+                       <span class="info-label">设备名称:</span>
+                       <span class="info-value">{{ device.deviceName }}</span>
+                     </div>
+                     <div class="device-info-row">
+                       <span class="info-label">型号:</span>
+                       <span class="info-value">{{ device.model }}</span>
                      </div>
                      <div class="device-info-row">
                        <span class="info-label">制造商:</span>
@@ -75,60 +79,65 @@ const emit = defineEmits<{
 
 
 
-// 写死的设备数据（严格按照Excel表格）
 const staticDeviceData = [
-  // 弯管设备组 (WG_ALL) - 3台设备
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-39X4A-2S', manufacturer: '和和机械（张家港）有限公司', storage: '1001/2001'  },
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-39X4A-2S', manufacturer: '和和机械（张家港）有限公司', storage: '1001/2001' },
-  { groupName: '弯管设备组', groupCode: 1, macNo: 'SB-38NC', manufacturer: '张家港市兵丰机械制造有限公司', storage: '1001/2001'},
-  
-  // 压机设备组 (YJ_ALL) - 2台设备  
-  { groupName: '压机设备组', groupCode: 2, macNo: 'Y32-315T', manufacturer: '佛山市南海街金鑫液压机械有限公司', storage: '1001/2001' },
-  { groupName: '压机设备组', groupCode: 2, macNo: 'QC12Y-8*2500', manufacturer: '安徽中德机床股份有限公司', storage: '1001/2001' },
-  
-  // 缩管设备组 (SG_ALL) - 2台设备
-  { groupName: '缩管设备组', groupCode: 3, macNo: 'SAM-50', manufacturer: '广东省东莞市晨麒金属制品有限公司', storage: '1001/2001' },
-  { groupName: '缩管设备组', groupCode: 3, macNo: 'LP-3007', manufacturer: '常州龙鹏机械有限公司', storage: '1001/2001' },
-  
-    // 滚花设备组 (GH_ALL) - 2台设备
-  { groupName: '滚花设备组', groupCode: 4, macNo: 'LP-2008', manufacturer: '常州龙鹏机械有限公司', storage: '1001/2001' },
-  
-  // 冲弧设备组 (CHH_ALL) - 4台设备
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-CH502', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'CN-50', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'ML-425', manufacturer: '张家港农发科技集团机械科技有限公司', storage: '1001/2001' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: 'MC-315B', manufacturer: '永康市志敏机电', storage: '1001/2001' },
-  
-  // 台钻设备组 (TZ_ALL) - 8台设备
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z5040A', manufacturer: '杭州双龙机械有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z4116/2', manufacturer: '浙江台康金宝塑机厂', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'Z4116', manufacturer: '浙江台康金宝塑机厂', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'JZB4120', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },
-  { groupName: '台钻设备组', groupCode: 6, macNo: 'SWJ-16G', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001' },  
-  // 冲床设备组 (CHC_ALL) - 12台设备
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JB23-40T', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海机床有限公司', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海机床有限公司', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'J21-80', manufacturer: '上海第二锻压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JB23-63', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JF21-100T', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-6.3', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JD23-35', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'JS-16', manufacturer: '浙江锦压机械厂', storage: '1001/2001' },
-  { groupName: '冲床设备组', groupCode: 7, macNo: 'ALP-160V', manufacturer: '金澳兰', storage: '1001/2001' }
-]
+  // 激光设备组 - 4台设备
+  // { groupName: '激光设备组', groupCode: 8, macNo: '1020341', manufacturer: '浙江金澳兰机床有限公司', storage: '1001/2001', deviceName: '光纤激光割管机', model: 'T100B' },
+  // { groupName: '激光设备组', groupCode: 8, macNo: '1020424', manufacturer: '大族激光智能装备科技(江苏)有限公司', storage: '1001/2001', deviceName: '光纤激光切割机', model: 'G3015-K-H3000' },
+  // { groupName: '激光设备组', groupCode: 8, macNo: '10204241', manufacturer: '大族激光智能装备科技(江苏)有限公司', storage: '1001/2001', deviceName: '光纤激光切割机', model: 'G3105PRO-K-H6000' },
+  // { groupName: '激光设备组', groupCode: 8, macNo: '10203411', manufacturer: '江苏管力智能装备有限公司', storage: '1001/2001', deviceName: '光纤激光割管机', model: '3KW' },
 
+  // 弯管设备组 - 3台设备
+  { groupName: '弯管设备组', groupCode: 1, macNo: '1020149', manufacturer: '和和机械(张家港)有限公司', storage: '1001/2001', deviceName: '全自动弯管机', model: 'SB-39X4A-2S' },
+  { groupName: '弯管设备组', groupCode: 1, macNo: '1020150', manufacturer: '和和机械(张家港)有限公司', storage: '1001/2001', deviceName: '全自动弯管机', model: 'SB-39X4A-2S' },
+  { groupName: '弯管设备组', groupCode: 1, macNo: '1020273', manufacturer: '张家港市兵丰机械制造有限公司', storage: '1001/2001', deviceName: '半自动弯管机', model: 'SB-38NC' },
+  
+  // 压机设备组 - 1台设备
+  { groupName: '压机设备组', groupCode: 2, macNo: '1020249', manufacturer: '佛山市南海衡盛液压机械有限公司', storage: '1001/2001', deviceName: '315T四柱液压机', model: 'Y32-315T' },
+  
+  // 缩管设备组 - 1台设备
+  { groupName: '缩管设备组', groupCode: 3, macNo: '1020176', manufacturer: '广东省东莞市晨麒金属制品有限公司', storage: '1001/2001', deviceName: '自动缩管机', model: 'SAM-50' },
+
+  // 冲弧设备组 - 2台设备
+  { groupName: '冲弧设备组', groupCode: 5, macNo: '1020031', manufacturer: '张家港保税区民联机械科技有限公司', storage: '1001/2001', deviceName: '自动卧式冲弧机', model: 'ML-CH502' },
+  { groupName: '冲弧设备组', groupCode: 5, macNo: '1020033', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001', deviceName: '冲弧机', model: 'CN-50' },
+
+  // 手动割管组 - 2台设备
+  { groupName: '手动割管组', groupCode: 4, macNo: '1021004', manufacturer: '张家港保税区民联机械科技有限公司', storage: '1001/2001', deviceName: '全自动切管机', model: 'ML-425' },
+  { groupName: '手动割管组', groupCode: 4, macNo: '1020226', manufacturer: '永康市志乾机电', storage: '1001/2001', deviceName: '金属圆锯机', model: 'MC-315B' },
+  
+
+  // 台钻设备组 - 10台设备
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1020217', manufacturer: '杭州双龙机械有限公司', storage: '1001/2001', deviceName: '立式铣床', model: 'Z5040A' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1021005', manufacturer: '浙江省永康金塔机械厂', storage: '1001/2001', deviceName: '台式钻床', model: 'Z4116/2' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1021010', manufacturer: '浙江省永康金塔机械厂', storage: '1001/2001', deviceName: '台式钻床', model: 'Z4116' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1020258', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001', deviceName: '自动进刀台式钻床', model: 'JZB4120' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1020259', manufacturer: '安徽省黄山台钻有限公司', storage: '1001/2001', deviceName: '自动进刀台式钻床', model: 'JZB4120' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1021006', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001', deviceName: '台式攻丝机', model: 'SWJ-16G' },
+  { groupName: '台钻设备组', groupCode: 6, macNo: '1021007', manufacturer: '浙江西菱股份有限公司', storage: '1001/2001', deviceName: '台式攻丝机', model: 'SWJ-16G' },
+  // { groupName: '台钻设备组', groupCode: 6, macNo: '1021008', manufacturer: '天成', storage: '1001/2001', deviceName: '台式攻丝机', model: 'SWJ-16G' },
+  // { groupName: '台钻设备组', groupCode: 6, macNo: '1021009', manufacturer: '华泰', storage: '1001/2001', deviceName: '台式攻丝机', model: 'SWJ-16G' },
+  // { groupName: '台钻设备组', groupCode: 6, macNo: '1021011', manufacturer: '台州市路桥万象电机厂', storage: '1001/2001', deviceName: '砂轮机', model: 'MQJ2325G' },
+
+  // 冲床设备组 - 11台设备
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020180', manufacturer: '浙江铸压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JS-6.3' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020182', manufacturer: '浙江铸压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JS-16' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020221', manufacturer: '上海机床有限公司', storage: '1001/2001', deviceName: '开式固定台压力机', model: 'J21-80' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020222', manufacturer: '上海机床有限公司', storage: '1001/2001', deviceName: '开式固定台压力机', model: 'J21-80' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020223', manufacturer: '上海第二锻压机床厂', storage: '1001/2001', deviceName: '开式固定台压力机', model: 'J21-80' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020220', manufacturer: '浙江锻压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JB23-63' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1021012', manufacturer: '浙江锻压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JF21-100T' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020181', manufacturer: '浙江铸压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JS-6.3' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020219', manufacturer: '浙江铸压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JD23-35' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '10201831', manufacturer: '浙江铸压机床厂', storage: '1001/2001', deviceName: '开式可倾压力机', model: 'JS-16' },
+  { groupName: '冲床设备组', groupCode: 7, macNo: '1020298', manufacturer: '金澳兰', storage: '1001/2001', deviceName: '冲床', model: 'ALP-160V' }
+]
 // 计算设备列表 - 使用写死的数据，支持按组代码筛选
 
 const deviceList = computed(() => {
   return staticDeviceData.map((device, index) => ({
     macNo: device.macNo,
+    deviceName: device.deviceName,
+    model: device.model,
     machineName: device.manufacturer,
     workNo: `WO-${(index + 1).toString().padStart(4, '0')}`,
     itemName: `${device.groupName}产品`,
@@ -273,16 +282,16 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 
 .device-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 16px;
   margin-bottom: 32px;
 }
 
 .device-card {
   background: #2a2a2a;
   border: 1px solid #333;
-  border-radius: 12px;
-  padding: 20px;
+  border-radius: 8px;
+  padding: 16px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
@@ -363,16 +372,17 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 }
 
 .info-label {
-  font-size: 13px;
-  color: #ffffff;
-  font-weight: 500;
+  font-size: 12px;
+  color: #e5e7eb;
+  font-weight: 600;
+  min-width: 60px;
 }
 
 .info-value {
-  font-size: 13px;
-  color: #fff;
+  font-size: 12px;
+  color: #ffffff;
   font-weight: 500;
-  max-width: 120px;
+  max-width: 140px;
   text-align: right;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -570,14 +580,14 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 .device-card-content {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
 }
 
 .device-info-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 6px 0;
+  padding: 4px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.05);
 }
 
@@ -587,19 +597,23 @@ console.log('DeviceGroupDialog props:', props.data?.length || 0)
 
 .info-label {
   font-size: 12px;
-  color: #999;
-  font-weight: 500;
-  min-width: 70px;
+  color: #e5e7eb;
+  font-weight: 600;
+  min-width: 60px;
 }
 
 .info-value {
-  font-size: 13px;
-  color: #fff;
-  font-weight: 400;
+  font-size: 12px;
+  color: #ffffff;
+  font-weight: 500;
   text-align: right;
   flex: 1;
-  margin-left: 10px;
+  margin-left: 8px;
   word-break: break-all;
+  max-width: 140px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 /* 设备进度条样式 */

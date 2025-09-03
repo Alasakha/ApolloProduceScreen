@@ -75,7 +75,7 @@
 </template>   
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import DataCard3 from '../components/DataCard3.vue'
 import ProcessDialog from './components/ProcessDialog.vue'
 import CompletedDialog from './components/CompletedDialog.vue'
@@ -83,6 +83,7 @@ import TotalQtyDialog from './components/TotalQtyDialog.vue'
 import DeviceGroupDialog from './components/DeviceGroupDialog.vue'
 import WaitingDialog from './components/WaitingDialog.vue'
 import { getStampingDoingIndex, type StampingDoingIndex } from '@/api/getStampWeldinfo'
+import { eventBus } from '@/utils/eventbus'
 import { useRoute } from 'vue-router'
 import Abnormal from './Abnormal.vue'
 const route = useRoute()
@@ -209,8 +210,15 @@ const displayCards = computed(() => {
 
 // 组件挂载时获取数据
 onMounted(() => {
+  eventBus.on('refreshData', fetchStampingData)
   fetchStampingData()
 })
+
+// 组件销毁时移除事件监听器
+onBeforeUnmount(() => {
+  eventBus.off('refreshData', fetchStampingData)
+})
+
 
 
 

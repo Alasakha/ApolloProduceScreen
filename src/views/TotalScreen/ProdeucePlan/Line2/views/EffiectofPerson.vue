@@ -16,7 +16,11 @@
           
           <!-- 第二个图形 - 出勤人数 -->
           <div class="chart-container  p-2">
-            <div ref="Indicators2" class="w-full h-full"></div>
+            <div 
+              ref="Indicators2" 
+              class="w-full h-full cursor-pointer"
+              @click="openAttendanceDialog"
+            ></div>
           </div>
           
           <!-- 第三个图形 - 换型换线时间 -->
@@ -97,6 +101,38 @@
       @save="handleTimeDialogSave"
     />
 
+    <!-- 出勤人员信息弹窗 -->
+    <el-dialog v-model="attendanceDialogVisible" title="出勤人员信息" width="70%" :z-index="99999999">
+      <div v-if="attendanceLoading" class="text-center py-8">
+        <dv-loading>Loading...</dv-loading>
+      </div>
+      <div v-else-if="attendanceData.length === 0" class="text-center py-8 text-gray-500">
+        暂无出勤人员数据
+      </div>
+      <div v-else class="attendance-list">
+        <div class="attendance-header mb-4 p-3 bg-gray-100 rounded">
+          <span class="font-bold">生产线：{{ prodLineValue }}</span>
+          <span class="ml-4 font-bold">出勤人数：{{ attendanceData.length }}人</span>
+        </div>
+                   <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+             <div 
+               v-for="(member, index) in attendanceData" 
+               :key="index"
+               class="attendance-item p-3 border rounded hover:bg-gray-50 text-center"
+             >
+               <div class="flex flex-col items-center space-y-2">
+                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-600 rounded-full flex items-center justify-center text-white text-lg font-bold shadow-md">
+                   {{ member.name ? member.name.charAt(0) : '?' }}
+                 </div>
+                 <div class="text-center">
+                   <div class="font-medium text-gray-800">{{ member.name || '未知姓名' }}</div>
+                 </div>
+               </div>
+             </div>
+           </div>
+      </div>
+    </el-dialog>
+
   </div>
 </template>
 
@@ -105,7 +141,7 @@ import { ref, onMounted,onBeforeUnmount,reactive ,nextTick, computed } from 'vue
 import * as echarts from 'echarts';
 import DataCard from "@/components/DataCard.vue"; // 导入封装组件
 import EffiectCard from "@/components/EffiectCard.vue"; // 导入封装组件
-import { getEfficiencyToday, getEfficiencyBelowAdd } from '@/api/getProduceinfo';
+import { getEfficiencyToday, getEfficiencyBelowAdd, getSignInMember } from '@/api/getProduceinfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import BigScreenTitle from '@/components/title.vue'
@@ -117,6 +153,11 @@ const prodLineValue = ref('')
 // 时间对话框相关状态
 const timeDialogVisible = ref(false)
 const currentTimeType = ref(1) // '1' 或 '2' 1:换型换线时间,2:计划生产外时间
+
+// 出勤人员对话框相关状态
+const attendanceDialogVisible = ref(false)
+const attendanceLoading = ref(false)
+const attendanceData = ref([])
 // 定义数据
 const config = reactive({
   value: 66,
@@ -187,7 +228,7 @@ const drawChart = () => {
   });
 
   const option2 = createGaugeOption({
-    text: "出勤人数",
+    text: "白班人数",
     data: EfficentData.scanNum, 
     max: EfficentData.stanardNum
   });
@@ -311,6 +352,31 @@ onMounted(() => {
     } else {
       // 返回计划生产外时间的当前值
       return EfficentData.reduceMinute_jhw || 45;
+    }
+  }
+
+  // 打开出勤人员弹窗
+  async function openAttendanceDialog() {
+    attendanceDialogVisible.value = true;
+    attendanceLoading.value = true;
+    
+    try {
+      const res = await getSignInMember(prodLineValue.value);
+      if (res.data && Array.isArray(res.data)) {
+        // 将姓名数组转换为对象数组，添加默认值
+        attendanceData.value = res.data.map(name => ({
+          name: name,
+          employeeId: '未知工号',
+          department: '未知部门'
+        }));
+      } else {
+        attendanceData.value = [];
+      }
+    } catch (error) {
+      console.error('获取出勤人员信息失败:', error);
+      attendanceData.value = [];
+    } finally {
+      attendanceLoading.value = false;
     }
   }
 </script>

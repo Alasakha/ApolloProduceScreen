@@ -13,6 +13,7 @@ export const useProductionDataStore = defineStore('productionData', {
     lastFetchTime: null as Date | null,
     autoRefreshTimer: null as ReturnType<typeof setInterval> | null,
     manufacturingCost: null as ManufacturingCostData | null,
+    selectedEndDate: new Date().toISOString().split('T')[0] as string, // 新增：选中的结束日期
   }),
 
   getters: {
@@ -79,7 +80,6 @@ export const useProductionDataStore = defineStore('productionData', {
       const targetPercent = target <= 1 ? target * 100 : target
       
       const achievement = (actualPercent / targetPercent) * 100
-      
       // 保留一位小数
       return Number(achievement.toFixed(1))
     },
@@ -95,7 +95,6 @@ export const useProductionDataStore = defineStore('productionData', {
       
       const achievement = (actualPercent / targetPercent) * 100
       
-
       // 保留一位小数
       return Number(achievement.toFixed(1))
     },
@@ -255,10 +254,33 @@ export const useProductionDataStore = defineStore('productionData', {
       return { yearParam, monthParam }
     },
 
+    // 新增：设置结束日期并重新获取数据
+    setEndDate(date: string) {
+      console.log('productionData store: setEndDate 被调用，新日期:', date)
+      // 直接设置选中的结束日期
+      this.selectedEndDate = date
+      console.log('productionData store: selectedEndDate 已设置为:', this.selectedEndDate)
+      // 更新日期后重新获取数据
+      console.log('productionData store: 准备调用 fetchProductionData')
+      this.fetchProductionData()
+    },
+
+    // 新增：重置为今天并重新获取数据
+    resetEndDateToToday() {
+      // 重置为今天的日期
+      this.selectedEndDate = new Date().toISOString().split('T')[0]
+      // 重置后重新获取数据
+      this.fetchProductionData()
+    },
+
     // 获取生产数据
     async fetchProductionData() {
+      console.log('productionData store: fetchProductionData 开始执行')
       // 如果正在加载，避免重复请求
-      if (this.loading) return
+      if (this.loading) {
+        console.log('productionData store: 正在加载中，跳过重复请求')
+        return
+      }
 
       try {
         this.loading = true
@@ -266,62 +288,94 @@ export const useProductionDataStore = defineStore('productionData', {
         
         const { yearParam, monthParam } = this.getCurrentDateParams()
         
-        // 当日参数：今天的日期（用于准交率）
-        const today = new Date()
-        const todayParam = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`
+        // 使用选中的结束日期，如果没有选中则使用今天的日期
+        const endDate = this.selectedEndDate || new Date().toISOString().split('T')[0]
         
-        console.log('正在获取生产数据...', { monthParam, yearParam, todayParam })
+        console.log('正在获取生产数据...', { monthParam, yearParam, endDate })
+        console.log('接口调用参数详情:', {
+          'getFty(月度)': { startDate: monthParam, endDay: endDate },
+          'getFty(年度)': { startDate: yearParam, endDay: endDate },
+          'getOnTime(月度)': { startDay: monthParam },
+          'getOnTime(当日)': { startDay: endDate }
+        })
         
-        // 同时获取月度、年度、准交率和制造费用数据
-        const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse] = await Promise.all([
-          getFty(monthParam),        // 本月1号获取月度数据
-          getFty(yearParam),         // 本年1月1号获取年度数据
-          getOnTime(monthParam),     // 本月1号获取月度准交率
-          getOnTime(todayParam),     // 今日数据获取今日准交率
-          getManufacturingCost()     // 获取制造费用数据
-        ])
+        console.log('productionData store: 准备调用接口...')
         
-        if (monthlyResponse && monthlyResponse.data) {
-          this.monthlyData = monthlyResponse.data
-          console.log('月度数据获取成功:', monthlyResponse.data)
-        }
-        
-        if (yearlyResponse && yearlyResponse.data) {
-          this.yearlyData = yearlyResponse.data
-          console.log('年度数据获取成功:', yearlyResponse.data)
-        }
-        
-        if (onTimeMonthlyResponse && onTimeMonthlyResponse.data) {
-          this.onTimeMonthlyData = onTimeMonthlyResponse.data
-          console.log('月度准交率数据获取成功:', onTimeMonthlyResponse.data)
-        }
-        
-        if (onTimeDailyResponse && onTimeDailyResponse.data) {
-          this.onTimeDailyData = onTimeDailyResponse.data
-          console.log('今日准交率数据获取成功:', onTimeDailyResponse.data)
-        }
+        try {
+          // 同时获取月度、年度、准交率和制造费用数据
+          const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse] = await Promise.all([
+            getFty(monthParam, endDate),        // 本月1号到选中结束日期的月度数据（endDate 对应接口的 endDay 参数）
+            getFty(yearParam, endDate),         // 本年1月1号到选中结束日期的年度数据（endDate 对应接口的 endDay 参数）
+            getOnTime(monthParam),     // 本月1号获取月度准交率（接口只支持开始日期）
+            getOnTime(endDate),        // 选中结束日期作为开始日期获取准交率（接口只支持开始日期）
+            getManufacturingCost()     // 获取制造费用数据
+          ])
+          
+          console.log('productionData store: 接口调用完成，开始处理响应')
+          console.log('productionData store: 接口响应详情:', {
+            monthlyResponse: monthlyResponse,
+            yearlyResponse: yearlyResponse,
+            onTimeMonthlyResponse: onTimeMonthlyResponse,
+            onTimeDailyResponse: onTimeDailyResponse,
+            manufacturingCostResponse: manufacturingCostResponse
+          })
+          
+          if (monthlyResponse && monthlyResponse.data) {
+            this.monthlyData = monthlyResponse.data
+            console.log('月度数据获取成功:', monthlyResponse.data)
+          } else {
+            console.warn('productionData store: 月度数据响应异常:', monthlyResponse)
+          }
+          
+          if (yearlyResponse && yearlyResponse.data) {
+            this.yearlyData = yearlyResponse.data
+            console.log('年度数据获取成功:', yearlyResponse.data)
+          } else {
+            console.warn('productionData store: 年度数据响应异常:', yearlyResponse)
+          }
+          
+          if (onTimeMonthlyResponse && onTimeMonthlyResponse.data) {
+            this.onTimeMonthlyData = onTimeMonthlyResponse.data
+            console.log('月度准交率数据获取成功:', onTimeMonthlyResponse.data)
+          } else {
+            console.warn('productionData store: 月度准交率数据响应异常:', onTimeMonthlyResponse)
+          }
+          
+          if (onTimeDailyResponse && onTimeDailyResponse.data) {
+            this.onTimeDailyData = onTimeDailyResponse.data
+            console.log('今日准交率数据获取成功:', onTimeDailyResponse.data)
+          } else {
+            console.warn('productionData store: 今日准交率数据响应异常:', onTimeDailyResponse)
+          }
 
-        if (manufacturingCostResponse && manufacturingCostResponse.data) {
-          this.manufacturingCost = manufacturingCostResponse.data
-          console.log('制造费用数据获取成功:', manufacturingCostResponse.data)
+          if (manufacturingCostResponse && manufacturingCostResponse.data) {
+            this.manufacturingCost = manufacturingCostResponse.data
+            console.log('制造费用数据获取成功:', manufacturingCostResponse.data)
+          } else {
+            console.warn('productionData store: 制造费用数据响应异常:', manufacturingCostResponse)
+          }
+          
+          // 更新最后获取时间
+          this.lastFetchTime = new Date()
+          
+          if (!monthlyResponse.data && !yearlyResponse.data && !onTimeMonthlyResponse.data && !onTimeDailyResponse.data) {
+            throw new Error('获取数据失败')
+          }
+          
+          console.log('生产数据获取完成')
+        } catch (apiError) {
+          console.error('productionData store: 接口调用失败:', apiError)
+          throw apiError
         }
-        
-        // 更新最后获取时间
-        this.lastFetchTime = new Date()
-        
-        if (!monthlyResponse.data && !yearlyResponse.data && !onTimeMonthlyResponse.data && !onTimeDailyResponse.data) {
-          throw new Error('获取数据失败')
-        }
-        
-        console.log('生产数据获取完成')
       } catch (err: any) {
         this.error = err.message || '获取数据失败'
         console.error('获取生产数据失败:', err)
       } finally {
         this.loading = false
+        console.log('productionData store: loading 状态已重置为 false')
       }
     },
-
+  
     // 强制刷新数据
     async refreshData() {
       this.lastFetchTime = null
@@ -340,8 +394,6 @@ export const useProductionDataStore = defineStore('productionData', {
       this.autoRefreshTimer = setInterval(() => {
         this.fetchProductionData()
       }, 30 * 60 * 1000) // 30分钟
-      
-      console.log('生产数据自动刷新已启动（每30分钟）')
     },
 
     // 停止自动刷新

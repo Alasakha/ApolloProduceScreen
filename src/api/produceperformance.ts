@@ -2,12 +2,13 @@ import request from '../utils/request'
 
 
 // /manufacturing/fty post
-export const getFty = (date: string) => {
+export const getFty = (date: string ,endDay: string) => {
   return request({
     url: '/manufacturing/fty',
     method: 'post',
-    data: {
-      date: date
+    params: {
+      date: date,
+      endDay: endDay
     },
   })
 }
@@ -78,10 +79,14 @@ export interface TopIssueWorkshopResponse {
 }
 
 // /manufacturing/topIssueWorkshop post
-export const getTopIssueWorkshop = (): Promise<TopIssueWorkshopResponse> => {
+export const getTopIssueWorkshop = (startDay: string,endDay: string): Promise<TopIssueWorkshopResponse> => {
   return request({
     url: '/manufacturing/topIssueWorkshop',
     method: 'post',
+    params: {
+      startDay: startDay,
+      endDay: endDay
+    },
   })
 }
 
@@ -101,13 +106,14 @@ export const getTopIssueWorkshop = (): Promise<TopIssueWorkshopResponse> => {
 //   // 达成率就是实际值除以目标值 分为常规和A类
 // }
 
-export const getFtyWorkshop = (prodLine: string,startDay: string) => {
+export const getFtyWorkshop = (prodLine: string,startDay: string,endDay: string) => {
   return request({
     url: '/manufacturing/ftyWorkshop',
     method: 'post',
     params: {
       prodLine: prodLine,
       startDay: startDay,
+      endDay: endDay
     },
   })
 }
@@ -213,4 +219,73 @@ export interface ManufacturingCostResponse {
 export interface ManufacturingCostData {
   营业收入: number
   实际制造费: number
+  目标: number
+}
+
+
+// /manufacturing/onTimePart
+export const getOnTimePart = (customer: string) => {
+  return request({
+    url: '/manufacturing/onTimePart',
+    method: 'post',
+    params: { customer }
+  })
+}
+
+
+// 准交率接口返回类型定义
+export interface OnTimePartResponse {
+  code: number
+  message: string
+  data: OnTimePartData
+}
+
+export interface OnTimePartData {
+  total: number //总数
+  zjNum: number //准交数
+}
+
+// onTimePartDetail
+export const  getOnTimePartDetail= (customer) =>{
+
+  return request({
+    url: '/manufacturing/onTimePartDetail',
+    method: 'post',
+    params: { customer }
+  })
+
+}
+
+// ftyChart 
+export const getFtyChart = (Customer) => {
+  return request({
+    url: '/manufacturing/ftyChart',
+    method: 'post',
+    params: {
+      Customer 
+    },
+  })
+}
+
+
+
+// 涂装合格率数据接口
+export interface PaintingPassRateData {
+  target_normal: number  // 目标合格率
+  actual_normal: number  // 实际合格率  
+  target_a: number       // A类目标合格率
+  actual_a: number       // A类实际合格率
+}
+
+// /paintingPassRate - 涂装合格率
+export const getPaintingPassRate = (startDay?: string, endDay?: string): Promise<{data: PaintingPassRateData}> => {
+  const params: Record<string, string> = {}
+  if (startDay) params.startDay = startDay
+  if (endDay) params.endDay = endDay
+  
+  return request({
+    url: '/manufacturing/paintingPassRate',
+    method: 'post',
+    params
+  })
 }

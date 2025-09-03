@@ -2,7 +2,7 @@
   <div
     class="flex justify-center items-center
            text-white font-bold tracking-[0.5vw]
-           text-[4.5vw] hd:text-[2.8vw] fullhd:text-[3vw] 2k:text-[2.4vw] 2k-plus:text-[3vw] 4k:text-[2vw]">
+           text-3xl 3xl:text-4xl 4xl:text-6xl">
            涂装看板
   </div>
 </template>

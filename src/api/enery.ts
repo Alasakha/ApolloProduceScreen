@@ -20,6 +20,7 @@ export const getGasPower = (monthDay) => {
         params: {
             monthDay
         }
+  
       })
 }
 

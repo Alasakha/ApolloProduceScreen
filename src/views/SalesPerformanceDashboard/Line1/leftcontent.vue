@@ -106,7 +106,7 @@
                     </tr>
 
                     <!-- 阶段性汇总行 -->
-                    <tr v-if="summaryData" class="bg-[rgba(0,238,255,0.1)] font-semibold border-b border-[#00eeff40]">
+                    <!-- <tr v-if="summaryData" class="bg-[rgba(0,238,255,0.1)] font-semibold border-b border-[#00eeff40]">
                         <td class="px-1 py-1 text-left border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.empCategory }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.pjTotal }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysQuantityYear }}</td>
@@ -115,7 +115,7 @@
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.ysAmtAgain }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.xdCount }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ summaryData.xdTotal }}</td>
-                    </tr>
+                    </tr> -->
                 </tbody>
             </table>
         </div>
@@ -341,9 +341,9 @@ const regularData = computed(() => {
   return tableData.value.filter(item => item.empCategory !== '阶段性汇总');
 });
 
-const summaryData = computed(() => {
-  return tableData.value.find(item => item.empCategory === '阶段性汇总');
-});
+// const summaryData = computed(() => {
+//   return tableData.value.find(item => item.empCategory === '阶段性汇总');
+// });
 
 // 格式化金额，保留2位小数，转换为万元
 const formatAmount = (value: string | number): string => {

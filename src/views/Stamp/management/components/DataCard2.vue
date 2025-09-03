@@ -13,24 +13,25 @@
     <div class="flex-1 flex flex-row gap-4  p-3 min-h-0 min-w-0">
       <!-- 左侧数量区块 -->
       <div class="flex flex-col justify-around items-center gap-4 w-24 min-w-[5rem]">
-        <div class="flex flex-col items-center bg-blue-900/60 border border-blue-400 rounded-lg px-2 py-1 w-full">
-          <div class="text-sm text-blue-200">任务总数量</div>
-          <div class="text-xl font-bold text-white drop-shadow">{{ totalQty }}</div>
+        <div class="flex flex-col items-center bg-blue-900/60 border border-blue-400 rounded-lg px-2 py-1 w-full ">
+          <div class="text-sm text-blue-200 3xl:text-[12px] 2xl:text-[10px] 1xl:text[8px]">任务总数量</div>
+          <div class="text-xl font-bold text-white drop-shadow 3xl:text-[12px] 2xl:text-[10px] xl:text[8px]">{{ totalQty }}</div>
         </div>
         <div class="flex flex-col items-center bg-blue-900/60 border border-blue-400 rounded-lg px-2 py-1 w-full">
-          <div class="text-sm text-blue-200">已完成数量</div>
-          <div class="text-xl font-bold text-white drop-shadow">{{ doneQty }}</div>
+          <div class="text-sm text-blue-200 3xl:text-[12px] 2xl:text-[10px] 1xl:text[8px]">已完成数量</div>
+          <div class="text-xl font-bold text-white drop-shadow 3xl:text-[12px] 2xl:text-[10px] xl:text[8px]">{{ doneQty }}</div>
         </div>
       </div>
       <!-- 右侧详细信息 -->
-      <div class="flex-1 flex flex-col  min-w-0">
+      <div class=" flex flex-col  min-w-0 h-full">
         <!-- 工单信息和进度条 -->
-        <div class="mb-2 h-[40%] flex flex-col justify-around">
+        <div class="mb-2 h-full flex flex-col justify-around">
           <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-white mb-1 h-[70%]" >
             <span>品号：{{ ta006 || '暂无数据' }}</span>
             <span>品名：{{ spec }}</span>
             <span>规格：{{ spen }}</span>
             <span v-if="gdNum">工单数：{{ gdNum }}</span>
+            <span>上机人员：{{ peopleName }}</span>
           </div>
           <div class="flex items-center gap-2">
             <div class="flex-1 h-2 bg-blue-300 rounded h-[30%]">
@@ -40,7 +41,7 @@
           </div>
         </div>
         <!-- 参数区块 -->
-        <div class="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-white h-[60%] ">
+        <!-- <div class="grid grid-cols-1 gap-x-4 gap-y-1 text-sm text-white h-[60%] ">
           <div class="flex justify-between items-center">
             <span class="text-blue-200"> 激光功率</span>
             <span class="text-yellow-300">标准: {{ stdTemperature ?? '暂无' }}</span>
@@ -52,7 +53,7 @@
             <span class="text-cyan-300">实际: {{ maxspeed ?? '暂无' }}</span>
           </div>
 
-        </div>
+        </div> -->
         <!-- 能耗监控 -->
         <!-- <div v-if="device && device.hourBetween && device.power" class="bg-blue-900/70 rounded p-2 text-xs text-blue-100 ">
           <div class="font-bold text-cyan-300 mb-1">能耗监控</div>  
@@ -173,6 +174,10 @@ const props = defineProps({
   },
   workNo: {
     type: [Number, String],
+    default: "暂无"
+  },
+  peopleName: {
+    type: String,
     default: "暂无"
   }
 });

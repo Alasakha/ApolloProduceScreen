@@ -110,8 +110,8 @@ const getTrendValue = () => {
 
 <style scoped>
 .progress-bar-card {
-  background: rgba(255, 255, 255, 0.05);
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: var(--bg-card);
+  border: 1px solid var(--border-secondary);
   border-radius: 12px;
   padding: 20px;
   height: 100%;
@@ -122,8 +122,8 @@ const getTrendValue = () => {
 }
 
 .progress-bar-card:hover {
-  border-color: rgba(0, 255, 255, 0.3);
-  box-shadow: 0 0 20px rgba(0, 255, 255, 0.1);
+  border-color: rgba(0, 212, 255, 0.3);
+  box-shadow: 0 0 20px rgba(0, 212, 255, 0.1);
   transform: translateY(-2px);
 }
 
@@ -135,17 +135,17 @@ const getTrendValue = () => {
 }
 
 .card-title {
-  color: #fff;
+  color: var(--text-primary);
   font-size: 14px;
   font-weight: 600;
   margin: 0;
 }
 
 .progress-value {
-  color: #00ffff;
+  color: var(--primary-blue);
   font-size: 18px;
   font-weight: bold;
-  text-shadow: 0 0 10px rgba(0, 255, 255, 0.5);
+  text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
 }
 
 .progress-container {
@@ -159,7 +159,7 @@ const getTrendValue = () => {
 .progress-bar {
   width: 100%;
   height: 12px;
-  background: rgba(255, 255, 255, 0.1);
+  background: var(--border-secondary);
   border-radius: 6px;
   overflow: hidden;
   position: relative;
@@ -191,7 +191,7 @@ const getTrendValue = () => {
   right: 0;
   width: 20px;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.6));
+  background: linear-gradient(90deg, transparent, var(--text-muted));
   filter: blur(2px);
 }
 
@@ -202,11 +202,11 @@ const getTrendValue = () => {
 
 /* 颜色主题 */
 .progress-fill.color-primary {
-  background: linear-gradient(90deg, #0096ff, #00ffff);
+  background: linear-gradient(90deg, #0096ff, var(--primary-blue));
 }
 
 .progress-fill.color-success {
-  background: linear-gradient(90deg, #00ff96, #00cc7a);
+  background: linear-gradient(90deg, var(--success), #00cc7a);
 }
 
 .progress-fill.color-warning {
@@ -214,7 +214,7 @@ const getTrendValue = () => {
 }
 
 .progress-fill.color-info {
-  background: linear-gradient(90deg, #0096ff, #00ffff);
+  background: linear-gradient(90deg, #0096ff, var(--primary-blue));
 }
 
 .progress-fill.color-danger {
@@ -225,7 +225,7 @@ const getTrendValue = () => {
   display: flex;
   justify-content: space-between;
   font-size: 11px;
-  color: rgba(255, 255, 255, 0.6);
+  color: var(--text-muted);
 }
 
 .card-footer {
@@ -234,7 +234,7 @@ const getTrendValue = () => {
   align-items: center;
   margin-top: 20px;
   padding-top: 15px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  border-top: 1px solid var(--border-secondary);
 }
 
 .status-indicator {
@@ -245,7 +245,7 @@ const getTrendValue = () => {
 }
 
 .status-indicator.status-excellent {
-  color: #00ff96;
+  color: var(--success);
 }
 
 .status-indicator.status-good {
@@ -279,8 +279,8 @@ const getTrendValue = () => {
 }
 
 .trend-indicator.trend-up {
-  background: rgba(0, 255, 150, 0.2);
-  color: #00ff96;
+  background: rgba(0, 204, 122, 0.2);
+  color: var(--success);
 }
 
 .trend-indicator.trend-down {
@@ -344,7 +344,7 @@ const getTrendValue = () => {
   left: -100%;
   width: 100%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0, 255, 255, 0.1), transparent);
+  background: linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.1), transparent);
   transition: left 0.6s;
 }
 

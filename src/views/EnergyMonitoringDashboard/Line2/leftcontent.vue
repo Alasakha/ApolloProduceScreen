@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[25vh] w-full p-2">
+  <div class="h-full w-full p-2">
     <dv-border-box-2>
       <div class="flex flex-col h-full">
         <!-- 标题 -->
@@ -87,16 +87,75 @@
             </div>
           </div>
         </div>
+        
+        <!-- 添加填写原因按钮 -->
+        <div class="reason-section" v-if="dayDiff > 0">
+          <div class="reason-info">
+            <span class="reason-label">超过原因：</span>
+            <span class="reason-text">{{ waterReason || '暂无' }}</span>
+          </div>
+          <button class="reason-btn" @click="showReasonDialog = true">
+            <span class="btn-icon">📝</span>
+            填写原因
+          </button>
+        </div>
       </div>
     </dv-border-box-2>
+    
+    <!-- 原因填写弹窗 -->
+    <el-dialog
+      v-model="showReasonDialog"
+      title="填写超支原因"
+      width="500px"
+      class="reason-dialog"
+      :close-on-click-modal="false"
+    >
+      <div class="dialog-content">
+        <div class="form-item">
+          <label class="form-label">水表编号：</label>
+          <span class="form-value">82522504270042</span>
+        </div>
+        <div class="form-item">
+          <label class="form-label">超支数值：</label>
+          <span class="form-value exceeded">{{ dayDiff > 0 ? '+' : '' }}{{ dayDiff }}m³</span>
+        </div>
+        <div class="form-item">
+          <label class="form-label">超支原因：</label>
+          <el-input
+            v-model="reasonInput"
+            type="textarea"
+            :rows="4"
+            placeholder="请输入超支原因..."
+            maxlength="200"
+            show-word-limit
+          />
+        </div>
+      </div>
+      <template #footer>
+        <div class="dialog-footer">
+          <el-button @click="showReasonDialog = false">取消</el-button>
+          <el-button type="primary" @click="submitReason" :loading="submitting">
+            提交
+          </el-button>
+        </div>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { computed, reactive, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useEnergyStore } from '@/store/energy'
+import { ElMessage } from 'element-plus'
+import { getRawMaterialMonitoringAdd } from '@/api/getnewInjection'
 
 const energyStore = useEnergyStore()
+
+// 原因填写相关变量
+const showReasonDialog = ref(false)
+const reasonInput = ref('')
+const submitting = ref(false)
+const waterReason = ref('')
 
 // 响应式窗口宽度
 const windowWidth = ref(window.innerWidth)
@@ -284,11 +343,184 @@ watch([actualTotal, actualMonth, actualDay, standardTotal, standardMonth, standa
 }, { immediate: true })
 
 console.log('💧 Line2水表组件：使用store中的真实API数据')
+
+// 提交原因方法
+const submitReason = async () => {
+  if (!reasonInput.value.trim()) {
+    ElMessage.warning('请输入超支原因')
+    return
+  }
+
+  submitting.value = true
+  try {
+    // 调用API接口提交原因
+    const res = await getRawMaterialMonitoringAdd('82522504270042', reasonInput.value.trim())
+    if (res.code === 200) {
+      // 更新本地显示的原因
+      waterReason.value = reasonInput.value.trim()
+      
+      ElMessage.success('原因提交成功')
+      showReasonDialog.value = false
+      reasonInput.value = ''
+    } else {
+      ElMessage.error('提交失败，请稍后再试')
+    }
+  } catch (error) {
+    console.error('提交原因失败:', error)
+    ElMessage.error('提交失败，请重试')
+  } finally {
+    submitting.value = false
+  }
+}
 </script>
 
 <style scoped>
 :deep(.dv-digital-flop) {
   width: 120px;
   height: 30px;
+}
+
+/* 原因填写相关样式 */
+.reason-section {
+  margin-top: 8px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.reason-info {
+  display: flex;
+  align-items: center;
+  margin-bottom: 4px;
+}
+
+.reason-label {
+  color: #fff;
+  font-size: 9px;
+  margin-right: 4px;
+}
+
+.reason-text {
+  color: #ffaa00;
+  font-size: 9px;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.reason-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
+  border: none;
+  border-radius: 4px;
+  padding: 3px 6px;
+  color: white;
+  font-size: 9px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+}
+
+.reason-btn:hover {
+  background: linear-gradient(135deg, #ff5252, #ff7676);
+  transform: translateY(-1px);
+}
+
+.btn-icon {
+  margin-right: 3px;
+}
+
+/* 弹窗样式 */
+.reason-dialog :deep(.el-dialog) {
+  background: #1a1a1a;
+  border: 1px solid #333;
+  border-radius: 12px;
+}
+
+.reason-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #2a2a2a, #333);
+  border-bottom: 1px solid #444;
+  padding: 20px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+.reason-dialog :deep(.el-dialog__title) {
+  color: #fff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.reason-dialog :deep(.el-dialog__body) {
+  padding: 24px;
+  background: #1a1a1a;
+}
+
+.reason-dialog :deep(.el-dialog__footer) {
+  background: #1a1a1a;
+  border-top: 1px solid #333;
+  padding: 16px 24px;
+  border-radius: 0 0 12px 12px;
+}
+
+.dialog-content {
+  color: #fff;
+}
+
+.form-item {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+}
+
+.form-label {
+  width: 80px;
+  color: #ccc;
+  font-size: 14px;
+}
+
+.form-value {
+  flex: 1;
+  color: #fff;
+  font-size: 14px;
+}
+
+.form-value.exceeded {
+  color: #ff6b6b;
+  font-weight: 600;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+:deep(.el-textarea__inner) {
+  background: #2a2a2a;
+  border: 1px solid #444;
+  color: #fff;
+}
+
+:deep(.el-textarea__inner:focus) {
+  border-color: #00eeff;
+}
+
+:deep(.el-button) {
+  background: #333;
+  border: 1px solid #555;
+  color: #fff;
+}
+
+:deep(.el-button--primary) {
+  background: #00eeff;
+  border-color: #00eeff;
+  color: #000;
+}
+
+:deep(.el-button--primary:hover) {
+  background: #00ccdd;
+  border-color: #00ccdd;
 }
 </style>

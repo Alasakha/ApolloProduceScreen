@@ -10,17 +10,17 @@
                     <tr class="border-b border-[#00eeff40] bg-[#001122]">
                         <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">属性</th>
                         <th v-for="month in months" :key="month" class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">{{ month }}</th>
-                        <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合计</th>
+                        <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合计</th>
                         <th class="px-2 py-2 sm:px-3 sm:py-2 md:px-4 md:py-3 xl:px-3 xl:py-2 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-2 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">阶段累计</th>
                     </tr>
                 </thead>
                 <tbody>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">挑战预算年度预算（收入）<span class='text-xs'>(万)</span></td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">年度挑战预算（收入）<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getData('budgetIncome', month)) }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getTotal('budgetIncome')) }}
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
@@ -28,11 +28,11 @@
                         </td>
                     </tr>
                     <tr class="border-b border-[#00eeff40] hover:bg-[rgba(0,238,255,0.2)]">
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">合理预算年度预算（收入）<span class='text-xs'>(万)</span></td>
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 text-left border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">年度合理预算（收入）<span class='text-xs'>(万)</span></td>
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getData('reasonableIncome', month)) }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getTotal('reasonableIncome')) }}
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
@@ -44,7 +44,7 @@
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getData('monthlyForecast', month)) }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg- bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getTotal('monthlyForecast')) }}
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
@@ -56,7 +56,7 @@
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getData('income', month)) }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ formatWan(getTotal('income')) }}
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
@@ -68,7 +68,7 @@
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getData('monthlyCompletionRate', month) !== '' ? getData('monthlyCompletionRate', month) + '%' : '' }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getTotal('monthlyCompletionRate') }}%
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
@@ -78,7 +78,7 @@
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getData('monthlyProcessingRate', month) !== '' ? getData('monthlyProcessingRate', month) + '%' : '' }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getTotal('monthlyProcessingRate') }}%
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
@@ -88,7 +88,7 @@
                         <td v-for="month in months" :key="month" class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getData('monthlyForecastRate', month) !== '' ? getData('monthlyForecastRate', month) + '%' : '' }}
                         </td>
-                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-yellow-500 bg-opacity-20 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
+                        <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] bg-blue-600 bg-opacity-30 text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm">
                             {{ getTotal('monthlyForecastRate') }}%
                         </td>
                         <td class="px-2 py-1 sm:px-3 sm:py-1 md:px-4 md:py-2 xl:px-3 xl:py-1 2xl:px-2 2xl:py-1 3xl:px-1 3xl:py-1 4xl:px-2 4xl:py-1 border-x border-[#00eeff40] text-xs sm:text-sm md:text-base xl:text-sm 2xl:text-xs 3xl:text-xs 4xl:text-sm"></td>
@@ -166,11 +166,11 @@ const getFinanceIncomeData = async () => {
       if (monthMap[month]) {
         // 计算各个比率
         const monthlyCompletionRate = totalBudget && item.ysChallengeYear ? 
-          ((item.ysChallengeYear / totalBudget) * 100).toFixed(1) : null
+          ((item.income/item.ysChallengeYear  ) * 100).toFixed(1) : null
         const monthlyProcessingRate = totalReasonable && item.ysReasonableYear ? 
-          ((item.ysReasonableYear / totalReasonable) * 100).toFixed(1) : null
-        const monthlyForecastRate = totalForecast && item.ysValueMonth ? 
-          ((item.ysValueMonth / totalForecast) * 100).toFixed(1) : null
+          ((item.income / item.ysReasonableYear) * 100).toFixed(1) : null
+        const monthlyForecastRate = item.ysValueMonth && item.income ? 
+          ((item.income/item.ysValueMonth ) * 100).toFixed(1) : null
 
         formattedData[monthMap[month]] = {
           budgetIncome: item.ysChallengeYear,
@@ -183,13 +183,13 @@ const getFinanceIncomeData = async () => {
         }
       }
     })
-
+    const totalIncome = (totalData as any).income || 0
     // 计算合计的比率
     totalData = {
       ...totalData,
-      monthlyCompletionRate: '100',
-      monthlyProcessingRate: '100',
-      monthlyForecastRate: ''
+      monthlyCompletionRate: totalBudget ? ((totalIncome / totalBudget) * 100).toFixed(1) : '0',
+      monthlyProcessingRate: totalReasonable ? ((totalIncome / totalReasonable) * 100).toFixed(1) : '0',
+      monthlyForecastRate: totalForecast ? ((totalIncome / totalForecast) * 100).toFixed(1) : '0'
     }
 
     tableData.value = {
@@ -229,6 +229,12 @@ const formatWan = (val: any) => {
   if (isNaN(num)) return '';
   return (num / 10000).toFixed(2);
 };
+
+// 暴露数据给父组件
+defineExpose({
+  tableData,
+  getFinanceIncomeData
+});
 
 onMounted(() => {
   getFinanceIncomeData()

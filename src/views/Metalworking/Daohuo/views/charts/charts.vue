@@ -109,7 +109,7 @@ const tableColumns = [
     { prop: 'caigou', label: '采购员', width: 100 },
     // { prop: 'cangguan', label: '仓管员', width: 80 },
     { prop: 'deliveryTime', label: '到货时间', width: 200 },
-    { prop: 'doc_no', label: '工单号', width: 200 },
+    { prop: 'doc_no', label: '采购单号', width: 200 },
     // { prop: 'item_code', label: '品号', width: 200 },
     { prop: 'item_description', label: '品名', width: 200 },
     { prop: 'item_specification', label: '规格', width: 200 },

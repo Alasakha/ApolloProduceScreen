@@ -1,12 +1,18 @@
 <template>
-    <div class="line2-container w-full h-[13%] flex">
-        <LeftContent class="flex-2"/>
-        <!-- <RightContent class="flex-1"/> -->
+    <div class="line2 flex h-[40%] w-full p-4 gap-4">
+      <Data></Data>
+      <Efficency></Efficency>  
+      <Eourly></Eourly>
+
     </div>
-</template>
+  </template>
+  
+  <script setup>
+    import Data from './data.vue'
+    import Efficency from './efficiency.vue'
+    import Eourly from './hourlyProduct.vue'
+  </script>
+  
+  <style scoped>
 
-
-<script setup lang="ts">
-import LeftContent from './LeftContent.vue';
-// import RightContent from './RightContent.vue';
-</script>
+  </style>
