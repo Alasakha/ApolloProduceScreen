@@ -40,6 +40,8 @@ const fetchFtyData = async () => {
       
       // 反转数据顺序，让数据从上3周开始
       chartData.value.data = ftyRates.reverse()
+      chartData.value.categories = response.data.map(item => item.weekNumber+'周').reverse()
+
       updateChart()
     } else {
       throw new Error(response.message || '获取数据失败')

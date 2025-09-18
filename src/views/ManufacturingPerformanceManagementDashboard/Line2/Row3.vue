@@ -8,6 +8,7 @@
         <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类一部涂装TOP前三问题占比</div>
         <div class="issues-grid">
           <div 
+            v-if="customerData.painting.topIssues.length > 0"
             v-for="(issue, index) in customerData.painting.topIssues" 
             :key="index"
             class="issue-item"
@@ -15,6 +16,9 @@
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
+          </div>
+          <div v-else class="no-issues-item">
+            <div class="no-issues-text text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">暂无问题点</div>
           </div>
         </div>
       </div>
@@ -24,6 +28,7 @@
         <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类总装一课TOP前三问题占比</div>
         <div class="issues-grid">
           <div 
+            v-if="customerData.assemblyCourse1.topIssues.length > 0"
             v-for="(issue, index) in customerData.assemblyCourse1.topIssues" 
             :key="index"
             class="issue-item"
@@ -31,6 +36,9 @@
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
+          </div>
+          <div v-else class="no-issues-item">
+            <div class="no-issues-text text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">暂无问题点</div>
           </div>
         </div>
       </div>
@@ -40,6 +48,7 @@
         <div class="section-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类总装二课TOP前三问题占比</div>
         <div class="issues-grid">
           <div 
+            v-if="customerData.assemblyCourse2.topIssues.length > 0"
             v-for="(issue, index) in customerData.assemblyCourse2.topIssues" 
             :key="index"
             class="issue-item"
@@ -47,6 +56,9 @@
           >
             <div class="issue-name text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">{{ issue.name }}</div>
             <div class="issue-percentage text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm font-bold">{{ issue.percentage }}%</div>
+          </div>
+          <div v-else class="no-issues-item">
+            <div class="no-issues-text text-[9px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">暂无问题点</div>
           </div>
         </div>
       </div>
@@ -57,8 +69,10 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useTopIssueWorkshopStore } from '@/store/modules/topIssueWorkshop'
+import { useProductionDataStore } from '@/store/productionData'
 
 const topIssueStore = useTopIssueWorkshopStore()
+const productionStore = useProductionDataStore()
 
 // 计算总问题数，用于计算百分比
 const calculatePercentage = (issues) => {
@@ -78,20 +92,35 @@ const calculatePercentage = (issues) => {
   })
 }
 
+// 计算涂装问题数据
+const calculatePaintingIssues = (paintingData) => {
+  if (!paintingData || !paintingData.length) return []
+  
+  return paintingData.map(issue => {
+    // 直接使用接口返回的ratio字段，转换为百分比
+    const percentage = issue.ratio ? (issue.ratio * 100).toFixed(1) : 0
+    // 根据问题数量判断严重程度
+    const status = issue.total > 20 ? 'major' : 'minor'
+    
+    return {
+      name: issue.ngName,
+      status: status,
+      percentage: parseFloat(percentage)
+    }
+  })
+}
+
 // 计算数据
 const customerData = computed(() => {
   const workshop1004 = topIssueStore.workshop1004Data
   const workshop2004 = topIssueStore.workshop2004Data
+  const paintingATypeData = productionStore.paintingProblemATypeData
   
   return {
-    // A类一部涂装 - 使用模拟数据（没有涂装车间的真实数据）
+    // A类一部涂装 - 使用涂装问题API的A类数据
     painting: {
-      passRateReached: false, // 直通率未达标
-      topIssues: [
-        { name: '漆面流挂缺陷', status: 'major', percentage: 18.5 },
-        { name: '色差问题', status: 'minor', percentage: 15.2 },
-        { name: '涂层厚度不均', status: 'minor', percentage: 12.8 }
-      ]
+      passRateReached: !(paintingATypeData?.some(issue => issue.total > 15)), // 有高严重问题说明未达标
+      topIssues: calculatePaintingIssues(paintingATypeData?.slice(0, 3) || [])
     },
     // A类总装一课 - 使用1004工作中心的真实数据
     assemblyCourse1: {
@@ -119,7 +148,10 @@ const getIssueClass = (issueStatus, passRateReached) => {
 
 // 组件挂载时获取数据
 onMounted(async () => {
-  await topIssueStore.fetchTopIssueWorkshopData()
+  await Promise.all([
+    topIssueStore.fetchTopIssueWorkshopData(),
+    productionStore.fetchProductionData()
+  ])
 })
 </script>
 
@@ -222,6 +254,22 @@ onMounted(async () => {
   50% {
     box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
   }
+}
+
+/* 暂无问题点样式 */
+.no-issues-item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 8px;
+  border-radius: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-left: 3px solid #666;
+}
+
+.no-issues-text {
+  color: #888;
+  font-style: italic;
 }
 
 /* .issue-warning::before {

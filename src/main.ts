@@ -14,6 +14,15 @@ import '@/styles/theme.css'
 
 import VueDOMPurifyHTML from "vue-dompurify-html"
 
+// 设置全局错误处理器（必须在所有其他导入之前）
+import './utils/globalErrorHandler.js'
+// 修复ECharts重复注册错误（必须在其他组件之前）
+import './utils/echartsFix.js'
+// 修复Three.js材质错误（必须在其他组件之前）
+import './utils/threeErrorHandler.js'
+// 初始化ECharts（必须在其他组件之前）
+import './utils/initEcharts.js'
+
 // function setRootFontSize() {
 //   const baseSize = 16; // 设计稿默认 100% 缩放时 html 的 font-size
 //   const scale = 1 / window.devicePixelRatio;

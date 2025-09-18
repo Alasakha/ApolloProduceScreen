@@ -240,12 +240,20 @@
     { prop: 'business_qty2', label: '调拨单业务总数量', width: '260' },
   ]
 
+  // 日期格式化函数
+  const formatDateTime = (dateStr: string) => {
+    if (!dateStr) return ''
+    // 将 2025-09-08 00:00:00.0000000 格式化为 2025-09-08 00:00:00
+    return dateStr.split('.')[0]
+  }
+
   // 工单异常数据的列定义
   const abnormalColumns = [
     { prop: 'docNo', label: '工单单号', width: '220' },
     { prop: 'customerOrderNo', label: '客户单号', width: '250' },
-    { prop: 'planDate', label: '计划完成日期', width: '500' },
-    { prop: 'completeDate', label: '实际完成日期', width: '300' },
+    { prop: 'item_code', label: '品号', width: '250' },
+    { prop: 'planDate', label: '计划完成日期', width: '500', formatter: formatDateTime },
+    { prop: 'completeDate', label: '实际完成日期', width: '300', formatter: formatDateTime },
   ]
 
   // 当前使用的列定义

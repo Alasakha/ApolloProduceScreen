@@ -258,6 +258,9 @@ const energyData = computed(() => {
   }
   
   // 过滤数据：只保留电表数据，排除气表和水表
+  console.log('🔍 开始过滤数据，总数据量:', dataToProcess.length)
+  console.log('🔍 MACHINE_CODES.ELECTRIC:', MACHINE_CODES.ELECTRIC)
+  
   const filteredData = dataToProcess.filter(item => {
     const isElectric = MACHINE_CODES.ELECTRIC.includes(item.machCode)
     const isGas = MACHINE_CODES.GAS.includes(item.machCode)
@@ -267,7 +270,8 @@ const energyData = computed(() => {
       isElectric,
       isGas,
       isWater,
-      willInclude: isElectric
+      willInclude: isElectric,
+      machCodeInArray: MACHINE_CODES.ELECTRIC.includes(item.machCode)
     })
     
     return isElectric
@@ -327,6 +331,7 @@ const energyData = computed(() => {
     return result
   })
   
+
   // 按照 MACHINE_CODES.ELECTRIC 中定义的顺序排序
   const sortedData = processedData.sort((a, b) => {
     const indexA = MACHINE_CODES.ELECTRIC.indexOf(a.machCode)
@@ -433,7 +438,7 @@ const submitReason = async () => {
 
 <style scoped>
 .line3-container {
-  height: 25vh;
+  height: 17vh;
   width: 100%;
 }
 
@@ -456,9 +461,7 @@ const submitReason = async () => {
   margin-top: 2px;
 }
 
-.content {
-  height: calc(100% - 70px);
-}
+
 
 .energy-grid {
   display: grid;

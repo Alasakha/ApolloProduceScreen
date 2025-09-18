@@ -1,7 +1,7 @@
 <template>
-    <div class="quality-container w-full h-full">
-        <div class="quality-title">
-            <h3>今日质量TOP问题</h3>
+    <div class="quality-container w-full h-full p-2">
+        <div class="text-lg font-bold text-white mb-2 text-center" style="letter-spacing: 2px;">
+            今日质量TOP问题
         </div>
         <div class="chart-container">
             <EChartsPieChart
@@ -12,6 +12,8 @@
                 :show-label="chartConfig.showLabel"
                 :show-value="chartConfig.showValue"
                 :show-pointer="chartConfig.showPointer"
+                :empty-text="chartData && chartData.length > 0 ? '' : '→ 暂无数据'"
+                :empty-text-color="'#00ff00'"
                 @click="handleChartClick"
                 ref="pieChartRef"
             />
@@ -289,26 +291,9 @@ onUnmounted(() => {
     width: 100%;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
+    border: 1px solid rgba(34, 211, 238, 0.3);
     overflow: hidden; /* 防止内容溢出 */
     box-sizing: border-box;
-}
-
-.quality-title {
-    background: linear-gradient(135deg, #87CEEB, #98D8E8);
-    padding: 8px;
-    border-radius: 6px 6px 0 0;
-    flex-shrink: 0; /* 防止标题被压缩 */
-}
-
-.quality-title h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 14px;
-    font-weight: 600;
-    text-align: center;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
 }
 
 .chart-container {

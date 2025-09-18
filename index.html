@@ -13,7 +13,32 @@
 
 <body>
   <div id="app"></div>
-  <script src="/module/PlayerControl.js"></script>                   
+  <script src="/module/PlayerControl.js"></script>
+  
+  <!-- ECharts错误处理脚本 -->
+  <script>
+    // 全局错误处理 - 解决ECharts重复注册错误
+    window.addEventListener('error', function(event) {
+      if (event.error && event.error.message && 
+          (event.error.message.includes('axisPointer') || 
+           event.error.message.includes('exists'))) {
+        console.warn('ECharts重复注册错误已忽略:', event.error.message);
+        event.preventDefault();
+        return false;
+      }
+    });
+    
+    window.addEventListener('unhandledrejection', function(event) {
+      if (event.reason && event.reason.message && 
+          (event.reason.message.includes('axisPointer') || 
+           event.reason.message.includes('exists'))) {
+        console.warn('ECharts Promise错误已忽略:', event.reason.message);
+        event.preventDefault();
+        return false;
+      }
+    });
+  </script>
+  
   <script type="module" src="/src/main.ts"></script>
 </body>
 

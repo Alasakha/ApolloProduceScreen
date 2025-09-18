@@ -235,8 +235,9 @@ onBeforeUnmount(() => {
     padding: 16px;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    margin: 0 8px;
+    margin: 0;
     width: 100%;
+    box-sizing: border-box;
 }
 
 .quality-title {

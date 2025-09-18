@@ -291,6 +291,16 @@ const updateChart = () => {
                     color: '#00eeff',
                     borderColor: '#ffffff',
                     borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#00eeff',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             },
             {
@@ -308,6 +318,16 @@ const updateChart = () => {
                     color: '#00ff9f',
                     borderColor: '#ffffff',
                     borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#00ff9f',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             },
             {
@@ -325,6 +345,16 @@ const updateChart = () => {
                     color: '#ff9f00',
                     borderColor: '#ffffff',
                     borderWidth: 2
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#ff9f00',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             }
         ]

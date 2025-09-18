@@ -59,6 +59,14 @@ export const useManufacturingPerformanceStore = defineStore('manufacturingPerfor
     }
   }
   
+  // 获取本地日期字符串（避免时区问题）
+  const getLocalDateString = (date: Date = new Date()): string => {
+    const year = date.getFullYear()
+    const month = String(date.getMonth() + 1).padStart(2, '0')
+    const day = String(date.getDate()).padStart(2, '0')
+    return `${year}-${month}-${day}`
+  }
+
   // 状态
   const state = ref<ManufacturingPerformanceState>({
     assemblyCourse1Monthly: null,
@@ -72,7 +80,7 @@ export const useManufacturingPerformanceStore = defineStore('manufacturingPerfor
     lastFetchTime: null,
     // 新增：日期配置初始值
     globalDays: 7,
-    selectedEndDate: new Date().toISOString().split('T')[0]
+    selectedEndDate: getLocalDateString()
   })
 
   // 新增：日期配置相关的 getters - 注释掉天数间隔功能
@@ -101,7 +109,7 @@ export const useManufacturingPerformanceStore = defineStore('manufacturingPerfor
   
   // 新增：重置结束日期为今天
   const resetEndDateToToday = () => {
-    state.value.selectedEndDate = new Date().toISOString().split('T')[0];
+    state.value.selectedEndDate = getLocalDateString();
     // 重置日期后自动重新获取数据
     fetchAllWorkshopData();
   };

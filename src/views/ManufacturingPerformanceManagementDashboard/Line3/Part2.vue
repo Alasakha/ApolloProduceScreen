@@ -1,23 +1,26 @@
 <template>
   <div class="part2-container">
 
-
-    <!-- 常规客户金工一部涂装直通率 -->
-    <div class="department-section">
-      <div class="section-title-with-toggle text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
-        <div class="title-text">常规客户金工一部涂装</div>
-        <div class="period-toggle">
-          <button 
-            class="toggle-btn" 
+    <!-- 大标题：常规客户 -->
+    <div class="main-title text-xs 2xl:text-sm 3xl:text-sm 4xl:text-xl">
+      常规客户直通率
+      <button 
+            class="toggle-btn absolute right-12 top-1/2 transform -translate-y-1/2" 
             :class="{ active: currentPeriod === 'monthly' }"
             @click="currentPeriod = 'monthly'"
           >月度</button>
           <button 
-            class="toggle-btn" 
+            class="toggle-btn absolute right-2 top-1/2 transform -translate-y-1/2" 
             :class="{ active: currentPeriod === 'yearly' }"
             @click="currentPeriod = 'yearly'"
           >年度</button>
-        </div>
+    </div>
+    <!-- 常规客户金工一部涂装直通率 -->
+    <div class="department-section">
+      
+      <div class="section-title-with-toggle text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+        <div class="text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">金工一部涂装</div>
+
       </div>
       <div class="data-cards-row">
         <DataCard 
@@ -63,7 +66,7 @@
 
     <!-- 常规客户总装一课直通率 -->
     <div class="department-section">
-      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">常规客户总装一课</div>
+      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">总装一课</div>
       <div class="data-cards-row">
         <DataCard 
           title="目标" 
@@ -108,7 +111,7 @@
 
     <!-- 常规客户总装二课直通率 -->
     <div class="department-section">
-      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">常规客户总装二课</div>
+      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">总装二课</div>
       <div class="data-cards-row">
         <DataCard 
           title="目标" 
@@ -259,6 +262,20 @@ onUnmounted(() => {
   color: #fff;
 }
 
+.main-title {
+  font-weight: bold;
+  color: #00d4ff;
+  text-align: start;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 30, 60, 0.3);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  border-radius: 6px;
+  /* font-size: 12px; */
+  backdrop-filter: blur(5px);
+  position: relative;
+}
+
 .top-header {
   display: flex;
   justify-content: space-between;
@@ -317,7 +334,7 @@ onUnmounted(() => {
 .section-title-with-toggle {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
   gap: 8px;
   font-weight: bold;
   color: #00d4ff;

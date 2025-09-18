@@ -25,12 +25,13 @@
           年度
         </button>
       </div>
+      <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm font-bold 4xl:text-lg">A类客户直通率</div>
     </div>
     
     <div class="departments-grid">
       <!-- A类客户金工一部涂装 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户金工一部涂装</div>
+        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">金工一部涂装</div>
         <div class="data-cards-row">
           <DataCard 
             title="目标" 
@@ -75,7 +76,7 @@
 
       <!-- A类客户总装一课 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户总装一课</div>
+        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">总装一课</div>
         <div class="data-cards-row">
           <DataCard 
             title="目标" 
@@ -120,7 +121,7 @@
 
       <!-- A类客户总装二课 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 4xl:text-base">A类客户总装二课</div>
+        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">总装二课</div>
         <div class="data-cards-row">
           <DataCard 
             title="目标" 

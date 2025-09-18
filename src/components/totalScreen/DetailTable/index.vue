@@ -122,9 +122,8 @@ watch(dialogVisible, (val) => {
 
 // 监听数据变化
 watch(() => props.data, (val) => {
-
-  tableData.value = val;
-  total.value = val.length;
+  tableData.value = val || [];
+  total.value = val ? val.length : 0;
 }, { immediate: true });
 
 // 处理分页

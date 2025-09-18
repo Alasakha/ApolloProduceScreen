@@ -46,8 +46,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
+import THREE, { OrbitControls } from '@/utils/threejsManager.js'
 
 // 响应式数据
 const earthContainer = ref(null)

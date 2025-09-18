@@ -20,9 +20,9 @@
               ></div>
             </div>
             <!-- 晚班人数 -->
-             <!-- <div class="peizhi flex-1">
+             <div class="peizhi flex-1">
               <div ref="Indicators5" class="w-full h-[100%]"></div>
-            </div> -->
+            </div>
           </div>
 
           <!-- 右侧两个仪表盘 -->
@@ -140,7 +140,7 @@ const Indicators1 = ref(null);
 const Indicators2 = ref(null);
 const Indicators3 = ref(null);
 const Indicators4 = ref(null);
-// const Indicators5 = ref(null);
+const Indicators5 = ref(null);
 const route = useRoute();
 const prodLine = route.query.prodLine;
 const isLoading = ref(true);
@@ -154,7 +154,7 @@ const chart1 = useEcharts(Indicators1);
 const chart2 = useEcharts(Indicators2);
 const chart3 = useEcharts(Indicators3);
 const chart4 = useEcharts(Indicators4);
-// const chart5 = useEcharts(Indicators5);
+const chart5 = useEcharts(Indicators5);
 
 const drawChart = () => {
   const option1 = createGaugeOption({
@@ -181,17 +181,17 @@ const drawChart = () => {
     max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) || 100
   });
 
-  // const option5 = createGaugeOption({
-  //   text: "晚班人数",
-  //   data: EfficentData.nightNum || 0,
-  //   max: EfficentData.stanardNum || 100
-  // });
+  const option5 = createGaugeOption({
+    text: "晚班人数",
+    data: EfficentData.nightNum || 0,
+    max: EfficentData.stanardNum || 100
+  });
 
   chart1.setOption(option1);
   chart2.setOption(option2);
   chart3.setOption(option3);
   chart4.setOption(option4);
-  // chart5.setOption(option5);
+  chart5.setOption(option5);
 };
 
 const fetchData = async () => {
@@ -214,7 +214,7 @@ const fetchData = async () => {
     chart2.initChart();
     chart3.initChart();
     chart4.initChart();
-    // chart5.initChart();
+    chart5.initChart();
     drawChart();
   });
 };

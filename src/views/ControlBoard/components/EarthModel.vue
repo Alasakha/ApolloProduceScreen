@@ -22,9 +22,7 @@
 
 <script setup>
 import { ref, onMounted, onUnmounted, watch } from 'vue'
-import * as THREE from 'three'
-import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import THREE, { STLLoader, OrbitControls } from '@/utils/threejsManager.js'
 // import earthTextureUrl from '../../../assets/earth.png'
 import appoloEarthTextureUrl from '../../../assets/appoloEarth.png'
 // 光环贴图 - 如果没有专门的图片，可以使用一个简单的径向渐变
@@ -170,30 +168,30 @@ const clearEarthElements = () => {
      color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
      intensity: 1.0
    },
-   {
-     from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
-     to: { lat: 51.5074, lng: -0.1278, name: '伦敦' },
-     color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
-     intensity: 1.0
-   },
-   {
-     from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
-     to: { lat: 35.6762, lng: 139.6503, name: '东京' },
-     color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
-     intensity: 1.0
-   },
-   {
-     from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
-     to: { lat: -33.8688, lng: 151.2093, name: '悉尼' },
-     color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
-     intensity: 1.0
-   },
-   {
-     from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
-     to: { lat: -23.5505, lng: -46.6333, name: '圣保罗' },
-     color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
-     intensity: 1.0
-   }
+  //  {
+  //    from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
+  //    to: { lat: 51.5074, lng: -0.1278, name: '伦敦' },
+  //    color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
+  //    intensity: 1.0
+  //  },
+  //  {
+  //    from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
+  //    to: { lat: 35.6762, lng: 139.6503, name: '东京' },
+  //    color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
+  //    intensity: 1.0
+  //  },
+  //  {
+  //    from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
+  //    to: { lat: -33.8688, lng: 151.2093, name: '悉尼' },
+  //    color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
+  //    intensity: 1.0
+  //  },
+  //  {
+  //    from: { lat: 30.2741, lng: 120.1551, name: '杭州' },
+  //    to: { lat: -23.5505, lng: -46.6333, name: '圣保罗' },
+  //    color: 0x0080ff, // 🔵 贸易路线颜色 - 可调整（当前为蓝色）
+  //    intensity: 1.0
+  //  }
  ]
 
 // 初始化Three.js场景
@@ -415,130 +413,7 @@ const createEarthGrid = () => {
   }
 }
 
-// 创建摩托车模型
-const createMotorcycle = () => {
-  console.log('开始创建摩托车模型...')
-  
-  const loader = new STLLoader()
-  
-  // 加载FROG_x_t.stl文件
-  loader.load('/FROG_x_t.stl', (geometry) => {
-    console.log('STL文件加载成功，开始创建网格...')
-    
-    // 创建材质
-    const material = new THREE.MeshPhongMaterial({
-      color: 0x666666,
-      shininess: 100,
-      specular: 0x222222
-    })
-    
-    // 创建网格
-    motorcycle = new THREE.Mesh(geometry, material)
-    
-    // 设置摩托车位置和缩放
-    motorcycle.position.set(0, 0, 0)
-    motorcycle.scale.setScalar(motorcycleScale)
-    
-    // 启用阴影
-    motorcycle.castShadow = true
-    motorcycle.receiveShadow = true
-    
-    // 添加到场景
-    scene.add(motorcycle)
-    
-    console.log('摩托车模型创建成功，已添加到场景')
-    
-    // 初始化摩托车位置
-    initializeMotorcyclePosition()
-    
-    // 确保模型可见
-    motorcycle.visible = true
-  }, 
-  // 进度回调
-  (progress) => {
-    console.log('摩托车加载进度:', (progress.loaded / progress.total * 100) + '%')
-  },
-  // 错误回调
-  (error) => {
-    console.error('摩托车加载失败:', error)
-    console.log('创建占位符模型...')
-    // 如果加载失败，创建一个简单的摩托车占位符
-    createMotorcyclePlaceholder()
-  })
-}
 
-// 创建摩托车占位符（如果STL文件加载失败）
-const createMotorcyclePlaceholder = () => {
-  console.log('创建占位符摩托车模型...')
-  
-  // 创建一个简单的摩托车形状作为占位符
-  const group = new THREE.Group()
-  
-  // 车身
-  const bodyGeometry = new THREE.BoxGeometry(2, 0.5, 1)
-  const bodyMaterial = new THREE.MeshPhongMaterial({ color: 0x333333 })
-  const body = new THREE.Mesh(bodyGeometry, bodyMaterial)
-  body.position.y = 0.5
-  group.add(body)
-  
-  // 车轮
-  const wheelGeometry = new THREE.CylinderGeometry(0.4, 0.4, 0.1, 16)
-  const wheelMaterial = new THREE.MeshPhongMaterial({ color: 0x111111 })
-  
-  const frontWheel = new THREE.Mesh(wheelGeometry, wheelMaterial)
-  frontWheel.position.set(0.8, 0.4, 0)
-  frontWheel.rotation.z = Math.PI / 2
-  group.add(frontWheel)
-  
-  const backWheel = new THREE.Mesh(wheelGeometry, wheelMaterial)
-  backWheel.position.set(-0.8, 0.4, 0)
-  backWheel.rotation.z = Math.PI / 2
-  group.add(backWheel)
-  
-  // 车头
-  const headGeometry = new THREE.BoxGeometry(0.5, 0.3, 0.8)
-  const headMaterial = new THREE.MeshPhongMaterial({ color: 0x666666 })
-  const head = new THREE.Mesh(headGeometry, headMaterial)
-  head.position.set(1.2, 0.8, 0)
-  group.add(head)
-  
-  motorcycle = group
-  motorcycle.scale.setScalar(motorcycleScale)
-  
-  // 启用阴影
-  motorcycle.castShadow = true
-  motorcycle.receiveShadow = true
-  
-  // 添加到场景
-  scene.add(motorcycle)
-  
-  console.log('占位符摩托车模型创建成功，已添加到场景')
-  
-  // 初始化摩托车位置
-  initializeMotorcyclePosition()
-  
-  // 确保模型可见
-  motorcycle.visible = true
-}
-
-// 初始化摩托车位置
-const initializeMotorcyclePosition = () => {
-  if (motorcycle) {
-    console.log('初始化摩托车位置和相机...')
-    
-    // 确保摩托车在场景中心
-    motorcycle.position.set(0, 0, 0)
-    
-    // 调整相机位置，让模型在画面中央显示
-    camera.position.set(0, 1.5, 8)
-    camera.lookAt(0, 0, 0)
-    
-    // 确保摩托车可见
-    motorcycle.visible = true
-    
-    console.log('摩托车位置初始化完成')
-  }
-}
 
 // 创建贸易飞线
 const createTradeLines = () => {

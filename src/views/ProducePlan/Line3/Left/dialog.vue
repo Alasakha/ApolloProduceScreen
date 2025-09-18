@@ -8,6 +8,21 @@
     @update:modelValue="val => emit('update:modelValue', val)"
     @close="emit('close')"
   >
+    <!-- 搜索框 -->
+    <div class="search-wrapper">
+      <el-input
+        v-model="searchKeyword"
+        placeholder="请输入品号或工单号进行搜索"
+        clearable
+        @input="handleSearch"
+        class="search-input"
+      >
+        <template #prefix>
+          <el-icon><Search /></el-icon>
+        </template>
+      </el-input>
+    </div>
+    
     <div class="table-wrapper">
       <el-table :data="paginatedData" max-height="60vh" style="width: 100%">
         <template v-for="col in columns" :key="col.prop">
@@ -16,7 +31,11 @@
             :prop="col.prop"
             :label="col.label"
             :width="col.width+'px'"
-          />
+          >
+            <template #default="{ row }">
+              {{ col.formatter ? col.formatter(row[col.prop]) : row[col.prop] }}
+            </template>
+          </el-table-column>
         </template>
         <el-table-column
           v-if="columns.some(col => col.prop === 'action')"
@@ -32,10 +51,10 @@
 
       <!-- 总数 & 分页 -->
       <div class="pagination-wrapper">
-        <div>共 {{ tableData.length }} 条</div>
+        <div>共 {{ filteredData.length }} 条</div>
         <el-pagination
           layout="total, sizes, prev, pager, next, jumper"
-          :total="tableData.length"
+          :total="filteredData.length"
           v-model:current-page="currentPage"
           v-model:page-size="pageSize"
           :page-sizes="[10, 20, 50, 100]"
@@ -47,8 +66,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
+import { Search } from '@element-plus/icons-vue'
 import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
 
 const props = defineProps<{
@@ -60,6 +80,7 @@ const props = defineProps<{
     prop: string
     label: string
     width?: string | number
+    formatter?: (value: any) => string
   }>
 }>()
 
@@ -67,14 +88,42 @@ const emit = defineEmits(['update:modelValue', 'close'])
 
 const dialogWidth = '90%'
 
+// 搜索状态
+const searchKeyword = ref('')
+const filteredData = ref<any[]>([])
+
 // 分页状态
 const currentPage = ref(1)
 const pageSize = ref(10)
 
+// 搜索功能
+const handleSearch = () => {
+  if (!searchKeyword.value.trim()) {
+    filteredData.value = props.tableData
+  } else {
+    const keyword = searchKeyword.value.toLowerCase().trim()
+    filteredData.value = props.tableData.filter((item: any) => {
+      // 搜索品号 (item_code) 和工单号 (docNo)
+      return (
+        (item.item_code && item.item_code.toLowerCase().includes(keyword)) ||
+        (item.docNo && item.docNo.toLowerCase().includes(keyword)) ||
+        (item.doc_no && item.doc_no.toLowerCase().includes(keyword))
+      )
+    })
+  }
+  // 重置到第一页
+  currentPage.value = 1
+}
+
+// 监听原始数据变化，重新搜索
+watch(() => props.tableData, () => {
+  handleSearch()
+}, { immediate: true })
+
 // 计算当前页数据
 const paginatedData = computed(() => {
   const start = (currentPage.value - 1) * pageSize.value
-  return props.tableData.slice(start, start + pageSize.value)
+  return filteredData.value.slice(start, start + pageSize.value)
 })
 
 const handleFill = async (row: any) => {
@@ -103,6 +152,14 @@ console.log('data:', paginatedData.value)
   max-height: 90vh;
   display: flex;
   flex-direction: column;
+}
+
+.search-wrapper {
+  margin-bottom: 16px;
+}
+
+.search-input {
+  width: 100%;
 }
 
 .table-wrapper {

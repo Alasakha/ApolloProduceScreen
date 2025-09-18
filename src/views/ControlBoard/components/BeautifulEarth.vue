@@ -1,14 +1,19 @@
 <template>
   <div class="beautiful-earth">
-    <!-- 标题栏 -->
-    <div class="title-bar">
-      <div class="title-content">
-        <h1 class="main-title">中控大屏看板</h1>
-        <p class="sub-title">若要退出全屏,请将鼠标移动到屏幕顶部或长按 Esc</p>
-      </div>
-    </div>
+    <!-- 飞线地球模式 -->
+    <FlyLineEarth v-if="isFlyLineMode" />
     
-    <div ref="threeContainer" class="three-container"></div>
+    <!-- 原始地球模式 -->
+    <template v-else>
+      <!-- 标题栏 -->
+      <div class="title-bar">
+        <div class="title-content px-3 py-2 lg:px-6 lg:py-4">
+          <h1 class="main-title text-lg lg:text-xl xl:text-2xl">中控大屏看板</h1>
+          <p class="sub-title text-xs lg:text-sm">若要退出全屏,请将鼠标移动到屏幕顶部或长按 Esc</p>
+        </div>
+      </div>
+      
+      <div ref="threeContainer" class="three-container"></div>
     
     <!-- 加载进度条 -->
     <div v-if="loading" class="loading-overlay">
@@ -159,6 +164,62 @@
         />
       </div>
       
+      <!-- 飞线控制 -->
+      <div class="control-group">
+        <label>飞线透明度: {{ params.flyLineOpacity.value.toFixed(2) }}</label>
+        <input 
+          type="range" 
+          v-model="params.flyLineOpacity.value" 
+          min="0.1" 
+          max="1.0" 
+          step="0.05"
+        />
+      </div>
+      
+      <div class="control-group">
+        <label>飞线宽度: {{ params.flyLineWidth.value.toFixed(1) }}</label>
+        <input 
+          type="range" 
+          v-model="params.flyLineWidth.value" 
+          min="1.0" 
+          max="5.0" 
+          step="0.1"
+        />
+      </div>
+      
+      <div class="control-group">
+        <label>飞线速度: {{ params.flyLineSpeed.value.toFixed(3) }}</label>
+        <input 
+          type="range" 
+          v-model="params.flyLineSpeed.value" 
+          min="0.001" 
+          max="0.05" 
+          step="0.001"
+        />
+      </div>
+      
+      <div class="control-group">
+        <label>移动光点大小: {{ params.movingLightSize.value.toFixed(1) }}</label>
+        <input 
+          type="range" 
+          v-model="params.movingLightSize.value" 
+          min="0.1" 
+          max="2.0" 
+          step="0.1"
+        />
+      </div>
+      
+      <div class="control-group">
+        <label>移动光点速度: {{ params.movingLightSpeed.value.toFixed(3) }}</label>
+        <input 
+          type="range" 
+          v-model="params.movingLightSpeed.value" 
+          min="0.001" 
+          max="0.1" 
+          step="0.001"
+        />
+      </div>
+      
       <button @click="toggleControls" class="toggle-btn">
         {{ showControls ? '隐藏控制' : '显示控制' }}
       </button>
@@ -168,14 +229,20 @@
     <button @click="toggleControls" class="control-toggle">
       ⚙️
     </button>
+    
+      <!-- 地球切换按钮 -->
+      <button @click="toggleEarthMode" class="earth-mode-toggle">
+        {{ isFlyLineMode ? '🌍' : '🌐' }}
+      </button>
+    </template>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, reactive } from 'vue'
-import * as THREE from 'three'
-import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
+import { ref, onMounted, onBeforeUnmount, reactive, watch } from 'vue'
+import THREE, { OrbitControls } from '@/utils/threejsManager.js'
 import { vertexShader, fragmentShader } from './earth-shaders.js'
+import FlyLineEarth from './FlyLineEarth.vue'
 
 const threeContainer = ref(null)
 let scene = null
@@ -193,6 +260,9 @@ const loading = ref(true)
 const loadingProgress = ref(0)
 const showControls = ref(false)
 
+// 地球模式切换
+const isFlyLineMode = ref(false)
+
 // 可调参数
 const params = reactive({
   sunIntensity: 1.3,
@@ -207,6 +277,13 @@ const params = reactive({
   markerPulseIntensity: { value: 0.5 },
   coordinateMarkerOpacity: { value: 0.8 },
   coordinateMarkerPulseSpeed: { value: 0.05 },
+  // 飞线相关参数
+  flyLineOpacity: { value: 0.8 },
+  flyLineWidth: { value: 2.0 },
+  flyLineSpeed: { value: 0.01 },
+  flyLineColor: { value: '#00ffff' },
+  movingLightSize: { value: 0.5 },
+  movingLightSpeed: { value: 0.02 },
 })
 
 // 纹理资源
@@ -218,7 +295,8 @@ const textures = {
   nightLights: null,
   gaiaSky: null,
   location: null,  // 添加光圈纹理
-  coordinateMarker: null  // 添加坐标标记纹理
+  coordinateMarker: null,  // 添加坐标标记纹理
+  flyLineTexture: null  // 添加飞线纹理
 }
 
 // 光圈坐标点
@@ -228,6 +306,11 @@ const markerMeshes = ref([])
 // 坐标标记点
 const coordinateMarkers = ref([])
 const coordinateMarkerMeshes = ref([])
+
+// 飞线相关
+const flyLines = ref([])
+const flyLineMeshes = ref([])
+const movingLights = ref([])
 
 // 创建场景
 const createScene = () => {
@@ -483,6 +566,253 @@ const latLngToVector3 = (lat, lng, radius) => {
   return new THREE.Vector3(x, y, z)
 }
 
+// 创建飞线纹理（程序生成）
+const createFlyLineTexture = () => {
+  const canvas = document.createElement('canvas')
+  canvas.width = 64
+  canvas.height = 64
+  
+  const ctx = canvas.getContext('2d')
+  
+  // 创建径向渐变
+  const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32)
+  gradient.addColorStop(0, 'rgba(255, 255, 255, 1)')
+  gradient.addColorStop(0.5, 'rgba(255, 255, 255, 0.5)')
+  gradient.addColorStop(1, 'rgba(255, 255, 255, 0)')
+  
+  ctx.fillStyle = gradient
+  ctx.fillRect(0, 0, 64, 64)
+  
+  const texture = new THREE.CanvasTexture(canvas)
+  texture.wrapS = THREE.ClampToEdgeWrapping
+  texture.wrapT = THREE.ClampToEdgeWrapping
+  
+  return texture
+}
+
+// 创建B样条曲线飞线 - 参考文章中的实现
+const createBSplineFlyLine = (fromPos, toPos, color) => {
+  const earthRadius = 10 // 地球半径
+  const coefficient = 1.2 // 飞线抬升系数
+  
+  // 计算两个点之间的距离
+  const distance = fromPos.distanceTo(toPos)
+  const distanceDivRadius = distance / earthRadius
+  
+  // 根据距离确定分段数
+  const partCount = 3 + Math.ceil(distanceDivRadius * 3)
+  
+  // 创建曲线点数组
+  const curvePoints = []
+  curvePoints.push(fromPos.clone())
+  
+  // 生成中间控制点
+  for (let i = 0; i < partCount; i++) {
+    const partCoefficient = coefficient + (partCount - Math.abs((partCount - 1) / 2 - i)) * 0.1
+    
+    // 计算中间点位置
+    const t = (i + 1) / (partCount + 1)
+    const basePoint = new THREE.Vector3().lerpVectors(fromPos, toPos, t)
+    
+    // 计算抬升点
+    const partTopXyz = getPartTopPoint(basePoint, earthRadius, partCoefficient)
+    curvePoints.push(partTopXyz)
+  }
+  
+  curvePoints.push(toPos.clone())
+  
+  // 使用CatmullRomCurve3创建B样条曲线
+  const curve = new THREE.CatmullRomCurve3(curvePoints, false)
+  
+  // 获取曲线上的点
+  const pointCount = Math.ceil(500 * partCount)
+  const allPoints = curve.getPoints(pointCount)
+  
+  return { curve, points: allPoints }
+}
+
+// 计算飞线抬升点
+const getPartTopPoint = (innerPoint, earthRadius, partCoefficient) => {
+  const fromPartLen = Math.sqrt(
+    innerPoint.x * innerPoint.x +
+    innerPoint.y * innerPoint.y +
+    innerPoint.z * innerPoint.z
+  )
+  
+  return new THREE.Vector3(
+    (innerPoint.x * partCoefficient * earthRadius) / fromPartLen,
+    (innerPoint.y * partCoefficient * earthRadius) / fromPartLen,
+    (innerPoint.z * partCoefficient * earthRadius) / fromPartLen
+  )
+}
+
+// 创建飞线几何体和材质 - 增强版本
+const createFlyLineMesh = (curve, color) => {
+  // 使用TubeGeometry创建有厚度的飞线
+  const tubeGeometry = new THREE.TubeGeometry(curve.curve, 64, 0.02, 8, false)
+  
+  // 主飞线材质 - 更亮的发光效果
+  const mainMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: params.flyLineOpacity.value,
+    side: THREE.DoubleSide
+  })
+  
+  const mainTube = new THREE.Mesh(tubeGeometry, mainMaterial)
+  
+  // 发光飞线材质 - 使用加法混合增强发光
+  const glowMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: params.flyLineOpacity.value * 0.6,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide
+  })
+  
+  const glowTube = new THREE.Mesh(tubeGeometry, glowMaterial)
+  glowTube.scale.setScalar(1.5) // 发光层更大
+  
+  // 外层光晕材质 - 更强烈的发光效果
+  const outerGlowMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: params.flyLineOpacity.value * 0.3,
+    blending: THREE.AdditiveBlending,
+    side: THREE.DoubleSide
+  })
+  
+  const outerGlowTube = new THREE.Mesh(tubeGeometry, outerGlowMaterial)
+  outerGlowTube.scale.setScalar(2.5) // 外层光晕更大
+  
+  // 创建飞线组
+  const lineGroup = new THREE.Group()
+  lineGroup.add(outerGlowTube) // 最外层光晕
+  lineGroup.add(glowTube)      // 中层发光
+  lineGroup.add(mainTube)      // 主飞线
+  
+  // 添加用户数据
+  lineGroup.userData = {
+    curve: curve.curve,
+    points: curve.points,
+    progress: 0,
+    speed: params.flyLineSpeed.value,
+    color: color,
+    mainTube: mainTube,
+    glowTube: glowTube,
+    outerGlowTube: outerGlowTube
+  }
+  
+  return lineGroup
+}
+
+// 创建移动光点 - 增强版本
+const createMovingLight = (curve, color) => {
+  const lightSize = 0.15 * params.movingLightSize.value
+  
+  // 核心光点
+  const coreGeometry = new THREE.SphereGeometry(lightSize * 0.3, 16, 16)
+  const coreMaterial = new THREE.MeshBasicMaterial({
+    color: 0xffffff, // 白色核心
+    transparent: true,
+    opacity: 1.0
+  })
+  const core = new THREE.Mesh(coreGeometry, coreMaterial)
+  
+  // 主光点
+  const lightGeometry = new THREE.SphereGeometry(lightSize, 16, 16)
+  const lightMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: 0.9
+  })
+  const light = new THREE.Mesh(lightGeometry, lightMaterial)
+  
+  // 内层光晕
+  const innerGlowGeometry = new THREE.SphereGeometry(lightSize * 2, 16, 16)
+  const innerGlowMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: 0.6,
+    blending: THREE.AdditiveBlending
+  })
+  const innerGlow = new THREE.Mesh(innerGlowGeometry, innerGlowMaterial)
+  
+  // 外层光晕
+  const outerGlowGeometry = new THREE.SphereGeometry(lightSize * 4, 16, 16)
+  const outerGlowMaterial = new THREE.MeshBasicMaterial({
+    color: color,
+    transparent: true,
+    opacity: 0.3,
+    blending: THREE.AdditiveBlending
+  })
+  const outerGlow = new THREE.Mesh(outerGlowGeometry, outerGlowMaterial)
+  
+  // 创建拖尾粒子系统
+  const tailParticles = createTailParticles(color, lightSize)
+  
+  // 创建光点组
+  const lightGroup = new THREE.Group()
+  lightGroup.add(outerGlow)     // 最外层光晕
+  lightGroup.add(innerGlow)     // 内层光晕
+  lightGroup.add(light)         // 主光点
+  lightGroup.add(core)          // 核心光点
+  lightGroup.add(tailParticles) // 拖尾粒子
+  
+  lightGroup.userData = {
+    curve: curve.curve,
+    progress: 0,
+    speed: params.movingLightSpeed.value,
+    color: color,
+    core: core,
+    light: light,
+    innerGlow: innerGlow,
+    outerGlow: outerGlow,
+    tailParticles: tailParticles
+  }
+  
+  return lightGroup
+}
+
+// 创建拖尾粒子系统
+const createTailParticles = (color, lightSize) => {
+  const particleCount = 20
+  const particles = new THREE.BufferGeometry()
+  const positions = new Float32Array(particleCount * 3)
+  const colors = new Float32Array(particleCount * 3)
+  const sizes = new Float32Array(particleCount)
+  
+  // 初始化粒子位置和属性
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3] = 0
+    positions[i * 3 + 1] = 0
+    positions[i * 3 + 2] = 0
+    
+    // 设置颜色
+    const colorObj = new THREE.Color(color)
+    colors[i * 3] = colorObj.r
+    colors[i * 3 + 1] = colorObj.g
+    colors[i * 3 + 2] = colorObj.b
+    
+    sizes[i] = lightSize * (1 - i / particleCount) * 0.5
+  }
+  
+  particles.setAttribute('position', new THREE.BufferAttribute(positions, 3))
+  particles.setAttribute('color', new THREE.BufferAttribute(colors, 3))
+  particles.setAttribute('size', new THREE.BufferAttribute(sizes, 1))
+  
+  const particleMaterial = new THREE.PointsMaterial({
+    size: lightSize * 0.5,
+    transparent: true,
+    opacity: 0.8,
+    blending: THREE.AdditiveBlending,
+    vertexColors: true,
+    sizeAttenuation: true
+  })
+  
+  return new THREE.Points(particles, particleMaterial)
+}
+
 // 创建光圈坐标点 - 使用正确的球面角度设置
 const createLocationMarker = (marker) => {
   if (!textures.location) return
@@ -625,6 +955,150 @@ const initCoordinateMarkers = () => {
   console.log('坐标标记点初始化完成')
 }
 
+// 初始化飞线
+const initFlyLines = () => {
+  // 预置的飞线数据
+  const flyLineData = [
+    {
+      from: { lat: 39.9042, lng: 116.4074, name: '北京' },
+      to: { lat: 40.7128, lng: -74.0060, name: '纽约' },
+      color: '#00ffff'
+    },
+    {
+      from: { lat: 39.9042, lng: 116.4074, name: '北京' },
+      to: { lat: 51.5074, lng: -0.1278, name: '伦敦' },
+      color: '#ff00ff'
+    },
+    {
+      from: { lat: 35.6762, lng: 139.6503, name: '东京' },
+      to: { lat: -33.8688, lng: 151.2093, name: '悉尼' },
+      color: '#ffff00'
+    },
+    {
+      from: { lat: 31.2304, lng: 121.4737, name: '上海' },
+      to: { lat: 22.5431, lng: 114.0579, name: '深圳' },
+      color: '#00ff00'
+    }
+  ]
+  
+  flyLines.value = flyLineData
+  
+  // 创建所有飞线
+  flyLineData.forEach((flyLine, index) => {
+    // 随机延迟创建飞线，避免同时显示
+    setTimeout(() => {
+      createFlyLine(flyLine.from, flyLine.to, flyLine.color)
+    }, index * 2000) // 每2秒创建一个飞线
+  })
+  
+  console.log('飞线初始化完成')
+}
+
+// 创建单条飞线
+const createFlyLine = (from, to, color) => {
+  // 将经纬度转换为3D坐标
+  const fromPos = latLngToVector3(from.lat, from.lng, 10.1)
+  const toPos = latLngToVector3(to.lat, to.lng, 10.1)
+  
+  // 创建B样条曲线
+  const curve = createBSplineFlyLine(fromPos, toPos, color)
+  
+  // 创建飞线网格
+  const flyLineMesh = createFlyLineMesh(curve, color)
+  
+  // 创建移动光点
+  const movingLight = createMovingLight(curve, color)
+  
+  // 添加交互功能
+  flyLineMesh.userData.interactive = true
+  flyLineMesh.userData.fromCity = from
+  flyLineMesh.userData.toCity = to
+  flyLineMesh.userData.type = 'flyline'
+  
+  movingLight.userData.interactive = true
+  movingLight.userData.fromCity = from
+  movingLight.userData.toCity = to
+  movingLight.userData.type = 'movinglight'
+  
+  // 添加到地球组
+  earthGroup.add(flyLineMesh)
+  earthGroup.add(movingLight)
+  
+  // 保存引用
+  flyLineMeshes.value.push(flyLineMesh)
+  movingLights.value.push(movingLight)
+  
+  console.log(`飞线已创建: ${from.name} -> ${to.name}`)
+}
+
+// 添加鼠标交互
+const addMouseInteraction = () => {
+  if (!renderer || !camera) return
+  
+  const raycaster = new THREE.Raycaster()
+  const mouse = new THREE.Vector2()
+  
+  const onMouseMove = (event) => {
+    const rect = renderer.domElement.getBoundingClientRect()
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+    
+    raycaster.setFromCamera(mouse, camera)
+    
+    // 检查与飞线的交互
+    const flyLineObjects = [...flyLineMeshes.value, ...movingLights.value]
+    const intersects = raycaster.intersectObjects(flyLineObjects, true)
+    
+    if (intersects.length > 0) {
+      const intersected = intersects[0].object
+      if (intersected.userData && intersected.userData.interactive) {
+        renderer.domElement.style.cursor = 'pointer'
+        
+        // 高亮效果
+        if (intersected.userData.type === 'flyline') {
+          intersected.children.forEach(child => {
+            if (child.material) {
+              child.material.opacity = Math.min(child.material.opacity * 1.5, 1.0)
+            }
+          })
+        }
+      }
+    } else {
+      renderer.domElement.style.cursor = 'default'
+    }
+  }
+  
+  const onMouseClick = (event) => {
+    const rect = renderer.domElement.getBoundingClientRect()
+    mouse.x = ((event.clientX - rect.left) / rect.width) * 2 - 1
+    mouse.y = -((event.clientY - rect.top) / rect.height) * 2 + 1
+    
+    raycaster.setFromCamera(mouse, camera)
+    
+    const flyLineObjects = [...flyLineMeshes.value, ...movingLights.value]
+    const intersects = raycaster.intersectObjects(flyLineObjects, true)
+    
+    if (intersects.length > 0) {
+      const intersected = intersects[0].object
+      if (intersected.userData && intersected.userData.interactive) {
+        const fromCity = intersected.userData.fromCity
+        const toCity = intersected.userData.toCity
+        console.log(`点击了飞线: ${fromCity.name} -> ${toCity.name}`)
+        
+        // 可以在这里添加更多交互逻辑，比如显示信息面板等
+        alert(`飞线信息:\n从: ${fromCity.name}\n到: ${toCity.name}`)
+      }
+    }
+  }
+  
+  renderer.domElement.addEventListener('mousemove', onMouseMove)
+  renderer.domElement.addEventListener('click', onMouseClick)
+  
+  // 保存事件监听器引用，用于清理
+  window.flyLineMouseMove = onMouseMove
+  window.flyLineMouseClick = onMouseClick
+}
+
 // 设置云层阴影 - 简化版本，避免着色器编译错误
 const setupCloudShadows = (earthMaterial) => {
   // 暂时禁用复杂的着色器修改，使用简单的材质效果
@@ -664,80 +1138,127 @@ const updateSpeedFactor = () => {
   console.log('旋转速度已更新:', params.speedFactor)
 }
 
-// 动画循环
-const animate = () => {
+// 性能优化变量
+let lastTime = 0
+let frameCount = 0
+const targetFPS = 60
+const frameInterval = 1000 / targetFPS
+
+// 动画循环 - 性能优化版本
+const animate = (currentTime = 0) => {
   animationId = requestAnimationFrame(animate)
   
+  // 帧率控制
+  if (currentTime - lastTime < frameInterval) {
+    return
+  }
+  
+  const deltaTime = currentTime - lastTime
+  lastTime = currentTime
+  frameCount++
+  
+  // 每60帧更新一次性能监控（减少开销）
+  if (frameCount % 60 === 0 && import.meta.env.DEV) {
+    import('@/utils/performanceMonitor').then(({ performanceMonitor }) => {
+      performanceMonitor.recordFrame()
+    })
+  }
+  
+  // 使用缓存的time值，避免重复计算
+  const time = currentTime * 0.001
+  
+  // 更新地球自转
   if (earth) {
     earth.rotateY(0.005 * params.speedFactor)
   }
   
+  // 更新云层自转
   if (clouds) {
     clouds.rotateY(0.01 * params.speedFactor)
   }
   
-  // 更新光圈坐标点动画 - 使用参考代码的动画效果
-  markerMeshes.value.forEach(mesh => {
-    if (mesh && mesh.userData) {
-      // 使用参考代码的动画逻辑
-      mesh.userData._s += 0.007
-      mesh.scale.set(mesh.userData.size * mesh.userData._s, mesh.userData.size * mesh.userData._s, mesh.userData.size * mesh.userData._s)
-      
-      if (mesh.userData._s <= 1.5) {
-        // mesh._s=1，透明度=0 mesh._s=1.5，透明度=1
-        mesh.material.opacity = (mesh.userData._s - 1) * 2 * params.markerOpacity.value
-      } else if (mesh.userData._s > 1.5 && mesh.userData._s <= 2) {
-        // mesh._s=1.5，透明度=1 mesh._s=2，透明度=0
-        mesh.material.opacity = (1 - (mesh.userData._s - 1.5) * 2) * params.markerOpacity.value
-      } else {
-        mesh.userData._s = 1.0
+  // 优化光圈坐标点动画 - 减少计算频率
+  if (frameCount % 2 === 0) { // 每2帧更新一次
+    markerMeshes.value.forEach(mesh => {
+      if (mesh && mesh.userData) {
+        mesh.userData._s += 0.007
+        const scale = mesh.userData.size * mesh.userData._s
+        mesh.scale.set(scale, scale, scale)
+        
+        if (mesh.userData._s <= 1.5) {
+          mesh.material.opacity = (mesh.userData._s - 1) * 2 * params.markerOpacity.value
+        } else if (mesh.userData._s > 1.5 && mesh.userData._s <= 2) {
+          mesh.material.opacity = (1 - (mesh.userData._s - 1.5) * 2) * params.markerOpacity.value
+        } else {
+          mesh.userData._s = 1.0
+        }
       }
-      
-      // 调试信息：检查光圈坐标点是否跟随地球旋转（仅在需要时启用）
-      // if (import.meta.env.DEV && mesh.userData.originalMarker) {
-      //   const worldPosition = mesh.getWorldPosition(new THREE.Vector3())
-      //   console.log(`光圈坐标点 ${mesh.userData.originalMarker.name} 世界位置:`, worldPosition)
-      // }
-    }
-  })
+    })
+  }
   
-  // 更新坐标标记点动画 - 简化脉动效果
-  coordinateMarkerMeshes.value.forEach(mesh => {
-    if (mesh && mesh.material) {
-      // 坐标标记脉动效果
-      const time = Date.now() * 0.001
-      const pulse = 0.7 + 0.3 * Math.sin(time * 2 + mesh.userData.pulseTime)
-      mesh.material.opacity = params.coordinateMarkerOpacity.value * pulse
-      
-      // 轻微缩放效果
-      const scalePulse = 1 + 0.1 * Math.sin(time * 3 + mesh.userData.pulseTime)
-      mesh.scale.setScalar(mesh.userData.size * scalePulse)
-      
-      // 调试信息：检查坐标标记是否跟随地球旋转（仅在需要时启用）
-      // if (import.meta.env.DEV && mesh.userData.originalMarker) {
-      //   const worldPosition = mesh.getWorldPosition(new THREE.Vector3())
-      //   console.log(`坐标标记 ${mesh.userData.originalMarker.name} 世界位置:`, worldPosition)
-      // }
-    }
-  })
+  // 优化坐标标记点动画 - 减少计算频率
+  if (frameCount % 3 === 0) { // 每3帧更新一次
+    coordinateMarkerMeshes.value.forEach(mesh => {
+      if (mesh && mesh.material) {
+        const pulse = 0.7 + 0.3 * Math.sin(time * 2 + mesh.userData.pulseTime)
+        mesh.material.opacity = params.coordinateMarkerOpacity.value * pulse
+        
+        const scalePulse = 1 + 0.1 * Math.sin(time * 3 + mesh.userData.pulseTime)
+        mesh.scale.setScalar(mesh.userData.size * scalePulse)
+      }
+    })
+  }
   
+  // 优化飞线动画 - 减少计算频率
+  if (frameCount % 4 === 0) { // 每4帧更新一次
+    flyLineMeshes.value.forEach(mesh => {
+      if (mesh && mesh.userData) {
+        mesh.children.forEach((child, index) => {
+          if (child.material) {
+            const baseOpacity = index === 0 ? params.flyLineOpacity.value : params.flyLineOpacity.value * 0.5
+            const flickerIntensity = index === 0 ? 0.1 : 0.2
+            child.material.opacity = baseOpacity + Math.sin(time * 3 + index) * flickerIntensity
+          }
+        })
+      }
+    })
+  }
+  
+  // 优化移动光点动画 - 减少计算频率
+  if (frameCount % 2 === 0) { // 每2帧更新一次
+    movingLights.value.forEach(lightGroup => {
+      if (lightGroup && lightGroup.userData) {
+        lightGroup.userData.progress += lightGroup.userData.speed
+        if (lightGroup.userData.progress > 1) {
+          lightGroup.userData.progress = 0
+        }
+        
+        const t = lightGroup.userData.progress
+        const position = lightGroup.userData.curve.getPointAt(t)
+        lightGroup.position.copy(position)
+        
+        if (lightGroup.userData.light && lightGroup.userData.light.material) {
+          lightGroup.userData.light.material.opacity = 0.7 + Math.sin(time * 8) * 0.3
+        }
+        
+        if (lightGroup.userData.glow && lightGroup.userData.glow.material) {
+          lightGroup.userData.glow.material.opacity = 0.3 + Math.sin(time * 6) * 0.2
+        }
+      }
+    })
+  }
+  
+  // 更新控制器
   if (controls) {
     controls.update()
   }
   
+  // 渲染场景
   if (renderer && scene && camera) {
     try {
       renderer.render(scene, camera)
-      
-      // 记录帧数用于性能监控
-      if (import.meta.env.DEV) {
-        import('@/utils/performanceMonitor').then(({ performanceMonitor }) => {
-          performanceMonitor.recordFrame()
-        })
-      }
     } catch (error) {
       console.warn('渲染错误，可能是WebGL上下文问题:', error)
-      // 如果渲染失败，停止动画循环
       if (animationId) {
         cancelAnimationFrame(animationId)
         animationId = null
@@ -761,6 +1282,12 @@ const toggleControls = () => {
   showControls.value = !showControls.value
 }
 
+// 切换地球模式
+const toggleEarthMode = () => {
+  isFlyLineMode.value = !isFlyLineMode.value
+  console.log('切换地球模式:', isFlyLineMode.value ? '飞线模式' : '原始模式')
+}
+
 // 初始化Three.js
 const initThreeJS = async () => {
   try {
@@ -776,6 +1303,8 @@ const initThreeJS = async () => {
       createEarth()
       initLocationMarkers() // 初始化光圈坐标点
       initCoordinateMarkers() // 初始化坐标标记点
+      initFlyLines() // 初始化飞线
+      addMouseInteraction() // 添加鼠标交互
       animate()
       loading.value = false
     }
@@ -791,6 +1320,13 @@ const cleanup = () => {
     cancelAnimationFrame(animationId)
   }
   if (renderer) {
+    // 清理事件监听器
+    if (window.flyLineMouseMove) {
+      renderer.domElement.removeEventListener('mousemove', window.flyLineMouseMove)
+    }
+    if (window.flyLineMouseClick) {
+      renderer.domElement.removeEventListener('click', window.flyLineMouseClick)
+    }
     renderer.dispose()
   }
   if (controls) {
@@ -798,8 +1334,24 @@ const cleanup = () => {
   }
 }
 
+// 监听地球模式切换
+watch(isFlyLineMode, (newMode) => {
+  if (!newMode) {
+    // 切换到原始模式，初始化Three.js
+    setTimeout(() => {
+      initThreeJS()
+    }, 100)
+  } else {
+    // 切换到飞线模式，清理Three.js资源
+    cleanup()
+  }
+})
+
 onMounted(() => {
-  initThreeJS()
+  // 只在非飞线模式下初始化Three.js
+  if (!isFlyLineMode.value) {
+    initThreeJS()
+  }
   window.addEventListener('resize', onWindowResize)
 })
 
@@ -847,23 +1399,20 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.7);
   border: 1px solid var(--border-secondary);
   border-radius: 8px;
-  padding: 16px 24px;
   backdrop-filter: blur(10px);
   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
 
 .main-title {
-  font-size: 28px;
   font-weight: 600;
   color: white;
-  margin: 0 0 8px 0;
+  margin: 0 0 6px 0;
   text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
-  letter-spacing: 2px;
+  letter-spacing: 1px;
 }
 
 .sub-title {
-  font-size: 12px;
   color: #b0b0b0;
   margin: 0;
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.6);
@@ -985,5 +1534,28 @@ onBeforeUnmount(() => {
 
 .control-toggle:hover {
   background: rgba(0, 0, 0, 0.8);
+}
+
+/* 地球模式切换按钮 */
+.earth-mode-toggle {
+  position: absolute;
+  top: 150px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: rgba(0, 0, 0, 0.6);
+  border: none;
+  border-radius: 50%;
+  color: white;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 5;
+  backdrop-filter: blur(10px);
+  transition: all 0.3s ease;
+}
+
+.earth-mode-toggle:hover {
+  background: rgba(0, 0, 0, 0.8);
+  transform: scale(1.1);
 }
 </style> 

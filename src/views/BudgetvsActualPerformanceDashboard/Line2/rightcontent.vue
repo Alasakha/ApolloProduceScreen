@@ -39,6 +39,14 @@ const chartRef = ref(null);
 // 月份标签
 const months = ['一月', '二月', '三月', '四月', '五月', '六月', '七月', '八月', '九月', '十月', '十一月', '十二月'];
 
+// 金额转万函数（与表格保持一致）
+const formatWan = (val: any) => {
+    if (val === null || val === undefined || val === '') return 0;
+    const num = Number(val);
+    if (isNaN(num)) return 0;
+    return (num / 10000);
+};
+
 // 计算图表数据
 const chartData = computed(() => {
     const data = {
@@ -51,10 +59,10 @@ const chartData = computed(() => {
     months.forEach(month => {
         const monthData = props.tableData.months[month];
         if (monthData) {
-            data.budgetIncome.push(monthData.budgetIncome || 0);
-            data.reasonableIncome.push(monthData.reasonableIncome || 0);
-            data.monthlyForecast.push(monthData.monthlyForecast || 0);
-            data.income.push(monthData.income || 0);
+            data.budgetIncome.push(formatWan(monthData.budgetIncome));
+            data.reasonableIncome.push(formatWan(monthData.reasonableIncome));
+            data.monthlyForecast.push(formatWan(monthData.monthlyForecast));
+            data.income.push(formatWan(monthData.income));
         } else {
             data.budgetIncome.push(0);
             data.reasonableIncome.push(0);
@@ -85,7 +93,7 @@ const chartOption = computed(() => ({
         formatter: function(params: any) {
             let result = params[0].axisValue + '<br/>';
             params.forEach((param: any) => {
-                result += param.marker + param.seriesName + ': ' + param.value + '万<br/>';
+                result += param.marker + param.seriesName + ': ' + parseFloat(param.value).toFixed(2) + '万<br/>';
             });
             return result;
         }

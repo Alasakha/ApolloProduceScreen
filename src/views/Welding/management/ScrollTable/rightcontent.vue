@@ -2,7 +2,7 @@
   
 
       <div class="wrapper flex flex-col h-full">
-        <!-- <div class="title-container">
+        <div class="title-container">
           <h2>工单异常</h2>
           <el-button 
             type="primary" 
@@ -12,7 +12,7 @@
           >
             查看详情
           </el-button>
-        </div> -->
+        </div>
             
        <!-- 如果没有数据，显示暂无数据 -->
        <div v-if="!isLoading && isDataEmpty" class="empty-container">
@@ -83,17 +83,17 @@
   const scrollBoardRef = ref(null);
 
   // 扩展表头，添加原因、责任人和完成期限
-  const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
+  const tableHeaders = ref(props.headers && props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限', '详细']);
 
   const config = reactive({
     header: tableHeaders.value,
     tableData: [],
     data: [
-      ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+      ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
     ],
     index: true,
-    columnWidth: [50, 70],
-    align: [],
+    columnWidth: [50, 70, 100, 150, 100, 120, 80, 100, 120, 100, 120, 80],
+    align: ['center', 'center', 'left', 'left', 'left', 'center', 'center', 'center', 'center', 'left', 'center', 'center', 'center'],
     rowNum: 6,
     showTooltip: true,
   })
@@ -125,7 +125,10 @@
               item.dateTime ?? '无',
               Number(item.productionQuantity) - Number(item.inboundQuantity),
               item.daysBetween + '天' ?? '无',
-              isOverdue
+              reason || '无',
+              item.duty || '无',
+              completeDate || '无',
+              '<button class="detail-btn" style="background: #409EFF; color: white; border: none; padding: 4px 8px; border-radius: 4px; cursor: pointer;">详细</button>'
             ]
           });
           config.data = config.tableData; // Keep data in sync
@@ -159,8 +162,13 @@
   
   
     const clickHandler = (row) => {
-    selectedItem.value = row.row; // 直接保存整行
-    dialogVisible.value = true;
+    // 检查是否点击的是详细按钮
+    if (row.columnIndex === 11) { // 详细按钮是第12列（索引11）
+      handleDetail();
+    } else {
+      selectedItem.value = row.row; // 直接保存整行
+      dialogVisible.value = true;
+    }
   };
 
   // 处理详情按钮点击
@@ -181,7 +189,7 @@
       }
 
       // 转换数据格式
-      tableData.value = config.data.map((row) => {
+      const convertedData = config.data.map((row) => {
         if (!Array.isArray(row)) {
           console.error('行数据格式错误:', row);
           return null;
@@ -194,11 +202,13 @@
         return rowData;
       }).filter(Boolean); // 过滤掉null值
 
-      if (tableData.value.length === 0) {
+      if (convertedData.length === 0) {
         throw new Error('转换后的数据为空');
       }
 
-      console.log('转换后的表格数据:', tableData.value);
+      // 更新config.tableData，这样DetailTable组件就能获取到正确的数据
+      config.tableData = convertedData;
+      console.log('转换后的表格数据:', convertedData);
       detailDialogVisible.value = true;
     } catch (error) {
       console.error('处理数据失败:', error);
@@ -408,6 +418,39 @@
   .overdue-cell {
     color: #e03030 !important;
     font-weight: bold;
+  }
+
+  /* 修复ScrollBoard对齐问题 */
+  :deep(.ScrollBoard .header-item) {
+    text-align: center !important;
+  }
+  
+  :deep(.ScrollBoard .header-item[align="center"]) {
+    text-align: center !important;
+  }
+  
+  :deep(.ScrollBoard .header-item[align="right"]) {
+    text-align: right !important;
+  }
+  
+  :deep(.ScrollBoard .header-item[align="left"]) {
+    text-align: left !important;
+  }
+  
+  :deep(.ScrollBoard .ceil) {
+    text-align: center !important;
+  }
+  
+  :deep(.ScrollBoard .ceil[align="center"]) {
+    text-align: center !important;
+  }
+  
+  :deep(.ScrollBoard .ceil[align="right"]) {
+    text-align: right !important;
+  }
+  
+  :deep(.ScrollBoard .ceil[align="left"]) {
+    text-align: left !important;
   }
   </style>
    

@@ -11,7 +11,7 @@ export const getFty = (date: string ,endDay: string) => {
       endDay: endDay
     },
   })
-}
+} 
 
 export interface TodayProduction {
     target_normal: string, //常规达成率目标
@@ -23,12 +23,13 @@ export interface TodayProduction {
 
 
 // /manufacturing/onTime post  参数通过URL查询参数传递 当月填写本月第一天  当日填写今日
-export const getOnTime = (date: string) => {
+export const getOnTime = (startDay: string,endDay: string) => {
   return request({
     url: '/manufacturing/onTime',
     method: 'post',
     params: {
-        startDay: date
+        startDay: startDay,
+        endDay: endDay
     },
   })
 }
@@ -289,3 +290,30 @@ export const getPaintingPassRate = (startDay?: string, endDay?: string): Promise
     params
   })
 }
+
+
+// /manufacturing/paintingProblem
+export const getPaintingProblem = (startDay: string, endDay: string): Promise<PaintingProblemResponse> => {
+  return request({
+    url: '/manufacturing/paintingProblem',
+    method: 'post',
+    params: { startDay, endDay }
+  })
+}
+
+// 涂装问题数据类型定义
+export interface PaintingProblemItem {
+  total: number
+  num: number
+  ngName: string
+}
+
+export interface PaintingProblemResponse {
+  code: number
+  message: string
+  data: {
+    a: PaintingProblemItem[]
+    b: PaintingProblemItem[]
+  }
+}
+

@@ -292,7 +292,7 @@ const updateChart = () => {
             left: '5%', 
             right: '5%', 
             bottom: '0%', 
-            top: '3%', 
+            top: '10%', 
             containLabel: true
         },
         xAxis: {
@@ -344,6 +344,16 @@ const updateChart = () => {
                             { offset: 1, color: 'rgba(255, 149, 0, 0.05)' }
                         ]
                     }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#ff9500',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             },
             {
@@ -371,6 +381,16 @@ const updateChart = () => {
                             { offset: 1, color: 'rgba(0, 238, 255, 0.05)' }
                         ]
                     }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#00eeff',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             }
         ]
@@ -477,7 +497,6 @@ const handleResize = () => {
         rgba(0, 102, 255, 0.9) 100%);
     padding: 12px 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -595,7 +614,7 @@ const handleResize = () => {
 
 .summary-item {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: center;
     gap: 8px;
     padding: 16px;

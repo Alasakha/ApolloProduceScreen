@@ -10,145 +10,92 @@
     </div>
     
     <div class="content-area">
-      <div class="main-metrics">
-        <div class="metric-card productivity-rate">
-          <div class="metric-circle">
-            <svg viewBox="0 0 120 120" class="progress-ring">
-              <defs>
-                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
-                  <stop offset="0%" style="stop-color:var(--primary-blue);stop-opacity:1" />
-                  <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
-                </linearGradient>
-              </defs>
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                stroke="rgba(0, 212, 255, 0.2)"
-                stroke-width="8"
-                fill="transparent"
-              />
-              <circle
-                cx="60"
-                cy="60"
-                r="50"
-                stroke="url(#gradient2)"
-                stroke-width="8"
-                fill="transparent"
-                stroke-dasharray="314"
-                :stroke-dashoffset="132465"
-                stroke-linecap="round"
-                transform="rotate(-90 60 60)"
-              />
-            </svg>
-            <div class="metric-value">132465</div>
+      <div class="scrollable-content">
+        <div class="main-metrics">
+          <div class="metric-card productivity-rate">
+            <div class="metric-content">
+              <div class="metric-circle">
+                <svg viewBox="0 0 120 120" class="progress-ring">
+                  <defs>
+                    <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" style="stop-color:var(--primary-blue);stop-opacity:1" />
+                      <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
+                    </linearGradient>
+                  </defs>
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    stroke="rgba(0, 212, 255, 0.2)"
+                    stroke-width="8"
+                    fill="transparent"
+                  />
+                  <circle
+                    cx="60"
+                    cy="60"
+                    r="50"
+                    stroke="url(#gradient2)"
+                    stroke-width="8"
+                    fill="transparent"
+                    stroke-dasharray="314"
+                    :stroke-dashoffset="132465"
+                    stroke-linecap="round"
+                    transform="rotate(-90 60 60)"
+                  />
+                </svg>
+                <div class="metric-value">132465</div>
+              </div>
+              <div class="metric-info">
+                <div class="metric-label">人均产值</div>
+                <div class="metric-trend">
+                  <!-- <span class="trend-arrow" :class="productivityTrend > 0 ? 'up' : 'down'">
+                    {{ productivityTrend > 0 ? '↗' : '↘' }}
+                  </span> -->
+                  <span class="trend-value" :class="productivityTrend > 0 ? 'positive' : 'negative'">
+                    ¥ 132465
+                  </span>
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="metric-label">人均产值</div>
-          <div class="metric-trend">
-            <!-- <span class="trend-arrow" :class="productivityTrend > 0 ? 'up' : 'down'">
-              {{ productivityTrend > 0 ? '↗' : '↘' }}
-            </span> -->
-            <span class="trend-value" :class="productivityTrend > 0 ? 'positive' : 'negative'">
-              ¥ 132465
-            </span>
-          </div>
+          
+          <!-- <div class="metric-card efficiency-ratio">
+            <div class="metric-value">{{ efficiencyRatio }}%</div>
+            <div class="metric-label">效率比率</div>
+            <div class="efficiency-breakdown">
+              <div class="efficiency-item">
+                <span class="efficiency-type">人数</span>
+                <span class="efficiency-value">436 人</span>
+              </div>
+              <div class="efficiency-item">
+                <span class="efficiency-type">收入</span>
+                <span class="efficiency-value">¥57,754,681.7</span>
+              </div> -->
+              <!-- <div class="efficiency-item">
+                <span class="efficiency-type">加班工时</span>
+                <span class="efficiency-value">{{ overtimeHours }}h</span>
+              </div> -->
+            <!-- </div> -->
+          <!-- </div> -->
         </div>
         
-        <div class="metric-card efficiency-ratio">
-          <div class="metric-value">{{ efficiencyRatio }}%</div>
-          <div class="metric-label">效率比率</div>
-          <div class="efficiency-breakdown">
-            <div class="efficiency-item">
-              <span class="efficiency-type">人数</span>
-              <span class="efficiency-value">436 人</span>
-            </div>
-            <div class="efficiency-item">
-              <span class="efficiency-type">收入</span>
-              <span class="efficiency-value">¥57,754,681.7</span>
-            </div>
-            <!-- <div class="efficiency-item">
-              <span class="efficiency-type">加班工时</span>
-              <span class="efficiency-value">{{ overtimeHours }}h</span>
-            </div> -->
-          </div>
-        </div>
-      </div>
+   
+        
       
-      <div class="workforce-stats">
-        <div class="section-title">劳动力统计</div>
-        <div class="stats-grid">
-          <div class="stat-item">
-            <span class="stat-label">总员工数</span>
-            <span class="stat-value">{{ totalEmployees }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">生产人员</span>
-            <span class="stat-value">{{ productionStaff }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">技术人员</span>
-            <span class="stat-value">{{ technicalStaff }}</span>
-          </div>
-          <div class="stat-item">
-            <span class="stat-label">管理人员</span>
-            <span class="stat-value">{{ managementStaff }}</span>
-          </div>
-        </div>
-      </div>
-      
-      <div class="productivity-trends">
-        <div class="section-title">生产率趋势</div>
-        <div class="trend-chart">
-          <div class="chart-labels">
-            <span>1月</span>
-            <span>2月</span>
-            <span>3月</span>
-            <span>4月</span>
-            <span>5月</span>
-            <span>6月</span>
-          </div>
-          <div class="chart-bars">
-            <div 
-              v-for="(value, index) in monthlyProductivity" 
-              :key="index"
-              class="chart-bar"
-              :style="{ height: value + '%' }"
-              :class="getBarClass(value)"
-            ></div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="performance-alerts">
-        <div class="section-title">绩效预警</div>
-        <div class="alert-list">
-          <div 
-            v-for="alert in performanceAlerts" 
-            :key="alert.id"
-            class="alert-item"
-            :class="alert.level"
-          >
-            <div class="alert-icon">{{ alert.icon }}</div>
-            <div class="alert-content">
-              <div class="alert-title">{{ alert.title }}</div>
-              <div class="alert-desc">{{ alert.description }}</div>
-            </div>
-            <div class="alert-time">{{ alert.time }}</div>
-          </div>
         </div>
       </div>
     </div>
     
     <!-- SVG渐变定义 -->
-    <svg width="0" height="0">
+    <!-- <svg width="0" height="0">
       <defs>
         <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" style="stop-color:var(--primary-blue);stop-opacity:1" />
           <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
         </linearGradient>
       </defs>
-    </svg>
-  </div>
+    </svg> -->
+
 </template>
 
 <script setup>
@@ -310,12 +257,52 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 4px;
+}
+
+/* 自定义滚动条样式 */
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.6);
+}
+
+/* Firefox滚动条样式 */
+.scrollable-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.4) rgba(0, 0, 0, 0.2);
 }
 
 .main-metrics {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  /* display: grid; */
+  /* grid-template-columns: 1fr; */
   gap: 16px;
+  display: flex;
+  width: 100%;
 }
 
 .metric-card {
@@ -324,13 +311,29 @@ onMounted(() => {
   border-radius: 8px;
   padding: 16px;
   text-align: center;
+  width: 100%;
+}
+
+.metric-content {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+  justify-content: center;
 }
 
 .metric-circle {
   position: relative;
   width: 120px;
   height: 120px;
-  margin: 0 auto 16px;
+  flex-shrink: 0;
+}
+
+.metric-info {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  text-align: left;
 }
 
 .progress-ring {
@@ -546,5 +549,171 @@ onMounted(() => {
 .alert-time {
   font-size: 10px;
   color: #666;
+}
+
+/* 2000px断点响应式设计 */
+@media (min-width: 2000px) {
+  .labor-productivity {
+    margin-left: 15px;
+  }
+  
+  .component-header {
+    /* padding: 12px 16px; */
+    gap: 10px;
+    padding: 0px;
+  }
+  
+  .header-icon {
+    font-size: 10px;
+  }
+  
+  .header-title {
+    font-size: 10px;
+  }
+  
+  .header-status {
+    padding: 4px 8px;
+    font-size: 12px;
+    gap: 6px;
+  }
+  
+  .status-dot {
+    width: 8px;
+    height: 8px;
+  }
+  
+  .content-area {
+    padding: 20px;
+    gap: 24px;
+  }
+  
+  .scrollable-content {
+    gap: 24px;
+    padding-right: 6px;
+  }
+  
+  .scrollable-content::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .main-metrics {
+    gap: 20px;
+  }
+  
+  .metric-card {
+    padding: 20px;
+    border-radius: 10px;
+  }
+  
+  .metric-content {
+    gap: 24px;
+  }
+  
+  .metric-circle {
+    width: 140px;
+    height: 140px;
+  }
+  
+  .metric-value {
+    font-size: 28px;
+  }
+  
+  .metric-label {
+    font-size: 16px;
+  }
+  
+  .metric-info {
+    gap: 10px;
+  }
+  
+  .metric-trend {
+    font-size: 14px;
+    gap: 6px;
+  }
+  
+  .efficiency-breakdown {
+    gap: 10px;
+    margin-top: 16px;
+  }
+  
+  .efficiency-item {
+    padding: 8px 12px;
+    border-radius: 6px;
+  }
+  
+  .efficiency-type {
+    font-size: 13px;
+  }
+  
+  .efficiency-value {
+    font-size: 14px;
+  }
+  
+  .section-title {
+    font-size: 16px;
+    margin-bottom: 16px;
+  }
+  
+  .stats-grid {
+    gap: 16px;
+  }
+  
+  .stat-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+  }
+  
+  .stat-label {
+    font-size: 14px;
+  }
+  
+  .stat-value {
+    font-size: 16px;
+  }
+  
+  .trend-chart {
+    gap: 12px;
+  }
+  
+  .chart-labels {
+    font-size: 12px;
+  }
+  
+  .chart-bars {
+    height: 80px;
+    gap: 6px;
+  }
+  
+  .chart-bar {
+    border-radius: 3px;
+    min-height: 6px;
+  }
+  
+  .alert-list {
+    gap: 12px;
+  }
+  
+  .alert-item {
+    padding: 12px 16px;
+    border-radius: 8px;
+    gap: 16px;
+  }
+  
+  .alert-icon {
+    font-size: 18px;
+  }
+  
+  .alert-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .alert-desc {
+    font-size: 12px;
+  }
+  
+  .alert-time {
+    font-size: 12px;
+  }
 }
 </style> 

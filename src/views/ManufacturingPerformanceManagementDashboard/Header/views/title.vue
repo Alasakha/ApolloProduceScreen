@@ -4,10 +4,10 @@ import CompactDateSelector from '@/components/GlobalDateSelector/CompactDateSele
 </script>
 
 <template>
-<div class="title-container flex justify-between items-center w-full">
-  <div class="title title-main absolute">制造绩效管理看板</div>
+<div class="title-container relative flex justify-center items-center w-full">
+  <div class="title title-main">制造绩效管理看板</div>
   <!-- 全局日期选择器 -->
-  <div class="global-date-control relative right-0">
+  <div class="global-date-control absolute right-0">
     <CompactDateSelector />
   </div>
 </div>
@@ -31,7 +31,9 @@ import CompactDateSelector from '@/components/GlobalDateSelector/CompactDateSele
 }
 
 .global-date-control {
-  /* 确保日期选择器在右侧显示 */
-  margin-left: auto;
+  /* 绝对定位到右侧 */
+  top: 50%;
+  transform: translateY(-50%);
+  transform: translateX(50%);
 }
 </style>

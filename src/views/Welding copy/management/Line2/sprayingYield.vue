@@ -2,7 +2,7 @@
     <div class="yield-container" @click="openDialog">
         <div class="yield-title">
             <h3>喷涂直通率</h3>
-            <span class="click-note ">(点击进入可以查看和编辑不合格问题明细)</span>
+            <!-- <span class="click-note ">(点击进入可以查看和编辑不合格问题明细)</span> -->
         </div>
         <div class="yield-content">
             <!-- 指标标签行 -->

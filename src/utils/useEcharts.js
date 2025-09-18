@@ -1,4 +1,4 @@
-import * as echarts from 'echarts';
+import { createSafeEchartsInstance } from './initEcharts.js';
 import { onBeforeUnmount } from 'vue';
 
 export function useEcharts(chartRef) {
@@ -6,29 +6,45 @@ export function useEcharts(chartRef) {
 
   const initChart = () => {
     if (!chartRef.value || chartInstance) return;
-    chartInstance = echarts.init(chartRef.value);
-    window.addEventListener('resize', resizeChart);
+    
+    try {
+      // 使用安全的实例创建函数
+      chartInstance = createSafeEchartsInstance(chartRef.value);
+      if (chartInstance) {
+        window.addEventListener('resize', resizeChart);
+      }
+    } catch (error) {
+      console.error('创建ECharts实例失败:', error);
+    }
   };
 
   const setOption = (option) => {
-    chartInstance?.setOption(option);
+    if (chartInstance && !chartInstance.isDisposed()) {
+      chartInstance.setOption(option);
+    }
   };
 
   const resizeChart = () => {
-    chartInstance?.resize();
+    if (chartInstance && !chartInstance.isDisposed()) {
+      chartInstance.resize();
+    }
   };
 
   const onClick = (handler) => {
-    chartInstance?.on('click', handler);
+    if (chartInstance && !chartInstance.isDisposed()) {
+      chartInstance.on('click', handler);
+    }
   };
 
   const offClick = (handler) => {
-    chartInstance?.off('click', handler);
+    if (chartInstance && !chartInstance.isDisposed()) {
+      chartInstance.off('click', handler);
+    }
   };
 
   onBeforeUnmount(() => {
     window.removeEventListener('resize', resizeChart);
-    if (chartInstance) {
+    if (chartInstance && !chartInstance.isDisposed()) {
       chartInstance.dispose();
       chartInstance = null;
     }

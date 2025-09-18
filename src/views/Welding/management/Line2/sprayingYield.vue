@@ -2,7 +2,7 @@
     <div class="yield-container" @click="openDialog">
         <div class="yield-title">
             <h3 class="3xl:text-sm">喷涂直通率</h3>
-            <div class="click-note 3xl:text-xs ">(点击进入可以查看和编辑不合格问题明细)</div>
+            <!-- <div class="click-note 3xl:text-xs ">(点击进入可以查看和编辑不合格问题明细)</div> -->
         </div>
         <div class="yield-content">
             <!-- 指标标签行 -->
@@ -57,39 +57,62 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
 import { eventBus } from '@/utils/eventbus'
-import { getSprayFty } from '@/api/getStampWeldinfo'
-import type { SprayFty } from '@/api/getStampWeldinfo'
+import { getPaintingPassRate2 } from '@/api/getStampinfo'
+import { type PaintingPassRate2, type PaintingPassRate2Item } from '@/api/getStampinfo'
 import SprayYieldDialog from './SprayYieldDialog.vue'
+import { useRoute } from 'vue-router'
+
+// 获取路由参数
+const route = useRoute()
+const prodLine = route.query.prodLine as string
 
 // 响应式数据
 const dialogVisible = ref(false)
-const sprayData = ref<SprayFty[]>([])
+const sprayData = ref<PaintingPassRate2 | null>(null)
 
 // 计算属性 - 各部件数据
 const frameData = computed(() => {
-    const frameItems = sprayData.value.filter(item => 
-        item.item_description.includes('车架')
-    )
-    return calculateMetrics(frameItems)
+    if (!sprayData.value) {
+        return {
+            inspectionCount: '--',
+            firstPassCount: '--',
+            firstPassRate: '--',
+            qualifiedCount: '--',
+            qualifiedRate: '--'
+        }
+    }
+    return calculateMetrics(sprayData.value.cj) // 车架
 })
 
 const rearForkData = computed(() => {
-    const rearForkItems = sprayData.value.filter(item => 
-        item.item_description.includes('后叉')
-    )
-    return calculateMetrics(rearForkItems)
+    if (!sprayData.value) {
+        return {
+            inspectionCount: '--',
+            firstPassCount: '--',
+            firstPassRate: '--',
+            qualifiedCount: '--',
+            qualifiedRate: '--'
+        }
+    }
+    return calculateMetrics(sprayData.value.hch) // 后叉
 })
 
 const tailFrameData = computed(() => {
-    const tailFrameItems = sprayData.value.filter(item => 
-        item.item_description.includes('尾架')
-    )
-    return calculateMetrics(tailFrameItems)
+    if (!sprayData.value) {
+        return {
+            inspectionCount: '--',
+            firstPassCount: '--',
+            firstPassRate: '--',
+            qualifiedCount: '--',
+            qualifiedRate: '--'
+        }
+    }
+    return calculateMetrics(sprayData.value.wj) // 尾架
 })
 
 // 计算指标
-const calculateMetrics = (items: SprayFty[]) => {
-    if (items.length === 0) {
+const calculateMetrics = (item: PaintingPassRate2Item) => {
+    if (!item) {
         return {
             inspectionCount: '--',
             firstPassCount: '--',
@@ -99,16 +122,12 @@ const calculateMetrics = (items: SprayFty[]) => {
         }
     }
     
-    const totalInspection = items.reduce((sum, item) => sum + parseInt(item.inventory_qty), 0)
-    const totalFirstPass = items.reduce((sum, item) => sum + item.firstOkCount, 0)
-    const totalQualified = items.reduce((sum, item) => sum + item.okCount, 0)
-    
     return {
-        inspectionCount: totalInspection.toString(),//今日检验数
-        firstPassCount: totalFirstPass.toString(),
-        firstPassRate: totalInspection > 0 ? ((totalFirstPass / totalInspection) * 100).toFixed(1) + '%' : '--',
-        qualifiedCount: totalQualified.toString(),
-        qualifiedRate: totalInspection > 0 ? ((totalQualified / totalInspection) * 100).toFixed(1) + '%' : '--'
+        inspectionCount: item.qty.toString(),//今日检验数
+        firstPassCount: item.udf001.toString(),
+        firstPassRate: item.qty > 0 ? ((item.udf001 / item.qty) * 100).toFixed(1) + '%' : '--',
+        qualifiedCount: item.pass.toString(),
+        qualifiedRate: item.rate.toString()+'%'
     }
 }
 
@@ -120,7 +139,7 @@ const openDialog = () => {
 // 加载喷涂数据
 const loadSprayData = async () => {
     try {
-        const response = await getSprayFty()
+        const response = await getPaintingPassRate2(prodLine)
         sprayData.value = response.data
     } catch (error) {
         console.error('加载喷涂数据失败:', error)

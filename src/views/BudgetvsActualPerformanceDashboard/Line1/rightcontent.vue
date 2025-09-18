@@ -81,6 +81,13 @@ const chartOption = computed(() => ({
         borderWidth: 1,
         textStyle: {
             color: '#00eeff'
+        },
+        formatter: function(params: any) {
+            let result = params[0].axisValue + '<br/>';
+            params.forEach((param: any) => {
+                result += param.marker + param.seriesName + ': ' + parseFloat(param.value) + '台<br/>';
+            });
+            return result;
         }
     },
     legend: {

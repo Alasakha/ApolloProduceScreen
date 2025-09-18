@@ -14,17 +14,12 @@
       </el-button>
     </div> -->
         
-   <!-- 如果没有数据，显示暂无数据 -->
-   <div v-if="!isLoading && isDataEmpty" class="empty-container">
-     暂无数据
-   </div>
-   
-   <!-- 数据加载完成且非空时显示图表 -->
+   <!-- 数据加载完成时显示图表 -->
     <div class="tablebox w-full h-[90%]">
        <!-- 如果正在加载，显示 loading -->
      <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
 
-      <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
+      <ScrollBoard v-if="!isLoading" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
     </div>
   </div>
 
@@ -131,12 +126,20 @@ fetchClosingRateData(prodLine)
       config.data = config.tableData; // Keep data in sync
       isDataEmpty.value = false;
     } else {
+      // 当没有数据时，设置config.data为暂无数据
+      config.data = [
+        ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+      ];
       isDataEmpty.value = true;
       console.log('没有获取到数据');
     }
   })
   .catch((error) => {
     console.error('获取数据失败:', error);
+    // 当请求出错时，也设置config.data为暂无数据
+    config.data = [
+      ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+    ];
     isDataEmpty.value = true;
     ElMessage.error('获取数据失败，请稍后重试');
   })
@@ -409,4 +412,5 @@ color: #e03030 !important;
 color: #e03030 !important;
 font-weight: bold;
 }
+
 </style>

@@ -187,6 +187,7 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   margin-left: 10px;
+  position: relative;
 }
 
 .component-header {
@@ -204,7 +205,7 @@ onMounted(() => {
 
 .header-title {
   color: var(--primary-blue);
-  font-size: 16px;
+  font-size: 14px;
   font-weight: 600;
   flex: 1;
 }
@@ -243,6 +244,8 @@ onMounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .main-stats {
@@ -305,6 +308,9 @@ onMounted(() => {
   overflow: hidden;
   border: 1px solid rgba(0, 212, 255, 0.2);
   min-height: 200px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
 }
 
 .table-header {
@@ -322,25 +328,35 @@ onMounted(() => {
 
 .table-content {
   padding: 0;
-  max-height: 300px;
+  flex: 1;
   overflow-y: auto;
+  overflow-x: hidden;
+  min-height: 200px;
 }
 
 .table-content::-webkit-scrollbar {
-  width: 4px;
+  width: 6px;
 }
 
 .table-content::-webkit-scrollbar-track {
   background: rgba(0, 212, 255, 0.1);
+  border-radius: 3px;
 }
 
 .table-content::-webkit-scrollbar-thumb {
-  background: rgba(0, 212, 255, 0.3);
-  border-radius: 2px;
+  background: rgba(0, 212, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.2s ease;
 }
 
 .table-content::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 212, 255, 0.5);
+  background: rgba(0, 212, 255, 0.6);
+}
+
+/* Firefox 滚动条样式 */
+.table-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.4) rgba(0, 212, 255, 0.1);
 }
 
 .table-row {
@@ -358,7 +374,7 @@ onMounted(() => {
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
   font-weight: 600;
   color: var(--primary-blue);
-  font-size: 12px;
+  font-size: 11px;
   position: sticky;
   top: 0;
   z-index: 1;
@@ -417,7 +433,57 @@ onMounted(() => {
 }
 
 /* 响应式设计 */
-@media (max-width: 1400px) {
+@media (max-width: 2000px) {
+  .component-header {
+    padding: 4px;
+  }
+  
+  .header-icon {
+    font-size: 12px;
+  }
+  
+  .header-title {
+    font-size: 12px;
+  }
+  
+  .header-status {
+    font-size: 11px;
+    padding: 3px 6px;
+  }
+  
+  .content-area {
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .table-row {
+    grid-template-columns: 0.3fr 1.4fr 1.1fr 1.1fr 0.8fr;
+    font-size: 10px;
+    gap: 5px;
+    padding: 7px 10px;
+    min-height: 28px;
+  }
+  
+  .header-row {
+    font-size: 9px;
+  }
+  
+  .total-row {
+    font-size: 11px;
+  }
+  
+  .col-workcenter {
+    font-size: 10px;
+  }
+  
+  .equipment-table {
+    min-height: 180px;
+  }
+  
+  .table-content {
+    max-height: 280px;
+  }
+}@media (max-width: 1400px) {
   .table-row {
     grid-template-columns: 0.25fr 2.8fr 1.1fr 1.1fr 0.75fr;
     font-size: 10px;

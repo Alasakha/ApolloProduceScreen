@@ -102,6 +102,14 @@ const resetToToday = () => {
 onMounted(() => {
   // selectedDays.value = manufacturingStore.getGlobalDays(); // 注释掉天数间隔功能
   endDate.value = manufacturingStore.getSelectedEndDate();
+  
+  // 添加调试信息
+  console.log('=== CompactDateSelector 初始化调试 ===')
+  console.log('当前时间:', new Date().toString())
+  console.log('当前UTC时间:', new Date().toISOString())
+  console.log('manufacturingStore.getSelectedEndDate():', manufacturingStore.getSelectedEndDate())
+  console.log('endDate.value:', endDate.value)
+  console.log('=====================================')
 });
 </script>
 

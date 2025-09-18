@@ -104,18 +104,35 @@
           </div>
         </div>
         
-        <!-- 原因输入 -->
+        <!-- 原因选择 -->
         <div class="reason-input-section mb-6">
           <label class="input-label block text-gray-700 font-medium mb-3">原因说明 *</label>
-          <el-input
-            v-model="newReason"
-            type="textarea"
-            :rows="4"
-            placeholder="请详细描述设备当前状态的原因，例如：设备故障、原料不足、人员调整等..."
-            class="w-full"
-            :maxlength="500"
-            show-word-limit
-          />
+          <el-radio-group v-model="selectedReason" class="w-full">
+            <div class="reason-options">
+              <el-radio label="1、无计划" class="reason-option">1、无计划</el-radio>
+              <el-radio label="2、缺人" class="reason-option">2、缺人</el-radio>
+              <el-radio label="3、人员请假" class="reason-option">3、人员请假</el-radio>
+              <el-radio label="4、缺料" class="reason-option">4、缺料</el-radio>
+              <el-radio label="5、设备故障" class="reason-option">5、设备故障</el-radio>
+              <el-radio label="6、夹具故障" class="reason-option">6、夹具故障</el-radio>
+              <el-radio label="7、系统故障" class="reason-option">7、系统故障</el-radio>
+              <el-radio label="8、换模 换型" class="reason-option">8、换模 换型</el-radio>
+              <el-radio label="9、其他" class="reason-option">9、其他</el-radio>
+            </div>
+          </el-radio-group>
+          
+          <!-- 其他原因输入框 -->
+          <div v-if="selectedReason === '9、其他'" class="other-reason-input mt-4">
+            <el-input
+              v-model="otherReason"
+              type="textarea"
+              :rows="3"
+              placeholder="请详细描述其他原因..."
+              class="w-full"
+              :maxlength="200"
+              show-word-limit
+            />
+          </div>
         </div>
         
         <!-- 提交状态 -->
@@ -139,7 +156,7 @@
           type="primary" 
           @click="submitReason" 
           :loading="submittingReason"
-          :disabled="!newReason.trim()"
+          :disabled="!selectedReason || (selectedReason === '9、其他' && !otherReason.trim())"
         >
           提交原因
         </el-button>
@@ -166,9 +183,11 @@ const waitingDeviceCount = ref(0)
 // 设备详情弹窗相关状态
 const selectedDevice = ref(null)
 
+
 // 填写原因弹窗相关状态
 const reasonDialogVisible = ref(false)
-const newReason = ref('')
+const selectedReason = ref('')
+const otherReason = ref('')
 const feedbackMessage = ref('')
 const feedbackType = ref('success')
 const submittingReason = ref(false)
@@ -179,11 +198,13 @@ const fetchData = async () => {
   waitingDeviceCount.value = res.data.length
 }
 
+
 const props = withDefaults(defineProps<Props>(), {
   data: () => [],
   prodLine: '',
   type: 0
 })
+
 
 watch(() => visible.value, (newVisible) => {
   if (newVisible) {
@@ -191,16 +212,20 @@ watch(() => visible.value, (newVisible) => {
   }
 })
 
+
 const emit = defineEmits<{
   'update:visible': [value: boolean]
 }>()
+
+
 
 const handleClose = () => {
   // 如果填写原因弹窗是打开的，先关闭它
   if (reasonDialogVisible.value) {
     reasonDialogVisible.value = false
     selectedDevice.value = null
-    newReason.value = ''
+    selectedReason.value = ''
+    otherReason.value = ''
     feedbackMessage.value = ''
   }
   
@@ -217,7 +242,40 @@ const openDeviceDetailDialog = (device: any) => {
 // 打开填写原因弹窗
 const openReasonDialog = (device: any) => {
   selectedDevice.value = device
-  newReason.value = device.reason || '' // 设置当前原因或清空
+  
+  // 回写功能：根据设备已有的原因设置选择状态
+  const currentReason = device.reason || ''
+  console.log('设备当前原因:', currentReason) // 调试信息
+  
+  // 预定义的原因选项
+  const predefinedReasons = [
+    '1、无计划',
+    '2、缺人',
+    '3、人员请假', 
+    '4、缺料',
+    '5、设备故障',
+    '6、夹具故障',
+    '7、系统故障',
+    '8、换模 换型'
+  ]
+  
+  // 检查是否是预定义的原因
+  if (predefinedReasons.includes(currentReason)) {
+    selectedReason.value = currentReason
+    otherReason.value = ''
+    console.log('匹配预定义原因:', currentReason) // 调试信息
+  } else if (currentReason.trim()) {
+    // 如果是其他原因，设置为"其他"选项并填入具体内容
+    selectedReason.value = '9、其他'
+    otherReason.value = currentReason
+    console.log('设置为其他原因:', currentReason) // 调试信息
+  } else {
+    // 如果没有原因，清空所有选择
+    selectedReason.value = ''
+    otherReason.value = ''
+    console.log('清空选择') // 调试信息
+  }
+  
   feedbackMessage.value = '' // 清空反馈信息
   feedbackType.value = 'success'
   reasonDialogVisible.value = true
@@ -227,7 +285,8 @@ const openReasonDialog = (device: any) => {
 const closeReasonDialog = () => {
   reasonDialogVisible.value = false
   selectedDevice.value = null
-  newReason.value = ''
+  selectedReason.value = ''
+  otherReason.value = ''
   feedbackMessage.value = ''
 }
 
@@ -239,7 +298,8 @@ const handleReasonDialogClose = (done: () => void) => {
   }
   
   // 如果有未保存的更改，可以提示用户
-  if (newReason.value.trim() && newReason.value !== selectedDevice.value?.reason) {
+  const currentReason = selectedReason.value === '9、其他' ? otherReason.value : selectedReason.value
+  if (currentReason.trim() && currentReason !== selectedDevice.value?.reason) {
     ElMessage.warning('有未保存的更改，请确认是否关闭')
   }
   
@@ -250,12 +310,21 @@ const handleReasonDialogClose = (done: () => void) => {
 
 // 提交原因
 const submitReason = async () => {
-  if (!selectedDevice.value || !newReason.value.trim()) return
+  if (!selectedDevice.value || !selectedReason.value) return
+  
+  // 如果选择的是"其他"，需要检查是否填写了其他原因
+  if (selectedReason.value === '9、其他' && !otherReason.value.trim()) {
+    ElMessage.warning('请填写其他原因')
+    return
+  }
 
   submittingReason.value = true
   try {
+    // 确定最终的原因文本
+    const finalReason = selectedReason.value === '9、其他' ? otherReason.value : selectedReason.value
+    
     // 调用API接口提交原因
-    const res = await getRawMaterialMonitoringAdd(selectedDevice.value.macNo, newReason.value)
+    const res = await getRawMaterialMonitoringAdd(selectedDevice.value.macNo, finalReason)
     if(res.code === 200){
     feedbackMessage.value = '提交成功！'
     feedbackType.value = 'success'
@@ -265,7 +334,7 @@ const submitReason = async () => {
     }
     // 更新本地数据
     if (selectedDevice.value) {
-      selectedDevice.value.reason = newReason.value
+      selectedDevice.value.reason = finalReason
     }
     
     // 延迟关闭弹窗并刷新数据
@@ -827,6 +896,43 @@ const submitReason = async () => {
 .input-label {
   font-weight: 600;
   color: #374151;
+}
+
+/* 原因选择样式 */
+.reason-options {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.reason-option {
+  margin: 0 !important;
+  padding: 12px 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  background: #f9fafb;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.reason-option:hover {
+  background: #f3f4f6;
+  border-color: #d1d5db;
+}
+
+.reason-option.is-checked {
+  background: #dbeafe;
+  border-color: #3b82f6;
+  color: #1e40af;
+}
+
+.other-reason-input {
+  margin-top: 16px;
+  padding: 16px;
+  background: #f8fafc;
+  border-radius: 8px;
+  border: 1px solid #e2e8f0;
 }
 
 .feedback-section {

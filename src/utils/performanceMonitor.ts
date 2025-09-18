@@ -49,7 +49,7 @@ class PerformanceMonitor {
     this.isMonitoring = true
     this.monitorInterval = window.setInterval(() => {
       this.updateMetrics()
-    }, 1000)
+    }, 5000) // 从1秒改为5秒，减少输出频率
     
     console.log('性能监控已启动')
   }
@@ -156,6 +156,15 @@ class PerformanceMonitor {
   private logPerformance() {
     const { fps, memoryUsage, errors, warnings } = this.metrics
     
+    // 只在有性能问题或重要信息时才输出
+    const hasIssues = this.checkPerformanceIssues().length > 0
+    const hasNewErrors = errors.length > 0 && errors.length % 10 === 0 // 每10个错误输出一次
+    const hasNewWarnings = warnings.length > 0 && warnings.length % 50 === 0 // 每50个警告输出一次
+    
+    if (!hasIssues && !hasNewErrors && !hasNewWarnings) {
+      return // 没有重要问题时不输出
+    }
+    
     console.group('📊 性能监控报告')
     console.log(`🎯 FPS: ${fps}`)
     
@@ -163,14 +172,14 @@ class PerformanceMonitor {
       console.log(`💾 内存使用: ${memoryUsage.usedJSHeapSize}MB / ${memoryUsage.totalJSHeapSize}MB (限制: ${memoryUsage.jsHeapSizeLimit}MB)`)
     }
     
-    if (errors.length > 0) {
+    if (hasNewErrors) {
       console.warn(`❌ 错误数量: ${errors.length}`)
       errors.slice(-3).forEach(error => {
         console.error(`  - ${error.type}: ${error.message}`)
       })
     }
     
-    if (warnings.length > 0) {
+    if (hasNewWarnings) {
       console.warn(`⚠️ 警告数量: ${warnings.length}`)
       warnings.slice(-3).forEach(warning => {
         console.warn(`  - ${warning.type}: ${warning.message}`)
@@ -232,4 +241,22 @@ export type { PerformanceMetrics }
 // 自动启动监控（开发环境）
 if (import.meta.env.DEV) {
   performanceMonitor.start()
+} else {
+  // 生产环境使用轻量级监控
+  performanceMonitor.start()
+  // 在生产环境中，我们只监控严重问题
+  const originalLogPerformance = performanceMonitor['logPerformance']
+  performanceMonitor['logPerformance'] = function() {
+    const report = this.getReport()
+    const { fps, memoryUsage, errors } = report
+    
+    // 只在有严重性能问题时才输出
+    const hasCriticalIssues = fps < 20 || 
+      (memoryUsage && (memoryUsage.usedJSHeapSize / memoryUsage.jsHeapSizeLimit) > 0.9) ||
+      errors.length > 50
+    
+    if (hasCriticalIssues) {
+      originalLogPerformance.call(this)
+    }
+  }
 } 

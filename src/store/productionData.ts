@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
-import { getFty, getOnTime,getManufacturingCost } from '@/api/produceperformance'
-import type { TodayProduction, OnTime, ManufacturingCostData } from '@/api/produceperformance'
+import { getFty, getOnTime, getManufacturingCost, getPaintingProblem } from '@/api/produceperformance'
+import type { TodayProduction, OnTime, ManufacturingCostData, PaintingProblemResponse } from '@/api/produceperformance'
+
+// 获取本地日期字符串（避免时区问题）
+const getLocalDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
 
 export const useProductionDataStore = defineStore('productionData', {
   state: () => ({
@@ -13,7 +21,8 @@ export const useProductionDataStore = defineStore('productionData', {
     lastFetchTime: null as Date | null,
     autoRefreshTimer: null as ReturnType<typeof setInterval> | null,
     manufacturingCost: null as ManufacturingCostData | null,
-    selectedEndDate: new Date().toISOString().split('T')[0] as string, // 新增：选中的结束日期
+    paintingProblemData: null as PaintingProblemResponse['data'] | null, // 涂装问题数据
+    selectedEndDate: getLocalDateString() as string, // 新增：选中的结束日期（使用本地时间）
   }),
 
   getters: {
@@ -235,6 +244,28 @@ export const useProductionDataStore = defineStore('productionData', {
     onTimeNormalRate(): number {
       if (!this.onTimeMonthlyData?.normal?.total || this.onTimeMonthlyData.normal.total === 0) return 0
       return (this.onTimeMonthlyData.normal.completeNum / this.onTimeMonthlyData.normal.total) * 100
+    },
+
+    // 涂装问题数据相关 getters
+    paintingProblemATypeData(): any[] {
+      return this.paintingProblemData?.a || []
+    },
+    paintingProblemBTypeData(): any[] {
+      return this.paintingProblemData?.b || []
+    },
+    paintingProblemTotalCount(): number {
+      if (!this.paintingProblemData) return 0
+      const aCount = this.paintingProblemData.a?.reduce((sum, item) => sum + item.total, 0) || 0
+      const bCount = this.paintingProblemData.b?.reduce((sum, item) => sum + item.total, 0) || 0
+      return aCount + bCount
+    },
+    paintingProblemATypeCount(): number {
+      if (!this.paintingProblemData?.a) return 0
+      return this.paintingProblemData.a.reduce((sum, item) => sum + item.total, 0)
+    },
+    paintingProblemBTypeCount(): number {
+      if (!this.paintingProblemData?.b) return 0
+      return this.paintingProblemData.b.reduce((sum, item) => sum + item.total, 0)
     }
   },
 
@@ -267,8 +298,8 @@ export const useProductionDataStore = defineStore('productionData', {
 
     // 新增：重置为今天并重新获取数据
     resetEndDateToToday() {
-      // 重置为今天的日期
-      this.selectedEndDate = new Date().toISOString().split('T')[0]
+      // 重置为今天的日期（使用本地时间）
+      this.selectedEndDate = getLocalDateString()
       // 重置后重新获取数据
       this.fetchProductionData()
     },
@@ -288,27 +319,39 @@ export const useProductionDataStore = defineStore('productionData', {
         
         const { yearParam, monthParam } = this.getCurrentDateParams()
         
-        // 使用选中的结束日期，如果没有选中则使用今天的日期
-        const endDate = this.selectedEndDate || new Date().toISOString().split('T')[0]
+        // 使用选中的结束日期，如果没有选中则使用今天的日期（使用本地时间）
+        const endDate = this.selectedEndDate || getLocalDateString()
+        
+        // 添加详细的调试信息
+        console.log('=== 日期调试信息 ===')
+        console.log('当前时间对象:', new Date())
+        console.log('当前时间字符串:', new Date().toString())
+        console.log('当前UTC时间:', new Date().toISOString())
+        console.log('selectedEndDate:', this.selectedEndDate)
+        console.log('计算出的endDate:', endDate)
+        console.log('yearParam:', yearParam)
+        console.log('monthParam:', monthParam)
+        console.log('==================')
         
         console.log('正在获取生产数据...', { monthParam, yearParam, endDate })
         console.log('接口调用参数详情:', {
           'getFty(月度)': { startDate: monthParam, endDay: endDate },
           'getFty(年度)': { startDate: yearParam, endDay: endDate },
-          'getOnTime(月度)': { startDay: monthParam },
-          'getOnTime(当日)': { startDay: endDate }
+          'getOnTime(月度)': { startDay: monthParam, endDay: endDate },
+          'getOnTime(当日)': { startDay: endDate, endDay: endDate }
         })
         
         console.log('productionData store: 准备调用接口...')
         
         try {
-          // 同时获取月度、年度、准交率和制造费用数据
-          const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse] = await Promise.all([
+          // 同时获取月度、年度、准交率、制造费用和涂装问题数据
+          const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse, paintingProblemResponse] = await Promise.all([
             getFty(monthParam, endDate),        // 本月1号到选中结束日期的月度数据（endDate 对应接口的 endDay 参数）
             getFty(yearParam, endDate),         // 本年1月1号到选中结束日期的年度数据（endDate 对应接口的 endDay 参数）
-            getOnTime(monthParam),     // 本月1号获取月度准交率（接口只支持开始日期）
-            getOnTime(endDate),        // 选中结束日期作为开始日期获取准交率（接口只支持开始日期）
-            getManufacturingCost()     // 获取制造费用数据
+            getOnTime(monthParam, endDate),     // 本月1号获取月度准交率（接口只支持开始日期）
+            getOnTime(endDate, endDate),        // 选中结束日期作为开始日期获取准交率（接口只支持开始日期）
+            getManufacturingCost(),             // 获取制造费用数据
+            getPaintingProblem(monthParam, endDate) // 获取涂装问题数据（使用月度时间范围）
           ])
           
           console.log('productionData store: 接口调用完成，开始处理响应')
@@ -317,7 +360,8 @@ export const useProductionDataStore = defineStore('productionData', {
             yearlyResponse: yearlyResponse,
             onTimeMonthlyResponse: onTimeMonthlyResponse,
             onTimeDailyResponse: onTimeDailyResponse,
-            manufacturingCostResponse: manufacturingCostResponse
+            manufacturingCostResponse: manufacturingCostResponse,
+            paintingProblemResponse: paintingProblemResponse
           })
           
           if (monthlyResponse && monthlyResponse.data) {
@@ -354,11 +398,18 @@ export const useProductionDataStore = defineStore('productionData', {
           } else {
             console.warn('productionData store: 制造费用数据响应异常:', manufacturingCostResponse)
           }
+
+          if (paintingProblemResponse && paintingProblemResponse.data) {
+            this.paintingProblemData = paintingProblemResponse.data
+            console.log('涂装问题数据获取成功:', paintingProblemResponse.data)
+          } else {
+            console.warn('productionData store: 涂装问题数据响应异常:', paintingProblemResponse)
+          }
           
           // 更新最后获取时间
           this.lastFetchTime = new Date()
           
-          if (!monthlyResponse.data && !yearlyResponse.data && !onTimeMonthlyResponse.data && !onTimeDailyResponse.data) {
+          if (!monthlyResponse.data && !yearlyResponse.data && !onTimeMonthlyResponse.data && !onTimeDailyResponse.data && !manufacturingCostResponse.data && !paintingProblemResponse.data) {
             throw new Error('获取数据失败')
           }
           
@@ -409,6 +460,10 @@ export const useProductionDataStore = defineStore('productionData', {
     clearData() {
       this.monthlyData = null
       this.yearlyData = null
+      this.onTimeMonthlyData = null
+      this.onTimeDailyData = null
+      this.manufacturingCost = null
+      this.paintingProblemData = null
       this.error = ''
       this.lastFetchTime = null
     }

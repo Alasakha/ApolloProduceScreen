@@ -3,15 +3,17 @@
         <div class="yield-section flex-1">
             <SprayingYield />
         </div>
-        <!-- <div class="yield-section flex-1">
-            <RoughYield />
-        </div> -->
+        <div class="yield-section flex-1">
+            <!-- <RoughYield /> -->
+             <Quality />
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import SprayingYield from './sprayingYield.vue';
 // import RoughYield from './roughYield.vue';
+import Quality from '../Line3/qualityQues.vue';
 </script>
 
 <style scoped>

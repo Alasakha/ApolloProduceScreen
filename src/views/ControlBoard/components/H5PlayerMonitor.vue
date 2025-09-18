@@ -3,10 +3,10 @@
     <div style="width: 100%; height: 100%;">
       <!-- <input id="play" type="button" value="play" @click="playerPlay" /> -->
       <br/>
-      <canvas ref="canvasElement" style="background-color:#000;width:100%;height:300px;"></canvas>
-      <div>
-          <video ref="videoElement" style="background-color:#000;width:100%;height:300px;"></video>
-      </div>
+       <canvas ref="canvasElement" class="video-canvas"></canvas>
+       <div>
+           <video ref="videoElement" class="video-element"></video>
+       </div>
     </div>
     <!-- <fieldset class="h5-fieldset-wrap"> -->
       <!-- <legend>云台控制</legend> -->
@@ -84,46 +84,83 @@
   }
 
   function playerPlay() {
+    // 清理之前的播放器
+    if (player) {
+      try {
+        player.close();
+      } catch (e) {
+        // 忽略清理错误
+      }
+    }
+
     var options = {
       wsURL: props.ip ? `ws://${props.ip}/rtspoverwebsocket` : 'ws://192.168.10.11/rtspoverwebsocket',
       rtspURL: props.ip ? `rtsp://${props.ip}/cam/realmonitor?channel=1&subtype=0&proto=Private3` : 'rtsp://172.3.101.2/cam/realmonitor?channel=1&subtype=0&proto=Private3',
       username: 'admin',
-      password: 'admin123'
+      password: 'admin123',
+      // 性能优化配置
+      bufferSize: 1024 * 1024, // 1MB缓冲区
+      maxBufferSize: 5 * 1024 * 1024, // 5MB最大缓冲区
+      frameRate: 25, // 限制帧率
+      quality: 'medium', // 中等质量
+      hardwareAcceleration: true, // 启用硬件加速
+      lowLatency: true // 低延迟模式
     };
-    player = new window.PlayerControl(options);
-    player.on('WorkerReady', function(){
-      player.connect();  
-    });
-    player.on('DecodeStart', function(rs){
-      console.log('start decode');
-      console.log(rs);
-    });
-    player.on('PlayStart', function(rs){
-      console.log('play');
-      console.log(rs);
-    });
-    player.on('Error', function(rs){
-      console.log('error');
-      console.log(rs);
-    });
-    player.on('FileOver', function(rs){
-      console.log('recorder play over');
-      console.log(rs);
-    });
-    player.on('MSEResolutionChanged', function(rs){
-      console.log('resolution  changed');
-      console.log(rs);
-    });
-    player.on('FrameTypeChange', function(rs){
-      console.log('video encode mode changed');
-      console.log(rs);
-    });
-    player.on('audioChange', function(rs){
-      console.log('audio encode changed');
-      console.log(rs);
-    });
-    player.init(canvasElement.value, videoElement.value);
-    window.__player = player;
+    
+    try {
+      player = new window.PlayerControl(options);
+      
+      // 优化事件处理，减少不必要的日志输出
+      player.on('WorkerReady', function(){
+        player.connect();  
+      });
+      
+      player.on('DecodeStart', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 开始解码', rs);
+        }
+      });
+      
+      player.on('PlayStart', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 开始播放', rs);
+        }
+      });
+      
+      player.on('Error', function(rs){
+        console.warn('H5Player: 播放错误', rs);
+      });
+      
+      player.on('FileOver', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 录制播放结束', rs);
+        }
+      });
+      
+      player.on('MSEResolutionChanged', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 分辨率改变', rs);
+        }
+      });
+      
+      player.on('FrameTypeChange', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 视频编码模式改变', rs);
+        }
+      });
+      
+      player.on('audioChange', function(rs){
+        if (import.meta.env.DEV) {
+          console.log('H5Player: 音频编码改变', rs);
+        }
+      });
+      
+      player.init(canvasElement.value, videoElement.value);
+      window.__player = player;
+      
+    } catch (e) {
+      console.error('H5Player: 播放器初始化失败', e);
+    }
   }
 
   function login() {
@@ -175,8 +212,43 @@ onMounted(() => {
 </script>
 
 <style scoped>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
+/* 视频渲染优化 */
+.video-canvas,
+.video-element {
+  background-color: #000;
+  width: 100%;
+  height: 300px;
+  /* 硬件加速优化 */
+  transform: translateZ(0);
+  will-change: transform;
+  /* 减少重绘 */
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+  /* 优化渲染 */
+  image-rendering: optimizeSpeed;
+  image-rendering: -moz-crisp-edges;
+  image-rendering: -webkit-optimize-contrast;
+  image-rendering: optimize-contrast;
+  /* 禁用用户选择 */
+  user-select: none;
+  -webkit-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  /* 平滑缩放 */
+  object-fit: cover;
+}
+
+/* 容器优化 */
+.video-container {
+  position: relative;
+  overflow: hidden;
+  /* 启用硬件加速 */
+  transform: translateZ(0);
+  will-change: transform;
+}
+
+ #app {
+   font-family: Avenir, Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;

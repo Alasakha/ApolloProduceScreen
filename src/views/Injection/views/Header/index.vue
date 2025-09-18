@@ -22,7 +22,7 @@
                         ? 'red' 
                         : powerDiffDirection.includes('↓') 
                           ? 'lime' 
-                          : 'gray' }">
+                          : 'gray' }">&nbsp;
   {{ powerDiffDirection }}
 </span>
       </div>
@@ -46,15 +46,13 @@
 
     
       </div>
-     
-   
-      
+          
       <!-- 标题单独提取，不受 opacity 影响 -->
       <div class="tracking-wide text-5xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
-      flex  justify-center items-end flex-1">
+      flex  justify-center items-center flex-1 flex-col ">
         <div class="tracking-widest">注塑生产管理看板</div>
-         
-    </div>
+        <div class="tracking-widest text-sm mt-2">Injection Molding Production Management Board</div>
+      </div>
   
    
       <div class="flex-1 flex justify-center items-center justify-around
@@ -108,12 +106,12 @@ const powerDiffDirection = computed(() => {
 
   if (isNaN(actual) || isNaN(standard)) return ''  // 安全处理
   if (actual > standard) {
-    const delta = Number(actual - standard).toFixed(2)
-    return '↑'+delta
+    const delta = Math.round(actual - standard)
+    return '↑' + delta + 'kw·h'
   }
   if (actual < standard){
-    const delta = standard-actual  
-    return '↓' + delta
+    const delta = Math.round(standard - actual)
+    return '↓' + delta + 'kw·h'
   } 
   return '-' // 表示相等
 })

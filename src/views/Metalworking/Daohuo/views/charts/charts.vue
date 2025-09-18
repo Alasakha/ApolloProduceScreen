@@ -104,22 +104,23 @@ const handleCurrentChange = (val) => {
 
 // 表格列配置
 const tableColumns = [
-    // { prop: 'arrival_date', label: '到货审核日期', width: 120 },
-    { prop: 'business_qty', label: '到货数量', width: 150 },
-    { prop: 'caigou', label: '采购员', width: 100 },
-    // { prop: 'cangguan', label: '仓管员', width: 80 },
-    { prop: 'deliveryTime', label: '到货时间', width: 200 },
+   // { prop: 'arrival_date', label: '到货审核日期', width: 120 },
+    
+   { prop: 'caigou', label: '采购员', width: 100 },
     { prop: 'doc_no', label: '采购单号', width: 200 },
-    // { prop: 'item_code', label: '品号', width: 200 },
     { prop: 'item_description', label: '品名', width: 200 },
     { prop: 'item_specification', label: '规格', width: 200 },
-    // { prop: 'jianyan', label: '检验员', width: 200 },
     { prop: 'supplierCode', label: '供应商', width: 200 },
-    { prop: 'deliveryTime', label: '预计发货日期', width: 200 },
-    { prop: 'expectedArrivalDate', label: '到货日期', width: 200 }
-    // { prop: 'supplier_full_name', label: '供应商名称', width: 300 },
-    // { prop: 'udf021', label: '客户单号', width: 300 }
-]
+    { prop: 'business_qty', label: '到货数量', width: 150 },
+    // { prop: 'cangguan', label: '仓管员', width: 80 },
+    { prop: 'deliveryTime', label: '计划发货日期', width: 200 },
+   
+    // { prop: 'item_code', label: '品号', width: 200 },
+    
+    // { prop: 'jianyan', label: '检验员', width: 200 },
+    { prop: 'expectedArrivalDate', label: '预计到货日期', width: 200 },
+    
+    ]
 // 处理饼图点击事件
 const handleChartClick = async (params) => {
     if (params && params.name) {

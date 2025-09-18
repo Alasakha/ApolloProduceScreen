@@ -26,7 +26,8 @@
         />
       </div>
       <div class="carousel-wrapper">
-        <Abnormal />
+        <!-- <Abnormal /> -->
+        <Equipment />
       </div>
     </div>
 
@@ -85,7 +86,8 @@ import WaitingDialog from './components/WaitingDialog.vue'
 import { getStampingDoingIndex, type StampingDoingIndex } from '@/api/getStampWeldinfo'
 import { eventBus } from '@/utils/eventbus'
 import { useRoute } from 'vue-router'
-import Abnormal from './Abnormal.vue'
+// import Abnormal from './Abnormal.vue'
+import Equipment from './equipment.vue'
 const route = useRoute()
 const prodLine = route.query.prodLine as string
 

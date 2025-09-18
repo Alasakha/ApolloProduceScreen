@@ -2,17 +2,10 @@
   
 
   <div class="wrapper flex flex-col h-[70%] ">
-    <!-- <div class="title-container">
-      <h2>工单异常</h2>
-      <el-button 
-        type="primary" 
-        size="small" 
-        @click="handleDetail"
-        class="action-btn"
-      >
-        查看详情
-      </el-button>
-    </div> -->
+    <div class="title-container">
+      <!-- 标题已移到父组件 -->
+
+    </div>
         
    <!-- 如果没有数据，显示暂无数据 -->
    <div v-if="!isLoading && isDataEmpty" class="empty-container">
@@ -83,67 +76,73 @@ let chartInstance = null;
 const scrollBoardRef = ref(null);
 
 // 扩展表头，添加原因、责任人和完成期限
-const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
+const tableHeaders = ref(props.headers && props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长','警告', '原因', '责任人', '完成期限']);
+
+
+
 
 const config = reactive({
-header: tableHeaders.value,
-tableData: [],
-data: [
-  ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据','暂无数据']
-],
-index: true,
-columnWidth: [],
-align: [],
-rowNum: 5,
-showTooltip: true,
-})
+    header: [
+      '状态' , '工单号','车型名称','工单数量','应完成时间','欠数','处理时长','原因','责任人', '完成期限','警告'
+    ],
+    data: [
+      ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+    ],
+    index: true,
+    columnWidth: [50],
+    align: [],
+    rowNum:6,
+    showTooltip: true,
+  })
 
 
-const fetchData = () => {
-isLoading.value = true; // 设置加载状态
-fetchClosingRateData(prodLine)
-  .then((res) => {
-    console.log('获取到的原始数据:', res);
-    if (res && res.length > 0) {
-      rawData.value = res; // 保存原始数据
-      config.tableData = res.map(item => {
-        const completeDate = item.completeDate ?? '';
-        const reason = item.reason ?? '';
-        let isOverdue = '否';
-        // 只有处理结果和完成时间都不为空时才判断日期，否则直接为true
-        if (reason && completeDate) {
-          isOverdue = dayjs().isAfter(dayjs(completeDate), 'day') ? '是' : '否';
-        } else {
-          isOverdue = '是';
+
+  const fetchData = () => {
+    let line = Array.isArray(prodLine) ? prodLine[0] : prodLine;
+    fetchClosingRateData(line)
+      .then((res) => {
+        if (res && res.length > 0) {
+          rawData.value = res; // 保存原始数据
+          config.data = res.map(item => {
+            const completeDate = item.completeDate ?? '';
+            const reason = item.reason ?? '';
+            let isOverdue = '否';
+            // 只有处理结果和完成时间都不为空时才判断日期，否则直接为true
+            if (reason && completeDate) {
+              isOverdue = dayjs().isAfter(dayjs(completeDate), 'day') ? '是' : '否';
+            } else {
+              isOverdue = '是';
+            }
+            return [
+              '未完工',
+              item.number ?? '无',
+              // item.workNo ?? '无',
+              item.specifications ?? '无',
+              Number(item.productionQuantity) ?? '无',
+              item.dateTime  ?? '无',
+              Number(item.productionQuantity)-Number(item.finalInboundQuantity),
+              item.daysBetween != null ? item.daysBetween + '天' : '无',
+              item.reason ?? '无',
+              item.duty  ?? '无',
+              item.completeDate ?? '无',
+              isOverdue // 最后一项只用于变色，不展示
+            ];
+          });
+          isDataEmpty.value = false;
+        } 
+        else{
+         config.data = [['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']]
         }
-        return [
-          '未完工',
-          item.number ?? '无',
-          item.workNo ?? '无',
-          item.articleName ?? '无',
-          Number(item.productionQuantity) ?? '无',
-          item.dateTime ?? '无',
-          Number(item.productionQuantity) - Number(item.inboundQuantity),
-          item.daysBetween + '天' ?? '无',
-          isOverdue
-        ]
+      })
+      .catch((error) => {
+        console.error('Error fetching data:', error);  // 错误回调
+        isDataEmpty.value = true; // 如果发生错误，显示暂无数据
+      })
+      .finally(() => {
+        isLoading.value = false;  // 无论成功失败，都结束加载
       });
-      config.data = config.tableData; // Keep data in sync
-      isDataEmpty.value = false;
-    } else {
-      isDataEmpty.value = true;
-      console.log('没有获取到数据');
-    }
-  })
-  .catch((error) => {
-    console.error('获取数据失败:', error);
-    isDataEmpty.value = true;
-    ElMessage.error('获取数据失败，请稍后重试');
-  })
-  .finally(() => {
-    isLoading.value = false;
-  });
-};
+  };
+
 
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
@@ -181,7 +180,7 @@ try {
   }
 
   // 转换数据格式
-  tableData.value = config.data.map((row) => {
+  const convertedData = config.data.map((row) => {
     if (!Array.isArray(row)) {
       console.error('行数据格式错误:', row);
       return null;
@@ -194,11 +193,13 @@ try {
     return rowData;
   }).filter(Boolean); // 过滤掉null值
 
-  if (tableData.value.length === 0) {
+  if (convertedData.length === 0) {
     throw new Error('转换后的数据为空');
   }
 
-  console.log('转换后的表格数据:', tableData.value);
+  // 更新config.tableData，这样DetailTable组件就能获取到正确的数据
+  config.tableData = convertedData;
+  console.log('转换后的表格数据:', convertedData);
   detailDialogVisible.value = true;
 } catch (error) {
   console.error('处理数据失败:', error);
@@ -306,7 +307,8 @@ defineExpose({
 handleReasonUpdate,
 config,
 rawData,
-fetchData
+fetchData,
+handleDetail
 });
 
 
@@ -408,5 +410,38 @@ color: #e03030 !important;
 .overdue-cell {
 color: #e03030 !important;
 font-weight: bold;
+}
+
+/* 修复ScrollBoard对齐问题 */
+:deep(.ScrollBoard .header-item) {
+  text-align: center !important;
+}
+
+:deep(.ScrollBoard .header-item[align="center"]) {
+  text-align: center !important;
+}
+
+:deep(.ScrollBoard .header-item[align="right"]) {
+  text-align: right !important;
+}
+
+:deep(.ScrollBoard .header-item[align="left"]) {
+  text-align: left !important;
+}
+
+:deep(.ScrollBoard .ceil) {
+  text-align: center !important;
+}
+
+:deep(.ScrollBoard .ceil[align="center"]) {
+  text-align: center !important;
+}
+
+:deep(.ScrollBoard .ceil[align="right"]) {
+  text-align: right !important;
+}
+
+:deep(.ScrollBoard .ceil[align="left"]) {
+  text-align: left !important;
 }
 </style>

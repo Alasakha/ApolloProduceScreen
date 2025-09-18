@@ -248,6 +248,7 @@ const updateChart = () => {
     const cjData = hourData.value.map(item => item.cj)
     const hchData = hourData.value.map(item => item.hch)
     const wjData = hourData.value.map(item => item.wj)
+    const planData = hourData.value.map(item => item.plan)
 
     // 添加调试信息
     console.log('更新图表数据:', { hours, cjData, hchData, wjData })
@@ -272,7 +273,7 @@ const updateChart = () => {
             textStyle: { color: '#ffffff' }
         },
         legend: {
-            data: ['车架', '后叉', '尾架'],
+            data: ['车架', '后叉', '尾架', '计划产量'],
             top: 0,
             right: 0,
             textStyle: { 
@@ -338,6 +339,16 @@ const updateChart = () => {
                             { offset: 1, color: 'rgba(0, 238, 255, 0.05)' }
                         ]
                     }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#00eeff',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             },
             {
@@ -365,6 +376,16 @@ const updateChart = () => {
                             { offset: 1, color: 'rgba(0, 255, 159, 0.05)' }
                         ]
                     }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#00ff9f',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             },
             {
@@ -392,6 +413,53 @@ const updateChart = () => {
                             { offset: 1, color: 'rgba(255, 159, 0, 0.05)' }
                         ]
                     }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#ff9f00',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
+                }
+            },
+            {
+                name: '计划产量',
+                type: 'line',
+                data: planData,
+                smooth: true,
+                lineStyle: { 
+                    color: '#007bff', // 修改为蓝色
+                    width: 3,
+                    shadowColor: 'rgba(0, 123, 255, 0.5)',
+                    shadowBlur: 10
+                },
+                itemStyle: { 
+                    color: '#007bff',
+                    borderColor: '#ffffff',
+                    borderWidth: 2
+                },
+                areaStyle: {
+                    color: {
+                        type: 'linear',
+                        x: 0, y: 0, x2: 0, y2: 1,
+                        colorStops: [
+                            { offset: 0, color: 'rgba(0, 123, 255, 0.3)' },
+                            { offset: 1, color: 'rgba(0, 123, 255, 0.05)' }
+                        ]
+                    }
+                },
+                label: {
+                    show: true,
+                    position: 'top',
+                    formatter: '{c}',
+                    fontSize: 12,
+                    color: '#007bff',
+                    fontWeight: 'bold',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2
                 }
             }
         ]
@@ -507,7 +575,6 @@ const handleResize = () => {
         rgba(0, 102, 255, 0.9) 100%);
     padding: 12px 20px;
     border-radius: 8px;
-    margin-bottom: 20px;
     display: flex;
     justify-content: space-between;
     align-items: center;

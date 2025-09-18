@@ -1,229 +1,152 @@
 <template>
-  <div class="h-[22vh] w-full p-2">
-    <dv-border-box-2>
-      <div class="flex flex-col h-full">
-        <!-- 标题 -->
-        <div class="text-[#00eeff] text-2xl font-bold px-8 py-2 flex justify-between items-center">
-          <span>000025061899公司用气总表</span>
-          <span class="text-gray-400 text-sm">
-            数据时间：{{ new Date().toLocaleString() }}
-          </span>
-        </div>
-
-        <!-- 内容区域 -->
-        <div class="flex-1 flex  justify-between px-20">
-          <!-- 主要用气数据行 -->
-          <div class="flex w-full">
-            <!-- 年度排放 -->
-            <div class="w-[33%] flex flex-col">
-              <div class="text-[#00eeff] text-xl mb-4">年度用气</div>
-              <div class="flex gap-4 items-start h-full">
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center">
-                    <span class="text-[#00eeff] w-14">实际：</span>
-                    <span class="text-[#00eeff] text-2xl">{{actualYear.toFixed(1)}}m³</span>
-                  </div>
-                  <div class="text-red-500 text-sm">同比：{{yearDiff.toFixed(1)}}m³</div>
-                </div>
-              </div>
-            </div>
-            <div class="relative">
-              <dv-water-level-pond :config="waterConfig1" style="width:140px;height:140px" />
-            </div>
-          </div>
-
-          <!-- 月度用气 -->
-          <div class="flex w-full">
-            <div class="w-[33%] flex flex-col">
-              <div class="text-[#00eeff] text-xl mb-4">月度用气</div>
-              <div class="flex gap-4 items-start h-full">
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center">
-                    <span class="text-[#00eeff] w-14">实际：</span>
-                    <span class="text-[#00eeff] text-2xl">{{actualMonth.toFixed(1)}}m³</span>
-                  </div>
-                  <div class="text-red-500 text-sm">同比：{{monthDiff.toFixed(1)}}m³</div>
-                </div>
-              </div>
-            </div>
-            <div class="relative">
-              <dv-water-level-pond :config="waterConfig2" style="width:140px;height:140px" />
-            </div>
-          </div>
-
-          <!-- 日用气 -->
-          <div class="flex w-full">
-            <div class="w-[33%] flex flex-col">
-              <div class="text-[#00eeff] text-xl mb-4">日用气</div>
-              <div class="flex gap-4 items-start h-full">
-                <div class="flex flex-col gap-2">
-                  <div class="flex items-center">
-                    <span class="text-[#00eeff] w-14">实际：</span>
-                    <span class="text-[#00eeff] text-2xl">{{actualDay.toFixed(1)}}m³</span>
-                  </div>
-                  <div class="text-red-500 text-sm">同比：{{dayDiff.toFixed(1)}}m³</div>
-                </div>
-              </div>
-            </div>
-            <div class="relative">
-              <dv-water-level-pond :config="waterConfig3" style="width:140px;height:140px" />
-            </div>
-          </div>
-          
-          <!-- 平均每台用气数据行 -->
-          <div class="flex w-full mt-4">
-            <!-- 平均每台日气量 -->
-            <div class="w-[50%] flex flex-col">
-              <div class="text-[#00eeff] text-lg mb-2">平均每台日气量</div>
-              <div class="flex items-center">
-                <span class="text-[#00eeff] w-20">数值：</span>
-                <span class="text-[#00eeff] text-xl">{{averageDailyGasPower.toFixed(2)}}m³/台</span>
-              </div>
-            </div>
-            
-            <!-- 平均每台月气量 -->
-            <div class="w-[50%] flex flex-col">
-              <div class="text-[#00eeff] text-lg mb-2">平均每台月气量</div>
-              <div class="flex items-center">
-                <span class="text-[#00eeff] w-20">数值：</span>
-                <span class="text-[#00eeff] text-xl">{{averageMonthlyGasPower.toFixed(2)}}m³/台</span>
-              </div>
-            </div>
-          </div>
-          
-          <!-- 产量数据行 -->
-          <div class="flex w-full mt-4">
-            <!-- 当日产量 -->
-            <div class="w-[50%] flex flex-col">
-              <div class="text-[#00eeff] text-lg mb-2">当日产量</div>
-              <div class="flex items-center">
-                <span class="text-[#00eeff] w-20">数值：</span>
-                <span class="text-[#00eeff] text-xl">{{dailyProduction}}台</span>
-              </div>
-            </div>
-            
-            <!-- 当月产量 -->
-            <div class="w-[50%] flex flex-col">
-              <div class="text-[#00eeff] text-lg mb-2">当月产量</div>
-              <div class="flex items-center">
-                <span class="text-[#00eeff] w-20">数值：</span>
-                <span class="text-[#00eeff] text-xl">{{monthlyProduction}}台</span>
-              </div>
-            </div>
-          </div>
-        </div>
+  <div class="energy-trend-container ml-4 mr-4">
+    <!-- 大标题 -->
+    <div class="main-header">
+      <h1 class="main-title text-xl">月度能耗趋势</h1>
+      <div class="data-time">
+        数据时间：{{ new Date().toLocaleString() }}
       </div>
-    </dv-border-box-2>
+    </div>
+    
+    <!-- 三个柱状图区域 -->
+    <div class="charts-container">
+      <!-- 电能检测 -->
+      <EnergyChart
+        title="电能"
+        :data="monthlyData.electric"
+        :month-labels="monthLabels"
+        color="#007bff"
+        unit="kWh"
+      />
+
+      <!-- 气能监测 -->
+      <EnergyChart
+        title="气能"
+        :data="monthlyData.gas"
+        :month-labels="monthLabels"
+        color="#ff9f00"
+        unit="m³"
+      />
+
+      <!-- 水能监测 -->
+      <EnergyChart
+        title="水能"
+        :data="monthlyData.water"
+        :month-labels="monthLabels"
+        color="#00ff9f"
+        unit="m³"
+      />
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, computed } from 'vue'
-import { useEnergyStore } from '@/store/energy'
+import { ref, onMounted } from 'vue'
+import { getElectricPowerYear, getGasPower } from '@/api/enery'
+import EnergyChart from './components/EnergyChart.vue'
 
-// 获取能源store
-const energyStore = useEnergyStore()
-
-// 用气数据标准值
-const standardYear = ref(9000)
-const standardMonth = ref(900)
-const standardDay = ref(30)
-
-// 从store中获取用气数据
-const gasData = computed(() => energyStore.gasData)
-const dailyGasData = computed(() => energyStore.dailyData.filter(item => item.machCode === '000025061899'))
-const monthlyGasData = computed(() => energyStore.monthlyData.filter(item => item.machCode === '000025061899'))
-
-// 计算实际用气量和差值
-const actualYear = computed(() => {
-  const data = gasData.value.find(item => item.machCode === '000025061899')
-  return data ? parseFloat(String(data.numberPower)) || 0 : 0
+// 六个月的数据
+const monthlyData = ref({
+  electric: {
+    standard: [1200, 1300, 1250, 1350, 1400, 1450], // 六个月电力标准用量
+    actual: [1150, 1280, 1200, 1320, 1380, 1420]     // 六个月电力实际用量
+  },
+  gas: {
+    standard: [800, 850, 820, 880, 900, 920],        // 六个月气标准用量
+    actual: [780, 830, 800, 860, 880, 900]           // 六个月气实际用量
+  },
+  water: {
+    standard: [600, 650, 620, 680, 700, 720],        // 六个月水标准用量
+    actual: [580, 630, 600, 660, 680, 700]          // 六个月水实际用量
+  }
 })
 
-const actualMonth = computed(() => {
-  const data = monthlyGasData.value.find(item => item.machCode === '000025061899')
-  return data ? parseFloat(String(data.numberPower)) || 0 : 0
-})
+// 月份标签
+const monthLabels = ['1月', '2月', '3月', '4月', '5月', '6月']
 
-const actualDay = computed(() => {
-  const data = dailyGasData.value.find(item => item.machCode === '000025061899')
-  return data ? parseFloat(String(data.numberPower)) || 0 : 0
-})
-
-const yearDiff = computed(() => actualYear.value - standardYear.value)
-const monthDiff = computed(() => actualMonth.value - standardMonth.value)
-const dayDiff = computed(() => actualDay.value - standardDay.value)
-
-// 计算平均每台用气量
-const averageDailyGasPower = computed(() => energyStore.getAverageDailyGasPower)
-const averageMonthlyGasPower = computed(() => energyStore.getAverageMonthlyGasPower)
-
-// 计算产量
-const dailyProduction = computed(() => energyStore.getDailyProduction)
-const monthlyProduction = computed(() => energyStore.getMonthlyProduction)
-
-// 数据更新时间
-const lastUpdateTime = ref(new Date())
-
-// 水位图配置
-const waterConfig1 = ref({
-  data: [80],
-  shape: 'round',
-  waveHeight: 0.1,  // 降低波浪高度
-  waveNum: 1,      // 减少波浪数量
-  colors: ['rgba(0, 238, 255, 0.6)']  // 添加透明度
-})
-
-const waterConfig2 = ref({
-  data: [80],
-  shape: 'round',
-  waveHeight: 0.1,
-  waveNum: 1,
-  colors: ['rgba(0, 238, 255, 0.6)']
-})
-
-const waterConfig3 = ref({
-  data: [80],
-  shape: 'round',
-  waveHeight: 0.1,
-  waveNum: 1,
-  colors: ['rgba(0, 238, 255, 0.6)']
-})
-
-// 更新数据
-const updateData = () => {
-  // 更新水位图配置，使用computed值
-  waterConfig1.value.data = [Math.min(actualYear.value / standardYear.value * 100, 100)]
-  waterConfig2.value.data = [Math.min(actualMonth.value / standardMonth.value * 100, 100)]
-  waterConfig3.value.data = [Math.min(actualDay.value / standardDay.value * 100, 100)]
-
-  // 更新时间
-  lastUpdateTime.value = new Date()
+// 获取数据
+const fetchData = async () => {
+  try {
+    // 获取电能数据
+    const electricData = await getElectricPowerYear()
+    if (electricData && electricData.data) {
+      // 处理电能数据
+      console.log('电能数据:', electricData.data)
+    }
+    
+    // 获取气能数据
+    const gasData = await getGasPower('2024-01')
+    if (gasData && gasData.data) {
+      // 处理气能数据
+      console.log('气能数据:', gasData.data)
+    }
+  } catch (error) {
+    console.error('获取数据失败:', error)
+  }
 }
 
-let timer: NodeJS.Timeout
-onMounted(() => {
-  updateData()
-  timer = setInterval(updateData, 3000)
-})
-
-onUnmounted(() => {
-  clearInterval(timer)
+onMounted(async () => {
+  await fetchData()
 })
 </script>
 
 <style scoped>
-.animate-pulse {
-  animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+.energy-trend-container {
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(26,79,172,0.7) 100%);
+  max-height: 28vh;
+  color: #fff;
 }
 
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: .5; }
+.main-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  border-radius: 16px;
+  border: 1px solid rgba(0, 123, 255, 0.3);
+  backdrop-filter: blur(10px);
 }
 
-:deep(.dv-water-level-pond) {
-  --svg-bg-color: transparent;
-  --svg-border-color: #0066ff;
+.main-title {
+  font-weight: 700;
+  color: #007bff;
+  margin: 0 0 15px 0;
+  text-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
+  letter-spacing: 2px;
+}
+
+.data-time {
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 400;
+}
+
+.charts-container {
+  display: flex;
+  gap: 20px;
+  justify-content: space-between;
+  align-items: stretch;
+}
+
+/* 响应式设计 */
+@media (max-width: 1200px) {
+  .charts-container {
+    flex-direction: column;
+    gap: 30px;
+  }
+}
+
+@media (max-width: 768px) {
+  .energy-trend-container {
+    padding: 15px;
+  }
+  
+  .main-title {
+    font-size: 24px;
+  }
+  
+  .charts-container {
+    gap: 20px;
+  }
 }
 </style>

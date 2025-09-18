@@ -34,11 +34,10 @@
             <div class="stat-label">在研项目数</div>
           </div>
           
-          <div class="stat-card patents ">
+          <div class="stat-card patents">
             <div class="stat-icon">📜</div>
             <div class="stat-value">{{ totalPatents }}</div>
             <div class="stat-label">专利总数</div>
-
           </div>
         </div>
 
@@ -321,34 +320,39 @@ onUnmounted(() => {
 .main-stats {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 16px;
+  gap: 12px;
 }
 
 .stat-card {
   background: rgba(0, 212, 255, 0.05);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 8px;
-  padding: 16px;
+  padding: 12px;
   text-align: center;
   position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .stat-icon {
-  font-size: 24px;
-  margin-bottom: 8px;
+  font-size: 20px;
+  margin-bottom: 6px;
 }
 
 .stat-value {
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   color: var(--primary-blue);
-  margin-bottom: 8px;
+  margin-bottom: 4px;
+  line-height: 1;
 }
 
 .stat-label {
-  font-size: 14px;
-  color: var(--text-primary);
-  margin-bottom: 4px;
+  font-size: 12px;
+  color: #E5E7EB;
+  font-weight: 500;
 }
 
 .stat-source {
@@ -375,38 +379,38 @@ onUnmounted(() => {
 }
 
 .patent-breakdown {
-  color: var(--text-primary);
-  display: flex;
-  flex-direction: row; /* 横向排列 */
+  color: #E5E7EB;
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
   gap: 8px;
   margin-top: 12px;
   width: 100%;
-  flex-wrap: wrap; /* 允许换行 */
 }
 
 .patent-item {
   display: flex;
-  flex-direction: column; /* 内部垂直排列 */
+  flex-direction: column;
   align-items: center;
-  padding: 8px 12px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  border-bottom: 2px solid rgba(0, 212, 255, 0.6);
-  flex: 1; /* 平均分配宽度 */
-  min-width: 60px; /* 最小宽度 */
+  padding: 8px 6px;
+  background: rgba(0, 212, 255, 0.05);
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 6px;
+  text-align: center;
 }
 
 .patent-type {
   font-size: 10px;
-  color: var(--text-primary);
+  color: #9CA3AF;
   margin-bottom: 4px;
   text-align: center;
+  line-height: 1.2;
 }
 
 .patent-count {
-  font-size: 14px;
+  font-size: 16px;
   color: var(--primary-blue);
   font-weight: 600;
+  line-height: 1;
 }
 
 .summary-info {
@@ -626,19 +630,54 @@ onUnmounted(() => {
 
 
 /* 响应式设计 */
-@media (max-width: 768px) {
+@media (max-width: 2000px) {
   .main-stats {
-    grid-template-columns: 1fr;
-    gap: 12px;
+    gap: 8px;
   }
   
   .stat-card {
-    padding: 6px;
-
+    padding: 8px;
+  }
+  
+  .stat-icon {
+    font-size: 16px;
+    margin-bottom: 4px;
   }
   
   .stat-value {
-    font-size: 24px;
+    font-size: 18px;
+  }
+  
+  .stat-label {
+    font-size: 10px;
+  }
+
+  .header-icon {
+    font-size: 16px;
+  }
+
+  .header-title {
+    font-size: 14px;
+  }
+
+  .component-header {
+    padding: 12px;
+  }
+  
+  .patent-breakdown {
+    gap: 6px;
+  }
+  
+  .patent-item {
+    padding: 6px 4px;
+  }
+  
+  .patent-type {
+    font-size: 9px;
+  }
+  
+  .patent-count {
+    font-size: 14px;
   }
 }
 

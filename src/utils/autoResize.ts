@@ -34,10 +34,20 @@ function autoResize(
         width.value = dom.value ? dom.value.clientWidth : 0;
         height.value = dom.value ? dom.value.clientHeight : 0;
  
-        if (!dom.value)
-          console.warn("DataV: Failed to get dom node, component rendering may be abnormal!");
-        else if (!width.value || !height.value)
-          console.warn("DataV: Component width or height is 0px, rendering abnormality may occur!");
+        // 减少警告频率，只在开发环境且确实有问题时才警告
+        if (import.meta.env.DEV) {
+          if (!dom.value) {
+            console.warn("DataV: Failed to get dom node, component rendering may be abnormal!");
+          } else if (!width.value || !height.value) {
+            // 检查是否是因为组件还未完全渲染导致的临时0尺寸
+            const rect = dom.value.getBoundingClientRect();
+            if (rect.width === 0 && rect.height === 0) {
+              // 如果getBoundingClientRect也返回0，说明组件确实没有尺寸
+              console.warn("DataV: Component width or height is 0px, rendering abnormality may occur!");
+            }
+            // 如果getBoundingClientRect有尺寸但clientWidth/Height为0，可能是CSS问题，不警告
+          }
+        }
  
         if (typeof onResize === "function" && resize) onResize();
         resolve(true);

@@ -132,39 +132,22 @@ const fetchEnergyData = async (isRetry = false) => {
     }
   } catch (err) {
     console.error('获取能耗数据失败:', err)
+    error.value = err.message || '网络请求失败'
     
-    // 检查是否是网络错误或服务器错误
-    const isNetworkError = err.code === 'NETWORK_ERROR' || err.code === 'ECONNABORTED'
-    const isServerError = err.response?.status === 500 || err.response?.status === 502 || err.response?.status === 503
-    
-    if (isNetworkError || isServerError) {
-      error.value = '服务器连接异常，使用模拟数据'
-      console.warn('服务器连接异常，使用模拟数据')
-      // 立即使用模拟数据
+    // 重试逻辑
+    if (retryCount.value < maxRetries && !isRetry) {
+      retryCount.value++
+      console.log(`🔄 第${retryCount.value}次重试...`)
+      setTimeout(() => fetchEnergyData(true), 2000 * retryCount.value) // 递增延迟
+    } else if (retryCount.value >= maxRetries) {
+      console.warn('重试次数已达上限，使用模拟数据')
+      // 使用模拟数据作为备用
       energyData.value = {
         electricity: 125.6,
         water: 8.7,
         gas: 15.2
       }
       lastUpdateTime.value = new Date().toLocaleTimeString()
-    } else {
-      error.value = err.message || '网络请求失败'
-      
-      // 重试逻辑
-      if (retryCount.value < maxRetries && !isRetry) {
-        retryCount.value++
-        console.log(`🔄 第${retryCount.value}次重试...`)
-        setTimeout(() => fetchEnergyData(true), 2000 * retryCount.value) // 递增延迟
-      } else if (retryCount.value >= maxRetries) {
-        console.warn('重试次数已达上限，使用模拟数据')
-        // 使用模拟数据作为备用
-        energyData.value = {
-          electricity: 125.6,
-          water: 8.7,
-          gas: 15.2
-        }
-        lastUpdateTime.value = new Date().toLocaleTimeString()
-      }
     }
   } finally {
     loading.value = false
@@ -204,8 +187,8 @@ onUnmounted(() => {
 .component-header {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 16px;
+  /* gap: 12px;
+  padding: 16px; */
   background: rgba(0, 212, 255, 0.1);
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
 }
@@ -444,5 +427,37 @@ onUnmounted(() => {
 @keyframes pulse {
   0%, 100% { opacity: 1; }
   50% { opacity: 0.5; }
+}
+
+
+/* 响应式设计 */
+@media (max-width: 2000px) {
+  .energy-metrics {
+    gap: 10px;
+  }
+  
+  .metric-card {
+    padding: 6px;
+  }
+  
+  .metric-value {
+    font-size: 20px;
+  }
+  
+  .metric-label {
+    font-size: 13px;
+  }
+
+  .header-icon {
+    font-size: 12px;
+  }
+
+  .component-header {
+    padding: 6px;
+  }
+
+  .header-title {
+    font-size: 12px;
+  }
 }
 </style> 

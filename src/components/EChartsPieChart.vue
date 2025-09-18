@@ -5,7 +5,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted, watch, nextTick } from 'vue'
+import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
 import * as echarts from 'echarts'
 import type { EChartsOption, ECharts } from 'echarts'
 
@@ -25,6 +25,8 @@ interface Props {
     showLabel?: boolean
     showValue?: boolean
     showPointer?: boolean
+    emptyText?: string
+    emptyTextColor?: string
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -33,7 +35,9 @@ const props = withDefaults(defineProps<Props>(), {
     center: () => ['50%', '50%'],
     showLabel: true,
     showValue: true,
-    showPointer: true
+    showPointer: true,
+    emptyText: '暂无数据',
+    emptyTextColor: '#909399'
 })
 
 // 定义事件
@@ -80,9 +84,25 @@ const initChart = () => {
 
 // 获取图表配置
 const getChartOption = (): EChartsOption => {
+    // 检查是否有数据
+    const hasData = props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
+
+// 当没有有效数据时，创建一个默认的"暂无数据"项
+const chartData = computed(() => {
+    if (hasData) {
+        return props.data
+    } else {
+        return [{
+            name: '暂无数据',
+            value: 0,
+            color: '#3b7032' // 环保绿色
+        }]
+    }
+})
+    
     return {
         title: props.title ? {
-            text: props.title,
+            // text: props.title,
             left: 'center',
             top: '5%',
             textStyle: {
@@ -95,7 +115,7 @@ const getChartOption = (): EChartsOption => {
         tooltip: {
             trigger: 'item',
             formatter: (params: any) => {
-                return `${params.name}: ${params.value} (${params.percent}%)`
+                return `${params.name}: ${params.value}(${params.percent}%)`
             },
             backgroundColor: 'rgba(255,255,255,0.95)',
             borderColor: '#ddd',
@@ -126,7 +146,7 @@ const getChartOption = (): EChartsOption => {
                 type: 'pie',
                 radius: props.radius,
                 center: props.center,
-                data: props.data.map((item, index) => ({
+                data: chartData.value.map((item, index) => ({
                     name: item.name,
                     value: item.value,
                     itemStyle: {
@@ -140,7 +160,7 @@ const getChartOption = (): EChartsOption => {
                     position: 'outside',
                     formatter: (params: any) => {
                         if (props.showValue && props.showPointer) {
-                            return `${params.name}\n${params.value}`
+                            return `${params.name}\n${params.value}(${params.percent}%)`
                         } else if (props.showValue) {
                             return `${params.value}`
                         } else if (props.showPointer) {
@@ -149,7 +169,7 @@ const getChartOption = (): EChartsOption => {
                         return ''
                     },
                     fontSize: 13,
-                    fontWeight: 'bold',
+                    // fontWeight: 'bold',
                     // 使用白色字体
                     color: '#fff',
                     // 添加文字阴影，提高可读性
@@ -193,6 +213,21 @@ const getChartOption = (): EChartsOption => {
                 animationType: 'scale',
                 animationEasing: 'elasticOut',
                 animationDelay: (idx: number) => idx * 200
+            }
+        ],
+        
+        // 空数据时的处理
+        graphic: hasData ? undefined : [
+            {
+                type: 'text',
+                left: 'center',
+                top: 'middle',
+                style: {
+                    text: props.emptyText,
+                    fontSize: 16,
+                    fontWeight: 'bold',
+                    fill: props.emptyTextColor
+                }
             }
         ]
     }

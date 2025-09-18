@@ -3,7 +3,9 @@
 
   <div class="wrapper flex flex-col h-[70%] w-full ">
     <div class="title-container">
-      <h2>工单异常</h2>
+      <div class="title-section">
+        <h3>工单异常</h3>
+      </div>
       <el-button 
         type="primary" 
         size="small" 
@@ -14,17 +16,12 @@
       </el-button>
     </div>
         
-   <!-- 如果没有数据，显示暂无数据 -->
-   <div v-if="!isLoading && isDataEmpty" class="empty-container text-white">
-     暂无数据
-   </div>
-   
-   <!-- 数据加载完成且非空时显示图表 -->
+   <!-- 数据加载完成时显示图表 -->
     <div class="tablebox w-full h-[90%]">
        <!-- 如果正在加载，显示 loading -->
      <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
 
-      <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
+      <ScrollBoard v-if="!isLoading" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
     </div>
   </div>
 
@@ -83,13 +80,13 @@ let chartInstance = null;
 const scrollBoardRef = ref(null);
 
 // 扩展表头，添加原因、责任人和完成期限
-const tableHeaders = ref(props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
+const tableHeaders = ref(props.headers && props.headers.length > 0 ? props.headers : ['状态', '客户单号', '工单号', '品名', '工单数量', '应完成时间', '欠数', '处理时长', '原因', '责任人', '完成期限']);
 
 const config = reactive({
 header: tableHeaders.value,
 tableData: [],
 data: [
-  ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据','暂无数据']
+  ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
 ],
 index: true,
 columnWidth: [50, 80, 100, 120, 80, 100, 80, 80, 100, 80, 100],
@@ -118,26 +115,32 @@ fetchClosingRateData(prodLine)
         }
         return [
           '未完工',
-          item.number ?? '无',
-          item.workNo ?? '无',
-          item.articleName ?? '无',
-          Number(item.productionQuantity) ?? '无',
-          item.dateTime ?? '无',
+          item.number ?? '暂无数据',
+          item.workNo ?? '暂无数据',
+          item.articleName ?? '暂无数据',
+          Number(item.productionQuantity) ?? '暂无数据',
+          item.dateTime ?? '暂无数据',
           Number(item.productionQuantity) - Number(item.inboundQuantity),
-          item.daysBetween + '天' ?? '无',
+          item.daysBetween + '天' ?? '暂无数据',
           isOverdue
         ]
       });
       config.data = config.tableData; // Keep data in sync
       isDataEmpty.value = false;
     } else {
-      isDataEmpty.value = true;
-      console.log('没有获取到数据');
+      isDataEmpty.value = false; // 改为false，让轮播图显示
+      config.data = [
+        ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+      ];
+      console.log('没有获取到数据，显示暂无数据轮播');
     }
   })
   .catch((error) => {
     console.error('获取数据失败:', error);
-    isDataEmpty.value = true;
+    isDataEmpty.value = false; // 改为false，让轮播图显示
+    config.data = [
+      ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+    ];
     ElMessage.error('获取数据失败，请稍后重试');
   })
   .finally(() => {
@@ -189,7 +192,7 @@ try {
 
     const rowData = {};
     config.header.forEach((header, index) => {
-      rowData[header] = row[index] || '无';
+      rowData[header] = row[index] || '暂无数据';
     });
     return rowData;
   }).filter(Boolean); // 过滤掉null值
@@ -325,17 +328,35 @@ return (ci === lastIndex - 1 && row.ceils[lastIndex] === '是') ? 'overdue-cell'
 <style scoped>
 .wrapper {
 height: 100%;
+width: 100%;
+box-sizing: border-box;
 }
 
 .title-container {
 display: flex;
 justify-content: space-between;
 align-items: center;
-margin-bottom: 15px;
+margin-bottom: 8px;
+width: 100%;
+}
+
+.title-section {
+background: linear-gradient(135deg, #1e90ff, #4169e1);
+padding: 8px 12px;
+border-radius: 6px;
+text-align: center;
+flex: 1;
+margin-right: 12px;
+}
+
+.title-section h3 {
+margin: 0;
+color: white;
+font-size: 14px;
 }
 
 .action-btn {
-margin-left: auto;
+flex-shrink: 0;
 }
 
 .box1 {
@@ -347,15 +368,7 @@ color: aliceblue;
 padding: 20px;
 }
 
-h2 {
-top: 0.5vh;
-left: 1vw;
-margin: 0;
-font-size: 1vw;
-font-weight: bold;
-margin-bottom: 10px;
-color: #ffffff;
-}
+/* 移除旧的h2样式，使用新的h3样式 */
 
 .detail-table {
 max-height: 60vh;
@@ -407,7 +420,21 @@ color: #e03030 !important;
 }
 
 .overdue-cell {
-color: #e03030 !important;
-font-weight: bold;
+  color: #e03030 !important;
+  font-weight: bold;
+}
+
+/* 暂无数据行的样式 */
+:deep(.dv-scroll-board .header) {
+  background-color: #0d47a1;
+  color: #fff;
+}
+
+:deep(.dv-scroll-board .rows .row-item) {
+  background-color: rgba(255, 255, 255, 0.1);
+}
+
+:deep(.dv-scroll-board .rows .row-item:nth-child(odd)) {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 </style>

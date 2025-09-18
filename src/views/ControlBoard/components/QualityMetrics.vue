@@ -6,60 +6,118 @@
     </div>
     
     <div class="content-area">
-      <!-- 常规客户总直通率 -->
-      <div class="total-passrate-section">
-        <div class="section-header">
-          <div class="section-title">常规客户总直通率</div>
-          <!-- <div class="header-actions">
-            <button class="detail-btn" @click="showDetail">查看详情</button>
-            <button class="reason-btn" @click="showReasonDialog">填写原因/对策</button>
-          </div> -->
+      <div class="scrollable-content">
+        <!-- 第一行：A类客户数据 -->
+        <div class="metrics-row-container">
+          <!-- A类客户总直通率 -->
+          <div class="total-passrate-section">
+            <div class="section-header">
+              <div class="section-title">A类客户总直通率</div>
+              <!-- <div class="header-actions">
+                <button class="detail-btn" @click="showADetail">查看详情</button>
+              </div> -->
+            </div>
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">目标</div>
+                <div class="metric-value">{{ aClassData.totalPassRate.target }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">实际</div>
+                <div class="metric-value">{{ aClassData.totalPassRate.actual }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">达成率</div>
+                <div class="metric-value" :class="getAchievementClass(aClassData.totalPassRate.achievement)">
+                  {{ aClassData.totalPassRate.achievement }}%
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- A类客户年度数据 -->
+          <div class="annual-data-section">
+            <div class="section-header">
+              <div class="section-title">A类客户年度数据</div>
+              <!-- <div class="header-actions">
+                <button class="detail-btn" @click="showAAnnualDetail">查看详情</button>
+              </div> -->
+            </div>
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">年度目标</div>
+                <div class="metric-value">{{ aClassData.annualData.target }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">年度累计</div>
+                <div class="metric-value">{{ aClassData.annualData.plan }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">达成率</div>
+                <div class="metric-value" :class="getAchievementClass(aClassData.annualData.achievement)">
+                  {{ aClassData.annualData.achievement }}%
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
-        <div class="metrics-row">
-          <div class="metric-item">
-            <div class="metric-label">目标</div>
-            <div class="metric-value">{{ regularData.totalPassRate.target }}%</div>
+
+        <!-- 第二行：常规客户数据 -->
+        <div class="metrics-row-container">
+          <!-- 常规客户总直通率 -->
+          <div class="total-passrate-section">
+            <div class="section-header">
+              <div class="section-title">常规客户总直通率</div>
+              <!-- <div class="header-actions">
+                <button class="detail-btn" @click="showDetail">查看详情</button>
+                <button class="reason-btn" @click="showReasonDialog">填写原因/对策</button>
+              </div> -->
+            </div>
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">目标</div>
+                <div class="metric-value">{{ regularData.totalPassRate.target }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">实际</div>
+                <div class="metric-value">{{ regularData.totalPassRate.actual }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">达成率</div>
+                <div class="metric-value" :class="getAchievementClass(regularData.totalPassRate.achievement)">
+                  {{ regularData.totalPassRate.achievement }}%
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="metric-item">
-            <div class="metric-label">实际</div>
-            <div class="metric-value">{{ regularData.totalPassRate.actual }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">达成率</div>
-            <div class="metric-value" :class="getAchievementClass(regularData.totalPassRate.achievement)">
-              {{ regularData.totalPassRate.achievement }}%
+
+          <!-- 常规客户年度数据 -->
+          <div class="annual-data-section">
+            <div class="section-header">
+              <div class="section-title">常规客户年度数据</div>
+              <!-- <div class="header-actions">
+                <button class="detail-btn" @click="showAnnualDetail">查看详情</button>
+              </div> -->
+            </div>
+            <div class="metrics-row">
+              <div class="metric-item">
+                <div class="metric-label">年度目标</div>
+                <div class="metric-value">{{ regularData.annualData.target }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">年度累计</div>
+                <div class="metric-value">{{ regularData.annualData.plan }}%</div>
+              </div>
+              <div class="metric-item">
+                <div class="metric-label">达成率</div>
+                <div class="metric-value" :class="getAchievementClass(regularData.annualData.achievement)">
+                  {{ regularData.annualData.achievement }}%
+                </div>
+              </div>
             </div>
           </div>
         </div>
       </div>
-
-      <!-- 常规客户年度数据 -->
-      <div class="annual-data-section">
-        <div class="section-header">
-          <div class="section-title">常规客户年度数据</div>
-          <!-- <div class="header-actions">
-            <button class="detail-btn" @click="showAnnualDetail">查看详情</button>
-          </div> -->
-        </div>
-        <div class="metrics-row">
-          <div class="metric-item">
-            <div class="metric-label">年度目标</div>
-            <div class="metric-value">{{ regularData.annualData.target }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">年度累计</div>
-            <div class="metric-value">{{ regularData.annualData.plan }}%</div>
-          </div>
-          <div class="metric-item">
-            <div class="metric-label">达成率</div>
-            <div class="metric-value" :class="getAchievementClass(regularData.annualData.achievement)">
-              {{ regularData.annualData.achievement }}%
-            </div>
-          </div>
-        </div>
-      </div>
-      
-
     </div>
     
     <!-- 详情弹窗 -->
@@ -122,25 +180,85 @@
       </div>
     </div>
 
-    <!-- 填写原因对话框 -->
+    <!-- A类客户详情弹窗 -->
+    <!-- <div v-if="showADetailDialog" class="dialog-overlay" @click="closeADetail">
+      <div class="dialog-content" @click.stop>
+        <div class="dialog-header">
+          <h3>A类客户总直通率详情</h3>
+          <button class="close-btn" @click="closeADetail">×</button>
+        </div>
+        <div class="dialog-body">
+          <div class="detail-item">
+            <span class="detail-label">当前目标：</span>
+            <span class="detail-value">{{ aClassData.totalPassRate.target }}%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">实际完成：</span>
+            <span class="detail-value">{{ aClassData.totalPassRate.actual }}%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">达成情况：</span>
+            <span class="detail-value" :class="getAchievementClass(aClassData.totalPassRate.achievement)">
+              {{ aClassData.totalPassRate.achievement }}%
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">差值：</span>
+            <span class="detail-value">{{ (aClassData.totalPassRate.actual - aClassData.totalPassRate.target).toFixed(1) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- A类客户年度详情弹窗 -->
+    <!-- <div v-if="showAAnnualDetailDialog" class="dialog-overlay" @click="closeAAnnualDetail">
+      <div class="dialog-content" @click.stop>
+        <div class="dialog-header">
+          <h3>A类客户年度数据详情</h3>
+          <button class="close-btn" @click="closeAAnnualDetail">×</button>
+        </div>
+        <div class="dialog-body">
+          <div class="detail-item">
+            <span class="detail-label">年度目标：</span>
+            <span class="detail-value">{{ aClassData.annualData.target }}%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">年度累计：</span>
+            <span class="detail-value">{{ aClassData.annualData.plan }}%</span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">达成情况：</span>
+            <span class="detail-value" :class="getAchievementClass(aClassData.annualData.achievement)">
+              {{ aClassData.annualData.achievement }}%
+            </span>
+          </div>
+          <div class="detail-item">
+            <span class="detail-label">差值：</span>
+            <span class="detail-value">{{ (aClassData.annualData.plan - aClassData.annualData.target).toFixed(1) }}%</span>
+          </div>
+        </div>
+      </div>
+    </div> -->
+
+    <!-- 填写原因对话框
     <ReasonDialog
       :visible="reasonDialogVisible"
       :metric-info="currentMetricInfo"
       @close="reasonDialogVisible = false"
       @submit="handleReasonSubmit"
-    />
+    /> -->
     
     <!-- SVG渐变定义 -->
-    <svg width="0" height="0">
+    <!-- <svg width="0" height="0">
       <defs>
         <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="0%">
           <stop offset="0%" style="stop-color:var(--primary-blue);stop-opacity:1" />
           <stop offset="100%" style="stop-color:#3B82F6;stop-opacity:1" />
         </linearGradient>
       </defs>
-    </svg>
-  </div>
-</template>
+    </svg> -->
+  </div> 
+</template> 
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
@@ -171,9 +289,30 @@ const regularData = computed(() => {
   return { totalPassRate, annualData }
 })
 
+// 计算属性：A类客户数据
+const aClassData = computed(() => {
+  // 月度数据（A类客户总直通率）- 使用store中的数据
+  const totalPassRate = {
+    target: productionStore.monthlyATarget,
+    actual: productionStore.monthlyAActual,
+    achievement: productionStore.monthlyAAchievement
+  }
+  
+  // 年度数据（A类客户年度数据）- 使用store中的数据
+  const annualData = {
+    target: productionStore.yearlyATarget,
+    plan: productionStore.yearlyAActual,
+    achievement: productionStore.yearlyAAchievement
+  }
+
+  return { totalPassRate, annualData }
+})
+
 // 弹窗状态
 const showDetailDialog = ref(false)
 const showAnnualDetailDialog = ref(false)
+const showADetailDialog = ref(false)
+const showAAnnualDetailDialog = ref(false)
 const reasonDialogVisible = ref(false)
 const currentMetricInfo = ref({})
 
@@ -203,6 +342,26 @@ const showAnnualDetail = () => {
 // 关闭年度详情
 const closeAnnualDetail = () => {
   showAnnualDetailDialog.value = false
+}
+
+// 显示A类客户详情
+const showADetail = () => {
+  showADetailDialog.value = true
+}
+
+// 关闭A类客户详情
+const closeADetail = () => {
+  showADetailDialog.value = false
+}
+
+// 显示A类客户年度详情
+const showAAnnualDetail = () => {
+  showAAnnualDetailDialog.value = true
+}
+
+// 关闭A类客户年度详情
+const closeAAnnualDetail = () => {
+  showAAnnualDetailDialog.value = false
 }
 
 // 显示原因对策弹窗
@@ -255,6 +414,17 @@ onUnmounted(() => {
   flex-direction: column;
 }
 
+/* 行容器样式 */
+.metrics-row-container {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.metrics-row-container:last-child {
+  margin-bottom: 0;
+}
+
 /* 常规客户总直通率和年度数据样式 */
 .total-passrate-section,
 .annual-data-section {
@@ -263,7 +433,8 @@ onUnmounted(() => {
   border-radius: 6px;
   padding: 10px;
   backdrop-filter: blur(5px);
-
+  flex: 1;
+  min-width: 0; /* 防止flex项目溢出 */
 }
 
 .section-header {
@@ -474,6 +645,44 @@ onUnmounted(() => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.scrollable-content {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding-right: 4px;
+}
+
+/* 自定义滚动条样式 */
+.scrollable-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollable-content::-webkit-scrollbar-track {
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb {
+  background: rgba(0, 212, 255, 0.4);
+  border-radius: 3px;
+  transition: background 0.3s ease;
+}
+
+.scrollable-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 212, 255, 0.6);
+}
+
+/* Firefox滚动条样式 */
+.scrollable-content {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(0, 212, 255, 0.4) rgba(0, 0, 0, 0.2);
 }
 
 .main-metrics {
@@ -495,6 +704,133 @@ onUnmounted(() => {
   font-size: 14px;
   font-weight: 600;
   margin-bottom: 12px;
+}
+
+/* 2000px断点响应式设计 */
+@media (min-width: 2000px) {
+  .quality-metrics {
+    margin-left: 15px;
+  }
+  
+  .component-header {
+    padding: 12px 16px;
+    gap: 10px;
+  }
+  
+  .header-icon {
+    font-size: 20px;
+  }
+  
+  .header-title {
+    font-size: 16px;
+  }
+  
+  .content-area {
+    padding: 12px 16px 16px;
+    gap: 0;
+    overflow: visible;
+  }
+  
+  .scrollable-content {
+    gap: 0;
+    padding-right: 0;
+    overflow: visible;
+    height: auto;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .metrics-row-container {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+  }
+  
+  .metrics-row-container:last-child {
+    margin-bottom: 0;
+  }
+  
+  .total-passrate-section,
+  .annual-data-section {
+    padding: 12px;
+    border-radius: 6px;
+    flex: 1;
+  }
+  
+  .section-header {
+    padding-bottom: 6px;
+  }
+  
+  .section-title {
+    font-size: 14px;
+  }
+  
+  .metrics-row {
+    gap: 8px;
+  }
+  
+  .metric-item {
+    padding: 8px 6px;
+    min-height: 55px;
+    border-radius: 4px;
+  }
+  
+  .metric-label {
+    font-size: 11px;
+    margin-bottom: 4px;
+  }
+  
+  .metric-value {
+    font-size: 14px;
+  }
+  
+  .detail-btn,
+  .reason-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .dialog-content {
+    min-width: 500px;
+    max-width: 600px;
+    padding: 24px;
+  }
+  
+  .dialog-header {
+    margin-bottom: 24px;
+    padding-bottom: 12px;
+  }
+}
+
+/* 小屏幕响应式设计 */
+@media (max-width: 1200px) {
+  .metrics-row-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+  
+  .total-passrate-section,
+  .annual-data-section {
+    margin-bottom: 0;
+  }
+  
+  .section-title {
+    font-size: 13px;
+  }
+  
+  .metric-item {
+    min-height: 50px;
+    padding: 6px 4px;
+  }
+  
+  .metric-label {
+    font-size: 10px;
+  }
+  
+  .metric-value {
+    font-size: 13px;
+  }
 }
 
 </style> 

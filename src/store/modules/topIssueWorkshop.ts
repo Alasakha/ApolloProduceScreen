@@ -1,6 +1,14 @@
 import { defineStore } from 'pinia'
 import { getTopIssueWorkshop, type WorkshopIssueData, type IssueItem } from '@/api/produceperformance'
 
+// 获取本地日期字符串（避免时区问题）
+const getLocalDateString = (date: Date = new Date()): string => {
+  const year = date.getFullYear()
+  const month = String(date.getMonth() + 1).padStart(2, '0')
+  const day = String(date.getDate()).padStart(2, '0')
+  return `${year}-${month}-${day}`
+}
+
 interface TopIssueWorkshopState {
   workshopData: WorkshopIssueData[]
   loading: boolean
@@ -19,7 +27,7 @@ export const useTopIssueWorkshopStore = defineStore('topIssueWorkshop', {
     
     // 新增：日期配置初始值
     globalDays: 7,
-    selectedEndDate: new Date().toISOString().split('T')[0]
+    selectedEndDate: getLocalDateString()
   }),
 
   getters: {
@@ -107,7 +115,7 @@ export const useTopIssueWorkshopStore = defineStore('topIssueWorkshop', {
     },
 
     resetEndDateToToday() {
-      this.selectedEndDate = new Date().toISOString().split('T')[0];
+      this.selectedEndDate = getLocalDateString();
       // 重置后自动重新获取数据
       this.fetchTopIssueWorkshopData();
     },

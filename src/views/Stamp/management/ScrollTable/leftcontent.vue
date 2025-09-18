@@ -77,8 +77,8 @@
   const nextday = getNextDay();
 
   const fetchData = () => {
-    const param = prodLine === 'CY' ? '1003' : undefined; // 或其他默认值
-getWarningNextDay(param).then(res => {
+
+getWarningNextDay(prodLine).then(res => {
   isLoading.value = false;
   if (res.data.length !== 0) {
     const list = res.data;

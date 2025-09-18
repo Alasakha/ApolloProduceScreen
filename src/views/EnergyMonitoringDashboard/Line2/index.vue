@@ -1,5 +1,5 @@
 <template>
-    <div class="h-[25vh] w-full p-2 flex">
+    <div class="h-[20vh] w-full p-2 flex">
             <Leftcontent></Leftcontent>
             <!-- <Middlecontent></Middlecontent> -->
             <Rightcontent></Rightcontent>

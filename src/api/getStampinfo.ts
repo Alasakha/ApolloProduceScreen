@@ -36,7 +36,7 @@ export const getQualificationRateTrend = (prodLine: string) => {
   })
 }
 
-// 今日不良TOP5问题
+// 今日不良TOP问题
 export const getTodayBadIssues = (prodLine: string) => {
   return request({
     url: '/stampingWelding/todayBadIssues',
@@ -127,3 +127,62 @@ export interface TodayProduction {
 }
 
 
+// /stampingWelding/paintingPassRate2
+/**
+ * 获取喷涂合格率2
+ * 返回示例:
+ * {
+ *   "code": 200,
+ *   "message": "操作成功",
+ *   "data": {
+ *     "wj": { "a_qty": 0, "b_qty": 0, "a_udf001": 0, "b_udf001": 0, "rate": 0 },
+ *     "cj": { "a_qty": 0, "b_qty": 0, "a_udf001": 0, "b_udf001": 0, "rate": 0 },
+ *     "hch": { "a_qty": 0, "b_qty": 0, "a_udf001": 0, "b_udf001": 0, "rate": 0 }
+ *   }
+ * }
+ */
+
+export const getPaintingPassRate2 = (prodLine: string): Promise<{
+  code: number,
+  message: string,
+  data: PaintingPassRate2
+}> => {
+  return request({
+    url: '/stampingWelding/paintingPassRate2',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+
+export interface PaintingPassRate2Item {
+  qty: number         // 今日检验数
+  a_qty: number       // A类今日检验数
+  b_qty: number       // B类今日检验数
+  udf001: number      // 一次合格数
+  a_udf001: number    // A类一次合格数
+  b_udf001: number    // B类一次合格数 
+  pass: number        // 合格数
+  rate: number        // 合格率
+}
+
+
+export interface PaintingPassRate2 {
+  wj: PaintingPassRate2Item   // 尾架
+  cj: PaintingPassRate2Item   // 车架
+  hch: PaintingPassRate2Item  // 后叉
+}
+
+// /equipment
+export const getEquipment = () =>{
+  return request({
+    url: '/stampingWelding/equipment',
+    method: 'get',
+  })
+}
+export interface Equipment {
+  running: number //开机数
+  guzhang: number //故障数
+  total: number //总设备数
+  hold: number //待机数
+}

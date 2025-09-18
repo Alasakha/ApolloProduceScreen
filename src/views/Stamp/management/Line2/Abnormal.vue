@@ -5,9 +5,9 @@
        <h2 class="title-vertical flex items-center justify-center m-1">设备异常</h2>
             
        <!-- 如果没有数据，显示暂无数据 -->
-       <div v-if="!isLoading && isDataEmpty" class="empty-container">
+       <!-- <div v-if="!isLoading && isDataEmpty" class="empty-container">
          暂无数据
-       </div>
+       </div> -->
        
        <!-- 数据加载完成且非空时显示图表 -->
         <div class="tablebox w-full h-[90%]">
@@ -80,7 +80,7 @@
         console.log('config.data:', config.data);
       } else {
         // 没有数据时设置
-        isDataEmpty.value = true;
+        isDataEmpty.value = false; // 改为false，让轮播图显示
         config.data = [
           ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
         ];
@@ -88,7 +88,10 @@
     }).catch(error => {
       console.error('获取数据失败:', error);
       isLoading.value = false;
-      isDataEmpty.value = true;
+      isDataEmpty.value = false; // 改为false，让轮播图显示
+      config.data = [
+        ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+      ];
     });
   }
   
@@ -165,6 +168,20 @@
     height: 100%;
     font-size: 24px;
     color: #909399;
+  }
+  
+  /* 暂无数据行的样式 */
+  :deep(.dv-scroll-board .header) {
+    background-color: #0d47a1;
+    color: #fff;
+  }
+  
+  :deep(.dv-scroll-board .rows .row-item) {
+    background-color: rgba(255, 255, 255, 0.1);
+  }
+  
+  :deep(.dv-scroll-board .rows .row-item:nth-child(odd)) {
+    background-color: rgba(255, 255, 255, 0.05);
   }
   
   </style>

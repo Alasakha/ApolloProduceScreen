@@ -39,7 +39,6 @@
 </template>
 
 <script setup >
-
 import motorImage from '../assets/Motor.jpg';
 import { ref } from "vue";
 import { useRouter } from "vue-router";

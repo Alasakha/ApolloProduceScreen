@@ -2,7 +2,7 @@
   <div class="sales-data">
     <div class="component-header">
       <div class="header-icon">📊</div>
-      <div class="header-title">销售数据</div>
+      <div class="header-title 3xl:text-sm p-2">销售数据</div>
       <div class="header-status" :class="salesStatus">
         <span class="status-dot"></span>
         {{ salesStatusText }}
@@ -27,36 +27,36 @@
       
       <!-- 数据展示 -->
       <template v-else-if="salesData">
-        <div class="data-grid">
-          <div class="data-item">
-            <div class="data-icon">🌍</div>
+        <div class="data-grid grid grid-cols-1 lg:grid-cols-2 3xl:grid-cols-2 gap-3 lg:gap-4 3xl:gap-6">
+          <div class="data-item p-2">
+            <div class="data-icon text-2xl lg:text-3xl 3xl:text-2xl 4xl:text-5xl">🌍</div>
             <div class="data-content">
-              <div class="data-value">{{ totalExportCountries }}</div>
-              <div class="data-label">出口国家</div>
+              <div class="data-value text-xl lg:text-2xl xl:text-3xl 3xl:text-2xl 4xl:text-5xl">{{ totalExportCountries }}</div>
+              <div class="data-label text-xs lg:text-sm 3xl:text-base 4xl:text-lg">出口国家</div>
             </div>
           </div>
           
-          <div class="data-item">
-            <div class="data-icon">🎯</div>
+          <div class="data-item p-2">
+            <div class="data-icon text-2xl lg:text-3xl 3xl:text-2xl 4xl:text-5xl">🎯</div>
             <div class="data-content">
-              <div class="data-value">{{ totalTarget }}</div>
-              <div class="data-label">年度出口目标</div>
+              <div class="data-value text-xl lg:text-2xl xl:text-3xl 3xl:text-2xl 4xl:text-5xl">{{ totalTarget }}</div>
+              <div class="data-label text-xs lg:text-sm 3xl:text-base 4xl:text-lg">年度出口目标</div>
             </div>
           </div>
           
-          <div class="data-item">
-            <div class="data-icon">📈</div>
+          <div class="data-item p-2">
+            <div class="data-icon text-2xl lg:text-3xl 3xl:text-2xl 4xl:text-5xl">📈</div>
             <div class="data-content">
-              <div class="data-value">{{ totalAchieved }}</div>
-              <div class="data-label">今年出口量</div>
+              <div class="data-value text-xl lg:text-2xl xl:text-3xl 3xl:text-2xl 4xl:text-5xl">{{ totalAchieved }}</div>
+              <div class="data-label text-xs lg:text-sm 3xl:text-base 4xl:text-lg">今年出口量</div>
             </div>
           </div>
           
-          <div class="data-item">
-            <div class="data-icon">📅</div>
+          <div class="data-item p-2">
+            <div class="data-icon text-2xl lg:text-3xl 3xl:text-2xl 4xl:text-5xl">📅</div>
             <div class="data-content">
-              <div class="data-value">{{ totalMonthly }}</div>
-              <div class="data-label">月度累计出口量</div>
+              <div class="data-value text-xl lg:text-2xl xl:text-3xl 3xl:text-2xl 4xl:text-5xl">{{ totalMonthly }}</div>
+              <div class="data-label text-xs lg:text-sm 3xl:text-base 4xl:text-lg">月度累计出口量</div>
             </div>
           </div>
         </div>
@@ -220,7 +220,6 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 16px;
   background: rgba(0, 212, 255, 0.1);
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
 }
@@ -231,7 +230,6 @@ onUnmounted(() => {
 
 .header-title {
   color: var(--primary-blue);
-  font-size: 16px;
   font-weight: 600;
   flex: 1;
 }
@@ -358,7 +356,7 @@ onUnmounted(() => {
   display: flex;
   align-items: center;
   gap: 16px;
-  padding: 20px;
+  /* padding: 20px; */
   background: rgba(0, 212, 255, 0.05);
   border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: 12px;
@@ -372,9 +370,7 @@ onUnmounted(() => {
 }
 
 .data-icon {
-  font-size: 32px;
-  width: 48px;
-  height: 48px;
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -387,7 +383,7 @@ onUnmounted(() => {
 }
 
 .data-value {
-  font-size: 32px;
+  /* font-size: 32px; */
   font-weight: bold;
   color: var(--primary-blue);
   margin-bottom: 8px;
@@ -454,17 +450,17 @@ onUnmounted(() => {
 }
 
 /* 响应式设计 */
-@media (max-width: 1400px) {
+@media (max-width: 2000px) {
   .data-grid {
-    gap: 16px;
+    gap: 10px;
   }
   
   .data-item {
-    padding: 16px;
+    padding: 6px;
   }
   
   .data-value {
-    font-size: 28px;
+    font-size: 20px;
   }
   
   .data-label {

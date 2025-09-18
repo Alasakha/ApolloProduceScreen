@@ -6,12 +6,14 @@
         <div class="chart-container">
             <EChartsPieChart
                 :data="chartData"
-                :title="chartConfig.title"
+                
                 :radius="chartConfig.radius"
                 :center="chartConfig.center"
                 :show-label="chartConfig.showLabel"
                 :show-value="chartConfig.showValue"
                 :show-pointer="chartConfig.showPointer"
+                :empty-text="chartData && chartData.length > 0 ? '' : '→ 暂无数据'"
+                :empty-text-color="'#00ff00'"
                 theme="dark"
                 @click="handleChartClick"
                 ref="pieChartRef"
@@ -118,7 +120,7 @@ const getDefaultColor = (index: number): string => {
 
 // 图表配置 - 优化字体颜色和可读性
 const chartConfig = computed(() => ({
-    title: '质量TOP问题分布',
+    // title: '质量TOP问题分布',
     radius: '70%',
     center: ['50%', '50%'] as [string, string],
     showLabel: true,

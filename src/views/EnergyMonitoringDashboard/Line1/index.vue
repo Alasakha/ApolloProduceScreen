@@ -1,86 +1,227 @@
 <template>
   <div class="h-[20vh] w-full p-2">
-    <dv-border-box-2>
-      
-      <div class="box-content h-[30%]">
-        <el-carousel trigger="click" height="100%" :interval="5000" indicator-position="none">
-          <el-carousel-item>
-            <!-- 序号1：本年电表 -->
-            <Today />
-          </el-carousel-item>
-          <el-carousel-item>
-            <!-- 序号2：总生产一趟 -->
-            <Month />
-          </el-carousel-item>
-          <el-carousel-item>
-            <!-- 序号3：当月电表 -->
-            <Year />
-          </el-carousel-item>
-        </el-carousel>
+
+      <div class="box-content h-full">
+        <!-- 年度能耗数据展示 -->
+        <div class="energy-dashboard">
+          <div class="dashboard-title">
+            <h2 class="title-elegant">年度能耗监控</h2>
+          </div>
+          
+          <div class="energy-grid">
+            <!-- 电力数据 -->
+            <div class="energy-section">
+              <div class="section-title">电力消耗</div>
+              <div class="data-grid">
+                <div class="data-item">
+                  <div class="data-label">总标准</div>
+                  <div class="data-value electric">{{ electricData.totalStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总实际</div>
+                  <div class="data-value electric">{{ electricData.totalActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总差额</div>
+                  <div class="data-value" :class="parseFloat(electricData.totalDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(electricData.totalDiff) > 0 ? '+' : '' }}{{ electricData.totalDiff }}
+                  </div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台标准</div>
+                  <div class="data-value electric">{{ electricData.perUnitStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台实际</div>
+                  <div class="data-value electric">{{ electricData.perUnitActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台差额</div>
+                  <div class="data-value" :class="parseFloat(electricData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(electricData.perUnitDiff) > 0 ? '+' : '' }}{{ electricData.perUnitDiff }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 气体数据 -->
+            <div class="energy-section">
+              <div class="section-title">气体消耗</div>
+              <div class="data-grid">
+                <div class="data-item">
+                  <div class="data-label">总标准</div>
+                  <div class="data-value gas">{{ gasData.totalStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总实际</div>
+                  <div class="data-value gas">{{ gasData.totalActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总差额</div>
+                  <div class="data-value" :class="parseFloat(gasData.totalDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(gasData.totalDiff) > 0 ? '+' : '' }}{{ gasData.totalDiff }}
+                  </div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台标准</div>
+                  <div class="data-value gas">{{ gasData.perUnitStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台实际</div>
+                  <div class="data-value gas">{{ gasData.perUnitActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台差额</div>
+                  <div class="data-value" :class="parseFloat(gasData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(gasData.perUnitDiff) > 0 ? '+' : '' }}{{ gasData.perUnitDiff }}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 水数据 -->
+            <div class="energy-section">
+              <div class="section-title">水消耗</div>
+              <div class="data-grid">
+                <div class="data-item">
+                  <div class="data-label">总标准</div>
+                  <div class="data-value water">{{ waterData.totalStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总实际</div>
+                  <div class="data-value water">{{ waterData.totalActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">总差额</div>
+                  <div class="data-value" :class="parseFloat(waterData.totalDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(waterData.totalDiff) > 0 ? '+' : '' }}{{ waterData.totalDiff }}
+                  </div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台标准</div>
+                  <div class="data-value water">{{ waterData.perUnitStandard }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台实际</div>
+                  <div class="data-value water">{{ waterData.perUnitActual }}</div>
+                </div>
+                <div class="data-item">
+                  <div class="data-label">每台差额</div>
+                  <div class="data-value" :class="parseFloat(waterData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
+                    {{ parseFloat(waterData.perUnitDiff) > 0 ? '+' : '' }}{{ waterData.perUnitDiff }}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
-    </dv-border-box-2>
+    
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import { use } from 'echarts/core'
-import { CanvasRenderer } from 'echarts/renderers'
-import { GaugeChart } from 'echarts/charts'
-import { TitleComponent, TooltipComponent } from 'echarts/components'
-import { getGaugeBaseOption } from './echarts'
-import Today from './Today.vue'
-import Month from './Month.vue'
-import Year from './year.vue'
-import { usePowerStore } from '@/store/power'
-use([CanvasRenderer, GaugeChart, TitleComponent, TooltipComponent])
-const powerStore = usePowerStore()
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { getElectricPowerYear, getGasPower } from '@/api/enery'
 
-// 定义每个仪表盘的初始配置
-const TodaygaugeOptions = ref({
-  compressor: getGaugeBaseOption('空压机', 0, 100, 65.5, 'kW', ['#00eeff', '#0066ff']),
-  injection: getGaugeBaseOption('注塑', 0, 150, 85.5, 'kW', ['#00ff9f', '#00eeff']),
-  welding: getGaugeBaseOption('焊接', 0, 80, 45.5, 'kW', ['#ff9f00', '#ff0000']),
-  metalwork1: getGaugeBaseOption('金工一楼', 0, 120, 75.5, 'kW', ['#00eeff', '#0066ff']),
-  assembly2: getGaugeBaseOption('总装二课', 0, 90, 55.5, 'kW', ['#00ff9f', '#00eeff']),
-  metalwork4: getGaugeBaseOption('金工四楼', 0, 100, 60.5, 'kW', ['#ff9f00', '#ff0000']),
-  stamping: getGaugeBaseOption('冲压', 0, 200, 125.5, 'kW', ['#00eeff', '#0066ff']),
-  dormitory: getGaugeBaseOption('宿舍', 0, 50, 25.5, 'kW', ['#00ff9f', '#00eeff']),
-  packaging: getGaugeBaseOption('包装', 0, 70, 35.5, 'kW', ['#ff9f00', '#ff0000']),
-  assembly1: getGaugeBaseOption('装配', 0, 110, 70.5, 'kW', ['#00eeff', '#0066ff'])
+// 年度数据
+const yearlyElectricData = ref([])
+const yearlyGasData = ref([])
+const yearlyWaterData = ref([])
+
+// 计算电力数据
+const electricData = computed(() => {
+  const totalStandard = yearlyElectricData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
+  const totalActual = yearlyElectricData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
+  const totalDiff = totalActual - totalStandard
+  
+  const totalUnits = yearlyElectricData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
+  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
+  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
+  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  
+  return {
+    totalStandard: totalStandard.toFixed(2),
+    totalActual: totalActual.toFixed(2),
+    totalDiff: totalDiff.toFixed(2),
+    perUnitStandard,
+    perUnitActual,
+    perUnitDiff
+  }
 })
 
-// 模拟数据更新
+// 计算气体数据
+const gasData = computed(() => {
+  const totalStandard = yearlyGasData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
+  const totalActual = yearlyGasData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
+  const totalDiff = totalActual - totalStandard
+  
+  const totalUnits = yearlyGasData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
+  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
+  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
+  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  
+  return {
+    totalStandard: totalStandard.toFixed(2),
+    totalActual: totalActual.toFixed(2),
+    totalDiff: totalDiff.toFixed(2),
+    perUnitStandard,
+    perUnitActual,
+    perUnitDiff
+  }
+})
+
+// 计算水数据
+const waterData = computed(() => {
+  const totalStandard = yearlyWaterData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
+  const totalActual = yearlyWaterData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
+  const totalDiff = totalActual - totalStandard
+  
+  const totalUnits = yearlyWaterData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
+  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
+  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
+  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  
+  return {
+    totalStandard: totalStandard.toFixed(2),
+    totalActual: totalActual.toFixed(2),
+    totalDiff: totalDiff.toFixed(2),
+    perUnitStandard,
+    perUnitActual,
+    perUnitDiff
+  }
+})
+
+// 获取年度数据
+const fetchYearlyData = async () => {
+  try {
+    // 获取年度电力数据
+    const electricRes = await getElectricPowerYear()
+    if (electricRes.code === 200 && Array.isArray(electricRes.data)) {
+      yearlyElectricData.value = electricRes.data
+    }
+    
+    // 获取年度气体数据
+    const gasRes = await getGasPower(new Date().toISOString().split('T')[0])
+    if (gasRes.code === 200 && Array.isArray(gasRes.data)) {
+      yearlyGasData.value = gasRes.data
+    }
+    
+    // 水数据暂时使用电力数据作为示例，实际应该调用水数据接口
+    yearlyWaterData.value = electricRes.data || []
+    
+  } catch (error) {
+    console.error('获取年度数据失败:', error)
+  }
+}
+
+// 定时器
 let timer = null
 
-// 生成随机波动值
-const getRandomFluctuation = (baseValue, range) => {
-  return (baseValue + Math.random() * range - range/2).toFixed(1)
-}
-
-// 更新所有仪表盘数据
-const updateGaugeData = () => {
-  const baseValues = {
-    compressor: 65.5,
-    injection: 85.5,
-    welding: 45.5,
-    metalwork1: 75.5,
-    assembly2: 55.5,
-    metalwork4: 60.5,
-    stamping: 125.5,
-    dormitory: 25.5,
-    packaging: 35.5,
-    assembly1: 70.5
-  }
-
-  Object.keys(TodaygaugeOptions.value).forEach(key => {
-    TodaygaugeOptions.value[key].series[0].data[0].value = getRandomFluctuation(baseValues[key], 10)
-  })
-}
-
 onMounted(() => {
-  timer = setInterval(updateGaugeData, 2000)
-  powerStore.fetchPowerData()
+  fetchYearlyData()
+  // 每5分钟更新一次数据
+  timer = setInterval(fetchYearlyData, 300000)
 })
 
 onUnmounted(() => {
@@ -93,95 +234,210 @@ onUnmounted(() => {
 @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@100;300;400;500;700;900&display=swap');
 @import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@400;500;600;700;800;900&display=swap');
 
-/* 科技感标题 */
-.title-tech {
-  font-family: 'Orbitron', sans-serif;
-  text-shadow: 0 0 10px #00eeff, 0 0 20px #00eeff;
-  position: relative;
-}
-
 /* 优雅现代标题 */
 .title-elegant {
   font-family: 'Noto Sans SC', sans-serif;
-  letter-spacing: 0.5em;
+  letter-spacing: 0.3em;
   position: relative;
-}
-
-/* 未来科幻标题 */
-.title-future {
-  font-family: 'Orbitron', sans-serif;
-  background: linear-gradient(45deg, #00eeff, #0066ff);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  position: relative;
-}
-
-/* 添加发光动画效果 */
-@keyframes glow {
-  0% { text-shadow: 0 0 10px #00eeff, 0 0 20px #00eeff; }
-  50% { text-shadow: 0 0 15px #00eeff, 0 0 30px #00eeff; }
-  100% { text-shadow: 0 0 10px #00eeff, 0 0 20px #00eeff; }
-}
-
-.title-tech {
-  animation: glow 2s ease-in-out infinite;
+  text-shadow: 0 0 10px #00eeff;
 }
 
 .box-content {
-  padding: 5px;
+  padding: 8px;
   height: 100%;
 }
 
-.gauge-container {
-  height: 100%;
-  display: flex;
-  justify-content: space-between;
-  gap: 5px;
-  padding: 5px;
-}
-
-.gauge-item {
-  width: calc(10% - 5px);
-  height: calc(100% - 10px);
-  padding: 2px;
-}
-
-.empty-page {
+/* 能耗仪表盘样式 */
+.energy-dashboard {
   height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+}
+
+.dashboard-title {
+  text-align: center;
+  margin-bottom: 10px;
+}
+
+.dashboard-title h2 {
   color: #00eeff;
-  font-size: 24px;
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0;
+  text-shadow: 0 0 8px #00eeff;
 }
 
+.energy-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  height: calc(100% - 40px);
+}
 
-
-h3 {
-  height: 15%;
-  margin-bottom: 2px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.energy-section {
+  background: rgba(0, 238, 255, 0.05);
+  border: 1px solid rgba(0, 238, 255, 0.2);
+  border-radius: 4px;
+  padding: 8px;
   display: flex;
+  flex-direction: column;
+}
+
+.section-title {
+  color: #00eeff;
+  font-size: 0.9rem;
+  font-weight: 500;
+  text-align: center;
+  margin-bottom: 8px;
+  text-shadow: 0 0 5px #00eeff;
+  border-bottom: 1px solid rgba(0, 238, 255, 0.3);
+  padding-bottom: 4px;
+}
+
+.data-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 4px;
+  flex: 1;
+}
+
+.data-item {
+  display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  padding: 4px;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 2px;
+  border: 1px solid rgba(0, 238, 255, 0.1);
 }
 
-:deep(.el-carousel) {
-  height: 100%;
+.data-label {
+  color: #00eeff;
+  font-size: 0.7rem;
+  font-weight: 300;
+  margin-bottom: 2px;
+  text-align: center;
+  opacity: 0.8;
 }
 
-:deep(.el-carousel__container) {
-  height: 100%;
+.data-value {
+  color: #ffffff;
+  font-size: 0.8rem;
+  font-weight: 500;
+  text-align: center;
+  font-family: 'Orbitron', monospace;
 }
 
-:deep(.echarts) {
-  width: 100% !important;
-  height: 85% !important;
+/* 不同类型数据的颜色 */
+.data-value.electric {
+  color: #00eeff;
+  text-shadow: 0 0 5px #00eeff;
 }
 
-:deep(.el-carousel__item) {
-  height: 100%;
+.data-value.gas {
+  color: #ff9f00;
+  text-shadow: 0 0 5px #ff9f00;
+}
+
+.data-value.water {
+  color: #00ff9f;
+  text-shadow: 0 0 5px #00ff9f;
+}
+
+/* 差额颜色 */
+.data-value.positive {
+  color: #ff6b6b;
+  text-shadow: 0 0 5px #ff6b6b;
+}
+
+.data-value.negative {
+  color: #51cf66;
+  text-shadow: 0 0 5px #51cf66;
+}
+
+/* 响应式设计 */
+@media (max-width: 1279px) {
+  .energy-grid {
+    grid-template-columns: 1fr;
+    gap: 4px;
+  }
+  
+  .data-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .data-label {
+    font-size: 0.6rem;
+  }
+  
+  .data-value {
+    font-size: 0.7rem;
+  }
+  
+  .section-title {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 1280px) and (max-width: 1849px) {
+  .energy-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+  }
+  
+  .data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .data-label {
+    font-size: 0.65rem;
+  }
+  
+  .data-value {
+    font-size: 0.75rem;
+  }
+}
+
+@media (min-width: 1850px) and (max-width: 2499px) {
+  .energy-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  
+  .data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .data-label {
+    font-size: 0.7rem;
+  }
+  
+  .data-value {
+    font-size: 0.8rem;
+  }
+}
+
+@media (min-width: 2500px) {
+  .energy-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  
+  .data-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .data-label {
+    font-size: 0.8rem;
+  }
+  
+  .data-value {
+    font-size: 0.9rem;
+  }
+  
+  .dashboard-title h2 {
+    font-size: 1.4rem;
+  }
 }
 </style>

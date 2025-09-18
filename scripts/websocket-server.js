@@ -118,4 +118,41 @@ wss.on('connection', (ws, req) => {
         ws.send(JSON.stringify({
           type: 'status',
           status: 'active',
-          message: `
+          message: `WebSocket服务器运行正常，已发送${frameCount}帧数据`
+        }));
+      }
+    } else {
+      clearInterval(dataInterval);
+    }
+  }, 200); // 每200ms发送一帧，减少发送频率
+  
+  // 处理客户端断开连接
+  ws.on('close', () => {
+    console.log('📡 WebSocket连接已断开');
+    clearInterval(dataInterval);
+  });
+  
+  ws.on('error', (error) => {
+    console.error('📡 WebSocket错误:', error);
+    clearInterval(dataInterval);
+  });
+});
+
+// 启动服务器
+const PORT = 8080;
+server.listen(PORT, () => {
+  console.log(`🚀 WebSocket服务器已启动，端口: ${PORT}`);
+  console.log(`📡 WebSocket地址: ws://localhost:${PORT}`);
+});
+
+// 优雅关闭
+process.on('SIGINT', () => {
+  console.log('\n🛑 正在关闭WebSocket服务器...');
+  server.close(() => {
+    console.log('✅ WebSocket服务器已关闭');
+    process.exit(0);
+  });
+});
+
+// 连接摄像头
+connectToCamera();

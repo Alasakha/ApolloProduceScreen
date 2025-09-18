@@ -30,19 +30,19 @@
           </div>
 
           <!-- 右侧两个仪表盘 -->
-          <div class="line flex-2 flex">
+          <!-- <div class="line flex-2 flex"> -->
             <!-- 标准人效 -->
-            <div class="biaozhun flex-1">
+            <!-- <div class="biaozhun flex-1">
               <div ref="Indicators3" class="w-full h-[100%]"></div>
-            </div>
+            </div> -->
             <!-- 实际人效 -->
-            <div class="shiji flex-1">
-              <div 
+            <!-- <div class="shiji flex-1"> -->
+              <!-- <div 
                 ref="Indicators4" 
                 class="w-full h-[100%]"
                 @click="openReasonDialog"
                 style="cursor: pointer;"
-              ></div>
+              ></div> -->
               <!-- 警告图标 -->
               <div v-if="showWarning" class="warning-icon-container">
                 <el-tooltip
@@ -56,8 +56,8 @@
                     <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
                   </svg>
                 </el-tooltip>
-              </div>
-            </div>
+              <!-- </div> -->
+            <!-- </div> -->
           </div>
 
         </div>
@@ -319,10 +319,10 @@ onBeforeUnmount(() => {
 const reasonDialogVisible = ref(false);
 const customReason = ref('');
 
-function openReasonDialog() {
-  reasonDialogVisible.value = true;
-  customReason.value = '';
-}
+// function openReasonDialog() {
+//   reasonDialogVisible.value = true;
+//   customReason.value = '';
+// }
 
 async function submitReason() {
   await getEfficiencyBelowAdd(prodLine, customReason.value);

@@ -9,8 +9,18 @@
       </dv-border-box-12>
       
       <dv-border-box-12 class="chart-box">
-          <div class="box-title">工单异常</div>
-          <AbnormalProduce/>
+          <div class="box-title flex justify-between items-center">
+            <span>工单异常</span>
+            <el-button 
+              type="primary" 
+              size="small" 
+              @click="handleDetail"
+              class="action-btn"
+            >
+              查看详情
+            </el-button>
+          </div>
+          <AbnormalProduce ref="abnormalProduceRef"/>
       </dv-border-box-12>
 
   </div>
@@ -18,9 +28,19 @@
 </template>
 
 <script setup lang="ts">
+import { ref } from 'vue'
 import AbnormalList from './ScrollTable/leftcontent.vue'
 // 工单异常
 import AbnormalProduce from './ScrollTable/rightcontent.vue'
+
+const abnormalProduceRef = ref()
+
+// 处理查看详情按钮点击
+const handleDetail = () => {
+  if (abnormalProduceRef.value) {
+    abnormalProduceRef.value.handleDetail()
+  }
+}
 </script>
 
 <style scoped>

@@ -4,25 +4,25 @@
         <div class="board-container">
           <div class="left-section">
             <ErrorBoundary>
-              <EquipmentManagement />
+              <SalesData />
+            </ErrorBoundary>
+            <ErrorBoundary>
+              <RDModule />
             </ErrorBoundary>
             <ErrorBoundary>
               <QualityMetrics />
-            </ErrorBoundary>
-            <ErrorBoundary>
-              <LaborProductivity />
             </ErrorBoundary>
           </div>
           
           <div class="center-section">
             <div class="earth-model-container" v-if="isModelVisible">
               <ErrorBoundary>
-                <BeautifulEarth />
+                <FlyLineEarth />
               </ErrorBoundary>
             </div>
             <div class="model-placeholder" v-else>
-              <h3>🌍 3D地球模型</h3>
-              <p>点击"显示模型"按钮查看3D地球</p>
+              <h3>🌍 3D地球模型 - 飞线效果</h3>
+              <p>点击"显示模型"按钮查看带飞线动画的3D地球</p>
             </div>
             <div class="model-controls">
               <button class="model-btn" @click="toggleModel">
@@ -34,13 +34,13 @@
           
           <div class="right-section">
             <ErrorBoundary>
-              <SalesData />
+              <EquipmentManagement />
             </ErrorBoundary>
             <ErrorBoundary>
               <EnergyConsumption />
             </ErrorBoundary>
             <ErrorBoundary>
-              <RDModule />
+              <LaborProductivity />
             </ErrorBoundary>
           </div>
           
@@ -69,7 +69,7 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
-import BeautifulEarth from './components/BeautifulEarth.vue'
+import FlyLineEarth from './components/FlyLineEarth.vue'
 import H5PlayerMonitor from './components/H5PlayerMonitor.vue'
 
 // import CameraTest from './components/CameraTest.vue'
@@ -207,9 +207,11 @@ onUnmounted(() => {
 
 .video-monitors {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
   align-items: stretch;
   width: 100%;
+  height: 100%;
+  min-height: 300px;
 }
 
 .camera-test-container {
@@ -400,6 +402,142 @@ onUnmounted(() => {
 }
 
 /* 响应式设计 */
+/* 1080p显示器优化 (1920x1080) */
+@media (max-width: 1920px) and (min-width: 1601px) {
+  .board-container {
+    gap: 18px;
+    padding: 18px;
+    grid-template-rows: 1fr 1fr 1fr 350px; /* 调整底部视频区域高度 */
+  }
+  
+  .company-title {
+    font-size: 26px;
+  }
+  
+  .company-slogan {
+    font-size: 15px;
+  }
+  
+  .model-btn {
+    padding: 10px 18px;
+    font-size: 13px;
+  }
+  
+  .data-item .value {
+    font-size: 16px;
+  }
+  
+  .data-item .label {
+    font-size: 11px;
+  }
+  
+  /* 优化左右侧组件间距 */
+  .left-section {
+    gap: 12px;
+    margin-top: 12px;
+  }
+  
+  .right-section {
+    gap: 18px;
+  }
+  
+  /* 调整模型占位符样式 */
+  .model-placeholder h3 {
+    font-size: 22px;
+  }
+  
+  .model-placeholder p {
+    font-size: 13px;
+  }
+  
+  /* 优化视频监控区域 */
+  .video-monitors {
+    gap: 18px;
+  }
+  
+  /* 优化控制按钮样式 */
+  .camera-test-btn {
+    padding: 10px 20px;
+    font-size: 14px;
+  }
+  
+  /* 优化模型控制按钮 */
+  .model-controls {
+    bottom: 15px;
+    gap: 10px;
+  }
+  
+  /* 优化中心信息区域 */
+  .center-info {
+    bottom: 15px;
+  }
+  
+  .real-time-data {
+    gap: 25px;
+  }
+  
+  /* 优化摩托车占位符 */
+  .motorcycle-placeholder h3 {
+    font-size: 28px;
+    margin-bottom: 15px;
+  }
+  
+  .motorcycle-placeholder p {
+    font-size: 16px;
+  }
+}
+
+/* 精确的1080p显示器优化 (1920x1080) */
+@media (width: 1920px) and (height: 1080px) {
+  .board-container {
+    gap: 20px;
+    padding: 20px;
+    grid-template-rows: 1fr 1fr 1fr 320px; /* 为1080p优化底部高度 */
+  }
+  
+  .left-section {
+    gap: 15px;
+    margin-top: 15px;
+  }
+  
+  .right-section {
+    gap: 20px;
+  }
+  
+  .bottom-section {
+    gap: 20px;
+  }
+  
+  .video-monitors {
+    gap: 20px;
+  }
+  
+  .company-title {
+    font-size: 28px;
+  }
+  
+  .company-slogan {
+    font-size: 16px;
+  }
+  
+  .model-btn {
+    padding: 12px 20px;
+    font-size: 14px;
+  }
+  
+  .data-item .value {
+    font-size: 18px;
+  }
+  
+  .data-item .label {
+    font-size: 12px;
+  }
+  
+  .real-time-data {
+    gap: 30px;
+  }
+}
+
 @media (max-width: 1600px) {
   .board-container {
     gap: 15px;
@@ -462,7 +600,7 @@ onUnmounted(() => {
   }
   
   .bottom-section > * {
-    /* min-height: 1220px; */ /* 暂时注释掉高度限制 */
+    min-height: auto; /* 自适应高度 */
   }
   
   .model-controls {
