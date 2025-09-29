@@ -148,9 +148,9 @@ export const useProductionDataStore = defineStore('productionData', {
 
     // 制造费用实际占比 - 实际制造费占营业收入的百分比
     manufacturingCostRatio(): number {
-      if (!this.manufacturingCost?.实际制造费 || !this.manufacturingCost?.营业收入) return 0
+      if (!this.manufacturingCost?.实际收入 || !this.manufacturingCost?.实际费用合计) return 0
       const actual = this.manufacturingCost.实际制造费
-      const revenue = this.manufacturingCost.营业收入
+      const revenue = this.manufacturingCost.实际费用合计
       return Number(((actual / revenue) * 100).toFixed(2))
     },
 

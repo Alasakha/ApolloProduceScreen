@@ -6,12 +6,12 @@
     <!-- 原始地球模式 -->
     <template v-else>
       <!-- 标题栏 -->
-      <div class="title-bar">
+      <!-- <div class="title-bar">
         <div class="title-content px-3 py-2 lg:px-6 lg:py-4">
           <h1 class="main-title text-lg lg:text-xl xl:text-2xl">中控大屏看板</h1>
           <p class="sub-title text-xs lg:text-sm">若要退出全屏,请将鼠标移动到屏幕顶部或长按 Esc</p>
         </div>
-      </div>
+      </div> -->
       
       <div ref="threeContainer" class="three-container"></div>
     

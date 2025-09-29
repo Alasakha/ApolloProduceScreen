@@ -10,11 +10,11 @@
     <div class="order-card-main">
       <!-- 左侧数量区块 -->
       <div class="order-card-left">
-        <div class="order-card-block">
+        <div class="order-card-block clickable-block" @click="showDetailDialog">
           <div class="order-card-block-label">任务总数量</div>
           <div class="order-card-block-value">{{ totalQty }}</div>
         </div>
-        <div class="order-card-block">
+        <div class="order-card-block clickable-block" @click="showDoneDetailDialog">
           <div class="order-card-block-label">已完成数量</div>
           <div class="order-card-block-value">{{ doneQty }}</div>
         </div>
@@ -113,11 +113,29 @@
         <li v-for="(warning, index) in allWarnings" :key="index">{{ warning }}</li>
       </ul>
     </div>
+    
+    <!-- 详细信息对话框 -->
+    <PlanDetailDialog 
+      :visible="showDialog"
+      :order-name="orderName"
+      :machine-code="machineCode"
+      @close="closeDetailDialog"
+    />
+    
+    <!-- 已完成详情对话框 -->
+    <DoneDetailDialog 
+      :visible="showDoneDialog"
+      :order-name="orderName"
+      :machine-code="machineCode"
+      @close="closeDoneDetailDialog"
+    />
   </div>
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref } from "vue";
+import PlanDetailDialog from "./PlanDetailDialog.vue";
+import DoneDetailDialog from "./DoneDetailDialog.vue";
 
 const props = defineProps({
   orderName: {
@@ -211,8 +229,36 @@ const props = defineProps({
   device: {
     type: Object,
     default: () => ({})
+  },
+  machineCode: {
+    type: String,
+    default: ""
   }
 });
+
+// 对话框状态
+const showDialog = ref(false);
+const showDoneDialog = ref(false);
+
+// 显示详细信息对话框
+const showDetailDialog = () => {
+  showDialog.value = true;
+};
+
+// 关闭详细信息对话框
+const closeDetailDialog = () => {
+  showDialog.value = false;
+};
+
+// 显示已完成详情对话框
+const showDoneDetailDialog = () => {
+  showDoneDialog.value = true;
+};
+
+// 关闭已完成详情对话框
+const closeDoneDetailDialog = () => {
+  showDoneDialog.value = false;
+};
 
 //判断是否有数据
 // 判断是否有标准数据
@@ -351,6 +397,43 @@ const allWarnings = computed(() => {
   align-items: center;
   justify-content: center;
   margin-bottom: 2px;
+}
+
+.clickable-block {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.clickable-block:hover {
+  background: rgba(0, 40, 90, 0.5);
+  border-color: #00eaff;
+  box-shadow:
+    0 0 20px #00eaff99,
+    0 0 0 2px #00eaff inset;
+  transform: translateY(-2px);
+}
+
+.clickable-block:hover::after {
+  content: "点击查看详情";
+  position: absolute;
+  top: -30px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(0, 234, 255, 0.9);
+  color: #000;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: bold;
+  white-space: nowrap;
+  z-index: 10;
+  animation: fadeInOut 0.3s ease;
+}
+
+@keyframes fadeInOut {
+  0% { opacity: 0; transform: translateX(-50%) translateY(5px); }
+  100% { opacity: 1; transform: translateX(-50%) translateY(0); }
 }
 .order-card-block-label {
   font-size: 14px;

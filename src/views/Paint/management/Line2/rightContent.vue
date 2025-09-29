@@ -4,6 +4,18 @@
       设备监控
     </div>
     
+    <!-- 加载状态和错误提示 -->
+    <div v-if="isLoading" class="text-center text-cyan-300 mb-3">
+      <div class="inline-flex items-center">
+        <div class="animate-spin rounded-full h-4 w-4 border-b-2 border-cyan-300 mr-2"></div>
+        正在获取数据...
+      </div>
+    </div>
+    
+    <div v-if="apiError" class="text-center text-red-400 mb-3 bg-red-900 bg-opacity-20 rounded p-2">
+      {{ apiError }}
+    </div>
+    
     <div class="grid grid-cols-1 gap-3 h-[calc(100%-4rem)] overflow-y-auto">
       <!-- 粉体线PLC监控 -->
       <div class="bg-opacity-20 rounded-lg p-3 border border-cyan-400 border-opacity-30 flex flex-col h-full">
@@ -13,11 +25,11 @@
         <div class="grid grid-cols-2 gap-2 text-sm flex-1">
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ powderLineData.temperature }}°C</span>
+            <span class="text-white font-semibold">{{ powderLineData.temperature !== null ? powderLineData.temperature + '°C' : '暂无' }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ powderLineData.workTemp }}°C</span>
+            <span class="text-white font-semibold">{{ powderLineData.workTemp !== null ? powderLineData.workTemp + '°C' : '暂无' }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>超温状态:</span>
@@ -46,11 +58,11 @@
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ labelLineData.workTemp }}°C</span>
+            <span class="text-white font-semibold">{{ labelLineData.workTemp !== null ? labelLineData.workTemp + '°C' : '暂无' }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ labelLineData.temperature }}°C</span>
+            <span class="text-white font-semibold">{{ labelLineData.temperature !== null ? labelLineData.temperature + '°C' : '暂无' }}</span>
           </div>
         </div>
       </div>
@@ -71,7 +83,7 @@
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ liquidLineData.workTemp }}°C</span>
+            <span class="text-white font-semibold">{{ liquidLineData.workTemp !== null ? liquidLineData.workTemp + '°C' : '暂无' }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>超温写入:</span>
@@ -83,7 +95,7 @@
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
             <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ liquidLineData.temperature }}°C</span>
+            <span class="text-white font-semibold">{{ liquidLineData.temperature !== null ? liquidLineData.temperature + '°C' : '暂无' }}</span>
           </div>
         </div>
       </div>
@@ -93,11 +105,13 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
+import { getTemperature4 } from '@/api/getStampWeldinfo'
+import { eventBus } from '@/utils/eventbus'
 
 // 粉体线PLC数据
 const powderLineData = ref({
-  temperature: 185,    // 固化炉温度
-  workTemp: 180,       // 固化炉工作温度写入
+  temperature: null,    // 固化炉温度
+  workTemp: null,       // 固化炉工作温度写入
   overTemp: false,     // 固化炉超温写入
   lowTemp: false       // 固化炉低温写入
 })
@@ -106,26 +120,26 @@ const powderLineData = ref({
 const labelLineData = ref({
   overTemp: false,     // 固化炉超温
   productionCount: 1250, // 生产计量信号
-  workTemp: 175,       // 固化炉工作温度写入
-  temperature: 180     // 固化炉温度
+  workTemp: null,       // 固化炉工作温度写入
+  temperature: null     // 固化炉温度
 })
 
 // 皮膜线PLC数据
 const filmLineData = ref({
   productionCount: 980, // 生产计量信号
-  workTemp: 170,       // 固化炉工作温度写入
+  workTemp: null,       // 固化炉工作温度写入
   overTemp: false,     // 固化炉超温写入
-  temperature: 175     // 固化炉温度
+  temperature: null     // 固化炉温度
 })
 
 // 液体线PLC数据
 const liquidLineData = ref({
   overTemp: false,     // 固化炉超温
   productionCount: 1100, // 生产计量信号
-  workTemp: 165,       // 固化炉工作温度写入
+  workTemp: null,       // 固化炉工作温度写入
   overTempWrite: false, // 固化炉超温写入
   lowTempWrite: false,  // 固化炉低温写入
-  temperature: 170     // 固化炉温度
+  temperature: null     // 固化炉温度
 })
 
 // T4炉PLC数据
@@ -136,46 +150,80 @@ const t4FurnaceData = ref({
   timerEnd: false      // 保温计时结束
 })
 
-// 模拟数据更新
-let dataTimer: NodeJS.Timeout | null = null
+// API数据更新
+const isLoading = ref(false)
+const apiError = ref('')
+let lastUpdateTime = 0
+const UPDATE_INTERVAL = 5000 // 最小更新间隔5秒
 
-const updatePLCData = () => {
-  // 模拟温度数据变化
-  powderLineData.value.temperature = 180 + Math.floor(Math.random() * 20)
-  labelLineData.value.temperature = 175 + Math.floor(Math.random() * 15)
-  filmLineData.value.temperature = 170 + Math.floor(Math.random() * 18)
-  liquidLineData.value.temperature = 165 + Math.floor(Math.random() * 20)
+const updatePLCData = async () => {
+  const now = Date.now()
+  if (now - lastUpdateTime < UPDATE_INTERVAL) {
+    console.log('⏳ 请求过于频繁，跳过本次更新')
+    return
+  }
+  lastUpdateTime = now
+  try {
+    isLoading.value = true
+    apiError.value = ''
+    
+    // 获取真实温度数据
+    const response = await getTemperature4()
+    const tempData = response.data
+    
+    // 更新粉体线数据 (pmx)
+    powderLineData.value.temperature = tempData.pmx
+    powderLineData.value.workTemp = tempData.pmx - 5
+    powderLineData.value.overTemp = tempData.pmx > 200
+    powderLineData.value.lowTemp = tempData.pmx < 160
+    
+    // 更新贴标线数据 (tbx) 
+    labelLineData.value.temperature = tempData.tbx
+    labelLineData.value.workTemp = tempData.tbx - 5
+    labelLineData.value.overTemp = tempData.tbx > 195
+    
+    // 更新液体线数据 (ytx)
+    liquidLineData.value.temperature = tempData.ytx
+    liquidLineData.value.workTemp = tempData.ytx - 5
+    liquidLineData.value.overTemp = tempData.ytx > 185
+    liquidLineData.value.overTempWrite = liquidLineData.value.overTemp
+    liquidLineData.value.lowTempWrite = tempData.ytx < 150
+    
+    // 保持生产计数的模拟更新（如果API没有提供）
+    labelLineData.value.productionCount += Math.floor(Math.random() * 3)
+    filmLineData.value.productionCount += Math.floor(Math.random() * 2)
+    liquidLineData.value.productionCount += Math.floor(Math.random() * 4)
+    
+    // 检查报警条件
+    checkAlarmConditions()
+    
+  } catch (error) {
+    console.error('获取温度数据失败:', error)
+    apiError.value = '数据获取失败，请检查网络连接'
+    
+    // 发生错误时设置数据为null，显示"暂无"
+    setDataToNull()
+  } finally {
+    isLoading.value = false
+  }
+}
+
+// 设置数据为null，显示"暂无"
+const setDataToNull = () => {
+  powderLineData.value.temperature = null
+  powderLineData.value.workTemp = null
+  powderLineData.value.overTemp = false
+  powderLineData.value.lowTemp = false
   
-  // 模拟工作温度
-  powderLineData.value.workTemp = powderLineData.value.temperature - 5
-  labelLineData.value.workTemp = labelLineData.value.temperature - 5
-  filmLineData.value.workTemp = filmLineData.value.temperature - 5
-  liquidLineData.value.workTemp = liquidLineData.value.temperature - 5
+  labelLineData.value.temperature = null
+  labelLineData.value.workTemp = null
+  labelLineData.value.overTemp = false
   
-  // 模拟超温状态
-  powderLineData.value.overTemp = powderLineData.value.temperature > 200
-  labelLineData.value.overTemp = labelLineData.value.temperature > 195
-  filmLineData.value.overTemp = filmLineData.value.temperature > 190
-  liquidLineData.value.overTemp = liquidLineData.value.temperature > 185
-  liquidLineData.value.overTempWrite = liquidLineData.value.overTemp
-  
-  // 模拟低温状态
-  powderLineData.value.lowTemp = powderLineData.value.temperature < 160
-  liquidLineData.value.lowTempWrite = liquidLineData.value.temperature < 150
-  
-  // 模拟生产计数
-  labelLineData.value.productionCount += Math.floor(Math.random() * 3)
-  filmLineData.value.productionCount += Math.floor(Math.random() * 2)
-  liquidLineData.value.productionCount += Math.floor(Math.random() * 4)
-  
-  // 模拟T4炉数据
-  t4FurnaceData.value.overTemp = Math.random() > 0.9
-  t4FurnaceData.value.tempReached = Math.random() > 0.1
-  t4FurnaceData.value.insulationTime = Math.max(0, t4FurnaceData.value.insulationTime - 1)
-  t4FurnaceData.value.timerEnd = t4FurnaceData.value.insulationTime === 0
-  
-  // 检查报警条件
-  checkAlarmConditions()
+  liquidLineData.value.temperature = null
+  liquidLineData.value.workTemp = null
+  liquidLineData.value.overTemp = false
+  liquidLineData.value.overTempWrite = false
+  liquidLineData.value.lowTempWrite = false
 }
 
 const checkAlarmConditions = () => {
@@ -198,17 +246,18 @@ const checkAlarmConditions = () => {
 }
 
 // 组件挂载时启动数据更新
-onMounted(() => {
-  // 每3秒更新一次PLC数据
-  dataTimer = setInterval(updatePLCData, 3000)
+onMounted(async () => {
+  // 立即获取一次数据
+  await updatePLCData()
+  
+  // 只监听全局刷新事件，移除3秒定时器
+  eventBus.on('globalRefresh', updatePLCData)
 })
 
-// 组件卸载时清理定时器
+// 组件卸载时清理事件监听
 onUnmounted(() => {
-  if (dataTimer) {
-    clearInterval(dataTimer)
-    dataTimer = null
-  }
+  // 移除EventBus监听
+  eventBus.off('globalRefresh', updatePLCData)
 })
 </script>
 

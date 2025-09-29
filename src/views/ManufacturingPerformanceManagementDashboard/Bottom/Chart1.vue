@@ -109,8 +109,18 @@ const updateChart = () => {
     },
     yAxis: {
       type: 'value',
-      min: 0,
-      max: 100,
+      min: function(value) {
+        // 动态设置最小值，确保数据可见
+        const allData = [...chartData.value.aClassData, ...chartData.value.normalData]
+        const dataMin = Math.min(...allData)
+        return Math.max(0, Math.floor(dataMin - 5)) // 最小值比数据最小值小5%
+      },
+      max: function(value) {
+        // 动态设置最大值
+        const allData = [...chartData.value.aClassData, ...chartData.value.normalData]
+        const dataMax = Math.max(...allData)
+        return Math.min(100, Math.ceil(dataMax + 5)) // 最大值比数据最大值大5%
+      },
       axisLabel: {
         color: '#8cc8ff',
         fontSize: 11,

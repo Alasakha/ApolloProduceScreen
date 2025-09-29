@@ -218,27 +218,27 @@ const getAchievementClass = (value) => {
 const getAchievementColor = (value) => {
   if (value >= 100) {
     return {
-      color1: '#00ff88',
-      color2: '#00cc6a',
-      textColor: '#00ff88'
+      color1: '#008000	',  // 深绿色
+      color2: '#15803d',  // 更深的绿色
+      textColor: '#7CFC00	'
     }
   }
   if (value >= 98) {
     return {
-      color1: '#00d4ff',
+      color1: '#008000	',
       color2: '#0099cc',
       textColor: '#00d4ff'
     }
   }
   if (value >= 95) {
     return {
-      color1: '#ffffff',
+      color1: '#008000',
       color2: '#cccccc',
       textColor: '#ffffff'
     }
   }
   return {
-    color1: '#ff4444',
+    color1: '#008000',
     color2: '#cc3333',
     textColor: '#ff4444'
   }

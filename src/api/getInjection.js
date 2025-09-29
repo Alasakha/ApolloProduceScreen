@@ -93,3 +93,31 @@ export const getElectricStandard =() =>{
     method: 'get',
   })
 }
+
+// injection/planDetail 注塑详细
+export const getplanDetail =(zhsCode ) =>{
+  return request({
+    url: '/injection/planDetail',
+    method: 'get',
+    params:{zhsCode}
+  })
+}
+// {
+//   "ty009": "102050101002        ",
+//   "ty001": "5103",
+//   "ty002": "250718005",
+//   "ty004": 100,
+//   "item_no": "304075002001",
+//   "item_name": "链条罩_黑色",
+//   "qty": 100
+// },
+// ty009：品号 ty001+ty002：客户单号 ty004:总数 qty: 完成数  item_name:品名
+
+// /injection/doneDetail
+export const getDoneDetail = (zhsCode) => {
+  return request({
+    url: '/injection/doneDetail',
+    method: 'get',
+    params: { zhsCode },
+  })
+}

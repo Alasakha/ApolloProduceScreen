@@ -196,16 +196,21 @@ const getAchievementClass = (value) => {
 // 获取达成率颜色配置
 const getAchievementColor = (value) => {
   if (value >= 100) {
-    return { color1: '#00ff88', color2: '#00cc6a', textColor: '#00ff88' }
-  }
+    return {
+      color1: '#008000',  // 深绿色
+      color2: '#15803d',  // 更深的绿色
+      textColor: '#7CFC00'
+    }
+  }     
   if (value >= 98) {
-    return { color1: '#00d4ff', color2: '#0099cc', textColor: '#00d4ff' }
+    return { color1: '#16a34a', color2: '#15803d', textColor: '#4ade80' }
   }
   if (value >= 95) {
-    return { color1: '#ffffff', color2: '#cccccc', textColor: '#ffffff' }
+    return { color1: '#696969', color2: '#696969', textColor: '#ffffff' }
   }
   return { color1: '#ff4444', color2: '#cc3333', textColor: '#ff4444' }
 }
+
 
 // 填写原因对话框状态
 const reasonDialogVisible = ref(false)

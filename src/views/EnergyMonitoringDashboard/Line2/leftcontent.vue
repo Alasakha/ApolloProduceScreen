@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full p-2">
+  <div class="h-full w-full ">
     <dv-border-box-2>
       <div class="flex flex-col h-full">
         <!-- 标题 -->
@@ -11,79 +11,112 @@
         </div>
 
         <!-- 内容区域 -->
-        <div class="flex flex-1 p-2">
+        <div class="content-grid">
           <!-- 总用水量 -->
-          <div class="flex-1 flex flex-col items-center">
-            <div class="text-[#00eeff] text-lg mb-3 
-            2xl:text-sm 3xl:text-sm 4xl:text-lg">总用水量</div>
-            <div class="flex items-center justify-between w-full mb-2">
-              <div class="flex items-center flex-1">
-                <span class="text-white  text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">标准值：</span>
-                <dv-digital-flop :config="standardTotalConfig" />
-              </div>
-              <div class="flex items-center flex-1">
-                <span class="text-white  text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">实际值：</span>
-                <dv-digital-flop :config="actualTotalConfig" />
-              </div>
+          <div class="data-card total-water">
+            <div class="card-header">
+              <div class="card-icon">💧</div>
+              <div class="card-title">总用水量</div>
             </div>
-
-            <div class="flex w-full items-center justify-around">
-                  <div class="text-white mt-2">
-                  同比：<span :class="{
-                    'text-red-500': dayDiff > 0,
-                    'text-green-500': dayDiff < 0
-                  }">{{dayDiff > 0 ? '↑' : '↓'}}{{Math.abs(dayDiff)}}m³</span>
+            <div class="card-content">
+              <div class="value-row">
+                <div class="value-item">
+                  <div class="value-label">标准值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="standardTotalConfig" />
+                  </div>
                 </div>
-                <dv-water-level-pond :config="waterConfig1" style="width:80px;height:80px;margin-top:8px" />
+                <div class="value-item">
+                  <div class="value-label">实际值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="actualTotalConfig" />
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-row">
+                <div class="comparison-item">
+                  <span class="comparison-label">同比：</span>
+                  <span :class="{
+                    'comparison-value increase': dayDiff > 0,
+                    'comparison-value decrease': dayDiff < 0,
+                    'comparison-value neutral': dayDiff === 0
+                  }">
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                  </span>
+                </div>
+              </div>
             </div>
-           
           </div>
 
           <!-- 月用水量 -->
-          <div class="flex-1 flex flex-col items-center">
-            <div class="text-[#00eeff] text-lg mb-3 2xl:text-sm 3xl:text-sm 4xl:text-lg">月用水量</div>
-            <div class="flex items-center justify-between w-full mb-2">
-              <div class="flex items-center flex-1">
-                <span class="text-white text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">标准值：</span>
-                <dv-digital-flop :config="standardMonthConfig" />
-              </div>
-              <div class="flex items-center flex-1">
-                <span class="text-white  text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">实际值：</span>
-                <dv-digital-flop :config="actualMonthConfig" />
-              </div>
+          <div class="data-card monthly-water">
+            <div class="card-header">
+              <div class="card-icon">📅</div>
+              <div class="card-title">月用水量</div>
             </div>
-            <div class="flex w-full items-center justify-around">
-                  <div class="text-white mt-2">
-                  同比：<span :class="{
-                    'text-red-500': dayDiff > 0,
-                    'text-green-500': dayDiff < 0
-                  }">{{dayDiff > 0 ? '↑' : '↓'}}{{Math.abs(dayDiff)}}m³</span>
+            <div class="card-content">
+              <div class="value-row">
+                <div class="value-item">
+                  <div class="value-label">标准值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="standardMonthConfig" />
+                  </div>
                 </div>
-                <dv-water-level-pond :config="waterConfig1" style="width:80px;height:80px;margin-top:8px" />
+                <div class="value-item">
+                  <div class="value-label">实际值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="actualMonthConfig" />
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-row">
+                <div class="comparison-item">
+                  <span class="comparison-label">同比：</span>
+                  <span :class="{
+                    'comparison-value increase': dayDiff > 0,
+                    'comparison-value decrease': dayDiff < 0,
+                    'comparison-value neutral': dayDiff === 0
+                  }">
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
 
           <!-- 日用水量 -->
-          <div class="flex-1 flex flex-col items-center">
-            <div class="text-[#00eeff] text-lg mb-3 2xl:text-sm 3xl:text-sm 4xl:text-lg">日用水量</div>
-            <div class="flex items-center justify-between w-full mb-2">
-              <div class="flex items-center flex-1">
-                <span class="text-white  text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">标准值：</span>
-                <dv-digital-flop :config="standardDayConfig" />
-              </div>
-              <div class="flex items-center flex-1">
-                <span class="text-white  text-sm 2xl:text-[10px] 3xl:text-[10px] 4xl:text-lg">实际值：</span>
-                <dv-digital-flop :config="actualDayConfig" />
-              </div>
+          <div class="data-card daily-water">
+            <div class="card-header">
+              <div class="card-icon">📊</div>
+              <div class="card-title">日用水量</div>
             </div>
-            <div class="flex w-full items-center justify-around">
-                  <div class="text-white mt-2">
-                  同比：<span :class="{
-                    'text-red-500': dayDiff > 0,
-                    'text-green-500': dayDiff < 0
-                  }">{{dayDiff > 0 ? '↑' : '↓'}}{{Math.abs(dayDiff)}}m³</span>
+            <div class="card-content">
+              <div class="value-row">
+                <div class="value-item">
+                  <div class="value-label">标准值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="standardDayConfig" />
+                  </div>
                 </div>
-                <dv-water-level-pond :config="waterConfig1" style="width:80px;height:80px;margin-top:8px" />
+                <div class="value-item">
+                  <div class="value-label">实际值</div>
+                  <div class="value-display">
+                    <dv-digital-flop :config="actualDayConfig" />
+                  </div>
+                </div>
+              </div>
+              <div class="comparison-row">
+                <div class="comparison-item">
+                  <span class="comparison-label">同比：</span>
+                  <span :class="{
+                    'comparison-value increase': dayDiff > 0,
+                    'comparison-value decrease': dayDiff < 0,
+                    'comparison-value neutral': dayDiff === 0
+                  }">
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                  </span>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -375,16 +408,307 @@ const submitReason = async () => {
 </script>
 
 <style scoped>
+/* 内容网格布局 - 默认样式 */
+.content-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  padding: 16px;
+  flex: 1;
+}
+
+/* 2K分辨率 (2560x1440) 样式 */
+@media (min-width: 1921px) and (max-width: 2560px) {
+  .content-grid {
+    gap: 20px;
+    padding: 20px;
+  }
+  
+  .data-card {
+    padding: 20px;
+  }
+  
+  .card-title {
+    font-size: 18px;
+  }
+  
+  .value-label {
+    font-size: 14px;
+  }
+  
+  .comparison-label,
+  .comparison-value {
+    font-size: 14px;
+  }
+  
+  :deep(.dv-digital-flop) {
+    width: 120px;
+    height: 32px;
+  }
+}
+
+/* 1080p分辨率 (1920x1080) 样式 */
+@media (min-width: 1600px) and (max-width: 1920px) {
+  .content-grid {
+    gap: 16px;
+    padding: 16px;
+    padding-top: 0%;
+  }
+  
+  .data-card {
+    padding: 16px;
+  }
+  
+  .card-title {
+    font-size: 16px;
+  }
+  
+  .value-label {
+    font-size: 12px;
+    flex-direction: row;
+  }
+  
+  .comparison-label,
+  .comparison-value {
+    font-size: 12px;
+  }
+  
+  :deep(.dv-digital-flop) {
+    width: 100px;
+    height: 28px;
+  }
+  .value-item{
+
+  }
+}
+
+/* 小屏1080p (1366x768) 样式 */
+@media (min-width: 1200px) and (max-width: 1599px) {
+  .content-grid {
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .data-card {
+    padding: 12px;
+  }
+  
+  .card-title {
+    font-size: 14px;
+  }
+  
+  .value-label {
+    font-size: 11px;
+  }
+  
+  .comparison-label,
+  .comparison-value {
+    font-size: 11px;
+  }
+  
+  :deep(.dv-digital-flop) {
+    width: 90px;
+    height: 26px;
+  }
+}
+
+/* 平板/小屏 (768px-1199px) */
+@media (min-width: 768px) and (max-width: 1199px) {
+  .content-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .data-card {
+    padding: 14px;
+  }
+  
+  .card-title {
+    font-size: 15px;
+  }
+  
+  .value-label {
+    font-size: 12px;
+  }
+  
+  .comparison-label,
+  .comparison-value {
+    font-size: 12px;
+  }
+  
+  :deep(.dv-digital-flop) {
+    width: 100px;
+    height: 28px;
+  }
+}
+
+/* 移动端 (<768px) */
+@media (max-width: 767px) {
+  .content-grid {
+    grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 12px;
+  }
+  
+  .data-card {
+    padding: 14px;
+  }
+  
+  .card-title {
+    font-size: 15px;
+  }
+  
+  .value-label {
+    font-size: 12px;
+  }
+  
+  .comparison-label,
+  .comparison-value {
+    font-size: 12px;
+  }
+  
+  :deep(.dv-digital-flop) {
+    width: 100px;
+    height: 28px;
+  }
+}
+
+/* 数据卡片样式 */
+.data-card {
+  background: linear-gradient(135deg, rgba(0, 238, 255, 0.05), rgba(0, 102, 255, 0.05));
+  border: 1px solid rgba(0, 238, 255, 0.2);
+  border-radius: 12px;
+  padding: 16px;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.data-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #00eeff, #0066ff);
+}
+
+.data-card:hover {
+  border-color: rgba(0, 238, 255, 0.4);
+  box-shadow: 0 4px 20px rgba(0, 238, 255, 0.1);
+  transform: translateY(-2px);
+}
+
+/* 卡片头部 */
+.card-header {
+  display: flex;
+  align-items: center;
+  margin-bottom: 16px;
+  gap: 8px;
+}
+
+.card-icon {
+  font-size: 20px;
+  opacity: 0.8;
+}
+
+.card-title {
+  color: #00eeff;
+  font-size: 16px;
+  font-weight: 600;
+  text-shadow: 0 0 10px rgba(0, 238, 255, 0.3);
+}
+
+/* 卡片内容 */
+.card-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* 数值行 */
+.value-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+.value-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.value-label {
+  color: #ffffff;
+  font-size: 12px;
+  opacity: 0.8;
+  text-align: center;
+}
+
+.value-display {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 32px;
+}
+
+/* 比较行 */
+.comparison-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.comparison-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: rgba(0, 238, 255, 0.1);
+  border-radius: 20px;
+  border: 1px solid rgba(0, 238, 255, 0.2);
+}
+
+.comparison-label {
+  color: #ffffff;
+  font-size: 12px;
+  opacity: 0.8;
+}
+
+.comparison-value {
+  font-weight: 600;
+  font-size: 12px;
+}
+
+.comparison-value.increase {
+  color: #ff6b6b;
+  text-shadow: 0 0 8px rgba(255, 107, 107, 0.5);
+}
+
+.comparison-value.decrease {
+  color: #4ade80;
+  text-shadow: 0 0 8px rgba(74, 222, 128, 0.5);
+}
+
+.comparison-value.neutral {
+  color: #94a3b8;
+}
+
+/* 数字翻牌器样式 */
 :deep(.dv-digital-flop) {
-  width: 120px;
-  height: 30px;
+  width: 100px;
+  height: 28px;
 }
 
 /* 原因填写相关样式 */
 .reason-section {
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid rgba(0, 238, 255, 0.2);
 }
 
 .reason-info {

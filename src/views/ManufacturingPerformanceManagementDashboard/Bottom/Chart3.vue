@@ -31,16 +31,54 @@ const fetchFtyData = async () => {
     
     const response = await getFtyChart(2) // 常规类客户 = 2
     
+    console.log('常规客户原始数据:', response)
+    
     if (response.code === 200 && response.data) {
-      // 计算直通率：一次合格数 / 总数 * 100
-      const ftyRates = response.data.map(item => {
-        const rate = (item.firstTotal / item.checkTotal * 100).toFixed(1)
-        return parseFloat(rate)
+      console.log('常规客户数据详情:', response.data)
+      
+      // 检查数据是否为空
+      if (!response.data || response.data.length === 0) {
+        console.warn('常规客户数据为空，使用模拟数据')
+        chartData.value.data = [88.5, 87.3, 86.7, 89.2]
+        chartData.value.categories = ['前3周', '前2周', '前1周', '本周']
+        updateChart()
+        return
+      }
+
+      // 按周数从小到大排序
+      const sortedData = response.data.sort((a, b) => a.week_num - b.week_num)
+      console.log('排序后的常规客户数据:', sortedData)
+      
+      // 直接使用接口返回的fty字段作为直通率（已经是百分比格式）
+      const ftyRates = sortedData.map(item => {
+        // 检查fty字段是否存在且有效
+        if (item.fty === null || item.fty === undefined || isNaN(item.fty)) {
+          console.warn(`周${item.week_num}的直通率数据无效:`, item.fty)
+          return 0 // 如果数据无效，返回0
+        }
+        
+        const ftyValue = parseFloat(item.fty.toFixed(1))
+        console.log(`周${item.week_num}的直通率:`, ftyValue)
+        return ftyValue
       })
       
-      // 反转数据顺序，让数据从上3周开始
-      chartData.value.data = ftyRates.reverse()
-      chartData.value.categories = response.data.map(item => item.weekNumber+'周').reverse()
+      console.log('处理后的直通率数据:', ftyRates)
+      
+      // 检查是否所有数据都是0
+      const allZero = ftyRates.every(rate => rate === 0)
+      if (allZero) {
+        console.warn('所有直通率数据都是0，使用模拟数据')
+        chartData.value.data = [88.5, 87.3, 86.7, 89.2]
+        chartData.value.categories = ['前3周', '前2周', '前1周', '本周']
+        updateChart()
+        return
+      }
+      
+      // 设置图表数据（按周数顺序）
+      chartData.value.data = ftyRates
+      chartData.value.categories = sortedData.map(item => item.week_num + '周')
+      
+      console.log('最终图表数据:', chartData.value)
       updateChart()
     } else {
       throw new Error(response.message || '获取数据失败')
@@ -50,6 +88,7 @@ const fetchFtyData = async () => {
     error.value = err.message
     // 使用模拟数据作为备用
     chartData.value.data = [88.5, 87.3, 86.7, 89.2]
+    chartData.value.categories = ['前3周', '前2周', '前1周', '本周']
     updateChart()
   } finally {
     loading.value = false
@@ -108,8 +147,16 @@ const updateChart = () => {
     },
     yAxis: {
       type: 'value',
-      min: 80,
-      max: 100,
+      min: function(value) {
+        // 动态设置最小值，确保数据可见
+        const dataMin = Math.min(...chartData.value.data)
+        return Math.max(0, Math.floor(dataMin - 5)) // 最小值比数据最小值小5%
+      },
+      max: function(value) {
+        // 动态设置最大值
+        const dataMax = Math.max(...chartData.value.data)
+        return Math.min(100, Math.ceil(dataMax + 5)) // 最大值比数据最大值大5%
+      },
       axisLabel: {
         color: '#8cc8ff',
         fontSize: 11,
@@ -206,4 +253,5 @@ onUnmounted(() => {
   flex: 1;
   min-height: 0;
 }
+
 </style>

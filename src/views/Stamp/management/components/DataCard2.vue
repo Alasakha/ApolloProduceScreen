@@ -23,21 +23,43 @@
         </div>
       </div>
       <!-- 右侧详细信息 -->
-      <div class=" flex flex-col  min-w-0 h-full">
-        <!-- 工单信息和进度条 -->
-        <div class="mb-2 h-full flex flex-col justify-around">
-          <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm text-white mb-1 h-[70%]" >
-            <span>品号：{{ ta006 || '暂无数据' }}</span>
-            <span>品名：{{ spec }}</span>
-            <span>规格：{{ spen }}</span>
-            <span v-if="gdNum">工单数：{{ gdNum }}</span>
-            <span>上机人员：{{ peopleName }}</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <div class="flex-1 h-2 bg-blue-300 rounded h-[30%]">
-              <div class="h-2 bg-yellow-400 rounded transition-all duration-500 " :style="{ width: progress + '%' }"></div>
+      <div class="flex flex-col min-w-0 h-full flex-1">
+        <!-- 工单信息 - 四宫格布局 -->
+        <div class="flex-1 flex flex-col justify-between py-2">
+          <div class="grid grid-cols-2 gap-3 text-sm text-white mb-4">
+            <div class="flex flex-col space-y-1">
+              <span class="text-blue-200 text-xs">品号</span>
+              <span class="text-white truncate">{{ ta006 || '暂无数据' }}</span>
             </div>
-            <span class="text-white text-sm font-bold w-12 text-right">{{ progress }}%</span>
+            <div class="flex flex-col space-y-1">
+              <span class="text-blue-200 text-xs">品名</span>
+              <span class="text-white truncate">{{ spec || '暂无数据' }}</span>
+            </div>
+            <div class="flex flex-col space-y-1">
+              <span class="text-blue-200 text-xs">规格</span>
+              <span class="text-white truncate">{{ spen || '暂无数据' }}</span>
+            </div>
+            <div class="flex flex-col space-y-1">
+              <span class="text-blue-200 text-xs">上机人员</span>
+              <span class="text-white truncate">{{ peopleName || '暂无数据' }}</span>
+            </div>
+          </div>
+          
+          <!-- 工单数单独显示 -->
+          <!-- <div v-if="gdNum" class="mb-4 text-center">
+            <span class="text-blue-200 text-sm">工单数：</span>
+            <span class="text-white text-lg font-bold">{{ gdNum }}</span>
+          </div> -->
+          
+          <!-- 进度条单独一行 -->
+          <div class="flex items-center gap-3">
+            <div class="flex-1 h-3 bg-blue-300/30 rounded-full overflow-hidden">
+              <div 
+                class="h-full bg-gradient-to-r from-yellow-400 to-yellow-500 rounded-full transition-all duration-500 ease-out" 
+                :style="{ width: progress + '%' }"
+              ></div>
+            </div>
+            <span class="text-white text-sm font-bold min-w-[3rem] text-right">{{ progress }}%</span>
           </div>
         </div>
         <!-- 参数区块 -->

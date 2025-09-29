@@ -12,7 +12,7 @@ const formattedData = formatPieChartData(data, 'ngName', 'total');
           <div class="stat-card">
             <div class="card-icon">📊</div>
             <div class="card-content">
-              <div class="card-label">总数</div>
+              <div class="card-label">应检数量</div>
               <div class="card-value" v-if="!isLoading">{{ total }}</div>
               <div class="loading-skeleton" v-else></div>
             </div>
@@ -20,7 +20,7 @@ const formattedData = formatPieChartData(data, 'ngName', 'total');
           <div class="stat-card">
             <div class="card-icon">✅</div>
             <div class="card-content">
-              <div class="card-label">已检</div>
+              <div class="card-label">已检数量</div>
               <div class="card-value" v-if="!isLoading">{{ checkTotal }}</div>
               <div class="loading-skeleton" v-else></div>
             </div>
@@ -197,7 +197,7 @@ onBeforeUnmount(() => {
 
   .card-label {
     font-size: 0.9rem;
-    color: rgba(240, 248, 255, 0.8);
+    color: rgba(255, 255, 255, 0.8);
     font-weight: 500;
     letter-spacing: 0.05em;
   }

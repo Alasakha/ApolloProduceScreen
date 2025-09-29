@@ -40,3 +40,13 @@ export const getElectricStandard = () => {
         method: 'get',
       })
 }
+
+// /energy/electricCompare 年度电力对比数据
+export const getElectricCompare = () => {
+    return request({
+        url: '/energy/electricCompare',
+        method: 'get',
+      })
+}
+
+    

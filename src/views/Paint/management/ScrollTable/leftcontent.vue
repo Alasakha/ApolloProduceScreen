@@ -15,12 +15,17 @@
         </div>
         
         <div class="wrapper flex flex-col h-full">
-            <!-- 数据加载完成时显示图表 -->
+            <!-- 如果没有数据，显示暂无数据 -->
+            <!-- <div v-if="!isLoading && isDataEmpty" class="empty-container">
+                暂无数据
+            </div> -->
+            
+            <!-- 数据加载完成且非空时显示图表 -->
             <div class="tablebox w-full h-[90%]">
                 <!-- 如果正在加载，显示 loading -->
                 <dv-loading v-if="isLoading" class="text-white">Loading...</dv-loading>
                 
-                <ScrollBoard v-if="!isLoading" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
+                <ScrollBoard v-if="!isLoading && !isDataEmpty" :config="config" @click="clickHandler" :rowClassName="rowClassName" :cellClassName="cellClassName" />
             </div>
         </div>
         
@@ -120,18 +125,10 @@ const fetchData = () => {
         });
         isDataEmpty.value = false;
       } else {
-        // 当没有数据时，设置config.data为暂无数据
-        config.data = [
-          ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
-        ];
         isDataEmpty.value = true;
       }
     }).catch((error) => {
       console.error('Error fetching data:', error);
-      // 当请求出错时，也设置config.data为暂无数据
-      config.data = [
-        ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
-      ];
       isDataEmpty.value = true;
     });
 }
@@ -396,6 +393,5 @@ function cellClassName(row, ci) {
     margin: 0;
     border-top: 1px solid #dcdfe6;
 }
-
 </style>
    

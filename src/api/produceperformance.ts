@@ -221,6 +221,8 @@ export interface ManufacturingCostData {
   营业收入: number
   实际制造费: number
   目标: number
+  实际收入: number
+  实际费用合计: number
 }
 
 
@@ -258,12 +260,12 @@ export const  getOnTimePartDetail= (customer) =>{
 }
 
 // ftyChart 
-export const getFtyChart = (Customer) => {
+export const getFtyChart = (customer) => {
   return request({
     url: '/manufacturing/ftyChart',
     method: 'post',
     params: {
-      Customer 
+      customer 
     },
   })
 }

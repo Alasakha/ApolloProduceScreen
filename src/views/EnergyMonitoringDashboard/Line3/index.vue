@@ -1,7 +1,7 @@
 <template>
   <div class="line3-container">
     <div class="header">
-      <div class="title">能耗监控</div>
+      <!-- <div class="title">能耗监控</div> -->
     </div>
     
     <div class="content">
@@ -446,7 +446,7 @@ const submitReason = async () => {
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin-bottom: 12px;
+  /* margin-bottom: 12px; */
 }
 
 .title {
@@ -465,7 +465,7 @@ const submitReason = async () => {
 
 .energy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
   gap: 12px;
   height: 100%;
   padding: 0 10px;
@@ -497,9 +497,8 @@ const submitReason = async () => {
   background: rgba(0, 238, 255, 0.1);
   border: 1px solid rgba(0, 238, 255, 0.3);
   border-radius: 8px;
-  padding: 12px;
+  padding: 2px;
   transition: all 0.3s ease;
-  min-height: 120px;
 }
 
 .energy-card:hover {

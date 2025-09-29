@@ -1,11 +1,11 @@
 <template>
   <div class="fly-line-earth">
     <!-- 标题栏 -->
-    <div class="title-bar">
+    <!-- <div class="title-bar">
       <div class="title-content px-3 py-2 lg:px-6 lg:py-4">
         <h1 class="main-title text-lg lg:text-xl xl:text-2xl">中控大屏看板</h1>
       </div>
-    </div>
+    </div> -->
     
     <div ref="earthContainer" class="earth-container" id="container"></div>
     

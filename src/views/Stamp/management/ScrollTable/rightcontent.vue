@@ -115,8 +115,8 @@ const config = reactive({
             }
             return [
               '未完工',
-              item.number ?? '无',
-              // item.workNo ?? '无',
+              // item.number ?? '无',
+              item.workNo ?? '无',
               item.specifications ?? '无',
               Number(item.productionQuantity) ?? '无',
               item.dateTime  ?? '无',

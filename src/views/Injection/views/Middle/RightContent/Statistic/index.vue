@@ -25,6 +25,7 @@
         :ta006="device.ta006"
         :gdNum="device.gdNum"
         :device="device"
+        :machineCode="device.macCode"
       />
     </div>
   </div>

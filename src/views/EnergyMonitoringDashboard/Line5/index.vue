@@ -92,7 +92,7 @@ onMounted(async () => {
 
 <style scoped>
 .energy-trend-container {
-  padding: 15px;
+  /* padding: 15px; */
   background: linear-gradient(135deg, rgba(0,212,255,0.15) 0%, rgba(26,79,172,0.7) 100%);
   max-height: 28vh;
   color: #fff;
@@ -108,9 +108,9 @@ onMounted(async () => {
 }
 
 .main-title {
-  font-weight: 700;
-  color: #007bff;
-  margin: 0 0 15px 0;
+  font-weight: 400;
+  color: #01d7ed;
+  /* margin: 0 0 15px 0; */
   text-shadow: 0 0 20px rgba(0, 123, 255, 0.5);
   letter-spacing: 2px;
 }

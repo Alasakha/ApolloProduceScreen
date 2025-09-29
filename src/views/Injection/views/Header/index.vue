@@ -17,7 +17,7 @@
        
        <div style=" color: aqua;">
       <div color-green font-600 class="content" bg="~ dark/0">
-        {{ injectionPowerStore.totalPower }}kw·h 
+        {{ Math.round(injectionPowerStore.totalPower) }}kw·h 
         <span :style="{ color: powerDiffDirection.includes('↑') 
                         ? 'red' 
                         : powerDiffDirection.includes('↓') 

@@ -113,15 +113,15 @@
         <div class="metrics-row">
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">目标</div>
-            <div class="metric-value target text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">¥{{ deliveryData.manufacturingCost.target }}</div>
+            <div class="metric-value target text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.manufacturingCost.target }}万元</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际制费</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">¥{{ deliveryData.manufacturingCost.actualCost }}</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.manufacturingCost.actualCost }}万元</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际收入</div>
-            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">¥{{ deliveryData.manufacturingCost.actualRevenue }}</div>
+            <div class="metric-value text-[11px] 2xl:text-sm 3xl:text-base 4xl:text-lg font-bold">{{ deliveryData.manufacturingCost.actualRevenue }}万元</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际占比</div>
@@ -208,7 +208,7 @@ const deliveryData = computed(() => ({
   manufacturingCost: {
     target: productionStore.manufacturingCost?.目标 ? productionStore.manufacturingCost.目标.toLocaleString() : '--',
     actualCost: productionStore.manufacturingCost?.实际制造费 ? productionStore.manufacturingCost.实际制造费.toLocaleString() : '--',
-    actualRevenue: productionStore.manufacturingCost?.营业收入 ? productionStore.manufacturingCost.营业收入.toLocaleString() : '--',
+    actualRevenue: productionStore.manufacturingCost?.实际收入 ? productionStore.manufacturingCost.实际收入.toLocaleString() : '--',
     actualRatio: productionStore.manufacturingCostRatio || 0
   }
 }))

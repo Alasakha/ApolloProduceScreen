@@ -1,5 +1,5 @@
 <template>
-  <div class="h-[20vh] w-full p-2">
+  <div class="h-[20vh] w-full p-2 pt-0">
 
       <div class="box-content h-full">
         <!-- 年度能耗数据展示 -->
@@ -122,22 +122,36 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getElectricPowerYear, getGasPower } from '@/api/enery'
+import { getElectricPowerYear, getGasPower, getElectricCompare } from '@/api/enery'
 
 // 年度数据
 const yearlyElectricData = ref([])
 const yearlyGasData = ref([])
 const yearlyWaterData = ref([])
 
-// 计算电力数据
+// 年度电力对比数据 - 电力数据写死
+const electricCompareData = ref({
+  cl2024: 4240,           // 标准台数
+  standard2024: 1740949,  // 标准电量 (写死)
+  standard2025: 0,        // 总实际 (从接口获取)
+  total2024: 133124,      // 标准产量 (写死)
+  cl2025: 0              // 实际台数 (从接口获取)
+})
+
+// 计算电力数据 - 使用新的年度对比数据结构
 const electricData = computed(() => {
-  const totalStandard = yearlyElectricData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
-  const totalActual = yearlyElectricData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
+  const data = electricCompareData.value
+  
+  // 使用新的数据结构
+  const totalStandard = data.standard2024 || 0  // 总标准
+  const totalActual = data.standard2025 || 0    // 总实际
   const totalDiff = totalActual - totalStandard
   
-  const totalUnits = yearlyElectricData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
-  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
-  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
+  // 计算每台数据
+  const standardUnits = data.cl2024 || 1        // 标准台数
+  const actualUnits = data.cl2025 || 1          // 实际台数
+  const perUnitStandard = standardUnits > 0 ? (totalStandard / standardUnits).toFixed(2) : '0.00'
+  const perUnitActual = actualUnits > 0 ? (totalActual / actualUnits).toFixed(2) : '0.00'
   const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
   
   return {
@@ -195,7 +209,15 @@ const waterData = computed(() => {
 // 获取年度数据
 const fetchYearlyData = async () => {
   try {
-    // 获取年度电力数据
+    // 获取年度电力对比数据 - 只获取实际数据，标准数据已写死
+    const electricCompareRes = await getElectricCompare()
+    if (electricCompareRes.code === 200 && electricCompareRes.data) {
+      // 只更新实际数据，标准数据保持写死的值
+      electricCompareData.value.standard2025 = electricCompareRes.data.standard2025 || 0
+      electricCompareData.value.cl2025 = electricCompareRes.data.cl2025 || 0
+    }
+    
+    // 获取年度电力数据（保留原有逻辑作为备用）
     const electricRes = await getElectricPowerYear()
     if (electricRes.code === 200 && Array.isArray(electricRes.data)) {
       yearlyElectricData.value = electricRes.data
@@ -245,6 +267,7 @@ onUnmounted(() => {
 .box-content {
   padding: 8px;
   height: 100%;
+  padding-top: 0px;
 }
 
 /* 能耗仪表盘样式 */
@@ -301,15 +324,31 @@ onUnmounted(() => {
   flex: 1;
 }
 
-.data-item {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  padding: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 2px;
-  border: 1px solid rgba(0, 238, 255, 0.1);
+/* 2K及以上分辨率使用此样式 */
+@media (min-width: 2000px) {
+  .data-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.25);
+    border-radius: 4px;
+    border: 1px solid rgba(0, 238, 255, 0.18);
+    box-shadow: 0 2px 8px rgba(0,238,255,0.08);
+  }
+}
+@media (max-width: 1980px) {
+  .data-item {
+    display: flex;
+    /* flex-direction: column; */
+    align-items: center;
+    justify-content: space-between;
+    padding: 4px;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 2px;
+    border: 1px solid rgba(0, 238, 255, 0.1);
+  }
 }
 
 .data-label {

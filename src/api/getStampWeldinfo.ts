@@ -466,7 +466,7 @@ export const submitRuisongHourCl = (data: RuisongHourClSubmit[]): Promise<any> =
 }
 
 // /stampingWelding/paintingPassRate
-export const getPaintingPassRate = () => {
+export const getPaintingPassRate = (): Promise<{data: PaintingPassRate[]}> => {
   return request({
     url: '/stampingWelding/paintingPassRate',
     method: 'get',
@@ -490,4 +490,76 @@ export interface PaintingPassRate {
   wjFirstNg: number
   rate: number
   firstRate: number
+}
+// /stampingWelding/getTemperature4
+export const getTemperature4 = (): Promise<{data: Temperature4}> => {
+  return request({
+    url: '/stampingWelding/getTemperature4',
+    method: 'get',
+  })
+}
+export interface Temperature4 {
+  pmx: number //粉体线 固化炉温度
+  tbx: number //铁板线 固化炉温度
+  ytx: number //液体线 固化炉温度
+}
+
+
+// paintingPassRateDetail 二部 直通率点击详细信息
+export const getPaintingPassRateDetail = (): Promise<{data: PaintingPassRateDetail[]}> => {
+  return request({
+    url: '/stampingWelding/paintingPassRateDetail',
+    method: 'get',
+  })
+}
+
+export interface PaintingPassRateDetail {
+  udateTim: string         // 更新时间
+  MB00: string             // 品号
+  UDF66: string            // 总数
+  ng: number               // 不合格数
+  firstNg: number          // 首件不合格数
+  TAO01: string            // 工单号 （TA001+TA002）
+  TA002: string           
+  TA006: string            // 品号
+  MBO03: string            // 规格
+  peopleName: string       // 操作人
+}
+
+// paintingPassRate2 一部 直通率点击详细信息
+export const getPaintingPassRate2 = (): Promise<{data: PaintingPassRateDetail[]}> => {
+  return request({
+    url: '/stampingWelding/paintingPassRate2',
+    method: 'get',
+  })
+}
+
+// /todayBadIssuesDetail
+export const getTodayBadIssuesDetail = (prodLine: string): Promise<{data: TodayBadIssuesDetail[]}> => {
+  return request({
+    url: '/stampingWelding/todayBadIssuesDetail',
+    method: 'get', 
+    params: { prodLine }
+  })
+}
+
+export interface TodayBadIssuesDetail {
+  ngNO: string
+  ngName: string //问题名称
+  total: number | null
+  grandTotal: number | null
+  uid: string
+  createDate: string //生成时间
+  ih_uid: string | null
+  ta001: string | null //
+  ta002: string //工单号
+  ta006: string //品号
+  mb002: string //品名
+  peopleName: string | null 
+  ngResponPeople: string //责任人
+  ngHandle: string | null
+  ngReason: string | null
+  nums: string //数量
+  mb003: string //规格型号
+  admin_UNIT_NAME: string //责任部门
 }

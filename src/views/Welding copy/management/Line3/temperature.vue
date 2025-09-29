@@ -10,13 +10,13 @@
                 <div class="plc-params">
                     <div class="param-item">
                         <span class="param-label">炉内超温：</span>
-                        <span class="param-value" :class="{ 'status-yes': t4Data.overTemp, 'status-no': !t4Data.overTemp }">
+                        <span class="param-value" :class="{ 'status-over-temp-yes': t4Data.overTemp, 'status-over-temp-no': !t4Data.overTemp }">
                             {{ t4Data.overTemp ? '是' : '否' }}
                         </span>
                     </div>
                     <div class="param-item">
                         <span class="param-label">温度到达：</span>
-                        <span class="param-value" :class="{ 'status-yes': t4Data.tempReached, 'status-no': !t4Data.tempReached }">
+                        <span class="param-value" :class="{ 'status-temp-reached-yes': t4Data.tempReached, 'status-temp-reached-no': !t4Data.tempReached }">
                             {{ t4Data.tempReached ? '是' : '否' }}
                         </span>
                     </div>
@@ -26,7 +26,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-label">计时结束：</span>
-                        <span class="param-value" :class="{ 'status-yes': t4Data.timerEnd, 'status-no': !t4Data.timerEnd }">
+                        <span class="param-value" :class="{ 'status-timer-end-yes': t4Data.timerEnd, 'status-timer-end-no': !t4Data.timerEnd }">
                             {{ t4Data.timerEnd ? '是' : '否' }}
                         </span>
                     </div>
@@ -39,13 +39,13 @@
                 <div class="plc-params">
                     <div class="param-item">
                         <span class="param-label">炉内超温：</span>
-                        <span class="param-value" :class="{ 'status-yes': t6Data.overTemp, 'status-no': !t6Data.overTemp }">
+                        <span class="param-value" :class="{ 'status-over-temp-yes': t6Data.overTemp, 'status-over-temp-no': !t6Data.overTemp }">
                             {{ t6Data.overTemp ? '是' : '否' }}
                         </span>
                     </div>
                     <div class="param-item">
                         <span class="param-label">温度到达：</span>
-                        <span class="param-value" :class="{ 'status-yes': t6Data.tempReached, 'status-no': !t6Data.tempReached }">
+                        <span class="param-value" :class="{ 'status-temp-reached-yes': t6Data.tempReached, 'status-temp-reached-no': !t6Data.tempReached }">
                             {{ t6Data.tempReached ? '是' : '否' }}
                         </span>
                     </div>
@@ -55,7 +55,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-label">计时结束：</span>
-                        <span class="param-value" :class="{ 'status-yes': t6Data.timerEnd, 'status-no': !t6Data.timerEnd }">
+                        <span class="param-value" :class="{ 'status-timer-end-yes': t6Data.timerEnd, 'status-timer-end-no': !t6Data.timerEnd }">
                             {{ t6Data.timerEnd ? '是' : '否' }}
                         </span>
                     </div>
@@ -76,7 +76,7 @@
                     </div>
                     <div class="param-item">
                         <span class="param-label">超温状态：</span>
-                        <span class="param-value" :class="{ 'status-yes': filmData.overTemp, 'status-no': !filmData.overTemp }">
+                        <span class="param-value" :class="{ 'status-over-status-yes': filmData.overTemp, 'status-over-status-no': !filmData.overTemp }">
                             {{ filmData.overTemp ? '是' : '否' }}
                         </span>
                     </div>
@@ -264,18 +264,52 @@ onBeforeUnmount(() => {
 }
 
 .param-value {
-    font-size: 13px;
+    font-size: 19px;
     font-weight: 500;
     color: #fff;
     text-align: right;
 }
 
-.status-yes {
+/* 炉内超温：是红色 否绿色 */
+.status-over-temp-yes {
     color: #ff4444;
     font-weight: bold;
 }
 
-.status-no {
+.status-over-temp-no {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+/* 温度到达：是绿色 否红色 */
+.status-temp-reached-yes {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.status-temp-reached-no {
+    color: #ff4444;
+    font-weight: bold;
+}
+
+/* 计时结束：是绿色 否红色 */
+.status-timer-end-yes {
+    color: #00ff00;
+    font-weight: bold;
+}
+
+.status-timer-end-no {
+    color: #ff4444;
+    font-weight: bold;
+}
+
+/* 超温状态：是红色 否绿色 */
+.status-over-status-yes {
+    color: #ff4444;
+    font-weight: bold;
+}
+
+.status-over-status-no {
     color: #00ff00;
     font-weight: bold;
 }

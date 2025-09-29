@@ -1,34 +1,33 @@
 <template>
-         <el-dialog
-         v-model="visible"
-         title="喷涂直通率详情"
-         width="95%"
-         :close-on-click-modal="false"
-         :close-on-press-escape="false"
-         class="spray-dialog"
-         :modal="true"
-         :append-to-body="true"
-         :lock-scroll="true"
-         :z-index="2000"
-         @close="handleClose"
-     >
+    <el-dialog
+        v-model="visible"
+        title="喷涂直通率详情"
+        width="95%"
+        :close-on-click-modal="false"
+        :close-on-press-escape="false"
+        class="spray-dialog"
+        :modal="true"
+        :append-to-body="true"
+        :lock-scroll="true"
+        :z-index="2000"
+        @close="handleClose"
+    >
         <div class="dialog-content">
             <!-- 数据表格 -->
             <div class="table-container">
-                                 <el-table :data="sprayData" border stripe style="width: 100%" v-loading="loading" height="500">
-                     <el-table-column prop="udateTim" label="更新时间" width="160" />
-                     <el-table-column prop="MB00" label="品号" width="140" />
-                     <el-table-column prop="UDF66" label="总数" width="100" />
-                     <el-table-column prop="ng" label="不合格数" width="100" />
-                     <el-table-column prop="firstNg" label="首件不合格数" width="120" />
-                     <el-table-column prop="TAO01" label="工单号" width="140" />
-                     <el-table-column prop="TA002" label="工单号2" width="120" />
-                     <el-table-column prop="TA006" label="品号" width="120" />
-                     <el-table-column prop="MBO03" label="规格" min-width="200" />
-                     <el-table-column prop="peopleName" label="操作人" width="120" />
+                <el-table :data="sprayData" border stripe style="width: 100%" v-loading="loading" height="500">
+                    <el-table-column prop="udateTim" label="更新时间" width="160" />
+                    <el-table-column prop="MB00" label="品号" width="140" />
+                    <el-table-column prop="UDF66" label="总数" width="100" />
+                    <el-table-column prop="ng" label="不合格数" width="100" />
+                    <el-table-column prop="firstNg" label="首件不合格数" width="120" />
+                    <el-table-column prop="TAO01" label="工单号" width="140" />
+                    <el-table-column prop="TA002" label="工单号2" width="120" />
+                    <el-table-column prop="TA006" label="品号" width="120" />
+                    <el-table-column prop="MBO03" label="规格" min-width="200" />
+                    <el-table-column prop="peopleName" label="操作人" width="120" />
                 </el-table>
             </div>
-
         </div>
         
         <template #footer>
@@ -75,7 +74,6 @@ watch(() => props.modelValue, async (newVal) => {
         await loadSprayData()
     }
 })
-
 
 // 加载喷涂数据
 const loadSprayData = async () => {
@@ -129,38 +127,31 @@ const handleClose = () => {
     z-index: 2099 !important;
 }
 
- .dialog-content {
-     max-height: 80vh;
-     overflow-y: auto;
-     padding: 0;
- }
+.dialog-content {
+    max-height: 80vh;
+    overflow-y: auto;
+    padding: 0;
+}
 
- .table-container {
-     margin-bottom: 0;
-     height: 100%;
- }
+.table-container {
+    margin-bottom: 0;
+    height: 100%;
+}
 
+.dialog-footer {
+    text-align: right;
+}
 
- .dialog-footer {
-     text-align: right;
- }
+:deep(.el-table__body-wrapper) {
+    overflow-y: auto;
+}
 
- /* 表格平分对话框空间的样式 */
- /* :deep(.el-table) {
-     height: 500px !important;
- } */
+:deep(.el-table__header-wrapper) {
+    background-color: #f5f7fa;
+}
 
- :deep(.el-table__body-wrapper) {
-     overflow-y: auto;
- }
-
- :deep(.el-table__header-wrapper) {
-     background-color: #f5f7fa;
- }
-
- /* 确保表格列宽合理分布 */
- :deep(.el-table .cell) {
-     padding: 8px 12px;
- }
-
-</style> 
+/* 确保表格列宽合理分布 */
+:deep(.el-table .cell) {
+    padding: 8px 12px;
+}
+</style>

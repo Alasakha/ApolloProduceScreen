@@ -1,7 +1,20 @@
 <template>
     <div class="quality-container">
         <div class="quality-title">
-            <h3>今日质量TOP问题</h3>
+            <div class="title-content">
+                <h3>今日质量TOP问题</h3>
+            </div>
+            <div class="title-actions">
+                <el-button 
+                    type="primary" 
+                    size="small" 
+                    @click="openDetailDialog('全部')"
+                    class="detail-button"
+                >
+                    查看详细
+                </el-button>
+
+            </div>
         </div>
         <div class="chart-container">
             <EChartsPieChart
@@ -46,16 +59,23 @@
                     style="width: 100%"
                     :empty-text="errorMessage || '暂无数据'"
                 >
-                    <el-table-column prop="date" label="日期" width="120" />
-                    <el-table-column prop="workOrder" label="工单号" width="150" />
-                    <el-table-column prop="partNo" label="品号" width="120" />
-                    <el-table-column prop="customerOrder" label="客户单号" width="150" />
-                    <el-table-column prop="type" label="类型" width="100" />
-                    <el-table-column prop="defectCode" label="不合格代码" width="120" />
-                    <el-table-column prop="defectName" label="不合格名称" width="150" />
-                    <el-table-column prop="department" label="责任部门" width="120" />
-                    <el-table-column prop="responsible" label="责任人" width="100" />
-                    <el-table-column prop="count" label="数量" width="80" />
+                    <el-table-column prop="createDate" label="日期" width="220" />
+                    <el-table-column prop="udf021" label="客户单号" width="150" />
+                    <el-table-column prop="ta006" label="品号" width="140" />
+                    <el-table-column prop="mb002" label="品名" width="230" />
+                    <el-table-column prop="mb003" label="规格型号" width="340" />
+                    <!-- <el-table-column prop="ngNO" label="不合格代码" width="120" /> -->
+                    <el-table-column prop="ngName" label="不合格名称" width="150" />
+                    <el-table-column prop="admin_UNIT_NAME" label="责任部门" width="120" />
+                    <el-table-column prop="ngResponPeople" label="责任人" width="100" />
+                    <el-table-column prop="nums" label="数量" width="80" />
+                    <el-table-column prop="ngReason" label="原因" width="120" />
+                    <el-table-column prop="ngHandle" label="处理方式" width="120" />
+                    <el-table-column label="操作" width="100">
+                        <template #default="scope">
+                            <el-button type="primary" size="small" @click="handleEdit(scope.row)">填写</el-button>
+                        </template>
+                    </el-table-column>
                 </el-table>
                 
 
@@ -67,15 +87,44 @@
                 </span>
             </template>
         </el-dialog>
+
+        <!-- 填写原因弹窗 -->
+        <el-dialog 
+            v-model="reasonDialogVisible" 
+            title="填写原因/处理方式" 
+            width="40%"
+            :close-on-click-modal="false"
+            :before-close="handleReasonDialogClose"
+            destroy-on-close
+            append-to-body
+        >
+            <el-form :model="reasonForm" label-width="120px">
+                <el-form-item label="不良问题">
+                    <el-input v-model="reasonForm.reason" placeholder="请输入不良问题原因" />
+                </el-form-item>
+                <el-form-item label="处理方式">
+                    <el-input v-model="reasonForm.way" placeholder="请输入处理方式" />
+                </el-form-item>
+            </el-form>
+            <template #footer>
+                <span class="dialog-footer">
+                    <el-button @click="clearReasonForm">清空</el-button>
+                    <el-button @click="reasonDialogVisible = false">取消</el-button>
+                    <el-button type="primary" @click="handleReasonSubmit">确定</el-button>
+                </span>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed,onUnmounted  } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
+import { ElMessage } from 'element-plus'
 import EChartsPieChart from '@/components/EChartsPieChart.vue'
 import type { PieChartItem } from '@/components/EChartsPieChart.vue'
-import { getTodayBadIssues, type TodayBadIssues } from '@/api/getStampWeldinfo'
+import { getTodayBadIssues, getTodayBadIssuesDetail, type TodayBadIssues } from '@/api/getStampWeldinfo'
+import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
 import { useRoute } from 'vue-router'
 
 const route = useRoute()
@@ -90,6 +139,13 @@ const detailData = ref<any[]>([])
 const loading = ref(false)
 const errorMessage = ref('')
 
+// 填写原因相关
+const reasonDialogVisible = ref(false)
+const reasonForm = ref({
+    reason: '',
+    way: ''
+})
+const currentRowUid = ref('')
 
 // 真实API数据
 const apiData = ref<TodayBadIssues[]>([])
@@ -181,15 +237,23 @@ const fetchDetailData = async (category: string) => {
     errorMessage.value = ''
     
     try {
-        console.log('开始获取明细数据，类别:', category)
+        console.log('开始获取明细数据，类别:', category, '生产线:', prodLine)
         
-        // TODO: 调用真实API获取明细数据
-        // const response = await getDetailData(prodLine.value, category)
-        // detailData.value = response.data || []
+        const response = await getTodayBadIssuesDetail(prodLine)
+        console.log('明细数据API响应:', response)
         
-        // 暂时设置为空数据，等待真实API实现
-        detailData.value = []
-        console.log('明细数据加载完成:', detailData.value)
+        if (response && response.data) {
+            // 如果选择了特定类别，过滤数据
+            if (category !== '全部') {
+                detailData.value = response.data.filter(item => item.ngName === category)
+            } else {
+                detailData.value = response.data
+            }
+            console.log('明细数据加载完成:', detailData.value)
+        } else {
+            detailData.value = []
+            console.warn('明细数据API返回为空')
+        }
         
     } catch (error) {
         console.error('获取明细数据失败:', error)
@@ -205,6 +269,52 @@ const handleClose = () => {
     dialogVisible.value = false
     detailData.value = []
     errorMessage.value = ''
+}
+
+
+// 处理填写按钮点击
+const handleEdit = (row: any) => {
+    console.log('点击填写按钮，行数据:', row)
+    reasonDialogVisible.value = true
+    reasonForm.value.reason = row.ngReason || ''
+    reasonForm.value.way = row.ngHandle || ''
+    currentRowUid.value = row.uid
+}
+
+// 处理原因提交
+const handleReasonSubmit = () => {
+    if (!currentRowUid.value) {
+        ElMessage.error('缺少必要参数')
+        return
+    }
+    
+    getAbnormalHandleAdd(currentRowUid.value, reasonForm.value.way, reasonForm.value.reason)
+        .then(res => {
+            if (res.code === 200) {
+                ElMessage.success('提交成功')
+                reasonDialogVisible.value = false
+                // 刷新明细数据
+                fetchDetailData('全部')
+            } else {
+                ElMessage.error('提交失败')
+            }
+        })
+        .catch(error => {
+            console.error('提交失败:', error)
+            ElMessage.error('提交失败')
+        })
+}
+
+// 清空原因表单
+const clearReasonForm = () => {
+    reasonForm.value.reason = ''
+    reasonForm.value.way = ''
+}
+
+// 关闭原因对话框
+const handleReasonDialogClose = () => {
+    reasonDialogVisible.value = false
+    clearReasonForm()
 }
 
 // 定时刷新数据
@@ -260,8 +370,24 @@ onUnmounted(() => {
 
 .quality-title {
     background: linear-gradient(135deg, #87CEEB, #98D8E8);
-    padding: 1px 1px;
+    padding: 8px 16px;
     border-radius: 6px;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.title-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex: 1;
+}
+
+.title-actions {
+    display: flex;
+    gap: 8px;
 }
 
 .quality-title h3 {
@@ -270,6 +396,41 @@ onUnmounted(() => {
     font-size: 16px;
     font-weight: 600;
     text-align: center;
+}
+
+.department-info {
+    color: #2c3e50;
+    font-size: 12px;
+    margin-top: 4px;
+    font-weight: 500;
+}
+
+.detail-button {
+    background: linear-gradient(135deg, #4A90E2, #357ABD);
+    border: none;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.detail-button:hover {
+    background: linear-gradient(135deg, #357ABD, #2E6DA4);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
+}
+
+.reason-button {
+    background: linear-gradient(135deg, #FF8C00, #FF7F00);
+    border: none;
+    color: white;
+    font-weight: 500;
+    transition: all 0.3s ease;
+}
+
+.reason-button:hover {
+    background: linear-gradient(135deg, #FF7F00, #FF6B00);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
 }
 
 .chart-container {
@@ -324,6 +485,4 @@ onUnmounted(() => {
 .dialog-footer {
     text-align: right;
 }
-
-
 </style>

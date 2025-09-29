@@ -134,6 +134,7 @@
   import DataCard from "@/components/DataCard.vue"; // 导入封装组件
   import { getMonthTotalInfo ,getTodayProductionInfo,} from '@/api/getProduceinfo';
   import { getPaintingPassRate } from '@/api/getStampWeldinfo';
+  import { getPaassedInfo } from '@/api/getQuiltyinfo';
   import { useRoute } from 'vue-router';
   import { eventBus } from '@/utils/eventbus';
   import { color } from 'echarts';
@@ -163,6 +164,10 @@
     getPaintingPassRate().then(res => {
       passedInfo.value = res.data
       console.log('passedInfo.value',passedInfo.value)
+    }),
+    getPaassedInfo(prodLine).then(res => {
+      passedInfo.value = res.data
+      console.log('涂装passedInfo.value',passedInfo.value)
     })
   
   }
