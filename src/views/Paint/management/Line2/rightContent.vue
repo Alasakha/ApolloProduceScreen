@@ -153,16 +153,8 @@ const t4FurnaceData = ref({
 // API数据更新
 const isLoading = ref(false)
 const apiError = ref('')
-let lastUpdateTime = 0
-const UPDATE_INTERVAL = 5000 // 最小更新间隔5秒
 
 const updatePLCData = async () => {
-  const now = Date.now()
-  if (now - lastUpdateTime < UPDATE_INTERVAL) {
-    console.log('⏳ 请求过于频繁，跳过本次更新')
-    return
-  }
-  lastUpdateTime = now
   try {
     isLoading.value = true
     apiError.value = ''
@@ -250,13 +242,15 @@ onMounted(async () => {
   // 立即获取一次数据
   await updatePLCData()
   
-  // 只监听全局刷新事件，移除3秒定时器
+  // 只监听EventBus刷新事件，不设置定时器
+  eventBus.on('refreshData', updatePLCData)
   eventBus.on('globalRefresh', updatePLCData)
 })
 
 // 组件卸载时清理事件监听
 onUnmounted(() => {
   // 移除EventBus监听
+  eventBus.off('refreshData', updatePLCData)
   eventBus.off('globalRefresh', updatePLCData)
 })
 </script>

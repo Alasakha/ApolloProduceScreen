@@ -563,3 +563,20 @@ export interface TodayBadIssuesDetail {
   mb003: string //规格型号
   admin_UNIT_NAME: string //责任部门
 }
+
+// 月度生产数据接口返回类型
+export interface MonthProductionData {
+  pcTotal: number  // 排产总数
+  done: number     // 已完成数
+  undone: number   // 未完成数
+}
+
+// monthProduction - 支持一部焊接(1006)和二部焊接(2006)
+export const getMonthProduction = (prodLine: string): Promise<{code: number, message: string, data: MonthProductionData}> => {
+  return request({
+    url: '/stampingWelding/monthProduction',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+

@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { getMonthTotalInfo} from '@/api/getProduceinfo';
-import {getMonthProduction } from '@/api/getStampinfo'
+import {getMonthProduction } from '@/api/getStampWeldinfo'
 import { eventBus } from '@/utils/eventbus';
 
 const planList = ref([
@@ -44,7 +44,7 @@ const prodLines = {
     '二课总装：': '2004',
     '一课总装：': '1004',
     '一部焊接：': '1003',
-    '二部焊接：': '2003',
+    '二部焊接：': '2006',
 };
 
 
@@ -56,11 +56,12 @@ const fetchLineData = async (item: any) => {
     try {
         if (item.name.includes('焊接')) {
             const res = await getMonthProduction(line);
+            const completionRate = res.data.pcTotal > 0 ? (res.data.done / res.data.pcTotal * 100) : 0;
             return {
                 ...item,
                 plan: res.data.pcTotal || 0,
                 done: res.data.done || 0,
-                rate: res.data.rate ? `${res.data.rate.toFixed(1)}%` : '0%',
+                rate: `${completionRate.toFixed(1)}%`,
                 loading: false
             };
         } else {

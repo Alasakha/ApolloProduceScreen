@@ -3,12 +3,10 @@
     <dv-border-box-2>
       <div class="flex flex-col h-full">
         <!-- 标题 -->
-        <div class="text-center py-2">
+        <!-- <div class="text-center py-2">
           <span class="text-[#00eeff] font-bold text-2xl 4xl:text-2xl 3xl:text-sm">82522504270042水表</span>
-          <!-- <div class="text-gray-400 text-sm mt-1">
-            数据时间：{{ currentDataTime }}
-          </div> -->
-        </div>
+
+        </div> -->
 
         <!-- 内容区域 -->
         <div class="content-grid">
@@ -452,7 +450,7 @@ const submitReason = async () => {
   .content-grid {
     gap: 16px;
     padding: 16px;
-    padding-top: 0%;
+    /* padding-top: 0%; */
   }
   
   .data-card {

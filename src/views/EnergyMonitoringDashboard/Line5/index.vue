@@ -2,7 +2,7 @@
   <div class="energy-trend-container ml-4 mr-4">
     <!-- 大标题 -->
     <div class="main-header">
-      <h1 class="main-title text-xl">月度能耗趋势</h1>
+      <h1 class="main-title text-xl">近六周气水电能耗趋势</h1>
       <div class="data-time">
         数据时间：{{ new Date().toLocaleString() }}
       </div>
@@ -10,31 +10,34 @@
     
     <!-- 三个柱状图区域 -->
     <div class="charts-container">
-      <!-- 电能检测 -->
-      <EnergyChart
-        title="电能"
-        :data="monthlyData.electric"
-        :month-labels="monthLabels"
-        color="#007bff"
-        unit="kWh"
-      />
-
       <!-- 气能监测 -->
       <EnergyChart
         title="气能"
-        :data="monthlyData.gas"
-        :month-labels="monthLabels"
+        :data="gasWaterData.gas"
+        :week-labels="weekLabels"
         color="#ff9f00"
         unit="m³"
+        chart-type="weekly"
       />
 
       <!-- 水能监测 -->
       <EnergyChart
         title="水能"
-        :data="monthlyData.water"
-        :month-labels="monthLabels"
+        :data="gasWaterData.water"
+        :week-labels="weekLabels"
         color="#00ff9f"
         unit="m³"
+        chart-type="weekly"
+      />
+
+      <!-- 电能监测 -->
+      <EnergyChart
+        title="电能"
+        :data="electricData"
+        :week-labels="weekLabels"
+        color="#ff6b6b"
+        unit="kWh"
+        chart-type="weekly"
       />
     </div>
   </div>
@@ -42,46 +45,103 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getElectricPowerYear, getGasPower } from '@/api/enery'
+import { getSixWeekGasWater, getSixWeekElectric } from '@/api/enery'
 import EnergyChart from './components/EnergyChart.vue'
+import type { SixWeekGasWaterItem, SixWeekElectricItem } from '@/api/enery'
 
-// 六个月的数据
-const monthlyData = ref({
-  electric: {
-    standard: [1200, 1300, 1250, 1350, 1400, 1450], // 六个月电力标准用量
-    actual: [1150, 1280, 1200, 1320, 1380, 1420]     // 六个月电力实际用量
-  },
+// 气水数据
+const gasWaterData = ref({
   gas: {
-    standard: [800, 850, 820, 880, 900, 920],        // 六个月气标准用量
-    actual: [780, 830, 800, 860, 880, 900]           // 六个月气实际用量
+    weeklyIncrement: [] as number[]  // 每周气能增量
   },
   water: {
-    standard: [600, 650, 620, 680, 700, 720],        // 六个月水标准用量
-    actual: [580, 630, 600, 660, 680, 700]          // 六个月水实际用量
+    weeklyIncrement: [] as number[]  // 每周水能增量
   }
 })
 
-// 月份标签
-const monthLabels = ['1月', '2月', '3月', '4月', '5月', '6月']
+// 电能数据
+const electricData = ref({
+  weeklyIncrement: [] as number[]  // 每周电能增量
+})
+
+// 周标签
+const weekLabels = ref<string[]>([])
 
 // 获取数据
 const fetchData = async () => {
   try {
-    // 获取电能数据
-    const electricData = await getElectricPowerYear()
-    if (electricData && electricData.data) {
-      // 处理电能数据
-      console.log('电能数据:', electricData.data)
+    // 获取气能数据 (气参数: 000025061803)
+    const gasData = await getSixWeekGasWater('000025061803')
+    if (gasData && gasData.data) {
+      console.log('气能数据:', gasData.data)
+      processGasWaterData(gasData.data, 'gas')
     }
     
-    // 获取气能数据
-    const gasData = await getGasPower('2024-01')
-    if (gasData && gasData.data) {
-      // 处理气能数据
-      console.log('气能数据:', gasData.data)
+    // 获取水能数据 (水参数: 82522504270042)
+    const waterData = await getSixWeekGasWater('82522504270042')
+    if (waterData && waterData.data) {
+      console.log('水能数据:', waterData.data)
+      processGasWaterData(waterData.data, 'water')
+    }
+
+    // 获取电能数据
+    const electricDataResponse = await getSixWeekElectric()
+    if (electricDataResponse && electricDataResponse.data) {
+      console.log('电能数据:', electricDataResponse.data)
+      processElectricData(electricDataResponse.data)
     }
   } catch (error) {
-    console.error('获取数据失败:', error)
+    console.error('获取能耗数据失败:', error)
+  }
+}
+
+// 处理气水数据
+const processGasWaterData = (data: SixWeekGasWaterItem[], type: 'gas' | 'water') => {
+  if (data && data.length > 0) {
+    // 按周数排序
+    const sortedData = data.sort((a, b) => a.week_num - b.week_num)
+    
+    // 提取周标签和增量数据
+    const labels = sortedData.map(item => `第${item.week_num}周`)
+    const increments = sortedData.map(item => item.weekly_increment)
+    
+    // 更新周标签（只需要设置一次）
+    if (weekLabels.value.length === 0) {
+      weekLabels.value = labels
+    }
+    
+    // 更新对应类型的数据
+    gasWaterData.value[type].weeklyIncrement = increments
+    
+    console.log(`${type}数据处理完成:`, {
+      labels,
+      increments
+    })
+  }
+}
+
+// 处理电能数据
+const processElectricData = (data: SixWeekElectricItem[]) => {
+  if (data && data.length > 0) {
+    // 按周数排序
+    const sortedData = data.sort((a, b) => a.week_num - b.week_num)
+    
+    // 提取周标签和增量数据
+    const labels = sortedData.map(item => `第${item.week_num}周`)
+    const increments = sortedData.map(item => item.weekly_increment)
+    
+    // 更新周标签（如果还没有设置）
+    if (weekLabels.value.length === 0) {
+      weekLabels.value = labels
+    }
+    
+    // 更新电能数据
+    electricData.value.weeklyIncrement = increments
+    
+    console.log('电能数据处理完成:', {
+      labels,
+      increments
+    })
   }
 }
 
@@ -123,16 +183,16 @@ onMounted(async () => {
 
 .charts-container {
   display: flex;
-  gap: 20px;
+  gap: 15px;
   justify-content: space-between;
   align-items: stretch;
 }
 
 /* 响应式设计 */
-@media (max-width: 1200px) {
+@media (max-width: 1400px) {
   .charts-container {
     flex-direction: column;
-    gap: 30px;
+    gap: 20px;
   }
 }
 

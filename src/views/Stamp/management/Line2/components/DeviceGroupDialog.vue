@@ -99,7 +99,7 @@ const staticDeviceData = [
 
   // 冲弧设备组 - 2台设备
   { groupName: '冲弧设备组', groupCode: 5, macNo: '1020031', manufacturer: '张家港保税区民联机械科技有限公司', storage: '1001/2001', deviceName: '自动卧式冲弧机', model: 'ML-CH502' },
-  { groupName: '冲弧设备组', groupCode: 5, macNo: '1020033', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001', deviceName: '冲弧机', model: 'CN-50' },
+  // { groupName: '冲弧设备组', groupCode: 5, macNo: '1020033', manufacturer: '张家港市亿格创机械有限公司', storage: '1001/2001', deviceName: '冲弧机', model: 'CN-50' },
 
   // 手动割管组 - 2台设备
   { groupName: '手动割管组', groupCode: 4, macNo: '1021004', manufacturer: '张家港保税区民联机械科技有限公司', storage: '1001/2001', deviceName: '全自动切管机', model: 'ML-425' },

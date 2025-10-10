@@ -345,7 +345,8 @@ export const useProductionDataStore = defineStore('productionData', {
         
         try {
           // 同时获取月度、年度、准交率、制造费用和涂装问题数据
-          const [monthlyResponse, yearlyResponse, onTimeMonthlyResponse, onTimeDailyResponse, manufacturingCostResponse, paintingProblemResponse] = await Promise.all([
+          // 使用 Promise.allSettled 避免单个接口失败影响其他接口
+          const responses = await Promise.allSettled([
             getFty(monthParam, endDate),        // 本月1号到选中结束日期的月度数据（endDate 对应接口的 endDay 参数）
             getFty(yearParam, endDate),         // 本年1月1号到选中结束日期的年度数据（endDate 对应接口的 endDay 参数）
             getOnTime(monthParam, endDate),     // 本月1号获取月度准交率（接口只支持开始日期）
@@ -355,62 +356,68 @@ export const useProductionDataStore = defineStore('productionData', {
           ])
           
           console.log('productionData store: 接口调用完成，开始处理响应')
-          console.log('productionData store: 接口响应详情:', {
-            monthlyResponse: monthlyResponse,
-            yearlyResponse: yearlyResponse,
-            onTimeMonthlyResponse: onTimeMonthlyResponse,
-            onTimeDailyResponse: onTimeDailyResponse,
-            manufacturingCostResponse: manufacturingCostResponse,
-            paintingProblemResponse: paintingProblemResponse
-          })
           
-          if (monthlyResponse && monthlyResponse.data) {
-            this.monthlyData = monthlyResponse.data
-            console.log('月度数据获取成功:', monthlyResponse.data)
+          // 解构响应结果
+          const [monthlyResult, yearlyResult, onTimeMonthlyResult, onTimeDailyResult, manufacturingCostResult, paintingProblemResult] = responses
+          
+          // 处理月度数据
+          if (monthlyResult.status === 'fulfilled' && monthlyResult.value?.data) {
+            this.monthlyData = monthlyResult.value.data
+            console.log('月度数据获取成功:', monthlyResult.value.data)
           } else {
-            console.warn('productionData store: 月度数据响应异常:', monthlyResponse)
+            console.warn('月度数据获取失败:', monthlyResult.status === 'rejected' ? monthlyResult.reason : '无数据')
           }
           
-          if (yearlyResponse && yearlyResponse.data) {
-            this.yearlyData = yearlyResponse.data
-            console.log('年度数据获取成功:', yearlyResponse.data)
+          // 处理年度数据
+          if (yearlyResult.status === 'fulfilled' && yearlyResult.value?.data) {
+            this.yearlyData = yearlyResult.value.data
+            console.log('年度数据获取成功:', yearlyResult.value.data)
           } else {
-            console.warn('productionData store: 年度数据响应异常:', yearlyResponse)
+            console.warn('年度数据获取失败:', yearlyResult.status === 'rejected' ? yearlyResult.reason : '无数据')
           }
           
-          if (onTimeMonthlyResponse && onTimeMonthlyResponse.data) {
-            this.onTimeMonthlyData = onTimeMonthlyResponse.data
-            console.log('月度准交率数据获取成功:', onTimeMonthlyResponse.data)
+          // 处理月度准交率数据
+          if (onTimeMonthlyResult.status === 'fulfilled' && onTimeMonthlyResult.value?.data) {
+            this.onTimeMonthlyData = onTimeMonthlyResult.value.data
+            console.log('月度准交率数据获取成功:', onTimeMonthlyResult.value.data)
           } else {
-            console.warn('productionData store: 月度准交率数据响应异常:', onTimeMonthlyResponse)
+            console.warn('月度准交率数据获取失败:', onTimeMonthlyResult.status === 'rejected' ? onTimeMonthlyResult.reason : '无数据')
           }
           
-          if (onTimeDailyResponse && onTimeDailyResponse.data) {
-            this.onTimeDailyData = onTimeDailyResponse.data
-            console.log('今日准交率数据获取成功:', onTimeDailyResponse.data)
+          // 处理今日准交率数据
+          if (onTimeDailyResult.status === 'fulfilled' && onTimeDailyResult.value?.data) {
+            this.onTimeDailyData = onTimeDailyResult.value.data
+            console.log('今日准交率数据获取成功:', onTimeDailyResult.value.data)
           } else {
-            console.warn('productionData store: 今日准交率数据响应异常:', onTimeDailyResponse)
+            console.warn('今日准交率数据获取失败:', onTimeDailyResult.status === 'rejected' ? onTimeDailyResult.reason : '无数据')
           }
 
-          if (manufacturingCostResponse && manufacturingCostResponse.data) {
-            this.manufacturingCost = manufacturingCostResponse.data
-            console.log('制造费用数据获取成功:', manufacturingCostResponse.data)
+          // 处理制造费用数据
+          if (manufacturingCostResult.status === 'fulfilled' && manufacturingCostResult.value?.data) {
+            this.manufacturingCost = manufacturingCostResult.value.data
+            console.log('制造费用数据获取成功:', manufacturingCostResult.value.data)
           } else {
-            console.warn('productionData store: 制造费用数据响应异常:', manufacturingCostResponse)
+            console.warn('制造费用数据获取失败:', manufacturingCostResult.status === 'rejected' ? manufacturingCostResult.reason : '无数据')
           }
 
-          if (paintingProblemResponse && paintingProblemResponse.data) {
-            this.paintingProblemData = paintingProblemResponse.data
-            console.log('涂装问题数据获取成功:', paintingProblemResponse.data)
+          // 处理涂装问题数据
+          if (paintingProblemResult.status === 'fulfilled' && paintingProblemResult.value?.data) {
+            this.paintingProblemData = paintingProblemResult.value.data
+            console.log('涂装问题数据获取成功:', paintingProblemResult.value.data)
           } else {
-            console.warn('productionData store: 涂装问题数据响应异常:', paintingProblemResponse)
+            console.warn('涂装问题数据获取失败:', paintingProblemResult.status === 'rejected' ? paintingProblemResult.reason : '无数据')
           }
           
           // 更新最后获取时间
           this.lastFetchTime = new Date()
           
-          if (!monthlyResponse.data && !yearlyResponse.data && !onTimeMonthlyResponse.data && !onTimeDailyResponse.data && !manufacturingCostResponse.data && !paintingProblemResponse.data) {
-            throw new Error('获取数据失败')
+          // 检查是否有任何数据获取成功
+          const hasAnyData = responses.some(result => 
+            result.status === 'fulfilled' && result.value?.data
+          )
+          
+          if (!hasAnyData) {
+            throw new Error('所有接口都获取数据失败')
           }
           
           console.log('生产数据获取完成')

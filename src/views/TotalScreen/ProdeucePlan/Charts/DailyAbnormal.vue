@@ -112,7 +112,7 @@
               item.specifications ?? '无',
               Number(item.productionQuantity) ?? '无',
               item.dateTime  ?? '无',
-              Number(item.productionQuantity)-Number(item.finalInboundQuantity),
+              Number(item.planNum)-Number(item.finalInboundQuantity),
               item.daysBetween != null ? item.daysBetween + '天' : '无',
               item.reason ?? '无',
               item.duty  ?? '无',

@@ -17,12 +17,15 @@ import type { ECharts } from 'echarts'
 interface Props {
   title: string
   data: {
-    standard: number[]
-    actual: number[]
+    standard?: number[]
+    actual?: number[]
+    weeklyIncrement?: number[]
   }
-  monthLabels: string[]
+  monthLabels?: string[]
+  weekLabels?: string[]
   color: string
   unit: string
+  chartType: 'monthly' | 'weekly'
 }
 
 const props = defineProps<Props>()
@@ -31,155 +34,226 @@ const chartRef = ref<HTMLDivElement | null>(null)
 let chartInstance: ECharts | null = null
 
 // 图表配置
-const chartOption = computed(() => ({
-  backgroundColor: 'transparent',
-//   title: {
-//     text: props.title,
-//     left: 'center',
-//     top: 10,
-//     textStyle: {
-//       color: '#00d4ff',
-//       fontSize: 14,
-//       fontWeight: 'bold' as const,
-//       textShadowColor: 'rgba(0, 212, 255, 0.3)',
-//       textShadowBlur: 10
-//     }
-//   },
-  tooltip: {
-    trigger: 'axis' as const,
-    axisPointer: {
-      type: 'shadow' as const,
-      shadowStyle: {
-        color: 'rgba(0, 212, 255, 0.1)'
-      }
-    },
-    backgroundColor: 'rgba(0, 20, 40, 0.95)',
-    borderColor: '#00d4ff',
-    borderWidth: 1,
-    borderRadius: 8,
-    textStyle: {
-      color: '#ffffff',
-      fontSize: 12
-    }
-  },
-  legend: {
-    data: ['标准用量', '实际用量'],
-    top: 35,
-    textStyle: {
-      color: '#ffffff',
-      fontSize: 12
-    },
-    itemGap: 20
-  },
-  grid: {
-    left: '10%',
-    right: '10%',
-    bottom: '20%',
-    top: '20%',
-    containLabel: true
-  },
-  xAxis: {
-    type: 'category' as const,
-    data: props.monthLabels,
-    axisLine: {
-      lineStyle: {
-        color: '#00d4ff',
-        width: 2
-      }
-    },
-    axisLabel: {
-      color: '#ffffff',
-      fontSize: 11,
-      margin: 8
-    },
-    axisTick: {
-      lineStyle: {
-        color: '#00d4ff'
-      }
-    }
-  },
-  yAxis: {
-    type: 'value' as const,
-    name: `用量(${props.unit})`,
-    nameTextStyle: {
-      color: '#00d4ff',
-      fontSize: 12
-    },
-    axisLine: {
-      lineStyle: {
-        color: '#00d4ff',
-        width: 2
-      }
-    },
-    axisLabel: {
-      color: '#ffffff',
-      fontSize: 11
-    },
-    splitLine: {
-      lineStyle: {
-        color: 'rgba(0, 212, 255, 0.15)',
-        type: 'dashed' as const
-      }
-    },
-    axisTick: {
-      lineStyle: {
-        color: '#00d4ff'
-      }
-    }
-  },
-  series: [
-    {
-      name: '标准用量',
-      type: 'bar' as const,
-      data: props.data.standard,
-      barWidth: '25%',
-      itemStyle: {
-        color: {
-          type: 'linear' as const,
-          x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: '#00d4ff' },
-            { offset: 1, color: '#0099cc' }
-          ]
-        },
-        borderRadius: [4, 4, 0, 0],
-        shadowColor: 'rgba(0, 212, 255, 0.3)',
-        shadowBlur: 8
+const chartOption = computed(() => {
+  const isMonthly = props.chartType === 'monthly'
+  const labels = isMonthly ? props.monthLabels : props.weekLabels
+  
+  return {
+    backgroundColor: 'transparent',
+    // title: {
+    //   text: props.title,
+    //   left: 'center',
+    //   top: 10,
+    //   textStyle: {
+    //     color: '#ffffff',
+    //     fontSize: 16,
+    //     fontWeight: 'bold' as const
+    //   }
+    // },
+    tooltip: {
+      trigger: 'axis' as const,
+      axisPointer: {
+        type: 'shadow' as const,
+        shadowStyle: {
+          color: 'rgba(0, 212, 255, 0.1)'
+        }
       },
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 15,
-          shadowColor: 'rgba(0, 212, 255, 0.5)'
+      backgroundColor: 'rgba(0, 20, 40, 0.95)',
+      borderColor: '#00d4ff',
+      borderWidth: 1,
+      borderRadius: 8,
+      textStyle: {
+        color: '#ffffff',
+        fontSize: 12
+      },
+      formatter: (params: any) => {
+        if (isMonthly) {
+          let result = `${params[0].name}<br/>`
+          params.forEach((param: any) => {
+            result += `${param.seriesName}: ${param.value} ${props.unit}<br/>`
+          })
+          return result
+        } else {
+          const data = params[0]
+          return `${data.name}<br/>${data.seriesName}: ${data.value} ${props.unit}`
         }
       }
     },
-    {
-      name: '实际用量',
-      type: 'bar' as const,
-      data: props.data.actual,
-      barWidth: '25%',
-      itemStyle: {
-        color: {
-          type: 'linear' as const,
-          x: 0, y: 0, x2: 0, y2: 1,
-          colorStops: [
-            { offset: 0, color: '#ff6b6b' },
-            { offset: 1, color: '#e55353' }
-          ]
-        },
-        borderRadius: [4, 4, 0, 0],
-        shadowColor: 'rgba(255, 107, 107, 0.3)',
-        shadowBlur: 8
+    legend: {
+      data: isMonthly ? ['标准用量', '实际用量'] : ['周增量'],
+      top: 0,
+      textStyle: {
+        color: '#ffffff',
+        fontSize: 12
       },
-      emphasis: {
-        itemStyle: {
-          shadowBlur: 15,
-          shadowColor: 'rgba(255, 107, 107, 0.5)'
+      itemGap: 20
+    },
+    grid: {
+      left: '10%',
+      right: '10%',
+      bottom: '20%',
+      top: '20%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category' as const,
+      data: labels,
+      axisLine: {
+        lineStyle: {
+          color: '#00d4ff',
+          width: 2
+        }
+      },
+      axisLabel: {
+        color: '#ffffff',
+        fontSize: 11,
+        margin: 8
+      },
+      axisTick: {
+        lineStyle: {
+          color: '#00d4ff'
         }
       }
-    }
-  ]
-}))
+    },
+    yAxis: {
+      type: 'value' as const,
+      name: `用量(${props.unit})`,
+      nameTextStyle: {
+        color: '#00d4ff',
+        fontSize: 12
+      },
+      axisLine: {
+        lineStyle: {
+          color: '#00d4ff',
+          width: 2
+        }
+      },
+      axisLabel: {
+        color: '#ffffff',
+        fontSize: 11
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(0, 212, 255, 0.15)',
+          type: 'dashed' as const
+        }
+      },
+      axisTick: {
+        lineStyle: {
+          color: '#00d4ff'
+        }
+      }
+    },
+    series: isMonthly ? [
+      {
+        name: '标准用量',
+        type: 'bar' as const,
+        data: props.data.standard,
+        barWidth: '25%',
+        label: {
+          show: true,
+          position: 'top' as const,
+          color: '#ffffff',
+          fontSize: 11,
+          fontWeight: 'bold' as const,
+          formatter: (params: any) => {
+            return `${params.value} ${props.unit}`
+          }
+        },
+        itemStyle: {
+          color: {
+            type: 'linear' as const,
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: '#00d4ff' },
+              { offset: 1, color: '#0099cc' }
+            ]
+          },
+          borderRadius: [4, 4, 0, 0],
+          shadowColor: 'rgba(0, 212, 255, 0.3)',
+          shadowBlur: 8
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 15,
+            shadowColor: 'rgba(0, 212, 255, 0.5)'
+          }
+        }
+      },
+      {
+        name: '实际用量',
+        type: 'bar' as const,
+        data: props.data.actual,
+        barWidth: '25%',
+        label: {
+          show: true,
+          position: 'top' as const,
+          color: '#ffffff',
+          fontSize: 11,
+          fontWeight: 'bold' as const,
+          formatter: (params: any) => {
+            return `${params.value} ${props.unit}`
+          }
+        },
+        itemStyle: {
+          color: {
+            type: 'linear' as const,
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: '#ff6b6b' },
+              { offset: 1, color: '#e55353' }
+            ]
+          },
+          borderRadius: [4, 4, 0, 0],
+          shadowColor: 'rgba(255, 107, 107, 0.3)',
+          shadowBlur: 8
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 15,
+            shadowColor: 'rgba(255, 107, 107, 0.5)'
+          }
+        }
+      }
+    ] : [
+      {
+        name: '周增量',
+        type: 'bar' as const,
+        data: props.data.weeklyIncrement,
+        barWidth: '50%',
+        label: {
+          show: true,
+          position: 'top' as const,
+          color: '#ffffff',
+          fontSize: 11,
+          fontWeight: 'bold' as const,
+          formatter: (params: any) => {
+            return `${params.value} ${props.unit}`
+          }
+        },
+        itemStyle: {
+          color: {
+            type: 'linear' as const,
+            x: 0, y: 0, x2: 0, y2: 1,
+            colorStops: [
+              { offset: 0, color: props.color },
+              { offset: 1, color: props.color + '80' } // 添加透明度
+            ]
+          },
+          borderRadius: [4, 4, 0, 0],
+          shadowColor: props.color + '30',
+          shadowBlur: 8
+        },
+        emphasis: {
+          itemStyle: {
+            shadowBlur: 15,
+            shadowColor: props.color + '50'
+          }
+        }
+      }
+    ]
+  }
+})
 
 // 初始化图表
 const initChart = async () => {
