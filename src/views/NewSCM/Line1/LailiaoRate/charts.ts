@@ -1,9 +1,25 @@
 
-
 // chartOption.ts
-export function createChartOption(data) {
+interface ChartDataItem {
+  name: string;
+  value: number;
+}
+
+export function createChartOption(regularData: ChartDataItem[], aClassData: ChartDataItem[]) {
+    // 获取所有供应商名称
+    const allNames = [...new Set([
+      ...regularData.map(item => item.name),
+      ...aClassData.map(item => item.name)
+    ])];
+
     return {
       color: ["#006cff", "#60cda0", "#ed8884", "#ff9f7f", "#0096ff", "#9fe6b8", "#32c5e9", "#1d9dff"],
+      legend: {
+        data: ['常规客户', 'A类客户'],
+        textStyle: {
+          color: '#fff'
+        }
+      },
       xAxis: {
         type: 'category',
         axisLabel: {
@@ -14,7 +30,7 @@ export function createChartOption(data) {
             color: '#fff'
           }
         },
-        data: data.map(item => item.name),
+        data: allNames,
       },
       yAxis: {
         type: 'value',
@@ -36,62 +52,37 @@ export function createChartOption(data) {
         show: true,
         position: 'top', // 显示在柱子顶部
         color: '#fff',   // 文字颜色
-        formatter: '{c}%' // 加上百分号
+        formatter: (params: any) => {
+          return `${(params.value).toFixed(0)}%`
+        }
       },
       series: [
         {
+          name: '常规客户',
           type: 'bar',
           itemStyle: {
             normal: {
-              color: {
-                type: 'linear',
-                x: 0,
-                x2: 0,
-                y: 0,
-                y2: 1,
-                colorStops: [
-                  {
-                    offset: 0,
-                    color: '#00b0ff'
-                  },
-                  {
-                    offset: 0.8,
-                    color: '#7052f4'
-                  }
-                ],
-                global: false, // 缺省为 false
-              },
+              color: '#2a8afc'
             },
           },
-          data: data.map(item => item.value*100),
+          data: allNames.map(name => {
+            const item = regularData.find(d => d.name === name);
+            return item ? item.value : 0;
+          }),
         },
-        // {
-        //   name: "网络流量监控",
-        //   type: "pie",
-        //   radius: ["10%", "40%"],
-        //   center: ["75%", "25%"],
-        //   roseType: "radius",
-        //   data: [
-        //     { value: 60, name: "广东" },
-        //     { value: 50, name: "深圳" },
-        //     { value: 35, name: "浙江" },
-        //     { value: 30, name: "江苏" },
-        //     { value: 24, name: "河北" },
-        //     { value: 12, name: "山东" },
-        //     { value: 6, name: "北京" },
-        //     { value: 5, name: "云南" },
-        //   ],
-        //   label: {
-        //     fontSize: 10,
-        //     formatter(params) {
-        //       return params.percent + '%';
-        //     }
-        //   },
-        //   labelLine: {
-        //     length: 10,
-        //     length2: 10
-        //   }
-        // }
+        {
+          name: 'A类客户',
+          type: 'bar',
+          itemStyle: {
+            normal: {
+              color: '#7ad7b6'
+            },
+          },
+          data: allNames.map(name => {
+            const item = aClassData.find(d => d.name === name);
+            return item ? item.value : 0;
+          }),
+        }
       ]
     };
   }

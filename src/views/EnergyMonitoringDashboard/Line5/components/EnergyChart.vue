@@ -70,12 +70,12 @@ const chartOption = computed(() => {
         if (isMonthly) {
           let result = `${params[0].name}<br/>`
           params.forEach((param: any) => {
-            result += `${param.seriesName}: ${param.value} ${props.unit}<br/>`
+            result += `${param.seriesName}: ${Math.round(param.value)} ${props.unit}<br/>`
           })
           return result
         } else {
           const data = params[0]
-          return `${data.name}<br/>${data.seriesName}: ${data.value} ${props.unit}`
+          return `${data.name}<br/>${data.seriesName}: ${Math.round(data.value)} ${props.unit}`
         }
       }
     },
@@ -157,7 +157,7 @@ const chartOption = computed(() => {
           fontSize: 11,
           fontWeight: 'bold' as const,
           formatter: (params: any) => {
-            return `${params.value} ${props.unit}`
+            return `${Math.round(params.value)} ${props.unit}`
           }
         },
         itemStyle: {
@@ -192,7 +192,7 @@ const chartOption = computed(() => {
           fontSize: 11,
           fontWeight: 'bold' as const,
           formatter: (params: any) => {
-            return `${params.value} ${props.unit}`
+            return `${Math.round(params.value)} ${props.unit}`
           }
         },
         itemStyle: {
@@ -228,7 +228,7 @@ const chartOption = computed(() => {
           fontSize: 11,
           fontWeight: 'bold' as const,
           formatter: (params: any) => {
-            return `${params.value} ${props.unit}`
+            return `${Math.round(params.value)} ${props.unit}`
           }
         },
         itemStyle: {

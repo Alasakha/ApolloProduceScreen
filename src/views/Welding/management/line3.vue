@@ -50,7 +50,7 @@
                   查看详情
                 </el-button>
               </div>
-              <AbnormalProduce ref="abnormalProduceRef" :headers="scrollHeaders"/>
+              <AbnormalProduce ref="abnormalProduceRef" :headers="scrollHeaders" :prod-line="prodLine"/>
             </div>
           </div>
       </dv-border-box-12>
@@ -70,12 +70,22 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
+const route = useRoute();
+const prodLine = Array.isArray(route.query.prodLine) ? route.query.prodLine[0] : route.query.prodLine;
+console.log('line3.vue - 路由信息:', route);
+console.log('line3.vue - prodLine 值:', prodLine);
 // import AbnormalList from './ScrollTable/leftcontent.vue'
 // 工单异常
 import AbnormalProduce from './ScrollTable/rightcontent.vue'
 import DetailTable from '@/components/totalScreen/DetailTable/index.vue'
 import { ElMessage } from 'element-plus';
 import { getWeldingPass, getWeldingProduction, type WeldingPass } from '@/api/getStampWeldinfo';
+
+// 定义 props
+// const props = defineProps<{
+//   prodLine: string;
+// }>();
 
 const abnormalProduceRef = ref(null);
 const detailDialogVisible = ref(false);
@@ -239,10 +249,10 @@ const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
     if (!abnormalProduceRef.value) {
       throw new Error('组件未初始化完成，请刷新页面重试');
     }
-
-    console.log('准备更新数据:', { row, reason, duty, completeDate });
-    await abnormalProduceRef.value.handleReasonUpdate({ row, reason, duty, completeDate });
     
+
+    await abnormalProduceRef.value.handleReasonUpdate({ row, reason, duty, completeDate, prodLine });
+    console.log('更新成功',prodLine);
     // 更新成功后，重新获取表格数据
     if (detailDialogVisible.value) {
       await handleDetail();

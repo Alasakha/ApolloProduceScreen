@@ -105,6 +105,15 @@ export const getPurchasePassRateDetail = (purchaserName ) => {
   })
 }
 
+// income0kRateChart 来料合格率
+export const getIncome0kRateChart = (startDay, endDay, customer) => {
+  return request({
+    url: '/SCM/incomeOkRateChart',
+    method: 'get',
+    params: { startDay, endDay, customer }
+  })
+}
+
 // /SCM/purchaseDeliveryRateDetail 到货及时率
 export const getPurchaseDeliveryRateDetail = (queryDate ,purchaseName ) => {
   return request({

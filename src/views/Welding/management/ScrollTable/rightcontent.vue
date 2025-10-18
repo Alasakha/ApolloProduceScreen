@@ -59,12 +59,19 @@
   import { getAbnormalUnfinishedAdd } from '@/api/getProduceinfo.js';
   import dayjs from 'dayjs';
 
-  const props = defineProps({
-    headers: {
-      type: Array,
-      default: () => []
-    }
-  });
+const props = defineProps({
+  headers: {
+    type: Array,
+    default: () => []
+  },
+  prodLine: {
+    type: String,
+    default: ''
+  }
+});
+
+console.log('rightcontent.vue - props.prodLine:', props.prodLine);
+console.log('rightcontent.vue - route.query.prodLine:', route.query.prodLine);
 
   const dialogVisible = ref(false);//弹窗控制
   const detailDialogVisible = ref(false);
@@ -101,7 +108,7 @@
 
   const fetchData = () => {
     isLoading.value = true; // 设置加载状态
-    fetchClosingRateData(prodLine)
+    fetchClosingRateData(props.prodLine || route.query.prodLine)
       .then((res) => {
         console.log('获取到的原始数据:', res);
         if (res && res.length > 0) {
@@ -253,8 +260,13 @@
       }
 
       // 组装参数
+      const finalProdLine = props.prodLine || route.query.prodLine;
+      console.log('最终使用的 prodLine:', finalProdLine);
+      console.log('props.prodLine:', props.prodLine);
+      console.log('route.query.prodLine:', route.query.prodLine);
+      
       const params = {
-        prodLine: origin.workCenter || prodLine,
+        prodLine: finalProdLine,
         doc_no: origin.workNo || origin.number,
         item_code: origin.articleNumber,
         pc_date: origin.dateTime,

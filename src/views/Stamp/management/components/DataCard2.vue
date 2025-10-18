@@ -6,7 +6,7 @@
       <span class="absolute left-2 text-xs text-white">设备编号: {{ workNo }}</span>
     </div>
     <!-- 右上角角标 -->
-    <div v-if="status" class="absolute top-2 right-4 bg-yellow-400 text-white font-bold text-xs px-3 py-1 rounded-lg shadow rotate-6 border border-yellow-100 z-20">
+    <div v-if="status" :class="statusColorClass" class="absolute top-2 right-4 text-white font-bold text-xs px-3 py-1 rounded-lg shadow rotate-6 border z-20">
       {{ status }}
     </div>
     <!-- 主体内容 -->
@@ -204,6 +204,19 @@ const props = defineProps({
   }
 });
 
+// 状态颜色计算属性
+const statusColorClass = computed(() => {
+  switch (props.status) {
+    case '闲置':
+      return 'bg-yellow-400 border-yellow-100';
+    case '运行中':
+      return 'bg-green-500 border-green-100';
+    case '维修中':
+      return 'bg-red-500 border-red-100';
+    default:
+      return 'bg-gray-400 border-gray-100';
+  }
+});
 
 // // 改用计算属性
 // const allWarnings = computed(() => {

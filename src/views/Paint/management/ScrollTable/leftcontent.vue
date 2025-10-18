@@ -43,6 +43,7 @@
           :headers="config.header"
           :data="tableData"
           :loading="tableLoading"
+          :prod-line="prodLine"
           @update:reason="handleReasonUpdate"
         />
     </div>

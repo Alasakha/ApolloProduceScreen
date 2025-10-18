@@ -59,10 +59,10 @@ const formatCardData = (item) => {
   return {
     orderName: item.machineName || "暂无",
     totalQty: item. total ? Math.round(item.total) : "暂无",
-    doneQty: item.total-item.num || "暂无",
+    doneQty: item.bochuProduction|| "暂无",
     spec: item.processName || "暂无",
     progress: item.total && item.num  ? Number((((item.total-item.num) / item.total) * 100).toFixed(0)) : 0,
-    status: getStatus(item),
+    status: item.machStatus,
     temperature: toFixedNumber(item.laserPower) || '暂无',
     pressure: '暂无',
     maxspeed: toFixedNumber(item.workSpeed) || '暂无',
@@ -83,13 +83,7 @@ const formatCardData = (item) => {
   }
 }
 
-const getStatus = (item) => {
-  if (item.isDoing === '1') {
-    return '运行中'
-  } else {
-    return '暂无'
-  }
-}
+
 
 // 省略小数点
 function toFixedNumber(num) {

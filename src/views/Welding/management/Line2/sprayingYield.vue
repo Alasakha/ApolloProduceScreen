@@ -8,8 +8,8 @@
             <!-- 指标标签行 -->
             <div class="metrics-labels">
                 <span class="metric-label">今日检验数</span>
-                <span class="metric-label">一次合格数</span>
-                <span class="metric-label">直通率</span>
+                <!-- <span class="metric-label">一次合格数</span> -->
+                <!-- <span class="metric-label">直通率</span> -->
                 <span class="metric-label">合格数</span>
                 <span class="metric-label">合格率</span>
             </div>
@@ -18,8 +18,8 @@
                 <div class="part-header">车架</div>
                 <div class="metrics-line">
                     <span class="metric">{{ frameData.inspectionCount }}</span>
-                    <span class="metric">{{ frameData.firstPassCount }}</span>
-                    <span class="metric">{{ frameData.firstPassRate }}</span>
+                    <!-- <span class="metric">{{ frameData.firstPassCount }}</span> -->
+                    <!-- <span class="metric">{{ frameData.firstPassRate }}</span> -->
                     <span class="metric">{{ frameData.qualifiedCount }}</span>
                     <span class="metric">{{ frameData.qualifiedRate }}</span>
                 </div>
@@ -29,8 +29,8 @@
                 <div class="part-header">后叉</div>
                 <div class="metrics-line">
                     <span class="metric">{{ rearForkData.inspectionCount }}</span>
-                    <span class="metric">{{ rearForkData.firstPassCount }}</span>
-                    <span class="metric">{{ rearForkData.firstPassRate }}</span>
+                    <!-- <span class="metric">{{ rearForkData.firstPassCount }}</span> -->
+                    <!-- <span class="metric">{{ rearForkData.firstPassRate }}</span> -->
                     <span class="metric">{{ rearForkData.qualifiedCount }}</span>
                     <span class="metric">{{ rearForkData.qualifiedRate }}</span>
                 </div>
@@ -40,8 +40,8 @@
                 <div class="part-header">尾架</div>
                 <div class="metrics-line">
                     <span class="metric">{{ tailFrameData.inspectionCount }}</span>
-                    <span class="metric">{{ tailFrameData.firstPassCount }}</span>
-                    <span class="metric">{{ tailFrameData.firstPassRate }}</span>
+                    <!-- <span class="metric">{{ tailFrameData.firstPassCount }}</span> -->
+                    <!-- <span class="metric">{{ tailFrameData.firstPassRate }}</span> -->
                     <span class="metric">{{ tailFrameData.qualifiedCount }}</span>
                     <span class="metric">{{ tailFrameData.qualifiedRate }}</span>
                 </div>
@@ -215,7 +215,7 @@ onBeforeUnmount(() => {
 
 .metrics-labels {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     padding: 6px 8px;
     background: rgba(30, 144, 255, 0.1);
@@ -251,7 +251,7 @@ onBeforeUnmount(() => {
 
 .metrics-line {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 8px;
     padding: 6px 8px;
     background: rgba(0, 0, 0, 0.2);

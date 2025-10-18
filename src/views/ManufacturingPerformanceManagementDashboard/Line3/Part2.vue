@@ -3,28 +3,38 @@
 
     <!-- 大标题：常规客户 -->
     <div class="main-title text-xs 2xl:text-sm 3xl:text-sm 4xl:text-xl">
-      常规客户直通率
-      <button 
-            class="toggle-btn absolute right-12 top-1/2 transform -translate-y-1/2" 
+      <div class="title-content">
+        <span class="title-text">常规客户直通率</span>
+        <div class="toggle-buttons">
+          <button 
+            class="toggle-btn" 
             :class="{ active: currentPeriod === 'monthly' }"
             @click="currentPeriod = 'monthly'"
           >月度</button>
           <button 
-            class="toggle-btn absolute right-2 top-1/2 transform -translate-y-1/2" 
+            class="toggle-btn" 
             :class="{ active: currentPeriod === 'yearly' }"
             @click="currentPeriod = 'yearly'"
           >年度</button>
+        </div>
+      </div>
     </div>
     <!-- 常规客户金工一部涂装直通率 -->
-    <div class="department-section">
-      
-      <div class="section-title-with-toggle text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
-        <div class="text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">金工一部涂装</div>
-
+    <div class="department-section w-full ">
+      <div class="column-headers flex justify-around text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">
+        <div class="header-item">目标</div>
+        <div class="header-item">实际</div>
+        <div class="header-item">达成率</div> 
       </div>
+
+      
+
       <div class="data-cards-row">
+        <div class="section-title-with-toggle text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+          <div class="text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">金工一部涂装</div>
+        </div>
         <DataCard 
-          title="目标" 
+      
           :value="regularData.painting.target" 
           unit="%" 
           :titleFontSize="0.6"
@@ -35,7 +45,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="实际" 
+         
           :value="regularData.painting.actual" 
           unit="%" 
           :titleFontSize="0.6"
@@ -46,7 +56,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="达成率" 
+    
           :value="regularData.painting.achievement" 
           unit="%" 
           :titleFontSize="0.6"
@@ -66,10 +76,11 @@
 
     <!-- 常规客户总装一课直通率 -->
     <div class="department-section">
-      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">总装一课</div>
+
       <div class="data-cards-row">
+        <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装一课</div>
         <DataCard 
-          title="目标" 
+         
           :value="regularData.assemblyCourse1.target" 
           unit="%" 
           :titleFontSize="0.6"
@@ -80,7 +91,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="实际" 
+  
           :value="regularData.assemblyCourse1.actual" 
           unit="%" 
           :titleFontSize="0.6"
@@ -91,7 +102,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="达成率" 
+     
           :value="regularData.assemblyCourse1.achievement" 
           unit="%" 
           :titleFontSize="0.6"
@@ -111,10 +122,11 @@
 
     <!-- 常规客户总装二课直通率 -->
     <div class="department-section">
-      <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">总装二课</div>
+
       <div class="data-cards-row">
+        <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装二课</div>
         <DataCard 
-          title="目标" 
+          
           :value="regularData.assemblyCourse2.target" 
           unit="%" 
           :titleFontSize="0.6"
@@ -125,7 +137,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="实际" 
+          
           :value="regularData.assemblyCourse2.actual" 
           unit="%" 
           :titleFontSize="0.6"
@@ -136,7 +148,7 @@
           color="#00FFFF"
         />
         <DataCard 
-          title="达成率" 
+
           :value="regularData.assemblyCourse2.achievement" 
           unit="%" 
           :titleFontSize="0.6"
@@ -270,15 +282,28 @@ onUnmounted(() => {
 .main-title {
   font-weight: bold;
   color: #00d4ff;
-  text-align: start;
   margin-bottom: 6px;
   padding: 4px 8px;
   background: rgba(0, 30, 60, 0.3);
   border: 1px solid rgba(0, 150, 255, 0.3);
   border-radius: 6px;
-  /* font-size: 12px; */
   backdrop-filter: blur(5px);
-  position: relative;
+}
+
+.title-content {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+}
+
+.title-text {
+  flex: 1;
+}
+
+.toggle-buttons {
+  display: flex;
+  gap: 6px;
 }
 
 .top-header {
@@ -305,6 +330,7 @@ onUnmounted(() => {
   font-size: 10px;
   cursor: pointer;
   transition: all 0.2s ease;
+  white-space: nowrap;
 }
 
 .toggle-btn.active {
@@ -321,6 +347,19 @@ onUnmounted(() => {
   flex: 1;
   display: flex;
   flex-direction: column;
+}
+
+.column-headers {
+  margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.header-item {
+  flex: 1;
+  text-align: center;
+  font-weight: bold;
+  color: #00d4ff;
 }
 
 .section-title {

@@ -26,23 +26,28 @@ const formatDate = (dateStr) => {
 
 // 配置轮播表格
 const scrollConfig = computed(() => {
-    const defaultRow = ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+    const defaultRow = ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据','暂无数据']
     return {
-        header: ['项目编号', '项目名称', '任务名称', '计划完成时间', '变更完成时间'],
+        header: ['项目编号', '项目名称', '任务名称', '计划完成时间', '变更完成时间','实际完成时间','完成状态','责任人'],
         data: overdueList.value.length > 0 
             ? overdueList.value.map(item => [
                 item.pno,
                 item.projName,
                 item.taskName,
                 formatDate(item.expectTime),
-                formatDate(item.changeTime) || '--'
+                formatDate(item.changeTime) || '--',
+                formatDate(item.completeTime) || '--',
+          
+                item.sts,
+                item.executant
+
             ])
             : [defaultRow],
         index: true,  // 显示序号列
         indexHeader: '序号',
         columnWidth: [50],  // 列宽
         align: ['center'],  // 对齐方式
-        rowNum: 5,  // 显示行数
+        rowNum: 7,  // 显示行数
         headerBGC: '#0f2749',  // 表头背景色
         oddRowBGC: '#003666',  // 奇数行背景色
         evenRowBGC: '#0a1f3d',  // 偶数行背景色

@@ -5,7 +5,7 @@
       <span>{{ orderName }}</span>
     </div>
     <!-- 右上角角标 -->
-    <div v-if="status" class="order-card-badge">{{ status }}</div>
+    <div v-if="status" class="order-card-badge" :class="getStatusClass(status)">{{ status }}</div>
     <!-- 主体内容 -->
     <div class="order-card-main">
       <!-- 左侧数量区块 -->
@@ -47,7 +47,7 @@
               <div class="param-row">
                 <span class="param-label">温度：</span>
                 <span class="param-std"
-                  >标准：{{
+                  >标准(±15)：{{
                     stdTemperature !== null && stdTemperature !== undefined && stdTemperature !== "" ? stdTemperature : "暂无标准"
                   }}</span
                 >
@@ -60,7 +60,7 @@
               <div class="param-row">
                 <span class="param-label">压力：</span>
                 <span class="param-std"
-                  >标准：{{
+                  >标准(±5%)：{{
                     stdPressure !== null && stdPressure !== undefined && stdPressure !== "" ? stdPressure : "暂无标准"
                   }}</span
                 >
@@ -71,7 +71,7 @@
               <div class="param-row">
                 <span class="param-label">射速：</span>
                 <span class="param-std"
-                  >标准：{{
+                  >标准(±5%)：{{
                     stdMaxspeed !== null && stdMaxspeed !== undefined && stdMaxspeed !== "" ? stdMaxspeed : "暂无标准"
                   }}</span
                 >
@@ -82,7 +82,7 @@
               <div class="param-row">
                 <span class="param-label">保压时间：</span>
                 <span class="param-std"
-                  >标准：{{
+                  >标准(±5%)：{{
                     stdKeeptime !== null && stdKeeptime !== undefined && stdKeeptime !== "" ? stdKeeptime : "暂无标准"
                   }}</span
                 >
@@ -136,6 +136,7 @@
 import { computed, ref } from "vue";
 import PlanDetailDialog from "./PlanDetailDialog.vue";
 import DoneDetailDialog from "./DoneDetailDialog.vue";
+import { number } from "echarts";
 
 const props = defineProps({
   orderName: {
@@ -233,6 +234,10 @@ const props = defineProps({
   machineCode: {
     type: String,
     default: ""
+  },
+  cycn: {
+    type: number,
+    default: ""
   }
 });
 
@@ -273,6 +278,31 @@ const hasActualData = value => {
   const num = Number(value);
   if (!num) return "暂无数据";
   return "实际值：" + num.toFixed(1);
+};
+
+// 根据状态获取CSS类
+const getStatusClass = (status) => {
+  if (!status) return '';
+  
+  const statusLower = status.toLowerCase();
+  
+  // 加工中 - 绿色
+  if (statusLower.includes('加工中')) {
+    return 'status-processing';
+  }
+  
+  // 待机中、调机中 - 黄色
+  if (statusLower.includes('待机中') || statusLower.includes('调机中') || statusLower.includes('闲置')) {
+    return 'status-waiting';
+  }
+  
+  // 维修中 - 红色
+  if (statusLower.includes('维修中')) {
+    return 'status-maintenance';
+  }
+  
+  // 默认样式
+  return 'status-default';
 };
 
 // 合并的警告逻辑
@@ -358,16 +388,42 @@ const allWarnings = computed(() => {
   position: absolute;
   top: 10px;
   right: 18px;
-  background: linear-gradient(135deg, #ffb300 80%, #fffbe6 100%);
   color: #fff;
   font-weight: bold;
   font-size: 16px;
   padding: 4px 16px 4px 12px;
   border-radius: 8px 8px 8px 0;
-  box-shadow: 0 2px 8px #ffb30055;
   transform: rotate(12deg);
   z-index: 3;
   border: 1.5px solid #fffbe6;
+}
+
+/* 加工中 - 绿色 */
+.status-processing {
+  background: linear-gradient(135deg, #4CAF50 80%, #8BC34A 100%);
+  box-shadow: 0 2px 8px #4CAF5055;
+  border-color: #8BC34A;
+}
+
+/* 待机中、调机中、闲置 - 黄色 */
+.status-waiting {
+  background: linear-gradient(135deg, #ffb300 80%, #fffbe6 100%);
+  box-shadow: 0 2px 8px #ffb30055;
+  border-color: #fffbe6;
+}
+
+/* 维修中 - 红色 */
+.status-maintenance {
+  background: linear-gradient(135deg, #f44336 80%, #ffcdd2 100%);
+  box-shadow: 0 2px 8px #f4433655;
+  border-color: #ffcdd2;
+}
+
+/* 默认状态 - 蓝色 */
+.status-default {
+  background: linear-gradient(135deg, #2196F3 80%, #BBDEFB 100%);
+  box-shadow: 0 2px 8px #2196F355;
+  border-color: #BBDEFB;
 }
 .order-card-main {
   display: flex;

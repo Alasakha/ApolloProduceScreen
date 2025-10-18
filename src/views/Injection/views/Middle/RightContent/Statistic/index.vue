@@ -9,7 +9,7 @@
         :key="device.macCode"
         :orderName="device.deviceName"
         :totalQty="device.pcNum ?? '暂无数据'"
-        :doneQty="device.doneNum ?? '暂无数据'"
+        :doneQty="device.cycnDone ?? '暂无数据'"
         :spec="device.ta034 ?? '暂无数据'"
         :spen="device.ta035 ?? '暂无数据'"
         :progress="calcProgress(device)"
@@ -26,6 +26,7 @@
         :gdNum="device.gdNum"
         :device="device"
         :machineCode="device.macCode"
+        :cycnDone="device.cycnDone"
       />
     </div>
   </div>
@@ -78,8 +79,8 @@ const chunkedDevices = computed(() => {
 });
 
 const calcProgress = device => {
-  if (!device.doneNum || !device.pcNum) return 0;
-  return Math.round((device.doneNum / device.pcNum) * 100);
+  if (!device.cycnDone || !device.cycnTotal) return 0;
+  return Math.round((device.cycnDone / device.cycnTotal) * 100);
 };
 </script>
 

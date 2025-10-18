@@ -30,31 +30,39 @@
       </div>
       
       <div class="progress-list">
-        <div v-for="project in projectList" :key="project.id" class="project-row">
-          <!-- 项目号和名称 -->
-          <div class="project-info">
-            <div class="project-no">{{ project.projectNo }}</div>
-            <div class="project-name">{{ project.projname }}</div>
-          </div>
-          
-          <!-- 进度阶段展示 -->
-          <div class="stages-container">
-            <div 
-              v-for="(stage, index) in project.stages" 
-              :key="index"
-              class="stage-block"
-              :class="getStageClass(stage.status)"
-              :style="{
-                width: getStageWidth(stage, project.stages.length),
-              }"
-              :title="`${stage.name}\n${stage.timeInfo}`"
-            >
-              {{ stage.name }}
+        <!-- pno 层级 -->
+        <div v-for="pnoGroup in projectList" :key="pnoGroup.pno" class="pno-group">
+          <div class="pno-header">项目号：{{ pnoGroup.pno }}</div>
+
+          <!-- 一级层级 -->
+          <div v-for="lvl1 in pnoGroup.level1Groups" :key="lvl1.level1Key" class="level1-group">
+            <div class="level1-header">{{ lvl1.level1Key }}</div>
+
+            <!-- 项目列表（按 projname 拆分） -->
+            <div v-for="project in lvl1.projects" :key="project.id" class="project-row">
+              <!-- 行标题：仅显示项目名称（小标题） -->
+              <div class="project-info">
+                <div class="project-name">{{ project.projname }}</div>
+              </div>
+
+              <!-- 进度阶段展示 -->
+              <div class="stages-container">
+                <div 
+                  v-for="(stage, index) in project.stages" 
+                  :key="index"
+                  class="stage-block"
+                  :class="getStageClass(stage.status)"
+                  :style="{ width: getStageWidth(stage, project.stages.length) }"
+                  :title="`${stage.name}\n${stage.timeInfo}`"
+                >
+                  {{ stage.name }}
+                </div>
+              </div>
+              <!-- 已完成率 -->
+              <div class="completed-rate" style="width:80px;text-align:right;">
+                已完成率：<span style="color:#67C23A">{{ project.completedRate }}%</span>
+              </div>
             </div>
-          </div>
-          <!-- 已完成率 -->
-          <div class="completed-rate" style="width:80px;text-align:right;">
-            已完成率：<span style="color:#67C23A">{{ project.completedRate }}%</span>
           </div>
         </div>
       </div>
@@ -90,6 +98,37 @@ const STATE_MAP = {
   'P': 'not-started' // 未下达
 }
 
+// 根据时间判断状态
+const getStatusByTime = (stime, etime) => {
+  const now = new Date()
+  const startTime = new Date(stime)
+  const endTime = etime ? new Date(etime) : null
+  
+  // 如果当前时间还没到开始时间，显示为里程碑计划
+  if (now < startTime) {
+    return 'milestone-plan'
+  }
+  
+  // 如果有结束时间
+  if (endTime) {
+    // 如果当前时间在时间段内，显示为已完成
+    if (now >= startTime && now <= endTime) {
+      return 'completed'
+    }
+    // 如果当前时间超出结束时间，显示为逾期
+    if (now > endTime) {
+      return 'overdue'
+    }
+  } else {
+    // 如果没有结束时间，且当前时间已过开始时间，显示为已完成
+    if (now >= startTime) {
+      return 'completed'
+    }
+  }
+  
+  return 'milestone-plan'
+}
+
 // 处理时间字符串的函数
 const parseDateTime = (dateTimeStr) => {
   if (!dateTimeStr) return new Date();
@@ -97,72 +136,100 @@ const parseDateTime = (dateTimeStr) => {
   return new Date(dateTimeStr.replace(' ', 'T'));
 }
 
-// 处理接口数据
+// 提取“一级”分组字段，做多键名兜底
+const getLevel1Key = (item) => {
+  return (
+    item.level1 || item.firstLevel || item.category1 || item.stageLevel1 ||
+    item.group1 || item.pclass || item.ptype || item.ptype1 || item.major ||
+    item.deptName || ''
+  )
+}
+
+// 处理接口数据：按 pno → 一级 → projname 分组
 const processData = (data) => {
-  // 按项目号分组
-  const projectMap = new Map()
-  
+  const pnoMap = new Map()
+
   data.forEach(item => {
-    if (!projectMap.has(item.pno)) {
-      projectMap.set(item.pno, {
-        id: item.pno,
-        projectNo: item.pno,
-        projname: item.projname,
+    const pno = item.pno
+    const level1Key = getLevel1Key(item)
+    const projname = item.projname || ''
+
+    if (!pnoMap.has(pno)) {
+      pnoMap.set(pno, new Map())
+    }
+    const level1Map = pnoMap.get(pno)
+
+    if (!level1Map.has(level1Key)) {
+      level1Map.set(level1Key, new Map())
+    }
+    const projMap = level1Map.get(level1Key)
+
+    const projKey = `${pno}__${level1Key}__${projname}`
+    if (!projMap.has(projKey)) {
+      projMap.set(projKey, {
+        id: projKey,
+        pno,
+        level1Key,
+        projname,
         stages: []
       })
     }
-    
-    const project = projectMap.get(item.pno)
-    let status = STATE_MAP[item.tstate] || 'not-issued'
-    
-    // 修改这里的逻辑：如果是E状态且没有结束时间，就直接显示为进行中
-    if (item.tstate === 'E') {
-      status = 'in-progress'  // 直接标记为进行中，不再判断是否逾期
+
+    const project = projMap.get(projKey)
+
+    let status
+    if (item.tstate === 'C') {
+      status = 'completed'
+    } else {
+      status = getStatusByTime(item.stime, item.etime)
     }
-    
+
     project.stages.push({
       name: item.pname,
-      status: status,
+      status,
       startTime: new Date(item.stime),
-      endTime: item.etime ? new Date(item.etime) : null,  // 如果etime为null就保持为null
+      endTime: item.etime ? new Date(item.etime) : null,
       duration: 0
     })
   })
 
-  // 计算每个阶段的持续时间占比时也需要处理null的情况
-  projectMap.forEach(project => {
-    // 找出项目的最早开始时间和最晚结束时间
-    const startTimes = project.stages.map(s => s.startTime.getTime())
-    const endTimes = project.stages
-      .filter(s => s.endTime) // 只处理有结束时间的阶段
-      .map(s => s.endTime.getTime())
-    
-    const projectStart = Math.min(...startTimes)
-    const projectEnd = endTimes.length > 0 ? Math.max(...endTimes) : Date.now() // 如果没有结束时间，使用当前时间
-    const totalDuration = projectEnd - projectStart
+  // 计算每个项目的阶段属性与完成率
+  const pnoGroups = []
+  pnoMap.forEach((level1Map, pno) => {
+    const level1Groups = []
+    level1Map.forEach((projMap, level1Key) => {
+      const projects = []
+      projMap.forEach(project => {
+        const startTimes = project.stages.map(s => s.startTime.getTime())
+        const endTimes = project.stages.filter(s => s.endTime).map(s => s.endTime.getTime())
+        const projectStart = Math.min(...startTimes)
+        const projectEnd = endTimes.length > 0 ? Math.max(...endTimes) : Date.now()
+        const totalDuration = Math.max(projectEnd - projectStart, 1)
 
-    // 计算每个阶段的持续时间占比
-    project.stages.forEach(stage => {
-      if (stage.endTime) {
-        const stageDuration = stage.endTime.getTime() - stage.startTime.getTime()
-        stage.duration = (stageDuration / totalDuration) * 100
-        stage.timeInfo = `${stage.startTime.toLocaleDateString()} - ${stage.endTime.toLocaleDateString()}`
-      } else {
-        // 如果没有结束时间，就显示"开始时间 - 进行中"
-        stage.duration = ((Date.now() - stage.startTime.getTime()) / totalDuration) * 100
-        stage.timeInfo = `${stage.startTime.toLocaleDateString()} - 进行中`
-      }
+        project.stages.forEach(stage => {
+          if (stage.endTime) {
+            const stageDuration = stage.endTime.getTime() - stage.startTime.getTime()
+            stage.duration = (stageDuration / totalDuration) * 100
+            stage.timeInfo = `${stage.startTime.toLocaleDateString()} - ${stage.endTime.toLocaleDateString()}`
+          } else {
+            stage.duration = ((Date.now() - stage.startTime.getTime()) / totalDuration) * 100
+            stage.timeInfo = `${stage.startTime.toLocaleDateString()} - 进行中`
+          }
+        })
+
+        project.stages.sort((a, b) => a.startTime - b.startTime)
+        const completedCount = project.stages.filter(s => s.status === 'completed').length
+        project.completedRate = project.stages.length > 0 ? Math.round(completedCount / project.stages.length * 100) : 0
+        projects.push(project)
+      })
+
+      level1Groups.push({ level1Key, projects })
     })
 
-    // 按开始时间排序
-    project.stages.sort((a, b) => a.startTime - b.startTime)
-
-    // 计算已完成率
-    const completedCount = project.stages.filter(s => s.status === 'completed').length
-    project.completedRate = project.stages.length > 0 ? Math.round(completedCount / project.stages.length * 100) : 0
+    pnoGroups.push({ pno, level1Groups })
   })
 
-  return Array.from(projectMap.values())
+  return pnoGroups
 }
 
 // 获取数据
@@ -190,8 +257,10 @@ const getStageClass = (status) => {
       return 'stage-not-started'
     case 'overdue':
       return 'stage-overdue'
+    case 'milestone-plan':
+      return 'stage-milestone-plan'
     default:
-      return 'stage-in-progress'
+      return 'stage-milestone-plan'
   }
 }
 </script>
@@ -263,6 +332,17 @@ const getStageClass = (status) => {
   padding: 0 1rem;
 }
 
+.pno-header {
+  margin: 6px 0 4px 0;
+  color: #00eaff;
+  font-weight: 600;
+}
+
+.level1-header {
+  margin: 4px 0;
+  color: rgba(255,255,255,0.85);
+}
+
 .project-row {
   display: flex;
   align-items: center;
@@ -328,6 +408,10 @@ const getStageClass = (status) => {
   background: #2e90d1;  /* 里程碑计划-灰色 */
 }
 .stage-not-started {
+  background: #444040;  /* 未开始-灰色 */
+}
+
+.stage-milestone-plan {
   background: #444040;  /* 里程碑计划-灰色 */
 }
 /* 鼠标悬停效果 */

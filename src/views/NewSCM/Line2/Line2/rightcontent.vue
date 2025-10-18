@@ -50,7 +50,7 @@ const config = reactive({
   rawData: [],
   detailData: [], // 添加用于详细信息显示的数据
   index: true,
-  columnWidth: [50,100,100,120,90,120,130,100,100,100,100,100,100],
+  columnWidth: [],
   dialogWidth: [70,100,150,150,180,130,350,100,100,100,100,100,130],
   align: [],
   rowNum: 5,
@@ -133,12 +133,7 @@ const refreshData = async () => {
     console.log(displayData)
     // 轮播图数据（去掉最后一项"处理结果"）
     const displayguolvData = displayData
-  .filter(item =>
-    (!item[12] || item[12] === '--') || // 处理结果为空
-    (!item[13] || item[13] === '--') || // 完成期限为空
-    item[0] === '逾期'                  // 状态为逾期
-  )
-  .map(item => item.slice(1, 13)) // 只取前12项，
+  .map(item => item.slice(1, 13)) // 只取前12项，显示所有数据
 
     // 将source_id_roid作为额外属性存储
     const dataWithId = rawData.map((item) => ({

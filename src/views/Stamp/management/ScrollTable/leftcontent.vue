@@ -36,8 +36,9 @@
   import ScrollBoard from '@/components/datav/ScrollBoard.vue'
   const dialogVisible = ref(false);//弹窗控制
   const selectedItem = ref({});
-  const route = useRoute();
-  const prodLine = route.query.prodLine;
+const route = useRoute();
+const prodLine = route.query.prodLine;
+console.log('leftcontent.vue - 从路由获取的 prodLine:', prodLine);
   const monthlyIndicators = ref(null);
   const isLoading = ref(true);
   const isDataEmpty = ref(false);

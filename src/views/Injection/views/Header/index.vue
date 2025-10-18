@@ -5,10 +5,23 @@
     <!-- 内容层 -->
     
       
-   <div class="flex-1 flex justify-center items-center w-full h-full  ">
+   <div class="flex-1 flex justify-center items-center w-full h-full ml-2 ">
+    <dv-border-box1 >
+        <div class="text-xl flex justify-around  item-center text-white flex-col w-full h-full">
+         
+          {{ dateStr }}
+          <div class="flex justify-center ">
+            <Time></Time>
+          </div>
+          
+        </div>
+         
+      </dv-border-box1>
+    <img src="@/assets/APOLLO.png" alt="" class="w-[50%]">
 
+<!-- 
       <div class=" flex items-center text-white text-2xl drop-shadow-lg justify-end flex-col w-full">
-        <!-- SVG图标（示例为电量/闪电图标，可替换为你喜欢的） -->
+
          <div class="flex"> <svg class="w-7 h-7 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
         <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
         </svg> <div class="tracking-widest from-cyan-500 to-white ">当日耗电总量</div>
@@ -30,7 +43,7 @@
     </div>
 
     <div class=" flex items-center text-white text-2xl drop-shadow-lg justify-end flex-col w-full">
-        <!-- SVG图标（示例为电量/闪电图标，可替换为你喜欢的） -->
+
          <div class="flex"> <svg class="w-7 h-7 mr-2 text-cyan-300" fill="currentColor" viewBox="0 0 24 24">
         <path d="M7 2v11h3v9l7-12h-4l4-8z"/>
         </svg> <div class="tracking-widest from-cyan-500 to-white ">当日标准耗总电量</div>
@@ -42,43 +55,34 @@
         {{ injectionPowerStore.totalStandardPower }} kw·h
       </div>
     </div>
-    </div>
+    </div> -->
 
     
       </div>
-          
+      <!-- bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
+      -->
       <!-- 标题单独提取，不受 opacity 影响 -->
-      <div class="tracking-wide text-5xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
-      flex  justify-center items-center flex-1 flex-col ">
-        <div class="tracking-widest">注塑生产管理看板</div>
-        <div class="tracking-widest text-sm mt-2">Injection Molding Production Management Board</div>
+      <div class="tracking-wide text-5xl font-bold   justify-center items-center flex-1 flex-col   flex text-white">
+        <div class="tracking-widest">注塑车间生产管理看板</div>
+        <div class="tracking-widest text-lg mt-2">Injection Molding Production Management Board</div>
       </div>
   
    
       <div class="flex-1 flex justify-center items-center justify-around
       text-3xl font-bold bg-gradient-to-t from-cyan-500 to-white text-transparent bg-clip-text
       tracking-wide w-[300px] h-full pl-4 pr-4 ">
-      <img src="@/assets/APOLLO.png" alt="" class="w-[50%]">
-      <dv-border-box1 >
-        <div class="text-xl flex justify-around  item-center text-white flex-col w-full h-full">
-         
-          {{ dateStr }}
-          <div class="flex justify-center ">
-            <Time></Time>
-          </div>
-          
-        </div>
-         
-      </dv-border-box1>
+
+      <weather></weather>
       </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import {onMounted, ref,computed} from 'vue'
+import {onMounted, ref} from 'vue'
 import Time from './time.vue'
 import { useDateTime } from "./time";
 import { useInjectionPowerStore } from '@/store/injectionPower';
+import weather from './weather.vue';
 const injectionPowerStore = useInjectionPowerStore();
 const { dateStr } = useDateTime();
 // import BorderBox from '@/components/datav/BorderBox.vue'
@@ -100,21 +104,21 @@ const fetchChartData = async () => {
   }
 }
 
-const powerDiffDirection = computed(() => {
-  const actual = Number(injectionPowerStore.totalPower)
-  const standard = Number(injectionPowerStore.totalStandardPower)
+// const powerDiffDirection = computed(() => {
+//   const actual = Number(injectionPowerStore.totalPower)
+//   const standard = Number(injectionPowerStore.totalStandardPower)
 
-  if (isNaN(actual) || isNaN(standard)) return ''  // 安全处理
-  if (actual > standard) {
-    const delta = Math.round(actual - standard)
-    return '↑' + delta + 'kw·h'
-  }
-  if (actual < standard){
-    const delta = Math.round(standard - actual)
-    return '↓' + delta + 'kw·h'
-  } 
-  return '-' // 表示相等
-})
+//   if (isNaN(actual) || isNaN(standard)) return ''  // 安全处理
+//   if (actual > standard) {
+//     const delta = Math.round(actual - standard)
+//     return '↑' + delta + 'kw·h'
+//   }
+//   if (actual < standard){
+//     const delta = Math.round(standard - actual)
+//     return '↓' + delta + 'kw·h'
+//   } 
+//   return '-' // 表示相等
+// })
 
 onMounted(()=>{
   fetchChartData()

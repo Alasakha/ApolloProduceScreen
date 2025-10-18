@@ -43,6 +43,7 @@
   :headers="config.header"
   :data="tableData"
   :loading="tableLoading"
+  :prod-line="prodLine"
   @update:reason="handleReasonUpdate"
 />
 </template>
@@ -163,7 +164,7 @@ const handleDetail = () => {
     tableData.value = config.data.map((row, index) => {
       // 获取原始数据
       const originalData = rawData.value[index];
-      console.log('Processing row:', { displayRow: row, originalData });
+      // console.log('Processing row:', { displayRow: row, originalData });
 
       // 构建显示数据
       const displayData = {};
@@ -210,6 +211,8 @@ const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
 
     const workCenter = (line: string) => {
     switch (line) {
+        case'1003':
+      return '焊接车间'
       case'1004':
         return '汽油车组装车间'
       case'1005':

@@ -30,8 +30,8 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('今日其他类责任');
-const pageTitle = ref('今日其他类责任');
+const title = ref('今日生产过程其他类责任');
+const pageTitle = ref('今日生产过程其他类责任');
 const reasonType = 2;
 const dayType = 1
 

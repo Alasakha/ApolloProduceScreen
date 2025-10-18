@@ -80,10 +80,10 @@ onMounted(() => {
   
   <div class='pl-5 pt-1'>
 <div class="flex justify-center items-center text-lg text-white font-bold">
-  <p class="tracking-widest text-xl ">工单异常</p>
+  <p class="tracking-widest text-xl ">注塑产品自检质量</p>
 </div>
     
-    <ScrollBoard :config="config" style="width:47vw;height:19vh;" @click='clickHandler'/>
+    <ScrollBoard :config="config" style="width:97%;height:19vh;" @click='clickHandler'/>
   </div>
 
   <!-- 弹窗部分 -->
@@ -101,6 +101,7 @@ import * as echarts from 'echarts';
 import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
+import { getSelfCheck } from '@/api/getInjection';
 
 const dialogVisible = ref(false);//弹窗控制
 const selectedItem = ref({});
@@ -114,43 +115,110 @@ const values = ref([]); // Y 轴数据
 let chartInstance = null;
 const scrollBoardRef = ref(null);
 const config = reactive({
-  header: ['状态', '客户单号', '工单号','车型名称','工单数量','应完成时间','欠数','处理时长'],
+  header: ['机台', '生产数量', '良品', '不良品', '废品', '自检合格率'],
   data: [
-    ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+    ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+    ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+    ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+    ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+    ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
   ],
   index: true,
-columnWidth: [50],
-  align: [],
-  rowNum:5,
-    // showTooltip: true,
-    showTooltip: true,
+  columnWidth: [],
+  align: ['center', 'center', 'center', 'center', 'center', 'center'],
+  rowNum: 5,
+  showTooltip: true,
 })
 
 
-const fetchData = () => {
-  fetchClosingRateData(prodLine)
-    .then((res) => {
-      if (res && res.length > 0) {
-        config.data = res.map(item => [
-          '未完工',
-          item.number ?? '无',
-          item.workNo ?? '无',
-          item.specifications ?? '无',
-          Number(item.productionQuantity) ?? '无',
-          item.dateTime  ?? '无',
-          Number(item.productionQuantity)-Number(item.inboundQuantity),
-          item.daysBetween+'天' ??'无'
-        ])
-        isDataEmpty.value = false;
-      } 
-    })
-    .catch((error) => {
-      console.error('Error fetching data:', error);  // 错误回调
-      isDataEmpty.value = true; // 如果发生错误，显示暂无数据
-    })
-    .finally(() => {
-      isLoading.value = false;  // 无论成功失败，都结束加载
-    });
+// 机台ID到机台名称的映射
+const getMachineName = (machineId) => {
+  const machineMap = {
+    '102050101001': 'HTF300注塑成型机',
+    '102050101002': 'HTF450注塑成型机', 
+    '102050101003': 'HTF1600注塑成型机',
+    '102050101004': 'HTF2500注塑成型机'
+  };
+  return machineMap[machineId] || machineId;
+};
+
+const fetchData = async () => {
+  try {
+    isLoading.value = true;
+    const res = await getSelfCheck();
+    
+    if (res && res.code === 200 && res.data && res.data.length > 0) {
+      // 处理API返回的数据
+      const processedData = res.data.map(item => {
+        const productionQuantity = item.qty || 0;
+        const scrapProducts = item.lot_att23 || 0;
+        const defectiveProducts = item.lot_att24 || 0;
+        const goodProducts = productionQuantity - scrapProducts - defectiveProducts;
+        const passRate = productionQuantity > 0 ? ((goodProducts / productionQuantity) * 100).toFixed(1) : 0;
+        
+        return {
+          machine: getMachineName(item.ty009),
+          productionQuantity,
+          goodProducts,
+          defectiveProducts,
+          scrapProducts,
+          passRate: parseFloat(passRate)
+        };
+      });
+
+      // 计算合计数据
+      const totalProduction = processedData.reduce((sum, item) => sum + item.productionQuantity, 0);
+      const totalGood = processedData.reduce((sum, item) => sum + item.goodProducts, 0);
+      const totalDefective = processedData.reduce((sum, item) => sum + item.defectiveProducts, 0);
+      const totalScrap = processedData.reduce((sum, item) => sum + item.scrapProducts, 0);
+      const totalPassRate = totalProduction > 0 ? ((totalGood / totalProduction) * 100).toFixed(1) : 0;
+
+      // 更新表格数据
+      config.data = [
+        ...processedData.map(item => [
+          item.machine,
+          item.productionQuantity.toString(),
+          item.goodProducts.toString(),
+          item.defectiveProducts.toString(),
+          item.scrapProducts.toString(),
+          item.passRate + '%'
+        ]),
+        [
+          '合计',
+          totalProduction.toString(),
+          totalGood.toString(),
+          totalDefective.toString(),
+          totalScrap.toString(),
+          totalPassRate + '%'
+        ]
+      ];
+
+      isDataEmpty.value = false;
+    } else {
+      // 如果没有数据，显示暂无数据
+      config.data = [
+        ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+        ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+        ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+        ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+        ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+      ];
+      isDataEmpty.value = true;
+    }
+  } catch (error) {
+    console.error('获取注塑产品自检质量数据失败:', error);
+    // 发生错误时显示暂无数据
+    config.data = [
+      ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+      ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+      ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+      ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+      ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+    ];
+    isDataEmpty.value = true;
+  } finally {
+    isLoading.value = false;
+  }
 };
 
 // 在组件挂载时启动定时获取数据
@@ -172,8 +240,21 @@ onMounted(() => {
 </script>
 
 
-<style scoped>
+<style scoped> 
 
+:deep(.ScrollBoard .header) {
+  background: rgba(79,142,247,0.3);
+  font-size: 0.6vw;
+  font-weight: bold;
+}
+
+:deep(.ScrollBoard .rows .row-item){
+  font-size: 0.6vw;
+}
+
+:deep(.ScrollBoard .rows .row-item:hover) {
+  background: rgba(79,142,247,0.1);
+}
 
 h2 {
   top: 0.5vh;
@@ -183,8 +264,6 @@ h2 {
   font-weight: bold;
   color:white
 }
-
-
 
 </style>
  

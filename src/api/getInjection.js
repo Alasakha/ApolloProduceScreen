@@ -121,3 +121,11 @@ export const getDoneDetail = (zhsCode) => {
     params: { zhsCode },
   })
 }
+
+// 注塑产品自检质量
+export const getSelfCheck = () => {
+  return request({
+    url: '/injection/selfCheck',
+    method: 'get',
+  })
+}

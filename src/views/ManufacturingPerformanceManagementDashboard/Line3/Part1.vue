@@ -51,7 +51,7 @@
             <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ regularData.annualData.target }}%</div>
           </div>
           <div class="metric-item">
-            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度计划</div>
+            <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度累计</div>
             <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ regularData.annualData.plan }}%</div>
           </div>
           <div class="metric-item">

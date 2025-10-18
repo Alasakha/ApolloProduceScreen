@@ -62,7 +62,7 @@ const gridColumns = [
   { prop: 'peopleName', label: '发现人' },
   { prop: 'admin_UNIT_NAME', label: '责任部门'},
   { prop: 'ngResponPeople', label: '责任人'},
-  { prop: 'ngReason', label: '不 良问题'},
+  { prop: 'ngReason', label: '不良问题'},
   { prop: 'ngHandle', label: '异常处理方式'},
   { prop: 'uid', label: 'uid' }
 ];

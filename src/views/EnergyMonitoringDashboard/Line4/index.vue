@@ -32,7 +32,7 @@
         <div class="flex flex-col items-center justify-center h-full">
           <div class="text-[#00eeff] text-xl mb-2 flex items-center">
             当月累计总电量
-            <span class="text-sm text-gray-400 ml-2">(标准、实际、平均每台、超过多少报警)</span>
+            <!-- <span class="text-sm text-gray-400 ml-2">(标准、实际、平均每台、超过多少报警)</span> -->
           </div>
           <div class="flex flex-col items-center gap-2">
             <!-- 总值显示 -->

@@ -36,6 +36,7 @@ title="工单异常详情"
 :headers="tableHeaders"
 :data="config.tableData"
 :loading="tableLoading"
+:prod-line="prodLine"
 @update:reason="handleReasonUpdate"
 />
 </template>
@@ -64,6 +65,7 @@ const detailDialogVisible = ref(false);
 const selectedItem = ref({});
 const route = useRoute();
 const prodLine = route.query.prodLine;
+console.log('rightcontent.vue - 从路由获取的 prodLine:', prodLine);
 const monthlyIndicators = ref(null);
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
@@ -210,9 +212,9 @@ try {
 };
 
 // 处理原因更新
-const handleReasonUpdate = async ({ row, reason, duty, completeDate }) => {
+const handleReasonUpdate = async ({ row, reason, duty, completeDate, prodLine }) => {
 try {
-  console.log('更新数据:', { row, reason, duty, completeDate });
+  console.log('更新数据:', { row, reason, duty, completeDate, prodLine });
   console.log('原始数据:', rawData.value);
   
   // 修改查找逻辑，使用多个字段匹配

@@ -50,6 +50,7 @@
               v-model="row['原因']"
               :row="row"
               :original-data="row.originalData"
+              :prod-line="prodLine"
               @save="handleReasonUpdate"
             />
           </template>
@@ -99,6 +100,10 @@ const props = defineProps({
   loading: {
     type: Boolean,
     default: false
+  },
+  prodLine: {
+    type: [String, Array],
+    default: ''
   }
 });
 

@@ -15,7 +15,7 @@
         title="气能"
         :data="gasWaterData.gas"
         :week-labels="weekLabels"
-        color="#ff9f00"
+        color="#00d4ff"
         unit="m³"
         chart-type="weekly"
       />
@@ -25,7 +25,7 @@
         title="水能"
         :data="gasWaterData.water"
         :week-labels="weekLabels"
-        color="#00ff9f"
+        color="#00d4ff"
         unit="m³"
         chart-type="weekly"
       />
@@ -35,7 +35,7 @@
         title="电能"
         :data="electricData"
         :week-labels="weekLabels"
-        color="#ff6b6b"
+        color="#00d4ff"
         unit="kWh"
         chart-type="weekly"
       />

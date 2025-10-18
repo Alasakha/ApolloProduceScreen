@@ -20,9 +20,8 @@
               查看详情
             </el-button>
           </div>
-          <AbnormalProduce ref="abnormalProduceRef"/>
+          <AbnormalProduce ref="abnormalProduceRef" :prod-line="props.prodLine"/>
       </dv-border-box-12>
-
   </div>
 
 </template>
@@ -33,10 +32,16 @@ import AbnormalList from './ScrollTable/leftcontent.vue'
 // 工单异常
 import AbnormalProduce from './ScrollTable/rightcontent.vue'
 
+// 定义 props 接收产线信息
+const props = defineProps<{
+  prodLine?: string | string[]
+}>()
+
 const abnormalProduceRef = ref()
 
 // 处理查看详情按钮点击
 const handleDetail = () => {
+  
   if (abnormalProduceRef.value) {
     abnormalProduceRef.value.handleDetail()
   }
@@ -49,7 +54,7 @@ const handleDetail = () => {
 }
 
 .chart-box {
-  width: 50%;
+  width: 100%;
   height: 25vh;
   padding: 1rem;
 }

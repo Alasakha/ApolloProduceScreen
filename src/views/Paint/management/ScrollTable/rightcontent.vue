@@ -43,6 +43,7 @@ title="工单异常详情"
 :headers="tableHeaders"
 :data="config.tableData"
 :loading="tableLoading"
+:prod-line="prodLine"
 @update:reason="handleReasonUpdate"
 />
 </template>

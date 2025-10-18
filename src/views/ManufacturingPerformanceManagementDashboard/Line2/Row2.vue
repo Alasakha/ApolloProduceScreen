@@ -28,13 +28,20 @@
       <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm font-bold 4xl:text-lg">A类客户直通率</div>
     </div>
     
+    <!-- 列标题 -->
+    <div class="column-headers">
+      <div class="header-item">目标</div>
+      <div class="header-item">实际</div>
+      <div class="header-item">达成率</div>
+    </div>
+
     <div class="departments-grid">
       <!-- A类客户金工一部涂装 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">金工一部涂装</div>
+
         <div class="data-cards-row">
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">金工一部涂装</div>
           <DataCard 
-            title="目标" 
             :value="currentPaintingData.target" 
             unit="%" 
             :titleFontSize="0.6"
@@ -45,7 +52,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="实际" 
             :value="currentPaintingData.actual" 
             unit="%" 
             :titleFontSize="0.6"
@@ -56,7 +62,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="达成率" 
             :value="currentPaintingData.achievement" 
             unit="%" 
             :titleFontSize="0.6"
@@ -67,19 +72,13 @@
             :color="getAchievementColor(currentPaintingData.achievement).textColor"
           />
         </div>
-        <!-- <div class="action-buttons">
-          <button class="reason-btn" @click="showReasonDialog('painting')">
-            填写原因/对策
-          </button>
-        </div> -->
       </div>
 
       <!-- A类客户总装一课 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">总装一课</div>
         <div class="data-cards-row">
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装一课</div>
           <DataCard 
-            title="目标" 
             :value="currentAssemblyCourse1Data.target" 
             unit="%" 
             :titleFontSize="0.6"
@@ -90,7 +89,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="实际" 
             :value="currentAssemblyCourse1Data.actual" 
             unit="%" 
             :titleFontSize="0.6"
@@ -101,7 +99,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="达成率" 
             :value="currentAssemblyCourse1Data.achievement" 
             unit="%" 
             :titleFontSize="0.6"
@@ -112,19 +109,13 @@
             :color="getAchievementColor(currentAssemblyCourse1Data.achievement).textColor"
           />
         </div>
-        <!-- <div class="action-buttons">
-          <button class="reason-btn" @click="showReasonDialog('assembly1')">
-            填写原因/对策
-          </button>
-        </div> -->
       </div>
 
       <!-- A类客户总装二课 -->
       <div class="department-section">
-        <div class="department-title text-[10px] 2xl:text-xs 3xl:text-sm 3xl:text-base">总装二课</div>
         <div class="data-cards-row">
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装二课</div>
           <DataCard 
-            title="目标" 
             :value="currentAssemblyCourse2Data.target" 
             unit="%" 
             :titleFontSize="0.6"
@@ -135,7 +126,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="实际" 
             :value="currentAssemblyCourse2Data.actual" 
             unit="%" 
             :titleFontSize="0.6"
@@ -146,7 +136,6 @@
             color="#00FFFF"
           />
           <DataCard 
-            title="达成率" 
             :value="currentAssemblyCourse2Data.achievement" 
             unit="%" 
             :titleFontSize="0.6"
@@ -157,11 +146,6 @@
             :color="getAchievementColor(currentAssemblyCourse2Data.achievement).textColor"
           />
         </div>
-        <!-- <div class="action-buttons">
-          <button class="reason-btn" @click="showReasonDialog('assembly2')">
-            填写原因/对策
-          </button>
-        </div> -->
       </div>
     </div>
     
@@ -326,10 +310,7 @@ const handleReasonSubmit = (data) => {
   display: flex;
   align-items: center;
   gap: 8px;
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
+
 }
 
 .loading-indicator {
@@ -383,19 +364,51 @@ const handleReasonSubmit = (data) => {
 }
 
 .department-section {
+  background: rgba(0, 30, 60, 0.3);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  border-radius: 6px;
+  padding: 6px;
+  backdrop-filter: blur(5px);
   flex: 1;
   display: flex;
   flex-direction: column;
 }
 
-.department-title {
-  color: #00d4ff;
-  text-align: center;
+.column-headers {
+  display: flex;
   margin-bottom: 4px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.header-item {
+  flex: 1;
+  text-align: center;
   font-weight: bold;
-  padding: 3px;
-  background: rgba(0, 0, 0, 0.1);
-  border-radius: 3px;
+  color: #00d4ff;
+}
+
+.section-title {
+  justify-content: center;
+  align-items: center;
+  display: flex;
+  font-weight: bold;
+  color: #00d4ff;
+  margin-bottom: 4px;
+  text-align: center;
+  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
+  padding-bottom: 3px;
+}
+
+.section-title-with-toggle {
+  font-weight: bold;
+  color: #00d4ff;
+  margin-bottom: 6px;
+  padding: 4px 8px;
+  background: rgba(0, 30, 60, 0.3);
+  border: 1px solid rgba(0, 150, 255, 0.3);
+  border-radius: 6px;
+  backdrop-filter: blur(5px);
 }
 
 .data-cards-row {
@@ -443,5 +456,9 @@ const handleReasonSubmit = (data) => {
   background: linear-gradient(135deg, #00b8e6 0%, #0088b3 100%);
   transform: translateY(-1px);
   box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+}
+
+.department-title{
+  color: #00d4ff;
 }
 </style>

@@ -6,7 +6,7 @@
                 <Header></Header>
                 <Line1></Line1>
                 <Line2></Line2>
-                <Line3></Line3>
+                <Line3 :prod-line="props.prodLine"></Line3>
             </div>
         </dv-border-box11>
     </body>
@@ -19,6 +19,11 @@ import Line2 from './Line2/index.vue'
 import Line3 from './line3.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { eventBus } from '@/utils/eventbus'
+
+// 定义 props
+const props = defineProps<{
+  prodLine?: string | string[]
+}>()
 
 onMounted(() => {
   // 每分钟刷新一次数据

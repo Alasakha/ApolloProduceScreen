@@ -328,9 +328,9 @@ onUnmounted(() => {
 @media (min-width: 2000px) {
   .data-item {
     display: flex;
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: center;
-    justify-content: center;
+    justify-content: space-between;
     padding: 8px;
     background: rgba(0, 0, 0, 0.25);
     border-radius: 4px;
@@ -365,16 +365,16 @@ onUnmounted(() => {
   font-size: 0.8rem;
   font-weight: 500;
   text-align: center;
-  font-family: 'Orbitron', monospace;
+  /* font-family: 'Orbitron', monospace; */
 }
 
 /* 不同类型数据的颜色 */
-.data-value.electric {
+.data-value {
   color: #00eeff;
   text-shadow: 0 0 5px #00eeff;
 }
 
-.data-value.gas {
+/* .data-value.gas {
   color: #ff9f00;
   text-shadow: 0 0 5px #ff9f00;
 }
@@ -382,7 +382,7 @@ onUnmounted(() => {
 .data-value.water {
   color: #00ff9f;
   text-shadow: 0 0 5px #00ff9f;
-}
+} */
 
 /* 差额颜色 */
 .data-value.positive {
@@ -390,10 +390,10 @@ onUnmounted(() => {
   text-shadow: 0 0 5px #ff6b6b;
 }
 
-.data-value.negative {
+/* .data-value.negative {
   color: #51cf66;
   text-shadow: 0 0 5px #51cf66;
-}
+} */
 
 /* 响应式设计 */
 @media (max-width: 1279px) {

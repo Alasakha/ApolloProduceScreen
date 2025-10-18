@@ -30,8 +30,8 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('本月功性能不良');
-const dialogTitle = ref('本月功性能不良');
+const title = ref('本月生产过程功性能不良');
+const dialogTitle = ref('本月生产过程功性能不良');
 const reasonType = 1;
 const dayType = 2
 

@@ -63,6 +63,10 @@ const props = defineProps({
   originalData: {
     type: Object,
     required: true
+  },
+  prodLine: {
+    type: [String, Array],
+    default: ''
   }
 });
 
@@ -96,7 +100,8 @@ const handleSave = () => {
       row: props.row,
       reason: currentReason.value.trim(),
       duty: currentDuty.value.trim(),
-      completeDate: currentCompleteDate.value
+      completeDate: currentCompleteDate.value,
+      prodLine: props.prodLine
     });
     
     dialogVisible.value = false;
@@ -149,7 +154,7 @@ const handleCancel = () => {
 };
 
 onMounted(() => {
-  console.log('props.row',props.row)
+
 })
 </script>
 

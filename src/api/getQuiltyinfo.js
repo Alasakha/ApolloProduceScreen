@@ -323,3 +323,13 @@ export const getCheckTotalDoneJcx = () => {
     method: 'get',
   })
 }
+
+
+// /quality/incomingInspectionDetail
+export const getIncomingInspectionDetail = (userName ) => {
+  return request({
+    url: '/quality/incomingInspectionDetail',
+    method: 'get',
+    params: { userName }
+  })
+}

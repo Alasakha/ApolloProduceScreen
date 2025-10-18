@@ -111,16 +111,27 @@
           label: {
             show: true,
             position: 'center',
-            formatter: `{b|${unfinished}}\n{c|未完成}`,
+            formatter: `{a|${unfinished}}\n{b|未完成}\n{c|${total - unfinished}}\n{d|已完成}`,
             rich: {
+              a: {
+                fontSize: 24,
+                color: '#e7141b',
+                fontWeight: 'bold'
+              },
               b: {
-                fontSize: 28,
-                color: '#e7141b'
+                fontSize: 12,
+                color: '#e7141b',
+                padding: [2, 0]
               },
               c: {
-                fontSize: 14,
-                color: '#ffffff',
-                padding: [4, 0]
+                fontSize: 24,
+                color: '#4CAF50',
+                fontWeight: 'bold'
+              },
+              d: {
+                fontSize: 12,
+                color: '#4CAF50',
+                padding: [2, 0]
               }
             }
           },
