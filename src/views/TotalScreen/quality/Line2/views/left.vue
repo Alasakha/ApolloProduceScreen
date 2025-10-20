@@ -277,38 +277,7 @@
             paginatedData.value = []
         }
         
-        // 测试弹窗功能
-        const testDialog = () => {
-            console.log('测试弹窗按钮被点击')
-            selectedUserName.value = '测试用户'
-            dialogVisible.value = true
-            const testData = [
-                {
-                    user_name: '测试用户',
-                    jsNum: 10,
-                    bjsNum: 2,
-                    rate: 83.33,
-                    itemDescription: '测试物料',
-                    item_specification: '规格A',
-                    arriveNum: 100,
-                    checkTime: '2024-01-01 10:00:00',
-                    arrivalTime: '2024-01-01 09:00:00',
-                    doc_no: 'DOC001',
-                    item_code: 'ITEM001',
-                    supplier_full_name: '测试供应商'
-                }
-            ]
-            detailData.value = testData
-            filteredDetailData.value = testData
-            
-            // 生成测试选项数据
-            inspectorOptions.value = [
-                { label: '测试用户', value: '测试用户' }
-            ]
-            supplierOptions.value = [
-                { label: '测试供应商', value: '测试供应商' }
-            ]
-        }
+       
         
         // 筛选功能
         const handleFilter = () => {

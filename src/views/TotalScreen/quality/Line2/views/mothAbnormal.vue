@@ -47,6 +47,7 @@ const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicato
 const gridData = ref([]);
 const gridColumns = [
   { prop: 'ngName', label: '不良问题' },
+  { prop: 'nums', label: '不良数量' },
   { prop: 'createDate', label: '发行时间' },
   { prop: 'ta002', label: '工单单号' },
   { prop: 'ta006', label: '品号' },
