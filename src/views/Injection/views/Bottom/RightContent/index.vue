@@ -80,7 +80,7 @@ onMounted(() => {
   
   <div class='pl-5 pt-1'>
 <div class="flex justify-center items-center text-lg text-white font-bold">
-  <p class="tracking-widest text-xl ">注塑产品自检质量</p>
+  <p class="tracking-widest text-xl ">注塑产品自检合格率</p>
 </div>
     
     <ScrollBoard :config="config" style="width:97%;height:19vh;" @click='clickHandler'/>

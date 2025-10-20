@@ -8,7 +8,7 @@
         <AbnormalList></AbnormalList>
       </dv-border-box-12>
       
-      <dv-border-box-12 class="chart-box">
+      <!-- <dv-border-box-12 class="chart-box">
           <div class="box-title flex justify-between items-center">
             <span>工单异常</span>
             <el-button 
@@ -21,31 +21,31 @@
             </el-button>
           </div>
           <AbnormalProduce ref="abnormalProduceRef" :prod-line="props.prodLine"/>
-      </dv-border-box-12>
+      </dv-border-box-12> -->
   </div>
 
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
+// import { ref } from 'vue'
 import AbnormalList from './ScrollTable/leftcontent.vue'
 // 工单异常
-import AbnormalProduce from './ScrollTable/rightcontent.vue'
+// import AbnormalProduce from './ScrollTable/rightcontent.vue'
 
 // 定义 props 接收产线信息
-const props = defineProps<{
-  prodLine?: string | string[]
-}>()
+// const props = defineProps<{
+//   prodLine?: string | string[]
+// }>()
 
-const abnormalProduceRef = ref()
+// const abnormalProduceRef = ref()
 
 // 处理查看详情按钮点击
-const handleDetail = () => {
+// const handleDetail = () => {
   
-  if (abnormalProduceRef.value) {
-    abnormalProduceRef.value.handleDetail()
-  }
-}
+//   if (abnormalProduceRef.value) {
+//     abnormalProduceRef.value.handleDetail()
+//   }
+// }
 </script>
 
 <style scoped>

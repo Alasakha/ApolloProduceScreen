@@ -72,7 +72,7 @@ const currentRequestId = ref(0); // 添加请求标识符
 const processedData = ref([]);
 // 表格列配置
 const tableColumns = [
-    { prop: 'arrival_date', label: '送检时间', width: 240 },
+    { prop: 'arrival_date', label: '扫码送检时间', width: 240 },
     { 
         prop: 'business_qty', 
         label: '到货数量', 

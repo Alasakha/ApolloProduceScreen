@@ -4,7 +4,7 @@
       <p class="tracking-widest text-xl ">原材料监控</p>
       <el-button class="absolute right-4" size="small" type="primary" @click="dialogVisible = true">详细</el-button>
     </div>
-    <ScrollBoard :config="config" style="width:47vw;height:19vh;"/>
+    <materialScrollBoard :config="config" style="width:47vw;height:19vh;"/>
     <el-dialog v-model="dialogVisible" title="原材料监控明细" width="60vw" >
       <el-table :data="tableData"  :loading="tableLoading" style="width: 100%" >
         <el-table-column v-for="(col, idx) in config2.header" :key="col" :label="col" :prop="'col' + idx" align="center" />
@@ -37,6 +37,7 @@ import { reactive, ref, onMounted,onBeforeUnmount, computed } from 'vue'
 import { getrawMaterialMonitoring,getRawMaterialMonitoringAdd } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 import  {ElMessage} from 'element-plus'
+import materialScrollBoard from '@/components/datav/materialScrollBoard.vue'
 const selectedCode = ref('')
 // 初始化配置对象
 const config = reactive({
@@ -153,6 +154,19 @@ onMounted(() => {
 
 :deep(.ScrollBoard .rows .row-item){
   font-size: 0.5vw;
+}
+
+/* 原材料监控特殊样式 */
+:deep(.overdue-row) {
+  background: #ff4444 !important;
+  color: #ffffff !important;
+  font-weight: bold;
+  box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
+}
+
+:deep(.overdue-row .ceil) {
+  color: #ffffff !important;
+  font-weight: bold;
 }
 
 </style>

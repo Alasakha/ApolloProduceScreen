@@ -71,7 +71,7 @@
               <div class="param-row">
                 <span class="param-label">射速：</span>
                 <span class="param-std"
-                  >标准(±5%)：{{
+                  >标准(±1)：{{
                     stdMaxspeed !== null && stdMaxspeed !== undefined && stdMaxspeed !== "" ? stdMaxspeed : "暂无标准"
                   }}</span
                 >
@@ -82,7 +82,7 @@
               <div class="param-row">
                 <span class="param-label">保压时间：</span>
                 <span class="param-std"
-                  >标准(±5%)：{{
+                  >标准(+5%)：{{
                     stdKeeptime !== null && stdKeeptime !== undefined && stdKeeptime !== "" ? stdKeeptime : "暂无标准"
                   }}</span
                 >
@@ -91,6 +91,24 @@
                 >
               </div>
             </div>
+            <!-- 右侧能耗监控区域 -->
+            <!-- <div class="energy-block">
+              <div class="energy-title">能耗监控</div>
+              <div class="energy-content">
+                <div class="energy-item">
+                  <span class="energy-label">当日开机时长：</span>
+                  <span class="energy-value">{{ device.hourBetween || '0' }}h</span>
+                </div>
+                <div class="energy-item">
+                  <span class="energy-label">设备功耗：</span>
+                  <span class="energy-value">{{ device.power || '0kw' }}</span>
+                </div>
+                <div class="energy-item">
+                  <span class="energy-label">标准耗电量：</span>
+                  <span class="energy-value">{{ (Number(device.power?.replace("kw", "") || 0) * Number(device.hourBetween || 0)).toFixed(2) }} kw·h</span>
+                </div>
+              </div>
+            </div> -->
             <!-- <div class="energy-block">
               <div class="energy-title">能耗监控</div>
               <div class="text-white text-sm">
@@ -313,43 +331,47 @@ const allWarnings = computed(() => {
 
   const warnings = [];
 
-  // 检查温度
+  // 检查温度 (±15)
   if (hasStrandData(props.stdTemperature) === "暂无标准") {
     warnings.push("温度：暂无标准");
   } else if (props.temperature) {
     const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
-    if (diff > 20) {
+    if (diff > 15) {
       warnings.push(`温度超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
     }
   }
 
-  // 检查压力
+  // 检查压力 (±5%)
   if (hasStrandData(props.stdPressure) === "暂无标准") {
     warnings.push("压力：暂无标准");
   } else if (props.pressure) {
-    const diff = Math.abs(Number(props.pressure) - Number(props.stdPressure));
-    if (diff > 20) {
-      warnings.push(`压力超出偏差 (偏差: ${diff.toFixed(1)}MPa)`);
+    const stdValue = Number(props.stdPressure);
+    const actualValue = Number(props.pressure);
+    const percentDiff = Math.abs(actualValue - stdValue) / stdValue * 100;
+    if (percentDiff > 5) {
+      warnings.push(`压力超出偏差 (偏差: ${percentDiff.toFixed(1)}%)`);
     }
   }
 
-  // 检查射速
+  // 检查射速 (±1)
   if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
     warnings.push("射速：暂无标准");
   } else if (props.maxspeed) {
     const diff = Math.abs(Number(props.maxspeed) - Number(props.stdMaxspeed));
-    if (diff > 20) {
+    if (diff > 1) {
       warnings.push(`射速超出偏差 (偏差: ${diff.toFixed(1)}mm/s)`);
     }
   }
 
-  // 检查保压时间
+  // 检查保压时间 (+5%)
   if (hasStrandData(props.stdKeeptime) === "暂无标准") {
     warnings.push("保压时间：暂无标准");
   } else if (props.keeptime) {
-    const diff = Math.abs(Number(props.keeptime) - Number(props.stdKeeptime));
-    if (diff > 20) {
-      warnings.push(`保压时间超出偏差 (偏差: ${diff.toFixed(1)}s)`);
+    const stdValue = Number(props.stdKeeptime);
+    const actualValue = Number(props.keeptime);
+    const percentDiff = (actualValue - stdValue) / stdValue * 100;
+    if (percentDiff > 5) {
+      warnings.push(`保压时间超出偏差 (偏差: +${percentDiff.toFixed(1)}%)`);
     }
   }
   return warnings;
@@ -563,18 +585,27 @@ const allWarnings = computed(() => {
   display: contents;
 }
 .param-label {
-  color: #4e71ff;
+  color: #b8d4ff;
   font-weight: bold;
   text-align: right;
+  font-size: 1.1em;
 }
 .param-std {
-  color: #ffb300;
-  text-align: left;
+  color: #ffd700;
+  text-align: center;
+  font-size: 1em;
+  background: rgba(255, 215, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 .param-act {
-  color: #06d8fe;
+  color: #00eaff;
   font-weight: bold;
-  text-align: left;
+  text-align: center;
+  font-size: 1em;
+  background: rgba(0, 234, 255, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
 }
 .info-progress-area {
   height: 40%;
@@ -693,14 +724,17 @@ const allWarnings = computed(() => {
 }
 .main-row {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: flex-start;
+  width: 100%;
 }
 .params-block {
   display: grid;
-  grid-template-columns: 8vw 8vw 10vw;
-  row-gap: 6px;
-  column-gap: 8px;
+  grid-template-columns: 1fr 1fr 1fr;
+  row-gap: 12px;
+  column-gap: 20px;
+  width: 100%;
+  max-width: 90%;
 }
 .param-item {
   display: flex;
