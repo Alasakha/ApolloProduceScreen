@@ -40,7 +40,7 @@
       <div class="department-section">
 
         <div class="data-cards-row">
-          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-sm">金工一部涂装</div>
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-xs 4xl:text-sm">金工一部涂装</div>
           <DataCard 
             :value="currentPaintingData.target" 
             unit="%" 
@@ -77,7 +77,7 @@
       <!-- A类客户总装一课 -->
       <div class="department-section">
         <div class="data-cards-row">
-          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装一课</div>
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-xs 4xl:text-lg">总装一课</div>
           <DataCard 
             :value="currentAssemblyCourse1Data.target" 
             unit="%" 
@@ -114,7 +114,7 @@
       <!-- A类客户总装二课 -->
       <div class="department-section">
         <div class="data-cards-row">
-          <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">总装二课</div>
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-xs 4xl:text-lg">总装二课</div>
           <DataCard 
             :value="currentAssemblyCourse2Data.target" 
             unit="%" 

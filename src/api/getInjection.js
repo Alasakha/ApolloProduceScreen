@@ -129,3 +129,12 @@ export const getSelfCheck = () => {
     method: 'get',
   })
 }
+
+
+// /rawMaterialMonitoring2
+export const getRawMaterialMonitoring2 = () => {
+  return request({
+    url: '/injection/rawMaterialMonitoring2',
+    method: 'get',
+  })
+}

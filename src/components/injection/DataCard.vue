@@ -47,9 +47,9 @@
               <div class="param-row">
                 <span class="param-label">温度：</span>
                 <span class="param-std"
-                  >标准(±15)：{{
+                  >标准：{{
                     stdTemperature !== null && stdTemperature !== undefined && stdTemperature !== "" ? stdTemperature : "暂无标准"
-                  }}</span
+                  }}±15</span
                 >
                 <span class="param-act"
                   >实际值：{{
@@ -60,9 +60,9 @@
               <div class="param-row">
                 <span class="param-label">压力：</span>
                 <span class="param-std"
-                  >标准(±5%)：{{
+                  >标准：{{
                     stdPressure !== null && stdPressure !== undefined && stdPressure !== "" ? stdPressure : "暂无标准"
-                  }}</span
+                  }}±5%</span
                 >
                 <span class="param-act"
                   >实际值：{{ pressure !== null && pressure !== undefined && pressure !== "" ? pressure : "暂无数据" }}</span
@@ -71,9 +71,9 @@
               <div class="param-row">
                 <span class="param-label">射速：</span>
                 <span class="param-std"
-                  >标准(±1)：{{
+                  >标准：{{
                     stdMaxspeed !== null && stdMaxspeed !== undefined && stdMaxspeed !== "" ? stdMaxspeed : "暂无标准"
-                  }}</span
+                  }}±5%</span
                 >
                 <span class="param-act"
                   >实际值：{{ maxspeed !== null && maxspeed !== undefined && maxspeed !== "" ? maxspeed : "暂无数据" }}</span
@@ -82,9 +82,9 @@
               <div class="param-row">
                 <span class="param-label">保压时间：</span>
                 <span class="param-std"
-                  >标准(+5%)：{{
+                  >标准：{{
                     stdKeeptime !== null && stdKeeptime !== undefined && stdKeeptime !== "" ? stdKeeptime : "暂无标准"
-                  }}</span
+                  }}+5%</span
                 >
                 <span class="param-act"
                   >实际值：{{ keeptime !== null && keeptime !== undefined && keeptime !== "" ? keeptime : "暂无数据" }}</span
@@ -353,13 +353,22 @@ const allWarnings = computed(() => {
     }
   }
 
-  // 检查射速 (±1)
+  // 检查射速 (+5%)
   if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
     warnings.push("射速：暂无标准");
   } else if (props.maxspeed) {
-    const diff = Math.abs(Number(props.maxspeed) - Number(props.stdMaxspeed));
-    if (diff > 1) {
-      warnings.push(`射速超出偏差 (偏差: ${diff.toFixed(1)}mm/s)`);
+    const stdValue = Number(props.stdMaxspeed);
+    // 计算偏差值：标准值 * 5%，向上取整
+    const deviationValue = stdValue * 0.05;
+    const roundedDeviation = Math.ceil(deviationValue);
+    
+    const actualValue = Number(props.maxspeed);
+    const lowerLimit = stdValue - roundedDeviation;
+    const upperLimit = stdValue + roundedDeviation;
+    
+    if (actualValue < lowerLimit || actualValue > upperLimit) {
+      const diff = actualValue - stdValue;
+      warnings.push(`射速超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}mm/s)`);
     }
   }
 
@@ -368,10 +377,17 @@ const allWarnings = computed(() => {
     warnings.push("保压时间：暂无标准");
   } else if (props.keeptime) {
     const stdValue = Number(props.stdKeeptime);
+    // 计算偏差值：标准值 * 5%，向上取整
+    const deviationValue = stdValue * 0.05;
+    const roundedDeviation = Math.ceil(deviationValue);
+    
     const actualValue = Number(props.keeptime);
-    const percentDiff = (actualValue - stdValue) / stdValue * 100;
-    if (percentDiff > 5) {
-      warnings.push(`保压时间超出偏差 (偏差: +${percentDiff.toFixed(1)}%)`);
+    const lowerLimit = stdValue - roundedDeviation;
+    const upperLimit = stdValue + roundedDeviation;
+    
+    if (actualValue < lowerLimit || actualValue > upperLimit) {
+      const diff = actualValue - stdValue;
+      warnings.push(`保压时间超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}%)`);
     }
   }
   return warnings;
@@ -587,7 +603,7 @@ const allWarnings = computed(() => {
 .param-label {
   color: #b8d4ff;
   font-weight: bold;
-  text-align: right;
+  text-align: center;
   font-size: 1.1em;
 }
 .param-std {

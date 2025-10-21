@@ -150,7 +150,7 @@ export const useProductionDataStore = defineStore('productionData', {
     manufacturingCostRatio(): number {
       if (!this.manufacturingCost?.实际收入 || !this.manufacturingCost?.实际费用合计) return 0
       const actual = this.manufacturingCost.实际制造费
-      const revenue = this.manufacturingCost.实际费用合计
+      const revenue = this.manufacturingCost.实际收入
       return Number(((actual / revenue) * 100).toFixed(2))
     },
 

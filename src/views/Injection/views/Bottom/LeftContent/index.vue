@@ -27,17 +27,16 @@
     <el-button type="primary" @click="submitReason">确定</el-button>
   </template>
 </el-dialog>
-
     </el-dialog>
   </div>
 </template>
 
 <script lang="ts" setup>
 import { reactive, ref, onMounted,onBeforeUnmount, computed } from 'vue'
-import { getrawMaterialMonitoring,getRawMaterialMonitoringAdd } from '@/api/getInjection'
+import { getRawMaterialMonitoring2,getRawMaterialMonitoringAdd } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 import  {ElMessage} from 'element-plus'
-import materialScrollBoard from '@/components/datav/materialScrollBoard.vue'
+import materialScrollBoard from '@/components/datav/MaterialScrollBoard.vue'
 const selectedCode = ref('')
 // 初始化配置对象
 const config = reactive({
@@ -100,7 +99,7 @@ const tableData = computed(() => {
 const fetchData = async () => {
   tableLoading.value = true;
   try {
-    const res = await getrawMaterialMonitoring();
+    const res = await getRawMaterialMonitoring2();
     if (res && res.code === 200 && res.data) {
       config.data = res.data.map(item => [
         item.ty009,

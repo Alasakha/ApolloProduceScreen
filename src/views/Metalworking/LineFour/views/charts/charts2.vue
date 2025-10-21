@@ -73,6 +73,8 @@ const processedData = ref([]);
 // 表格列配置
 const tableColumns = [
     { prop: 'arrival_date', label: '扫码送检时间', width: 240 },
+    { prop: 'plan_complete_date', label: '检验应完成时间', width: 200 },
+
     { 
         prop: 'business_qty', 
         label: '到货数量', 

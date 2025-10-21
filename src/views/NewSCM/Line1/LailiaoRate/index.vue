@@ -1,7 +1,7 @@
 
 <template>
 <dv-border-box8 :dur="5">
-<GlobalTitle title="来料合格率" :size="1" />
+<GlobalTitle title="本月来料合格率" :size="1" />
 
   
       <!-- 图表容器 -->

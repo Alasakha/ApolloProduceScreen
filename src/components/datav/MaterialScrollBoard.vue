@@ -280,27 +280,24 @@
     return isOutOfRange;
   }
   
-  // 获取行背景颜色
+  // 获取行背景颜色（恢复正常背景色）
   function getRowBackgroundColor(row: any) {
-    const isOutOfRange = isUsageRateOutOfRange(row);
+    // 始终返回正常的背景色，不再根据使用率改变背景
     const normalColor = state.mergedConfig[row.rowIndex % 2 === 0 ? 'evenRowBGC' : 'oddRowBGC'];
-    const finalColor = isOutOfRange ? '#ff4444' : normalColor;
     
     console.log('行背景颜色判断:', {
       行索引: row.rowIndex,
       行数据: row.ceils,
-      是否超出范围: isOutOfRange,
-      正常颜色: normalColor,
-      最终颜色: finalColor
+      正常颜色: normalColor
     });
     
-    return finalColor;
+    return normalColor;
   }
   
-  // 获取行CSS类名
+  // 获取行CSS类名（改为红字显示）
   function getRowClass(row: any) {
     if (isUsageRateOutOfRange(row)) {
-      return 'overdue-row';
+      return 'red-text-row';
     }
     return '';
   }
@@ -627,14 +624,13 @@
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-  }
-  .overdue-row {
-    color: #ffffff;
+  } 
+  .red-text-row {
+    color: #ff4444 !important;
     font-weight: bold;
-    box-shadow: 0 0 10px rgba(255, 68, 68, 0.5);
   }
-  .overdue-cell {
-    color: #ffffff !important;
+  .red-text-row .ceil {
+    color: #ff4444 !important;
     font-weight: bold;
   }
   </style>  

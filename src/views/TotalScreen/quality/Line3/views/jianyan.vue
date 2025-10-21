@@ -72,15 +72,16 @@ const currentRequestId = ref(0); // 添加请求标识符
 const processedData = ref([]);
 // 表格列配置
 const tableColumns = [
-    { prop: 'arrival_date', label: '到货审核日期', width: 120 },
+    { prop: 'arrival_date', label: '扫码送检时间', width: 200 },
+    { prop: 'plan_complete_date', label: '检验应完成时间', width: 200 },
     { prop: 'business_qty', label: '到货数量', width: 150 },
     { prop: 'caigou', label: '采购员', width: 100 },
     { prop: 'cangguan', label: '仓管员', width: 80 },
-    { prop: 'item_code', label: '品号', width: 200 },
+    { prop: 'item_code', label: '品号', width: 150 },
     { prop: 'item_description', label: '品名', width: 200 },
     { prop: 'item_specification', label: '规格', width: 200 },
-    { prop: 'jianyan', label: '检验员', width: 200 },
-    { prop: 'supplierCode', label: '供应商', width: 200 },
+    { prop: 'jianyan', label: '检验员', width: 100 },
+    { prop: 'supplierCode', label: '供应商编号', width: 100 },
     { prop: 'supplier_full_name', label: '供应商名称', width: 300 },
     { prop: 'udf021', label: '客户单号', width: 300 }
 

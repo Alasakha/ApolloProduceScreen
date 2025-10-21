@@ -72,7 +72,7 @@ onBeforeUnmount(() => {
         <span class="ml-3 text-lg font-normal">{{ weatherData.condition }}</span>
       </span>
       <span class="text-sm opacity-80 mt-1 flex items-center">
-        <span>{{ weatherData.city || '未知城市' }}</span>
+        <span>{{ weatherData.city || '武义' }}</span>
         <span v-if="weatherData.time" class="ml-4">{{ weatherData.time }}</span>
       </span>
     </div>

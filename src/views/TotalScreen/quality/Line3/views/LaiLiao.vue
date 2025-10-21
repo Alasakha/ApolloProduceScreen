@@ -63,7 +63,8 @@ const selectedPurchaser = ref('');
 const currentRequestId = ref(0);
 
 const tableColumns = [
-  { prop: 'arrival_date', label: '到货审核日期', width: 120 },
+  { prop: 'arrival_date', label: '扫码送检时间', width: 120 },
+  { prop: 'plan_complete_date', label: '检验应完成时间', width: 200 },
   { prop: 'business_qty', label: '到货数量', width: 150 },
   { prop: 'caigou', label: '采购员', width: 100 },
   { prop: 'cangguan', label: '仓管员', width: 80 },

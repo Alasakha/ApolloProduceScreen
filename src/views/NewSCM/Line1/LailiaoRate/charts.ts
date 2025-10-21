@@ -53,7 +53,10 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
         position: 'top', // 显示在柱子顶部
         color: '#fff',   // 文字颜色
         formatter: (params: any) => {
-          return `${(params.value).toFixed(0)}%`
+          const value = params.value;
+          // 如果小数位是0，就显示整数；否则显示一位小数
+          const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
+          return `${formattedValue}%`
         }
       },
       series: [
