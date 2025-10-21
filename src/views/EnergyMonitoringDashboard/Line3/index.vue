@@ -11,11 +11,11 @@
           v-for="(item, index) in energyData" 
           :key="index"
           class="energy-card"
-          :class="{ 'exceeded': item.actualPerUnit > item.standardPerUnit }"
+          :class="{ 'exceeded': Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 }"
         >
           <div class="card-header">
             <div class="workshop-name">{{ item.workshopName }}</div>
-            <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0, 'saved': Number(item.ratio) < 0 }">
+            <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0.5, 'saved': Number(item.ratio) <= 0.5 }">
               {{ Number(item.ratio) > 0 ? '+' : '' }}{{ item.ratio }}
             </div>
           </div>
@@ -24,42 +24,42 @@
           <div class="card-content">
             <div class="flex items-center">
               <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">标准每台：</span>
-              <dv-digital-flop :config="{
-                number: [item.standardPerUnit],
-                content: '{nt}kW/h',
-                style: {
-                  fontSize: getFontSize(),
-                  fill: '#00eeff'
-                }
-              }" />
+              <div class="number-display">
+                <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
+                  {{ Number(item.standardPerUnit).toFixed(1) }}
+                </span>
+                <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#00eeff' }">度</span>
+              </div>
             </div>
             
             <div class="flex items-center">
               <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台：</span>
-              <dv-digital-flop :config="{
-                number: [item.actualPerUnit],
-                content: '{nt}kW/h',
-                style: {
-                  fontSize: getFontSize(),
-                  fill: item.actualPerUnit > item.standardPerUnit ? '#ff0000' : '#00ff00'
-                }
-              }" />
+              <div class="number-display">
+                <span class="number-value" :style="{ 
+                  fontSize: getFontSize(), 
+                  color: Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
+                }">
+                  {{ Number(item.actualPerUnit).toFixed(1) }}
+                </span>
+                <span class="number-unit" :style="{ 
+                  fontSize: getFontSize() * 0.7, 
+                  color: Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
+                }">度</span>
+              </div>
             </div>
             
             <div class="flex items-center">
               <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际总电：</span>
-              <dv-digital-flop :config="{
-                number: [item.actualTotal],
-                content: '{nt}kW/h',
-                style: {
-                  fontSize: getFontSize(),
-                  fill: '#ffaa00'
-                }
-              }" />
+              <div class="number-display">
+                <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
+                  {{ Number(item.actualTotal).toFixed(1) }}
+                </span>
+                <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
+              </div>
             </div>
             
             <!-- 添加填写原因按钮 -->
-            <div class="reason-section" v-if="Number(item.ratio) > 0">
+            <div class="reason-section" v-if="Number(item.ratio) > 0.5">
               <div class="reason-info">
                 <span class="reason-label">超过原因：</span>
                 <span class="reason-text">{{ item.reason || '暂未填写' }}</span>
@@ -204,49 +204,19 @@ const energyData = computed(() => {
   // 如果没有数据，使用测试数据
   const testData: EnergyData[] = [
     {
-      machCode: '616506210001',
-      machName: '空压机',
-      workshopName: '空压机',
-      monthDay: '2025-08-01',
-      number: '1000',        // 标准接口：标准总电
-      numberPower: 1200,     // 实际接口：实际总电
+      machCode: '无',
+      machName: '无',
+      workshopName: '无',
+      monthDay: '无',
+      number: '无',        // 标准接口：标准总电
+      numberPower: 0,     // 实际接口：实际总电
       tipNumber: '0.0',
       peakNumber: '0.0',
-      flatNumber: '1000.0',
+      flatNumber: '0',
       valleyNumber: '0.0',
-      cl: 50,                // 台数
-      doneDay: 100,          // 日产量
-      reason: '设备老化导致能耗增加'
-    },
-    {
-      machCode: '616506210002',
-      machName: '注塑',
-      workshopName: '注塑',
-      monthDay: '2025-08-01',
-      number: '800',         // 标准接口：标准总电
-      numberPower: 750,      // 实际接口：实际总电
-      tipNumber: '0.0',
-      peakNumber: '0.0',
-      flatNumber: '800.0',
-      valleyNumber: '0.0',
-      cl: 30,                // 台数
-      doneDay: 80,           // 日产量
-      reason: ''
-    },
-    {
-      machCode: '616506210003',
-      machName: '焊接',
-      workshopName: '焊接',
-      monthDay: '2025-08-01',
-      number: '1500',        // 标准接口：标准总电
-      numberPower: 1800,     // 实际接口：实际总电
-      tipNumber: '0.0',
-      peakNumber: '0.0',
-      flatNumber: '1500.0',
-      valleyNumber: '0.0',
-      cl: 80,                // 台数
-      doneDay: 120,          // 日产量
-      reason: '生产负荷增加'
+      cl: 0,                // 台数
+      doneDay: 0,          // 日产量
+      reason: '暂无原因'
     }
   ]
   
@@ -257,9 +227,6 @@ const energyData = computed(() => {
     return []
   }
   
-  // 过滤数据：只保留电表数据，排除气表和水表
-  console.log('🔍 开始过滤数据，总数据量:', dataToProcess.length)
-  console.log('🔍 MACHINE_CODES.ELECTRIC:', MACHINE_CODES.ELECTRIC)
   
   const filteredData = dataToProcess.filter(item => {
     const isElectric = MACHINE_CODES.ELECTRIC.includes(item.machCode)
@@ -277,14 +244,10 @@ const energyData = computed(() => {
     return isElectric
   })
   
-  console.log('✅ 过滤后的电表数据:', filteredData.map(item => ({
-    machCode: item.machCode,
-    machName: item.machName,
-    type: '电表'
-  })))
+
   
   const processedData = filteredData.map(item => {
-    console.log('🔍 Line3组件：处理的数据:', item)
+
     
     // 从monthlyStandardData中获取标准数据（包含标准用电量和台数）
     const standardItem = energyStore.monthlyStandardData.find(storeItem => storeItem.machCode === item.machCode)
@@ -293,10 +256,10 @@ const energyData = computed(() => {
     const actualItem = energyStore.monthlyData.find(storeItem => storeItem.machCode === item.machCode)
     
     // 标准总电：优先使用标准接口的number，其次使用实际接口的number
-    const standardTotal = Number(standardItem?.number || item.number) || 0
+    const standardTotal = ((Number(standardItem?.number || item.number) || 0)).toFixed(1)
     
     // 实际总电：优先使用实际接口的numberPower
-    const actualTotal = actualItem?.numberPower || item.numberPower || 0
+    const actualTotal = ((actualItem?.numberPower || item.numberPower || 0)).toFixed(1)
     
     // 台数：优先使用标准接口的cl，其次使用props的cl
     const standardMachineCount = standardItem?.cl || item.cl || 1
@@ -307,12 +270,12 @@ const energyData = computed(() => {
 
     
     // 标准每台 = 标准总电 ÷ 台数
-    const standardPerUnit = standardMachineCount > 0 ? standardTotal / standardMachineCount : 0
+    const standardPerUnit = standardMachineCount > 0 ? (Number(standardTotal) / standardMachineCount).toFixed(1) : '0.0'
     // 实际每台 = 实际总电 ÷ 台数
-    const actualPerUnit = actualMachineCount > 0 ? actualTotal / actualMachineCount : 0
+    const actualPerUnit = actualMachineCount > 0 ? (Number(actualTotal) / actualMachineCount).toFixed(1) : '0.0'
     
     // 计算差异和比例
-    const difference = actualPerUnit - standardPerUnit
+    const difference = Number(actualPerUnit) - Number(standardPerUnit)
     const ratio = difference.toFixed(1)
     
 
@@ -350,11 +313,7 @@ const energyData = computed(() => {
     return 0
   })
   
-  console.log('✅ Line3组件：排序后的数据:', sortedData.map(item => ({
-    machCode: item.machCode,
-    workshopName: item.workshopName,
-    order: MACHINE_CODES.ELECTRIC.indexOf(item.machCode)
-  })))
+
   
   return sortedData
 })
@@ -437,6 +396,26 @@ const submitReason = async () => {
 </script>
 
 <style scoped>
+/* 数字显示样式 - 简洁版本 */
+.number-display {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+  font-weight: 600;
+}
+
+.number-value {
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  transition: all 0.3s ease;
+}
+
+.number-unit {
+  font-weight: 500;
+  opacity: 0.9;
+  font-size: 0.85em;
+}
 .line3-container {
   height: 17vh;
   width: 100%;

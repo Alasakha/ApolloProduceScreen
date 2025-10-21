@@ -133,7 +133,7 @@ export const getSelfCheck = () => {
 
 // /rawMaterialMonitoring2
 export const getRawMaterialMonitoring2 = () => {
-  return request({
+  return request({  
     url: '/injection/rawMaterialMonitoring2',
     method: 'get',
   })

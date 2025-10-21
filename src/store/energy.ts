@@ -229,7 +229,7 @@ export const useEnergyStore = defineStore('energy', {
     getMonthlyAvgStandardPower(): number {
       const totalPower = this.getMonthlyTotalStandardPower;
       const totalCount = this.starntotalCl;
-      return totalCount > 0 ? totalPower / totalCount : 0;
+      return totalCount > 0 ? Number((totalPower / totalCount).toFixed(1)) : 0;
     },
 
     // 获取当月实际平均每台电量
@@ -241,7 +241,7 @@ export const useEnergyStore = defineStore('energy', {
         .filter(item => ['616506210005', '616506210009'].includes(item.machCode))
         .reduce((total, item) => total + (Number(item.cl) || 0), 0);
       
-      return specificActualCount > 0 ? totalPower / specificActualCount : 0;
+      return specificActualCount > 0 ? Number((totalPower / specificActualCount).toFixed(1)) : 0;
     },
 
     getActualTotalCl(): number {
@@ -261,7 +261,7 @@ export const useEnergyStore = defineStore('energy', {
         .filter(item => ['616506210005', '616506210009'].includes(item.machCode))
         .reduce((total, item) => total + (Number(item.cl) || 0), 0);
       
-      return standardAvg * specificActualCount;
+      return Number((standardAvg * specificActualCount).toFixed(1));
     }
   },
 
@@ -387,8 +387,8 @@ export const useEnergyStore = defineStore('energy', {
         const gasData = this.dailyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
         
         if (gasData && this.dailyProduction > 0) {
-          this.averageDaGasPower = Number(gasData.numberPower) / this.dailyProduction;
-          console.log(`📊 平均每台日气量: ${this.averageDaGasPower.toFixed(2)} (气量: ${gasData.numberPower}, 日产量: ${this.dailyProduction})`);
+          this.averageDaGasPower = Number(((Number(gasData.numberPower) / this.dailyProduction)).toFixed(1));
+          console.log(`📊 平均每台日气量: ${this.averageDaGasPower.toFixed(1)} (气量: ${gasData.numberPower}, 日产量: ${this.dailyProduction})`);
           return true;
         } else {
           console.warn('⚠️ 当日气表数据或产量数据无效，无法计算平均每台日气量');
@@ -411,8 +411,8 @@ export const useEnergyStore = defineStore('energy', {
         const gasData = this.monthlyData.find(item => MACHINE_CODES.GAS.includes(item.machCode));
         
         if (gasData && this.monthlyProduction > 0) {
-          this.averageMonGasPower = Number(gasData.numberPower) / this.monthlyProduction;
-          console.log(`📊 平均每台月气量: ${this.averageMonGasPower.toFixed(2)} (气量: ${gasData.numberPower}, 月产量: ${this.monthlyProduction})`);
+          this.averageMonGasPower = Number(((Number(gasData.numberPower) / this.monthlyProduction)).toFixed(1));
+          console.log(`📊 平均每台月气量: ${this.averageMonGasPower.toFixed(1)} (气量: ${gasData.numberPower}, 月产量: ${this.monthlyProduction})`);
           return true;
         } else {
           console.warn('⚠️ 当月气表数据或产量数据无效，无法计算平均每台月气量');
@@ -617,7 +617,7 @@ export const useEnergyStore = defineStore('energy', {
         console.log('  - 当日气表数据:', dailyGasData);
         if (this.dailyProduction > 0) {
           const avgDaily = Number(dailyGasData.numberPower) / this.dailyProduction;
-          console.log(`  - 计算平均每台日气量: ${dailyGasData.numberPower} ÷ ${this.dailyProduction} = ${avgDaily.toFixed(2)}`);
+          console.log(`  - 计算平均每台日气量: ${dailyGasData.numberPower} ÷ ${this.dailyProduction} = ${avgDaily.toFixed(1)}`);
         }
       }
       
@@ -625,7 +625,7 @@ export const useEnergyStore = defineStore('energy', {
         console.log('  - 当月气表数据:', monthlyGasData);
         if (this.monthlyProduction > 0) {
           const avgMonthly = Number(monthlyGasData.numberPower) / this.monthlyProduction;
-          console.log(`  - 计算平均每台月气量: ${monthlyGasData.numberPower} ÷ ${this.monthlyProduction} = ${avgMonthly.toFixed(2)}`);
+          console.log(`  - 计算平均每台月气量: ${monthlyGasData.numberPower} ÷ ${this.monthlyProduction} = ${avgMonthly.toFixed(1)}`);
         }
       }
       

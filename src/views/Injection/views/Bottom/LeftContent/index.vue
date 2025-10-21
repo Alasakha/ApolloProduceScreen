@@ -40,7 +40,7 @@ import materialScrollBoard from '@/components/datav/MaterialScrollBoard.vue'
 const selectedCode = ref('')
 // 初始化配置对象
 const config = reactive({
-  header: ['机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料使用率',''], // 表头
+  header: ['工单号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料使用率',''], // 表头
   data: [], // 数据
   index: true,
   align: ['center','center','center','center','center','center','center','center'],
@@ -49,10 +49,10 @@ const config = reactive({
   headerHeight: 20
 })
 const config2 = reactive({
-  header: ['机码','机台号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料使用率','超出原因'], // 表头
+  header: ['工单号','计划成品产出数','计划原材料用量','计划原材料损耗', '实际产出数','实际原材料用量/kg','实际损耗量','原材料使用率','超出原因'], // 表头
   data: [], // 数据
   index: true,
-  align: ['center','center','center','center','center','center','center','center'],
+  align: ['center','center','center','center','center','center','center','center','center'],
   rowNum: 5,
   columnWidth: [50],
   headerHeight: 20  
@@ -102,7 +102,7 @@ const fetchData = async () => {
     const res = await getRawMaterialMonitoring2();
     if (res && res.code === 200 && res.data) {
       config.data = res.data.map(item => [
-        item.ty009,
+        item.gd,
         item.planOutput,
         Math.round(item.expectedUsage)+'kg',
         Math.round(item.planLoss)+'kg', 
@@ -112,8 +112,7 @@ const fetchData = async () => {
         item.useRate+'%',
       ]);
       config2.data = res.data.map(item => [
-        item.machineCode,
-        item.ty009,
+      item.gd,
         item.planOutput,
         Math.round(item.expectedUsage)+'kg',
         Math.round(item.planLoss)+'kg', 

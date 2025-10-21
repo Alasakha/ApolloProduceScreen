@@ -138,13 +138,7 @@ const monthlyTotalPower = computed(() => {
   const standardAvg = energyStore.getMonthlyAvgStandardPower;
   const actualAvg = energyStore.getMonthlyAvgActualPower;
   
-  console.log('📊 Line4组件：从store获取当月累计总电量:', {
-    standardTotal,
-    actualTotal,
-    standardAvg,
-    actualAvg
-  });
-  
+
   // 使用平均每台电量计算差值（更准确的报警判断）
   const avgDiff = actualAvg - standardAvg;
   
@@ -222,27 +216,27 @@ const monthlyTotalPower = computed(() => {
 
 const actualTotalConfig = computed(() => ({
   number: [monthlyTotalPower.value.actual],
-  content: '{nt}kW',
+  content: '{nt}度',
   style: { fontSize: 24, fill: '#00eeff' }
 }))
 
 // 当月平均每台电量配置
 const standardAvgConfig = computed(() => ({
   number: [energyStore.getMonthlyAvgStandardPower],
-  content: '{nt}kW',
+  content: '{nt}度',
   style: { fontSize: 24, fill: '#00eeff' }
 }))
 
 const actualAvgConfig = computed(() => ({
   number: [energyStore.getMonthlyAvgActualPower],
-  content: '{nt}kW',
+  content: '{nt}度',
   style: { fontSize: 24, fill: '#00eeff' }
 }))
 
 // 标准平均 ✖ 实际总台配置
 const standardAvgTimesActualConfig = computed(() => ({
   number: [energyStore.getStandardAvgTimesActualCount],
-  content: '{nt}kW',
+  content: '{nt}度',
   style: { fontSize: 24, fill: '#00eeff' }
 }))
 

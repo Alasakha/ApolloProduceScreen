@@ -11,7 +11,7 @@
         <!-- 内容区域 -->
         <div class="content-grid">
           <!-- 总用水量 -->
-          <div class="data-card total-water">
+          <!-- <div class="data-card total-water">
             <div class="card-header">
               <div class="card-icon">💧</div>
               <div class="card-title">总用水量</div>
@@ -39,12 +39,12 @@
                     'comparison-value decrease': dayDiff < 0,
                     'comparison-value neutral': dayDiff === 0
                   }">
-                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}} 吨
                   </span>
                 </div>
               </div>
             </div>
-          </div>
+          </div> -->
 
           <!-- 月用水量 -->
           <div class="data-card monthly-water">
@@ -75,7 +75,7 @@
                     'comparison-value decrease': dayDiff < 0,
                     'comparison-value neutral': dayDiff === 0
                   }">
-                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}吨
                   </span>
                 </div>
               </div>
@@ -111,7 +111,7 @@
                     'comparison-value decrease': dayDiff < 0,
                     'comparison-value neutral': dayDiff === 0
                   }">
-                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}m³
+                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}吨
                   </span>
                 </div>
               </div>
@@ -148,7 +148,7 @@
         </div>
         <div class="form-item">
           <label class="form-label">超支数值：</label>
-          <span class="form-value exceeded">{{ dayDiff > 0 ? '+' : '' }}{{ dayDiff }}m³</span>
+          <span class="form-value exceeded">{{ dayDiff > 0 ? '+' : '' }}{{ dayDiff }}吨</span>
         </div>
         <div class="form-item">
           <label class="form-label">超支原因：</label>
@@ -253,37 +253,37 @@ const dayDiff = computed(() => actualDay.value - standardDay.value)
 // 配置对象
 const standardTotalConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
 const actualTotalConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
 const standardMonthConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
 const actualMonthConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
 const standardDayConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
 const actualDayConfig = reactive({
   number: [0],
-  content: '{nt}m³',
+  content: '{nt}吨',
   style: { fontSize: 24, fill: '#00eeff' }
 })
 
@@ -409,9 +409,9 @@ const submitReason = async () => {
 /* 内容网格布局 - 默认样式 */
 .content-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
-  padding: 16px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+  padding: 12px;
   flex: 1;
 }
 
@@ -574,13 +574,14 @@ const submitReason = async () => {
 
 /* 数据卡片样式 */
 .data-card {
-  background: linear-gradient(135deg, rgba(0, 238, 255, 0.05), rgba(0, 102, 255, 0.05));
-  border: 1px solid rgba(0, 238, 255, 0.2);
-  border-radius: 12px;
-  padding: 16px;
+  background: linear-gradient(135deg, rgba(0, 238, 255, 0.08), rgba(0, 102, 255, 0.08));
+  border: 1px solid rgba(0, 238, 255, 0.3);
+  border-radius: 8px;
+  padding: 12px;
   transition: all 0.3s ease;
   position: relative;
   overflow: hidden;
+  min-height: 140px;
 }
 
 .data-card::before {
@@ -603,8 +604,8 @@ const submitReason = async () => {
 .card-header {
   display: flex;
   align-items: center;
-  margin-bottom: 16px;
-  gap: 8px;
+  margin-bottom: 8px;
+  gap: 6px;
 }
 
 .card-icon {
@@ -623,63 +624,74 @@ const submitReason = async () => {
 .card-content {
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 8px;
 }
 
 /* 数值行 */
 .value-row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 12px;
+  gap: 8px;
+  margin-bottom: 4px;
 }
 
 .value-item {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 6px;
+  gap: 4px;
+  background: rgba(0, 238, 255, 0.05);
+  border: 1px solid rgba(0, 238, 255, 0.15);
+  border-radius: 6px;
+  padding: 8px 4px;
 }
 
 .value-label {
   color: #ffffff;
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  opacity: 0.9;
   text-align: center;
+  font-weight: 500;
 }
 
 .value-display {
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: 32px;
+  min-height: 28px;
+  background: rgba(0, 238, 255, 0.1);
+  border-radius: 4px;
+  padding: 2px 6px;
 }
 
 /* 比较行 */
 .comparison-row {
   display: flex;
   justify-content: center;
-  margin-top: 8px;
+  margin-top: 4px;
 }
 
 .comparison-item {
   display: flex;
   align-items: center;
-  gap: 6px;
-  padding: 6px 12px;
-  background: rgba(0, 238, 255, 0.1);
-  border-radius: 20px;
-  border: 1px solid rgba(0, 238, 255, 0.2);
+  gap: 4px;
+  padding: 4px 10px;
+  background: rgba(0, 238, 255, 0.12);
+  border-radius: 16px;
+  border: 1px solid rgba(0, 238, 255, 0.25);
+  box-shadow: 0 2px 4px rgba(0, 238, 255, 0.1);
 }
 
 .comparison-label {
   color: #ffffff;
-  font-size: 12px;
-  opacity: 0.8;
+  font-size: 11px;
+  opacity: 0.9;
+  font-weight: 500;
 }
 
 .comparison-value {
   font-weight: 600;
-  font-size: 12px;
+  font-size: 11px;
 }
 
 .comparison-value.increase {
