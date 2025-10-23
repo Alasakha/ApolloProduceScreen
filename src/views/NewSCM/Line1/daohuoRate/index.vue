@@ -35,7 +35,7 @@
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { getPurchaseDeliveryRate } from '@/api/getnewInjection';
+import { getPmcKpi } from '@/api/getScmInfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import * as echarts from 'echarts';
@@ -81,33 +81,26 @@ const drawMonthlyIndicators = (data) => {
 const fetchData = async () => {
   try {
     isLoading.value = true;
-    // 获取交货日数据
-    const deliveryRes = await getPurchaseDeliveryRate(1);
-    // 获取排产日期数据
-    const productionRes = await getPurchaseDeliveryRate(2);
+    // 获取PMC KPI数据
+    const res = await getPmcKpi();
     
     isLoading.value = false;
     
     // 保存原始数据
-    deliveryData.value = deliveryRes.data || [];
-    productionData.value = productionRes.data || [];
+    const rawData = res.data || [];
     
     // 判断数据状态
-    const hasDelivery = deliveryData.value.length > 0;
-    const hasProduction = productionData.value.length > 0;
+    const hasData = rawData.length > 0;
     
-    if (!hasDelivery && !hasProduction) {
+    if (!hasData) {
       dataStatus.value = 'none';
       isDataEmpty.value = true;
-    } else if (hasDelivery && !hasProduction) {
-      dataStatus.value = 'onlyDelivery';
-      isDataEmpty.value = false;
-    } else if (!hasDelivery && hasProduction) {
-      dataStatus.value = 'onlyProduction';
-      isDataEmpty.value = false;
     } else {
       dataStatus.value = 'both';
       isDataEmpty.value = false;
+      // 直接使用原始数据，不需要分别处理
+      deliveryData.value = rawData;
+      productionData.value = rawData;
     }
     
     // 根据状态处理数据并绘制图表
@@ -128,37 +121,17 @@ const processDataByStatus = () => {
     case 'none':
       return [{
         purchaserName: '暂无数据',
-        deliveryRate: 0,
-        productionRate: 0
+        aCount: 0,
+        bCount: 0
       }];
     
-    case 'onlyDelivery':
+    case 'both':
+      // 处理PMC KPI数据，使用a_count和b_count
       return deliveryData.value.map(item => ({
         purchaserName: item.purchaserName,
-        deliveryRate: item.rate,
-        productionRate: 0
+        aCount: item.a_count || 0,
+        bCount: item.b_count || 0
       }));
-    
-    case 'onlyProduction':
-      return productionData.value.map(item => ({
-        purchaserName: item.purchaserName,
-        deliveryRate: 0,
-        productionRate: item.rate
-      }));
-    
-    case 'both':
-      // 合并两组数据
-      return deliveryData.value.map(delivery => {
-        const production = productionData.value.find(
-          p => p.purchaserName === delivery.purchaserName
-        ) || { rate: 0 };
-        
-        return {
-          purchaserName: delivery.purchaserName,
-          deliveryRate: delivery.rate,
-          productionRate: production.rate
-        };
-      });
     
     default:
       return [];

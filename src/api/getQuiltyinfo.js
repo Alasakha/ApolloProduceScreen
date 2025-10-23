@@ -295,12 +295,13 @@ export const getPlan4nPie = () =>{
 }
 
 // /quality/plan4n
-export const getPlan4n = (status) =>{
+export const getPlan4n = (status,projectName) =>{
   return request({
     url:'/quality/plan4n',
     method:'get',
     params:{
-      status
+      status,
+      projectName
     }
   })
 }

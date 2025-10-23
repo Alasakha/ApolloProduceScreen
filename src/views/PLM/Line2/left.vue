@@ -28,29 +28,29 @@
                         <table class="detail-table">
                             <thead>
                                 <tr>
-                                    <th>任务名称</th>
                                     <th>项目编号</th>
                                     <th>项目名称</th>
-                                    <th>状态</th>
+                                    <th>任务名称</th>
                                     <th>计划完成时间</th>
                                     <th>变更完成时间</th>
                                     <th>实际完成时间</th>
+                                    <th>完成状态</th>
                                     <th>责任人</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 <tr v-for="(item, index) in overdueList" :key="index" class="table-row">
-                                    <td class="task-name">{{ item.taskName }}</td>
                                     <td>{{ item.pno }}</td>
                                     <td>{{ item.projName }}</td>
+                                    <td class="task-name">{{ item.taskName }}</td>
+                                    <td>{{ formatDate(item.expectTime) }}</td>
+                                    <td>{{ formatDate(item.changeTime) || '--' }}</td>
+                                    <td>{{ formatDate(item.completeTime) || '--' }}</td>
                                     <td>
                                         <span class="status-badge" :class="getStatusClass(item.sts)">
                                             {{ item.sts }}
                                         </span>
                                     </td>
-                                    <td>{{ formatDate(item.expectTime) }}</td>
-                                    <td>{{ formatDate(item.changeTime) || '--' }}</td>
-                                    <td>{{ formatDate(item.completeTime) || '--' }}</td>
                                     <td>{{ item.executant }}</td>
                                 </tr>
                             </tbody>
@@ -94,7 +94,7 @@ const scrollConfig = computed(() => {
             : [defaultRow],
         index: true,  // 显示序号列
         indexHeader: '序号',
-        columnWidth: [50],  // 列宽
+        columnWidth: [60, 100, 120, 100, 100, 100, 80, 100],  // 各列宽度
         align: ['center'],  // 对齐方式
         rowNum: 7,  // 显示行数
         headerBGC: '#0f2749',  // 表头背景色
@@ -248,7 +248,6 @@ onBeforeUnmount(() => {
     border: 2px solid #00eaff;
     border-radius: 12px;
     width: 80%;
-    max-width: 1000px;
     max-height: 80vh;
     overflow: hidden;
     box-shadow: 0 10px 30px rgba(0, 234, 255, 0.3);

@@ -131,3 +131,11 @@ export const getPurchaseSigningRateDetail = (purchaseName ) => {
     params: { purchaseName  }
   })
 }
+
+// /SCM/pmcKpi 回签及时率
+export const getPmcKpi = ( ) => {
+  return request({
+    url: '/SCM/pmcKpi',
+    method: 'get',
+  })
+}

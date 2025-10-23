@@ -1,12 +1,12 @@
 export const createChartOption = (data) => {
   // 处理数据，分离出名称和数值
   const names = data.map(item => item.purchaserName);
-  const deliveryRates = data.map(item => (item.deliveryRate * 100).toFixed(0));
-  const productionRates = data.map(item => (item.productionRate * 100).toFixed(0));
+  const aCounts = data.map(item => item.aCount || 0);
+  const bCounts = data.map(item => item.bCount || 0);
   
   // 判断是否显示图例
-  const hasDelivery = deliveryRates.some(rate => parseFloat(rate) > 0);
-  const hasProduction = productionRates.some(rate => parseFloat(rate) > 0);
+  const hasACount = aCounts.some(count => count > 0);
+  const hasBCount = bCounts.some(count => count > 0);
 
   return {
     tooltip: {
@@ -18,15 +18,15 @@ export const createChartOption = (data) => {
         const name = params[0].name;
         let result = `${name}<br/>`;
         params.forEach(param => {
-          result += `${param.seriesName}: ${param.value}%<br/>`;
+          result += `${param.seriesName}: ${param.value}辆<br/>`;
         });
         return result;
       }
     },
     legend: {
-      data: hasDelivery && hasProduction ? ['预交达成率', '准时排交达成率'] : 
-            hasDelivery ? ['预交达成率'] : 
-            hasProduction ? ['准时排交达成率'] : ['预交达成率', '准时排交达成率'],
+      data: hasACount && hasBCount ? ['A类车型', '常规车型'] : 
+            hasACount ? ['A类车型'] : 
+            hasBCount ? ['常规车型'] : ['A类车型', '常规车型'],
       textStyle: {
         color: '#fff'
       },
@@ -52,39 +52,38 @@ export const createChartOption = (data) => {
       type: 'value',
       axisLabel: {
         color: '#fff',
-        formatter: '{value}%'
-      },
-      max: 100
+        formatter: '{value}辆'
+      }
     },
     series: [
       {
-        name: '预交达成率',
+        name: 'A类车型',
         type: 'bar',
-        data: deliveryRates,
+        data: aCounts,
         itemStyle: {
           color: '#006cff'
         },
-        barWidth: hasDelivery && hasProduction ? '40%' : '60%',
+        barWidth: hasACount && hasBCount ? '40%' : '60%',
         label: {
-          show: hasDelivery,
+          show: hasACount,
           position: 'top',
-          formatter: '{c}%',
+          formatter: '{c}辆',
           color: '#fff',
           fontSize: 12
         }
       },
       {
-        name: '准时排交达成率',
+        name: '常规车型',
         type: 'bar',
-        data: productionRates,
+        data: bCounts,
         itemStyle: {
           color: '#60cda0'
         },
-        barWidth: hasDelivery && hasProduction ? '40%' : '60%',
+        barWidth: hasACount && hasBCount ? '40%' : '60%',
         label: {
-          show: hasProduction,
+          show: hasBCount,
           position: 'top',
-          formatter: '{c}%',
+          formatter: '{c}辆',
           color: '#fff',
           fontSize: 12
         }

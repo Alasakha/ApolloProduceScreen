@@ -34,16 +34,28 @@
            <div class="detail-content">
                <el-table :data="detailData" border style="width: 100%">
                    <el-table-column prop="id" label="ID" width="80" />
-                   <el-table-column prop="planNumber" label="计划编号" width="120" />
-                   <el-table-column prop="actionMeasures" label="行动举措" width="150" />
-                   <el-table-column prop="outcomeRequirements" label="成果要求" width="150" />
-                   <el-table-column prop="status" label="状态" width="100" />
-                   <el-table-column prop="personInCharge" label="负责人" width="100" />
-                   <el-table-column prop="department" label="所属部门" width="120" />
-                   <el-table-column prop="plannedCompletionTime" label="计划完成时间" width="140" />
-                   <el-table-column prop="actualCompletionTime" label="实际完成时间" width="140" />
-                   <el-table-column prop="importanceLevel" label="重要紧急等级" width="120" />
-                   <el-table-column prop="creationTime" label="建立时间" width="140" />
+                   <el-table-column prop="计划编号" label="计划编号" width="120" />
+                   <el-table-column prop="行动举措" label="行动举措" width="150" />
+                   <el-table-column prop="成果要求" label="成果要求" width="150" />
+                   <el-table-column prop="状态描述" label="状态" width="100" />
+                   <el-table-column prop="负责人名称" label="负责人" width="100" />
+                   <el-table-column prop="所属部门" label="所属部门" width="120" />
+                   <el-table-column prop="计划完成时间" label="计划完成时间" width="140">
+                       <template #default="{ row }">
+                           {{ formatDate(row.计划完成时间) }}
+                       </template>
+                   </el-table-column>
+                   <el-table-column prop="实际完成时间" label="实际完成时间" width="140">
+                       <template #default="{ row }">
+                           {{ formatDate(row.实际完成时间) }}
+                       </template>
+                   </el-table-column>
+                   <el-table-column prop="重要紧急等级" label="重要紧急等级" width="120" />
+                   <el-table-column prop="建立时间" label="建立时间" width="140">
+                       <template #default="{ row }">
+                           {{ formatDate(row.建立时间) }}
+                       </template>
+                   </el-table-column>
                </el-table>
                
                <!-- 分页 -->
@@ -65,7 +77,7 @@
 
 <script setup>
 import { ref, onMounted, computed, onBeforeUnmount } from 'vue'
-import { getProjectOverdueInfo } from '@/api/getPMLinfo'
+import { getPlan4n } from '@/api/getQuiltyinfo'
 
 const overdueList = ref([])
 const detailVisible = ref(false)
@@ -74,78 +86,59 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const totalItems = ref(0)
 
-// Mock数据
-const mockData = [
-    {
-        id: 1,
-        planNumber: 'PLAN-001',
-        actionMeasures: '制定详细实施方案',
-        outcomeRequirements: '完成方案设计文档',
-        status: '进行中',
-        personInCharge: '张三',
-        department: '技术部',
-        plannedCompletionTime: '2024-01-15',
-        actualCompletionTime: '2024-01-20',
-        importanceLevel: '高',
-        creationTime: '2024-01-01'
-    },
-    {
-        id: 2,
-        planNumber: 'PLAN-002',
-        actionMeasures: '系统架构设计',
-        outcomeRequirements: '完成架构设计图',
-        status: '已完成',
-        personInCharge: '李四',
-        department: '研发部',
-        plannedCompletionTime: '2024-01-10',
-        actualCompletionTime: '2024-01-08',
-        importanceLevel: '中',
-        creationTime: '2024-01-02'
-    },
-    {
-        id: 3,
-        planNumber: 'PLAN-003',
-        actionMeasures: '数据库设计',
-        outcomeRequirements: '完成数据库表结构',
-        status: '待开始',
-        personInCharge: '王五',
-        department: '数据部',
-        plannedCompletionTime: '2024-01-25',
-        actualCompletionTime: '',
-        importanceLevel: '低',
-        creationTime: '2024-01-03'
-    }
-]
 
 // 格式化日期
 const formatDate = (dateStr) => {
-   if (!dateStr) return '--'
-   return new Date(dateStr).toLocaleDateString()
+    if (!dateStr) return '--'
+    const trimmedDate = dateStr.trim()
+    if (!trimmedDate) return '--'
+    
+    try {
+        // 处理 YYYYMMDD 格式（如：20251015）
+        if (/^\d{8}$/.test(trimmedDate)) {
+            const year = trimmedDate.substring(0, 4)
+            const month = trimmedDate.substring(4, 6)
+            const day = trimmedDate.substring(6, 8)
+            const date = new Date(year, month - 1, day) // month 需要减1，因为月份从0开始
+            return date.toLocaleDateString()
+        }
+        
+        // 处理其他常见格式
+        const date = new Date(trimmedDate)
+        if (isNaN(date.getTime())) {
+            return '--'
+        }
+        
+        return date.toLocaleDateString()
+    } catch (error) {
+        console.error('日期解析错误:', error, '原始值:', trimmedDate)
+        return '--'
+    }
 }
 
 // 配置轮播表格
 const scrollConfig = computed(() => {
    const defaultRow = ['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
    return {
-       header: ['ID', '计划编号', '行动举措', '成果要求', '状态', '负责人', '所属部门', '计划完成时间', '实际完成时间', '重要紧急等级', '建立时间'],
+       header: ['ID', '计划编号', '行动举措', '成果要求', '状态描述', '负责人名称', '所属部门', '计划完成时间', '实际完成时间', '重要紧急等级', '建立时间'],
        data: overdueList.value.length > 0 
            ? overdueList.value.map(item => [
-               item.id,
-               item.planNumber,
-               item.actionMeasures,
-               item.outcomeRequirements,
-               item.status,
-               item.personInCharge,
-               item.department,
-               formatDate(item.plannedCompletionTime),
-               formatDate(item.actualCompletionTime) || '--',
-               item.importanceLevel,
-               formatDate(item.creationTime)
+               item.id?.trim() || '--',
+               item.计划编号?.trim() || '--',
+               item.行动举措?.trim() || '--',
+               item.成果要求?.trim() || '--',
+               item.状态描述?.trim() || '--',
+               item.负责人名称?.trim() || '--',
+               item.所属部门?.trim() || '--',
+               formatDate(item.计划完成时间),
+               formatDate(item.实际完成时间) || '--',
+               item.重要紧急等级?.trim() || '--',
+               formatDate(item.建立时间)
            ])
            : [defaultRow],
        index: true,  // 显示序号列
        indexHeader: '序号',
-       columnWidth: [60, 100, 120, 120, 80, 80, 100, 120, 120, 100, 120],  // 各列宽度
+       columnWidth: [60,80],  // 各列宽度
        align: ['center'],  // 对齐方式
        rowNum: 5,  // 显示行数
        headerBGC: '#0f2749',  // 表头背景色
@@ -168,8 +161,8 @@ const handleClick = ({ row, ceil, rowIndex, columnIndex }) => {
 // 显示详细数据
 const showDetail = () => {
    detailVisible.value = true
-   detailData.value = mockData
-   totalItems.value = mockData.length
+   detailData.value = overdueList.value
+   totalItems.value = overdueList.value.length
 }
 
 // 关闭弹窗
@@ -190,14 +183,12 @@ const handleCurrentChange = (val) => {
 // 获取数据
 const fetchData = async () => {
    try {
-       // 暂时使用mock数据
-       overdueList.value = mockData
-       // const res = await getProjectOverdueInfo()
-       // if (res.code === 200 && Array.isArray(res.data)) {
-       //     overdueList.value = res.data
-       // }
+       const res = await getPlan4n(undefined, '转产计划')
+       if (res.code === 200 && Array.isArray(res.data)) {
+           overdueList.value = res.data
+       }
    } catch (error) {
-       console.error('获取逾期任务数据失败:', error)
+       console.error('获取转产计划数据失败:', error)
    }
 }
 
