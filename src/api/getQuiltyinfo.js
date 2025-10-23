@@ -217,11 +217,11 @@ export const getServiceRequest = (documentName,hasAccessory,isCrossBorder, custo
 }
 
 // /quality/serviceRequestDetail
-export const getServiceRequestDetail = (documentName,hasAccessory,isCrossBorder, customer_name ) => {
+export const getServiceRequestDetail = (documentName,hasAccessory,isCrossBorder, customer_name,belong ) => {
   return request({
     url: '/quality/serviceRequestDetail',
     method: 'get',
-    params: { documentName,hasAccessory,isCrossBorder, customer_name }
+    params: { documentName,hasAccessory,isCrossBorder, customer_name,belong }
   })
 }
 

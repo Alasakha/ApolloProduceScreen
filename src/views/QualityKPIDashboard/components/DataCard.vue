@@ -2,7 +2,7 @@
     <dv-border-box13 class="w-full h-full">
       <div class="flex  w-full h-full p-2 box-border text-white">
         <div
-          class="flex-1 flex justify-center items-center w-full text-lg font-bold text-cyan-300 tracking-wide drop-shadow-lg py-2"
+          class="flex-1 flex justify-center items-center w-full text-base font-bold text-cyan-300 tracking-wide drop-shadow-lg py-2"
           style="letter-spacing: 2px;"
         >
           {{ props.title1 }}
@@ -11,19 +11,31 @@
           <div ref="Indicators1" class="w-full h-full"></div>
         </div>
         <div class="flex-1 flex flex-col justify-center items-center">
-          <div class="text-lg font-bold text-cyan-300 tracking-wide drop-shadow-lg py-2"
+          <div class="text-base font-bold text-cyan-300 tracking-wide drop-shadow-lg py-2"
             style="letter-spacing: 2px;">
             {{ props.title2 }}
           </div>
+          <!-- 归属统计显示 -->
+        
           <!-- 添加详情按钮 -->
-          <el-button type="primary" size="small" @click="openDetailDialog">
+           <div  class="absolute bottom-4">
+            <el-button type="primary" size="small" @click="openDetailDialog">
             详细信息
           </el-button>
+           <el-button type="primary" size="small" @click="openKPIDetailDialog" >
+             KPI详细
+           </el-button>
+           </div>
+
         </div>
         <div class="flex-1">
-          <div ref="Indicators2" class="w-full h-full cursor-pointer" @click="openDialog"></div>
+          <div ref="Indicators2" class="w-full h-full cursor-pointer " @click="openDialog"></div>
         </div>
+         <div v-if="props.belongCount !== null && props.belongCount !== undefined" class="flex-1 flex items-center justify-center text-lg text-cyan-300">
+             KPI统计: {{ props.belongCount }}
+           </div>
       </div>
+      
     </dv-border-box13>
 
     <!-- 添加对话框组件 -->
@@ -102,6 +114,11 @@ const props = defineProps({
     data2:{
         type: Object,
         required: true,
+    },
+    belongCount:{
+        type: Number,
+        required: false,
+        default: 0
     }
 });
 
@@ -129,7 +146,8 @@ const getTypeByTitle = (title: string) => {
         '月度常规客诉投诉目标': 3,
         '月度跨境投诉目标': 4,
         '月度配件投诉目标': 5,
-        '月度国内客户投诉目标': 6
+        '月度国内客户投诉目标': 6,
+        '归属统计': 7
     };
     return typeMap[title] || 1;
 };
@@ -232,6 +250,13 @@ const getRequestParams = () => {
       params.hasAccessory = 0;
       params.customer_name = 'HZ20000';
       break;
+    case '归属统计':
+      // 归属统计使用默认参数，获取所有数据
+      params.documentName = null;
+      params.hasAccessory = null;
+      params.isCrossBorder = null;
+      params.customer_name = null;
+      break;
   }
 
   return params;
@@ -255,6 +280,31 @@ const openDetailDialog = async () => {
   } catch (error) {
     console.error('获取详细数据失败:', error);
     ElMessage.error('获取详细数据失败');
+  } finally {
+    detailLoading.value = false;
+  }
+};
+
+// 打开KPI详细对话框
+const openKPIDetailDialog = async () => {
+  detailLoading.value = true;
+  detailDialogVisible.value = true;
+  try {
+    const params = getRequestParams();
+    // 为KPI详细添加belong=1参数
+    const res = await getServiceRequestDetail(
+      params.documentName,
+      params.hasAccessory,
+      params.isCrossBorder,
+      params.customer_name,
+      1 // belong=1 参数
+    );
+    if (res.code === 200) {
+      detailData.value = res.data;
+    }
+  } catch (error) {
+    console.error('获取KPI详细数据失败:', error);
+    ElMessage.error('获取KPI详细数据失败');
   } finally {
     detailLoading.value = false;
   }
@@ -312,6 +362,17 @@ if (props.title1 === '月度常规客诉投诉目标') {
   if (val > 7) {
     warnLevel = 'danger';
   } else if (val > 5) {
+    warnLevel = 'warn';
+  } else {
+    warnLevel = 'normal';
+  }
+}
+
+if (props.title1 === '归属统计') {
+  const val = props.data2.data;
+  if (val > 50) {
+    warnLevel = 'danger';
+  } else if (val > 30) {
     warnLevel = 'warn';
   } else {
     warnLevel = 'normal';
