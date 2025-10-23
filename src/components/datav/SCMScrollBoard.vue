@@ -241,70 +241,38 @@
   defineExpose({
     updateRows,
   });
-  // 判断原材料使用率是否超出范围
-  function isUsageRateOutOfRange(row: any) {
+  // 判断原因和处理实际是否缺失
+  function isMissingRequiredInfo(row: any) {
     if (!row || !row.ceils) {
       console.log('行数据无效:', row);
       return false;
     }
     
-    // 先判断实际产出数是否为0（第5列，索引为4）
-    const actualOutputCell = row.ceils[5]; // 实际产出数列
-    console.log('实际产出数单元格数据:', actualOutputCell, '类型:', typeof actualOutputCell);
+    // 根据数据结构，查找原因和处理实际列
+    // 原因列是"问题点"（索引9），处理实际列是"处理结果"（索引13）
+    const reasonCell = row.ceils[9]; // 问题点/原因列
+    const processActualCell = row.ceils[13]; // 处理结果列
     
-    if (!actualOutputCell) {
-      console.log('实际产出数单元格为空');
-      return false;
-    }
-    
-    // 提取实际产出数的数字部分
-    const actualOutputText = actualOutputCell.toString().replace(/[^\d.-]/g, '');
-    const actualOutput = parseFloat(actualOutputText);
-    
-    console.log('处理后的实际产出数:', {
-      原始值: actualOutputCell,
-      处理后文本: actualOutputText,
-      解析后数字: actualOutput
+    console.log('检查原因和处理实际:', {
+      行数据: row,
+      所有列数据: row.ceils,
+      原因: reasonCell,
+      处理实际: processActualCell,
+      原因是否缺失: !reasonCell || reasonCell === '--' || reasonCell.toString().trim() === '',
+      处理实际是否缺失: !processActualCell || processActualCell === '--' || processActualCell.toString().trim() === ''
     });
     
-    // 检查实际产出数是否为有效数字且不为0
-    if (isNaN(actualOutput) || actualOutput === 0) {
-      console.log('实际产出数为0或无效数字，跳过使用率判断');
-      return false;
-    }
+    // 检查原因是否缺失
+    const isReasonMissing = !reasonCell || reasonCell === '--' || reasonCell.toString().trim() === '';
     
-    console.log('实际产出数不为0，继续判断使用率');
+    // 检查处理实际是否缺失
+    const isProcessActualMissing = !processActualCell || processActualCell === '--' || processActualCell.toString().trim() === '';
     
-    // 查找原材料使用率列（第8列，索引为7）
-    const usageRateCell = row.ceils[8]; // 原材料使用率列
-    console.log('使用率单元格数据:', usageRateCell, '类型:', typeof usageRateCell);
+    // 如果原因或处理实际中任何一个缺失，就返回true
+    const isMissing = isReasonMissing || isProcessActualMissing;
     
-    if (!usageRateCell) {
-      console.log('使用率单元格为空');
-      return false;
-    }
-    
-    // 提取数字部分，去掉%符号
-    const usageRateText = usageRateCell.toString().replace('%', '');
-    const usageRate = parseFloat(usageRateText);
-    
-    console.log('处理后的使用率:', {
-      原始值: usageRateCell,
-      处理后文本: usageRateText,
-      解析后数字: usageRate,
-      是否超出范围: usageRate < 95 || usageRate > 105
-    });
-    
-    // 检查是否为有效数字
-    if (isNaN(usageRate)) {
-      console.log('使用率不是有效数字');
-      return false;
-    }
-    
-    // 判断是否超出95%-105%范围
-    const isOutOfRange = usageRate < 95 || usageRate > 105;
-    console.log(`使用率 ${usageRate}% 是否超出范围:`, isOutOfRange);
-    return isOutOfRange;
+    console.log(`原因或处理实际是否缺失:`, isMissing);
+    return isMissing;
   }
   
   // 获取行背景颜色（恢复正常背景色）
@@ -323,7 +291,7 @@
   
   // 获取行CSS类名（改为红字显示）
   function getRowClass(row: any) {
-    if (isUsageRateOutOfRange(row)) {
+    if (isMissingRequiredInfo(row)) {
       return 'red-text-row';
     }
     return '';

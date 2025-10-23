@@ -78,6 +78,7 @@ const lines = ref([
   { id: "ControlBoard", name: "中控看板",router:"/control-board" },
   { id: "AdvancedEarthDemo", name: "🌍 高级3D地球演示",router:"/advanced-earth-demo" },
   { id: "2006", name: "金工二部焊接看板",router:"/welding2" },
+  { id: "rdc", name: "研发智驱中枢",router:"/rdcCenter" },
 ]);
 
 // 获取 lines 中指定范围的数据

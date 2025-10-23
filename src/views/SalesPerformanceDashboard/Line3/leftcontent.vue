@@ -13,6 +13,7 @@
                         <!-- <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">再次预算金额(万)</th> -->
                         <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">已下单数量</th>
                         <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">已下单金额(美元)</th>
+                        <th class="px-2 py-1 border-x border-[#00eeff40] text-[#00FFFF] font-normal tracking-wider text-xs 3xl:text-sm 4xl:text-base">达成率</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -66,6 +67,7 @@
                         </td> -->
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdCount }}</td>
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ item.xdTotal }}</td>
+                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ calculateCompletionRate(item.ysQuantityYear, item.xdCount) }}</td>
                     </tr>
                     
                     <!-- 合计行 -->
@@ -78,6 +80,7 @@
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.ysAmtAgain }}</td> -->
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdCount }}</td>
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ total.xdTotal }}</td>
+                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ calculateCompletionRate(total.ysQuantityYear, total.xdCount) }}</td>
                     </tr>
 
                     <!-- 阶段性汇总行 -->
@@ -90,6 +93,7 @@
                         <!-- <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.ysAmtAgain }}</td> -->
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdCount }}</td>
                         <td class="px-4 py-2 border-x border-[#00eeff40]">{{ summaryData.xdTotal }}</td>
+                        <td class="px-4 py-2 border-x border-[#00eeff40]">{{ calculateCompletionRate(summaryData.ysQuantityYear, summaryData.xdCount) }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -217,6 +221,7 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 </style>
   
@@ -270,6 +275,17 @@ const formatAmount = (value: string | number): string => {
 const formatQuantity = (value: string | number): string => {
   if (!value) return '0'
   return value.toString()
+}
+
+// 计算达成率（使用预算数量和达成数量）
+const calculateCompletionRate = (budgetQuantity: string | number, actualQuantity: string | number): string => {
+  const budget = Number(budgetQuantity) || 0
+  const actual = Number(actualQuantity) || 0
+  
+  if (budget === 0) return '0.00%'
+  
+  const rate = (actual / budget) * 100
+  return `${rate.toFixed(2)}%`
 }
 
 // 修改 total 计算属性

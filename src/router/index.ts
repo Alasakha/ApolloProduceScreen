@@ -185,6 +185,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ControlBoard',   // 路由名
     component: () => import('@/views/ControlBoard/index.vue')
   },
+  {
+    path: '/rdccenter', // URL地址
+    name: 'RdcCenter',   // 路由名
+    component: () => import('@/views/RdcCenter/index.vue')
+  },
 ];
 
 

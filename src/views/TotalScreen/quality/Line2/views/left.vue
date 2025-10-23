@@ -8,13 +8,8 @@
                 <div ref="chartRef" class="w-full h-[100%]"></div>
             </div>
             
-            <!-- 功能按钮 -->
-            <div class="absolute top-2 right-2 flex gap-2">
-                <el-button @click="exportToExcel" size="small" type="success" :icon="Download">
-                    导出Excel
-                </el-button>
-                <!-- <el-button @click="testDialog" size="small" type="primary">测试弹窗</el-button> -->
-            </div>
+      
+        
             
         </dv-border-box10>
         
@@ -27,7 +22,14 @@
             :before-close="handleClose"
             class="custom-dialog"
         >
-            <div class="dialog-content">
+            <!-- 加载状态 -->
+            <div v-if="detailLoading" class="loading-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div class="loading-text">正在加载数据...</div>
+                </div>
+            </div>
+            <div v-else class="dialog-content">
                 <!-- 筛选和导出区域 -->
                 <div class="dialog-toolbar mb-4 flex justify-between items-center">
                     <div class="filter-area flex gap-4 items-center">
@@ -213,6 +215,8 @@
                 selectedUserName.value = params.name
                 dialogVisible.value = true
                 console.log('设置弹窗可见，用户名:', params.name)
+                // 立即显示加载状态
+                detailLoading.value = true
                 fetchDetailData(params.name)
             } else {
                 console.warn('点击事件参数无效:', params)
@@ -221,7 +225,6 @@
         
         // 获取详情数据
         const fetchDetailData = (userName: string) => {
-            detailLoading.value = true
             getIncomingInspectionDetail(userName)
                 .then(res => {
                     detailData.value = res.data || []
@@ -275,6 +278,8 @@
             pageSize.value = 20
             totalCount.value = 0
             paginatedData.value = []
+            // 重置加载状态
+            detailLoading.value = false
         }
         
        
@@ -363,9 +368,9 @@
                     '到货单审核时间': item.arrivalTime || '',
                     '检验完成时间': item.checkTime || '',
                     '检验员': item.user_name || '',
-                    '及时数': item.jsNum || 0,
-                    '不及时数': item.bjsNum || 0,
-                    '及时率(%)': item.rate || 0
+                    // '及时数': item.jsNum || 0,
+                    // '不及时数': item.bjsNum || 0,
+                    // '及时率(%)': item.rate || 0
                 }))
                 
                 // 创建工作簿
@@ -383,9 +388,9 @@
                     { wch: 20 },  // 到货单审核时间
                     { wch: 20 },  // 检验完成时间
                     { wch: 12 },  // 检验员
-                    { wch: 10 },  // 及时数
-                    { wch: 12 },  // 不及时数
-                    { wch: 12 }   // 及时率
+                    // { wch: 10 },  // 及时数
+                    // { wch: 12 },  // 不及时数
+                    // { wch: 12 }   // 及时率
                 ]
                 ws['!cols'] = colWidths
                 
@@ -412,86 +417,7 @@
             }
         }
         
-        // 导出Excel功能
-        const exportToExcel = async () => {
-            try {
-                // 获取所有用户的详情数据
-                const allDetailData = []
-                
-                // 遍历所有用户数据，获取每个用户的详情
-                for (const userData of rawData.value) {
-                    try {
-                        const res = await getIncomingInspectionDetail(userData.name)
-                        if (res.data && res.data.length > 0) {
-                            allDetailData.push(...res.data)
-                        }
-                    } catch (error) {
-                        console.warn(`获取用户 ${userData.name} 的详情数据失败:`, error)
-                    }
-                }
-                
-                if (allDetailData.length === 0) {
-                    ElMessage.warning('暂无数据可导出')
-                    return
-                }
-                
-                // 准备Excel数据
-                const excelData = allDetailData.map((item, index) => ({
-                    '序号': index + 1,
-                    '到货单号': item.doc_no || '',
-                    '供应商': item.supplier_full_name || '',
-                    '品名': item.itemDescription || '',
-                    '品号': item.item_code || '',
-                    '到货数': item.arriveNum || 0,
-                    '到货单审核时间': item.arrivalTime || '',
-                    '检验完成时间': item.checkTime || '',
-                    '检验员': item.user_name || '',
-                    '及时数': item.jsNum || 0,
-                    '不及时数': item.bjsNum || 0,
-                    '及时率(%)': item.rate || 0
-                }))
-                
-                // 创建工作簿
-                const wb = XLSX.utils.book_new()
-                const ws = XLSX.utils.json_to_sheet(excelData)
-                
-                // 设置列宽
-                const colWidths = [
-                    { wch: 8 },   // 序号
-                    { wch: 15 },  // 到货单号
-                    { wch: 20 },  // 供应商
-                    { wch: 15 },  // 品名
-                    { wch: 15 },  // 品号
-                    { wch: 10 },  // 到货数
-                    { wch: 20 },  // 到货单审核时间
-                    { wch: 20 },  // 检验完成时间
-                    { wch: 12 },  // 检验员
-                    { wch: 10 },  // 及时数
-                    { wch: 12 },  // 不及时数
-                    { wch: 12 }   // 及时率
-                ]
-                ws['!cols'] = colWidths
-                
-                // 添加工作表到工作簿
-                XLSX.utils.book_append_sheet(wb, ws, '来料检验详情')
-                
-                // 生成文件名
-                const now = new Date()
-                const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
-                const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '')
-                const fileName = `来料检验详情_${dateStr}_${timeStr}.xlsx`
-                
-                // 导出文件
-                XLSX.writeFile(wb, fileName)
-                
-                ElMessage.success(`Excel文件已导出: ${fileName}`)
-                
-            } catch (error) {
-                console.error('导出Excel失败:', error)
-                ElMessage.error('导出Excel失败，请重试')
-            }
-        }
-        
+     
         onBeforeUnmount(() => {
         eventBus.off('refreshData', fetchData)
         })
@@ -622,5 +548,43 @@
                 color: #fff;
                 border-color: #4a90e2;
             }
+        }
+
+        /* 加载状态样式 */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(74, 144, 226, 0.3);
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: #4a90e2;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
         </style>

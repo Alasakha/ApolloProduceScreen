@@ -177,8 +177,8 @@ const chartOption = computed(() => ({
       barWidth: '10%',  // 进一步减小柱状图宽度
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'rgba(0,238,255,0.8)' },
-          { offset: 1, color: 'rgba(0,238,255,0.1)' }
+          { offset: 0, color: '#00eeff' },
+          { offset: 1, color: '#0088cc' }
         ])
       },
       label: {
@@ -200,8 +200,8 @@ watch(() => props.tableData, (newVal) => {
 
 <style scoped>
 .chart-container {
-  box-shadow: 0 0 20px rgba(0,238,255,0.3);
-  background: rgba(0,19,47,0.95);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  background: rgba(0,19,47,0.98);
   border: 1px solid #00eeff;
   border-radius: 8px;
 }

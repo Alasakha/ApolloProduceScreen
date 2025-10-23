@@ -24,3 +24,12 @@ export const getDailyCompleteInfo = () => {
     method: 'get',
   })
 }
+
+
+// /PLM/projectOverdueMain
+export const getProjectOverdueMainInfo = () => {
+  return request({
+    url: '/PLM/projectOverdueMain',
+    method: 'get',
+  })
+}

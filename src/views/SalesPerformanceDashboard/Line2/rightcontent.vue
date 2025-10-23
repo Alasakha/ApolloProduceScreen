@@ -167,8 +167,8 @@ const chartOption = computed(() => ({
       barWidth: '20%',
       itemStyle: {
         color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-          { offset: 0, color: 'rgba(0,238,255,0.8)' },
-          { offset: 1, color: 'rgba(0,238,255,0.1)' }
+          { offset: 0, color: '#00eeff' },
+          { offset: 1, color: '#0088cc' }
         ])
       },
       label: {
@@ -184,6 +184,7 @@ const chartOption = computed(() => ({
 
 <style scoped>
 .chart-container {
-  box-shadow: 0 0 20px rgba(0,238,255,0.3);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+  background: rgba(0,19,47,0.98);
 }
 </style>

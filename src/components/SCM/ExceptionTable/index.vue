@@ -23,7 +23,7 @@
         </div>
       </div>
       <div class="table-area">
-        <ScrollBoard v-if="!loading" :config="config" />
+        <SCMScrollBoard v-if="!loading" :config="config" />
         <div v-else class="loading">正在加载......</div>
       </div>
     </div>
@@ -140,7 +140,7 @@
   import * as XLSX from 'xlsx'
   import { getAbnormalQualityReasonAdd } from '@/api/getPmcinfo'
   import StatusCell from '@/components/SCM/DetailDialog/StatusCell.vue'
-  
+  import SCMScrollBoard from '@/components/datav/SCMScrollBoard.vue'
   interface TableConfig {
     header: string[];
     data: any[][];

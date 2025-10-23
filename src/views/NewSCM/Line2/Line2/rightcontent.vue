@@ -40,8 +40,8 @@ const fullHeader = [
   '不合格数量','检验日期', '问题点','判断结果' ,'处理时长','完成期限','处理结果',
 ]
 
-// 轮播图 header（去掉"处理结果"）
-const carouselHeader = fullHeader.filter(h => h !== '处理结果')
+// 轮播图 header（包含所有列）
+const carouselHeader = fullHeader
 
 // 表格配置
 const config = reactive({
@@ -131,9 +131,9 @@ const refreshData = async () => {
       ];
     })
     console.log(displayData)
-    // 轮播图数据（去掉最后一项"处理结果"）
+    // 轮播图数据（包含处理结果，用于检查逻辑）
     const displayguolvData = displayData
-  .map(item => item.slice(1, 13)) // 只取前12项，显示所有数据
+  .map(item => item.slice(1, 14)) // 包含所有数据，包括处理结果
 
     // 将source_id_roid作为额外属性存储
     const dataWithId = rawData.map((item) => ({

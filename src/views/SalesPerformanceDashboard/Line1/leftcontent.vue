@@ -91,6 +91,7 @@
                         </td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.xdCount }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ item.xdTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ calculateCompletionRate(item.ysAmtYear, item.xdTotal) }}</td>
                     </tr>
                     
                     <!-- 合计行 -->
@@ -103,6 +104,7 @@
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.ysAmtAgain }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.xdCount }}</td>
                         <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ total.xdTotal }}</td>
+                        <td class="px-1 py-1 border-x border-[#00eeff40] 3xl:px-0.5 3xl:py-0.5 4xl:px-1 4xl:py-1">{{ calculateCompletionRate(total.ysAmtYear, total.xdTotal) }}</td>
                     </tr>
 
                     <!-- 阶段性汇总行 -->
@@ -242,6 +244,7 @@ input::-webkit-inner-spin-button {
 
 input[type=number] {
     -moz-appearance: textfield;
+    appearance: textfield;
 }
 </style>
   
@@ -333,6 +336,13 @@ const tableHeaders = [
     lg: '已下单金额',
     md: '下金额',
     sm: '下$'
+  },
+  {
+    key: 'completionRate',
+    xl: '达成率',
+    lg: '达成率',
+    md: '达成率',
+    sm: '达成率'
   }
 ]
 
@@ -356,6 +366,17 @@ const formatAmount = (value: string | number): string => {
 const formatQuantity = (value: string | number): string => {
   if (!value) return '0'
   return value.toString()
+}
+
+// 计算达成率
+const calculateCompletionRate = (budgetAmount: string | number, actualAmount: string | number): string => {
+  const budget = Number(budgetAmount) || 0
+  const actual = Number(actualAmount) || 0
+  
+  if (budget === 0) return '0.00%'
+  
+  const rate = (actual / budget) * 100
+  return rate.toFixed(2) + '%'
 }
 
 // 修改 total 计算属性

@@ -75,7 +75,7 @@
                 </div>
                 <div class="quantity-item">
                   <div class="quantity-label">已完成数</div>
-                  <div class="quantity-value completed">{{ task.qty || 0 }}</div>
+                  <div class="quantity-value completed">{{ task.cycn || 0 }}</div>
                 </div>
                 <div class="quantity-item">
                   <div class="quantity-label">剩余数量</div>
@@ -212,7 +212,7 @@ const getTotalPlanned = () => {
 // 计算总完成数
 const getTotalCompleted = () => {
   if (!detailData.value || !Array.isArray(detailData.value)) return 0
-  return detailData.value.reduce((sum, task) => sum + (task.qty || 0), 0)
+  return detailData.value.reduce((sum, task) => sum + (task.cycn || 0), 0)
 }
 
 // 计算总剩余数
