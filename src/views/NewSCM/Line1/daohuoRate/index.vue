@@ -82,7 +82,7 @@ const fetchData = async () => {
   try {
     isLoading.value = true;
     // 获取PMC KPI数据
-    const res = await getPmcKpi();
+    const res = await getPmcKpi('B');
     
     isLoading.value = false;
     
@@ -156,8 +156,6 @@ onBeforeUnmount(() => {
   });
 });
 </script>
-
-
 
 
 <style scoped>

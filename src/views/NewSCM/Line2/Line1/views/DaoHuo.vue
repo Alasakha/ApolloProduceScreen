@@ -203,7 +203,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData = () => {
-    getPmcKpi().then(res => {
+    getPmcKpi('Z').then(res => {
         isLoading.value = false;
         if (res.code === 200) {
             processData(res.data);

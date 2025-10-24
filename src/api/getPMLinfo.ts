@@ -41,3 +41,12 @@ export const getYsCompleteInfo = () => {
     method: 'get',
   })
 }
+
+
+// /PLM/projectOverdueMainCount
+export const getProjectOverdueMainCountInfo = () => {
+  return request({
+    url: '/PLM/projectOverdueMainCount',
+    method: 'get',
+  })
+}

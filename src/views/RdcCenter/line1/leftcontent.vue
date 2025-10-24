@@ -16,7 +16,7 @@
                                 <div class="metric-icon">📋</div>
                                 <div class="metric-label">本月计划数</div>
                             </div>
-                            <div class="metric-value">--</div>
+                            <div class="metric-value">{{ data.total || '--' }}</div>
                         </div>
                         
                         <!-- 按时完成数 -->
@@ -25,7 +25,7 @@
                                 <div class="metric-icon">✅</div>
                                 <div class="metric-label">按时完成数</div>
                             </div>
-                            <div class="metric-value">--</div>
+                            <div class="metric-value">{{ data.completeCount || '--' }}</div>
                         </div>
                         
                         <!-- 按时完成数 (到期3天内) -->
@@ -34,7 +34,7 @@
                                 <div class="metric-icon">⏰</div>
                                 <div class="metric-label">按时完成数 (到期3天内)</div>
                             </div>
-                            <div class="metric-value">--</div>
+                            <div class="metric-value">{{ data.completeCount3 || '--' }}</div>
                         </div>
                         
                         <!-- 研发升级计划达成率 -->
@@ -43,7 +43,16 @@
                                 <div class="metric-icon">📊</div>
                                 <div class="metric-label">研发升级计划达成率</div>
                             </div>
-                            <div class="metric-value">--</div>
+                            <div class="metric-value">{{ completionRate }}%</div>
+                        </div>
+                        
+                        <!-- 到期3天内达成率 -->
+                        <div class="metric-card pending-rate-card">
+                            <div class="metric-header">
+                                <div class="metric-icon">⏳</div>
+                                <div class="metric-label">到期3天内达成率</div>
+                            </div>
+                            <div class="metric-value">{{ pendingCompletionRate }}%</div>
                         </div>
                     </div>
                 </div>
@@ -51,6 +60,51 @@
         </dv-border-box13>
     </div>
 </template>
+
+<script setup>
+import { ref, computed, onMounted } from 'vue'
+import { getProjectOverdueMainCountInfo } from '@/api/getPMLinfo'
+
+// 响应式数据
+const data = ref({
+  total: 0,
+  completeCount: 0,
+  completeCount3: 0
+})
+
+// 计算达成率
+const completionRate = computed(() => {
+  if (data.value.total === 0) return '--'
+  const rate = (data.value.completeCount / data.value.total) * 100
+  return rate.toFixed(1)
+})
+
+// 计算到期3天内达成率
+const pendingCompletionRate = computed(() => {
+  if (data.value.total === 0) return '--'
+  const rate = (data.value.completeCount3 / data.value.total) * 100
+  return rate.toFixed(1)
+})
+
+// 获取数据
+const fetchData = async () => {
+  try {
+    const response = await getProjectOverdueMainCountInfo()
+    if (response.code === 200) {
+      data.value = response.data
+    }
+  } catch (error) {
+    console.error('获取研发升级计划数据失败:', error)
+  }
+}
+
+// 组件挂载时获取数据
+onMounted(() => {
+  fetchData()
+  // 设置定时刷新，每30秒更新一次
+  setInterval(fetchData, 30000)
+})
+</script>
 
 <style scoped>
 /* 左侧面板容器 */
@@ -72,9 +126,14 @@
 /* 指标网格布局 */
 .metrics-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 12px;
     flex: 1;
+}
+
+/* 第5个卡片居中显示 */
+.pending-rate-card {
+    grid-column: 2 / 3;
 }
 
 /* 指标卡片基础样式 */
@@ -90,6 +149,7 @@
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    align-items: stretch;
 }
 
 .metric-card::before {
@@ -114,6 +174,7 @@
     align-items: center;
     margin-bottom: 8px;
     gap: 6px;
+    flex-shrink: 0;
 }
 
 .metric-icon {
@@ -136,6 +197,11 @@
     font-weight: 600;
     text-align: center;
     text-shadow: 0 0 8px rgba(0, 238, 255, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+    min-height: 40px;
 }
 
 /* 不同类型卡片的特殊样式 */
@@ -186,31 +252,75 @@
     text-shadow: 0 0 8px rgba(168, 85, 247, 0.5);
 }
 
-/* 响应式设计 - 大屏适配 */
-@media (min-width: 1921px) and (max-width: 2560px) {
+/* 到期3天内达成率卡片样式 */
+.pending-rate-card {
+    border-color: rgba(255, 165, 0, 0.3);
+}
+
+.pending-rate-card::before {
+    background: linear-gradient(90deg, #ffa500, #ff8c00);
+}
+
+.pending-rate-card .metric-value {
+    color: #ffa500;
+    text-shadow: 0 0 8px rgba(255, 165, 0, 0.5);
+}
+
+/* 4K分辨率 (3840x2160) */
+@media (min-width: 2561px) {
     .title-text {
-        font-size: 20px;
+        font-size: 28px;
     }
     
     .metrics-grid {
-        gap: 16px;
+        gap: 24px;
     }
     
     .metric-card {
-        padding: 16px;
-        min-height: 100px;
+        padding: 24px;
+        min-height: 140px;
     }
     
     .metric-label {
-        font-size: 14px;
+        font-size: 20px;
     }
     
     .metric-value {
-        font-size: 18px;
+        font-size: 32px;
+        min-height: 80px;
     }
     
     .metric-icon {
-        font-size: 18px;
+        font-size: 24px;
+    }
+}
+
+/* 2K分辨率 (2560x1440) */
+@media (min-width: 1921px) and (max-width: 2560px) {
+    .title-text {
+        font-size: 22px;
+    }
+    
+    .metrics-grid {
+        gap: 18px;
+    }
+    
+    .metric-card {
+        padding: 18px;
+        min-height: 110px;
+    }
+    
+    .metric-label {
+        font-size: 16px;
+    }
+    
+    .metric-value {
+        font-size: 24px;
+        min-height: 60px;
+    }
+    
+    .metric-icon {
+        font-size: 20px;
     }
 }
 
@@ -235,6 +345,7 @@
     
     .metric-value {
         font-size: 16px;
+        min-height: 45px;
     }
     
     .metric-icon {
@@ -263,6 +374,7 @@
     
     .metric-value {
         font-size: 14px;
+        min-height: 40px;
     }
     
     .metric-icon {
@@ -273,8 +385,12 @@
 /* 平板/小屏 (768px-1199px) */
 @media (min-width: 768px) and (max-width: 1199px) {
     .metrics-grid {
-        grid-template-columns: 1fr;
+        grid-template-columns: repeat(2, 1fr);
         gap: 8px;
+    }
+    
+    .pending-rate-card {
+        grid-column: 1 / 3;
     }
     
     .metric-card {
@@ -288,6 +404,7 @@
     
     .metric-value {
         font-size: 14px;
+        min-height: 35px;
     }
 }
 
@@ -296,6 +413,10 @@
     .metrics-grid {
         grid-template-columns: 1fr;
         gap: 8px;
+    }
+    
+    .pending-rate-card {
+        grid-column: 1;
     }
     
     .metric-card {
@@ -309,6 +430,7 @@
     
     .metric-value {
         font-size: 14px;
+        min-height: 35px;
     }
 }
 </style>
