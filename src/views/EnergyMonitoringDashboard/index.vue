@@ -9,12 +9,16 @@
       </div>
     </div>
     
-    <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
+    <dv-border-box11 title="浙江阿波罗运动科技股份有限公司" :title-width="400" >
         <Header></Header>
         <Line1></Line1>
         <Line3 :data="energyStore.monthlyData"></Line3>
-        <!-- <line4></line4> -->
-        <Line2></Line2>
+        <div class="flex">
+          <Line4 :data="energyStore.monthlyData"></Line4>
+          <WaterLevelPond></WaterLevelPond>
+        </div>
+
+        <!-- <Line2></Line2>   -->
         <Line5></Line5>
     </dv-border-box11>
   </dv-full-screen-container>
@@ -31,8 +35,9 @@ import Header from './header/index.vue'
 import Line1 from './Line1/index.vue'
 import Line2 from './Line2/index.vue'
 import Line3 from './Line3/index.vue'
-import line4 from './Line4/index.vue'
+import Line4 from './Line4/index.vue'
 import Line5 from './Line5/index.vue'
+import WaterLevelPond from './Line2/leftcontent.vue'
 
 const energyStore = useEnergyStore()
 let refreshInterval = null

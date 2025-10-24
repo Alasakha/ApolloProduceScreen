@@ -33,3 +33,11 @@ export const getProjectOverdueMainInfo = () => {
     method: 'get',
   })
 }
+
+// /PLl/ysComplete
+export const getYsCompleteInfo = () => {
+  return request({
+    url: '/PLM/ysComplete',
+    method: 'get',
+  })
+}

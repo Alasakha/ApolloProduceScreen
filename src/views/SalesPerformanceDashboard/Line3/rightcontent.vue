@@ -52,12 +52,11 @@
       item.empCategory !== '合计' && item.empCategory !== '阶段性汇总'
     )
   
-    return {
-      categories: filteredData.map(item => item.empCategory),
-      ysQuantityYear: filteredData.map(item => parseFloat(item.ysQuantityYear) || 0),
-      ysQuantityAgain: filteredData.map(item => parseFloat(item.ysQuantityAgain) || 0),
-      xdTotal: filteredData.map(item => parseFloat(item.xdTotal) || 0)
-    }
+  return {
+    categories: filteredData.map(item => item.empCategory),
+    ysQuantityYear: filteredData.map(item => parseFloat(item.ysQuantityYear) || 0),
+    xdTotal: filteredData.map(item => parseFloat(item.xdTotal) || 0)
+  }
   })
   
   const chartOption = computed(() => ({
@@ -77,7 +76,7 @@
     }
     },
     legend: {
-      data: ['年度预算数量', '再次预算数量', '已下单金额'],
+      data: ['年度预算数量', '已下单金额'],
       textStyle: {
         color: '#fff',
         fontSize: 10
@@ -154,27 +153,6 @@
         },
         itemStyle: {
           color: '#00eeff'
-        },
-        label: {
-        show: true,
-        position: 'top',
-        formatter: '{c}',
-        color: '#fff'
-      }
-      },
-      {
-        name: '再次预算数量',
-        type: 'line',
-        yAxisIndex: 1,
-        data: chartData.value.ysQuantityAgain,
-        symbol: 'circle',
-        symbolSize: 8,
-        lineStyle: {
-          width: 2,
-          color: '#00ff9d'
-        },
-        itemStyle: {
-          color: '#00ff9d'
         },
         label: {
         show: true,

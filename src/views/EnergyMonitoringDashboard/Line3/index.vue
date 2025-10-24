@@ -1,10 +1,17 @@
 <template>
+  <!-- 引入阿里巴巴iconfont -->
+  <link rel="stylesheet" href="//at.alicdn.com/t/c/font_8d5l8fz5bvb.css">
+  
   <div class="line3-container">
-    <div class="header">
+    <div class="header h-[10%]">
       <!-- <div class="title">能耗监控</div> -->
+                 <div class="dashboard-title">
+            <span class="title-icon">📊</span>
+            <h2 class="title-elegant tracking-widest">车间各单位耗电情况</h2>
+          </div>
     </div>
     
-    <div class="content">
+    <div class="content h-[90%]">
       <div class="energy-grid">
         <!-- 有数据时显示能耗卡片 -->
         <div 
@@ -14,7 +21,10 @@
           :class="{ 'exceeded': Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 }"
         >
           <div class="card-header">
-            <div class="workshop-name">{{ item.workshopName }}</div>
+            <div class="workshop-info">
+              <span class="energy-icon">⚡</span>
+              <div class="workshop-name">{{ item.workshopName }}</div>
+            </div>
             <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0.5, 'saved': Number(item.ratio) <= 0.5 }">
               {{ Number(item.ratio) > 0 ? '+' : '' }}{{ item.ratio }}
             </div>
@@ -23,7 +33,8 @@
 
           <div class="card-content">
             <div class="flex items-center">
-              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">标准每台：</span>
+              <span class="data-icon">🎯</span>
+              <span class="text-white  text-xl sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[14px] 4xl:text-xl">标准每台耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
                   {{ Number(item.standardPerUnit).toFixed(1) }}
@@ -33,7 +44,8 @@
             </div>
             
             <div class="flex items-center">
-              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台：</span>
+              <span class="data-icon">⚡</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台日耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ 
                   fontSize: getFontSize(), 
@@ -49,7 +61,18 @@
             </div>
             
             <div class="flex items-center">
-              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际总电：</span>
+              <span class="data-icon">🔋</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台月耗电量</span>
+              <div class="number-display">
+                <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
+                  {{ Number(item.actualTotal).toFixed(1) }}
+                </span>
+                <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
+              </div>
+            </div>
+            <div class="flex items-center">
+              <span class="data-icon">🔋</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台年耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
                   {{ Number(item.actualTotal).toFixed(1) }}
@@ -61,6 +84,7 @@
             <!-- 添加填写原因按钮 -->
             <div class="reason-section" v-if="Number(item.ratio) > 0.5">
               <div class="reason-info">
+                <span class="reason-icon">⚠️</span>
                 <span class="reason-label">超过原因：</span>
                 <span class="reason-text">{{ item.reason || '暂未填写' }}</span>
               </div>
@@ -68,7 +92,7 @@
                 class="reason-btn"
                 @click="openReasonDialog(item)"
               >
-                <span class="btn-icon">📝</span>
+                <span class="btn-icon">✏️</span>
                 填写原因
               </button>
             </div>
@@ -318,15 +342,16 @@ const energyData = computed(() => {
   return sortedData
 })
 
-// 字体大小计算
+// 字体大小计算 - 优化版本
 const getFontSize = () => {
   const width = window.innerWidth
-  if (width >= 4000) return 18
-  if (width >= 3000) return 16
-  if (width >= 2500) return 14
-  if (width >= 2000) return 12
-  if (width >= 1500) return 10
-  return 8
+  if (width >= 4000) return 20
+  if (width >= 3000) return 18
+  if (width >= 2500) return 16
+  if (width >= 2000) return 14
+  if (width >= 1500) return 12
+  if (width >= 1200) return 10
+  return 9
 }
 
 // 打开填写原因弹窗
@@ -396,13 +421,14 @@ const submitReason = async () => {
 </script>
 
 <style scoped>
-/* 数字显示样式 - 简洁版本 */
+/* 数字显示样式 - 优化版本 */
 .number-display {
   display: flex;
   align-items: baseline;
   gap: 4px;
   font-family: 'Arial', 'Microsoft YaHei', sans-serif;
   font-weight: 600;
+  position: relative;
 }
 
 .number-value {
@@ -417,10 +443,11 @@ const submitReason = async () => {
   font-size: 0.85em;
 }
 .line3-container {
-  height: 17vh;
+  height: 25vh;
   width: 100%;
+  padding-left: 5px;
+  padding-right: 5px;
 }
-
 .header {
   display: flex;
   flex-direction: column;
@@ -444,10 +471,10 @@ const submitReason = async () => {
 
 .energy-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 16px;
   height: 100%;
-  padding: 0 10px;
+  padding: 0 12px;
   overflow-y: auto;
   scrollbar-width: thin;
   scrollbar-color: rgba(0, 238, 255, 0.3) transparent;
@@ -473,105 +500,204 @@ const submitReason = async () => {
 .energy-card {
   display: flex;
   flex-direction: column;
-  background: rgba(0, 238, 255, 0.1);
-  border: 1px solid rgba(0, 238, 255, 0.3);
-  border-radius: 8px;
-  padding: 2px;
-  transition: all 0.3s ease;
+  background: linear-gradient(135deg, rgba(0, 238, 255, 0.08), rgba(0, 238, 255, 0.12));
+  border: 1px solid rgba(0, 238, 255, 0.4);
+  border-radius: 12px;
+  padding: 12px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.energy-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, rgba(0, 238, 255, 0.6), transparent);
+  opacity: 0;
+  transition: opacity 0.3s ease;
 }
 
 .energy-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0, 238, 255, 0.2);
+  transform: translateY(-3px);
+  box-shadow: 0 8px 25px rgba(0, 238, 255, 0.25);
+  border-color: rgba(0, 238, 255, 0.6);
+}
+
+.energy-card:hover::before {
+  opacity: 1;
 }
 
 .energy-card.exceeded {
-  background: rgba(255, 0, 0, 0.1);
-  border-color: rgba(255, 0, 0, 0.3);
+  background: linear-gradient(135deg, rgba(255, 0, 0, 0.08), rgba(255, 0, 0, 0.12));
+  border-color: rgba(255, 0, 0, 0.4);
+}
+
+.energy-card.exceeded::before {
+  background: linear-gradient(90deg, transparent, rgba(255, 0, 0, 0.6), transparent);
 }
 
 .energy-card.exceeded:hover {
-  box-shadow: 0 4px 12px rgba(255, 0, 0, 0.2);
+  box-shadow: 0 8px 25px rgba(255, 0, 0, 0.25);
+  border-color: rgba(255, 0, 0, 0.6);
 }
 
 .card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 10px;
-  padding-bottom: 6px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  /* margin-bottom: 12px; */
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+  position: relative;
+}
+
+.workshop-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.energy-icon {
+  font-size: 18px;
+  color: #00eeff;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.energy-icon:hover {
+  color: #00ff88;
+  transform: scale(1.1);
 }
 
 .workshop-name {
   color: #00eeff;
-  font-size: 11px;
+  font-size: 16px;
   font-weight: 600;
-  line-height: 1.2;
+  line-height: 1.3;
   flex: 1;
   margin-right: 8px;
+  transition: all 0.3s ease;
 }
 
 .ratio {
   color: #00ff00;
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 12px;
+  font-weight: 700;
   white-space: nowrap;
+  padding: 2px 6px;
+  border-radius: 4px;
+  background: rgba(0, 255, 0, 0.1);
+  border: 1px solid rgba(0, 255, 0, 0.3);
+  transition: all 0.3s ease;
 }
 
 .ratio.exceeded {
-  color: #ff0000;
+  color: #ff4444;
+  background: rgba(255, 68, 68, 0.1);
+  border-color: rgba(255, 68, 68, 0.3);
 }
 
 .ratio.saved {
-  color: #00ff00;
+  color: #00ff88;
+  background: rgba(0, 255, 136, 0.1);
+  border-color: rgba(0, 255, 136, 0.3);
 }
 
 .card-content {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: 8px;
+  height: 100%;
 }
 
 .card-content .flex {
   display: flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  padding: 4px 0;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.data-icon {
+  font-size: 14px;
+  color: #00eeff;
+  transition: all 0.3s ease;
+  flex-shrink: 0;
+  display: inline-block;
+  margin-right: 6px;
+}
+
+.data-icon:hover {
+  color: #00ff88;
+  transform: scale(1.1);
+}
+
+.card-content .flex:hover {
+  background: rgba(255, 255, 255, 0.05);
+  padding-left: 4px;
 }
 
 .card-content .text-white {
   color: #ffffff;
-  font-size: 10px;
   font-weight: 500;
   white-space: nowrap;
+  font-size: 13px;
+  opacity: 0.9;
+  transition: all 0.2s ease;
 }
 
 .reason-section {
-  margin-top: 8px;
-  padding-top: 6px;
-  border-top: 1px solid rgba(255, 255, 255, 0.1);
+  margin-top: 2px;
+  padding-top: 8px;
+  border-top: 1px solid rgba(255, 255, 255, 0.15);
 }
 
 .reason-info {
   display: flex;
   align-items: center;
-  margin-bottom: 4px;
+  margin-bottom: 6px;
+  padding: 4px 6px;
+  background: rgba(255, 170, 0, 0.1);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 170, 0, 0.2);
+  gap: 6px;
+}
+
+.reason-icon {
+  font-size: 12px;
+  color: #ffaa00;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.reason-icon:hover {
+  color: #ff8800;
+  transform: scale(1.1);
 }
 
 .reason-label {
   color: #fff;
-  font-size: 9px;
-  margin-right: 4px;
+  font-size: 10px;
+  margin-right: 6px;
+  font-weight: 500;
 }
 
 .reason-text {
   color: #ffaa00;
-  font-size: 9px;
+  font-size: 10px;
   flex: 1;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-weight: 500;
 }
 
 .reason-btn {
@@ -580,23 +706,40 @@ const submitReason = async () => {
   justify-content: center;
   background: linear-gradient(135deg, #ff6b6b, #ff8e8e);
   border: none;
-  border-radius: 4px;
-  padding: 3px 6px;
+  border-radius: 6px;
+  padding: 6px 10px;
   color: white;
-  font-size: 9px;
+  font-size: 10px;
+  font-weight: 600;
   cursor: pointer;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   width: 100%;
+  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
+  gap: 4px;
+}
+
+.btn-icon {
+  font-size: 12px;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-right: 4px;
+}
+
+.reason-btn:hover .btn-icon {
+  transform: scale(1.1);
 }
 
 .reason-btn:hover {
   background: linear-gradient(135deg, #ff5252, #ff7676);
-  transform: translateY(-1px);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 107, 107, 0.4);
 }
 
-.btn-icon {
-  margin-right: 3px;
+.reason-btn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
 }
+
 
 /* 弹窗样式 */
 .reason-dialog :deep(.el-dialog) {
@@ -769,6 +912,110 @@ const submitReason = async () => {
   :deep(.dv-digital-flop) {
     width: 110px;
     height: 28px;
+  }
+}
+
+
+.dashboard-title {
+  text-align: center;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+}
+
+.title-icon {
+  font-size: 24px;
+  color: #00eeff;
+  transition: all 0.3s ease;
+  display: inline-block;
+  margin-right: 8px;
+}
+
+.title-icon:hover {
+  color: #00ff88;
+  transform: scale(1.1);
+}
+
+.dashboard-title h2 {
+  color: #00eeff;
+  font-size: 1.2rem;
+  font-weight: 300;
+  margin: 0;
+}
+
+/* 响应式优化 */
+@media (max-width: 1200px) {
+  .energy-grid {
+    grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+    gap: 12px;
+  }
+  
+  .workshop-name {
+    font-size: 14px;
+  }
+  
+  .ratio {
+    font-size: 10px;
+    padding: 1px 4px;
+  }
+  
+  .card-content .text-white {
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 768px) {
+  .energy-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 8px;
+    padding: 0 8px;
+  }
+  
+  .energy-card {
+    padding: 8px;
+  }
+  
+  .workshop-name {
+    font-size: 12px;
+  }
+  
+  .ratio {
+    font-size: 9px;
+  }
+  
+  .card-content .text-white {
+    font-size: 10px;
+  }
+  
+  .reason-btn {
+    padding: 4px 8px;
+    font-size: 9px;
+  }
+}
+
+@media (min-width: 2000px) {
+  .energy-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 20px;
+  }
+  
+  .energy-card {
+    padding: 16px;
+  }
+  
+  .workshop-name {
+    font-size: 18px;
+  }
+  
+  .ratio {
+    font-size: 14px;
+    padding: 3px 8px;
+  }
+  
+  .card-content .text-white {
+    font-size: 15px;
   }
 }
 </style>

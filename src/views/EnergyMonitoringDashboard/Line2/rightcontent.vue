@@ -1,5 +1,5 @@
 <template>
-    <div class="h-[25vh] w-full p-2">
+    <div class="h-[25vh] w-full p-2 h-full">
       <dv-border-box-2>
         <div class="flex flex-col h-full">
           <!-- 标题 -->

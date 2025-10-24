@@ -22,7 +22,7 @@
         <!-- Element Plus 对话框 -->
         <el-dialog
           v-model="dialogVisible"
-          title="未完成任务详情"
+          title="本月爆品上新达成情况详细"
           width="80%"
           :close-on-click-modal="false"
           class="task-dialog"
@@ -35,22 +35,28 @@
             height="500"
           >
             <el-table-column prop="pno" label="项目编号" width="180" />
-            <el-table-column prop="projName" label="项目名称" width="200" />
-            <el-table-column prop="taskName" label="任务名称" />
-            <el-table-column label="预期完成时间" width="180">
+            
+            <el-table-column prop="projname" label="项目名称" width="200" />
+            <el-table-column prop="taskname" label="任务名称" />
+            <el-table-column prop="scwctime" label="计划完成时间" width="180">
               <template #default="scope">
-                {{ formatDate(scope.row.expectTime) }}
+                {{ formatDate(scope.row.scwctime) }}
               </template>
             </el-table-column>
-            <el-table-column label="变更时间" width="180">
+            <el-table-column prop="scwctime" label="变更完成时间" width="180">
               <template #default="scope">
-                {{ formatDate(scope.row.changeTime) || '-' }}
+                {{ formatDate(scope.row.scwctime) }}
+              </template>
+            </el-table-column>
+            <el-table-column prop="completetime" label="实际完成时间" width="180">
+              <template #default="scope">
+                {{ formatDate(scope.row.completetime) }}
               </template>
             </el-table-column>
             <el-table-column prop="sts" label="状态" width="100">
               <template #default="scope">
-                <el-tag :type="scope.row.sts === '未完成' ? 'danger' : 'success'">
-                  {{ scope.row.sts }}
+                <el-tag :type="scope.row.state !== 'C' ? 'danger' : 'success'">
+                  {{ scope.row.state === 'C' ? '已完成' : '未完成' }}
                 </el-tag>
               </template>
             </el-table-column>
@@ -64,7 +70,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getDailyCompleteInfo } from '@/api/getPMLinfo'
+import { getPmcKpi } from '@/api/getScmInfo'
 
 const chartRef = ref()
 let chart: echarts.ECharts | null = null
@@ -92,8 +98,11 @@ const initChart = (data: any[]) => {
   if (!chartRef.value) return
   
   chart = echarts.init(chartRef.value)
-  const total = data.length
-  const unfinished = data.filter(item => item.sts === '未完成').length
+  
+  // 计算A类和常规订单的总数
+  const aCount = data.reduce((sum, item) => sum + (item.a_count || 0), 0)
+  const bCount = data.reduce((sum, item) => sum + (item.b_count || 0), 0)
+  // const total = aCount + bCount
   
   const option = {
     color: ['#e7141b', '#4CAF50'],
@@ -111,7 +120,7 @@ const initChart = (data: any[]) => {
         label: {
           show: true,
           position: 'center',
-          formatter: `{a|${unfinished}}\n{b|未完成}\n{c|${total - unfinished}}\n{d|已完成}`,
+          formatter: `{a|${aCount}}\n{b|A类数量}\n{c|${bCount}}\n{d|常规订单}`,
           rich: {
             a: {
               fontSize: 24,
@@ -136,8 +145,8 @@ const initChart = (data: any[]) => {
           }
         },
         data: [
-          { value: unfinished, name: '未完成' },
-          { value: total - unfinished, name: '已完成' }
+          { value: aCount, name: 'A类数量' },
+          { value: bCount, name: '常规订单' }
         ]
       }
     ]
@@ -149,7 +158,7 @@ const initChart = (data: any[]) => {
 // 获取数据
 const fetchData = async () => {
   try {
-    const res = await getDailyCompleteInfo()
+    const res = await getPmcKpi()
     if (res.code === 200) {
       taskList.value = res.data
       initChart(res.data)

@@ -2,7 +2,7 @@
     <div class="h-[20vh] w-full flex">
             <Leftcontent></Leftcontent>
             <!-- <Middlecontent></Middlecontent> -->
-            <Rightcontent></Rightcontent>
+            <!-- <Rightcontent></Rightcontent> -->
     </div>
 </template>
 
@@ -10,6 +10,6 @@
 import Leftcontent from './leftcontent.vue'
 // import Middlecontent from './middlecontent.vue'
 // import Rightcontent from './rightcontent.vue'
-import Rightcontent from '../Line4/index.vue'
+// import Rightcontent from '../Line4/index.vue'
 
 </script>

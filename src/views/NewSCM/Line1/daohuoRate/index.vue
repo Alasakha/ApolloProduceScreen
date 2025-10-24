@@ -1,6 +1,6 @@
 <template>
 <dv-border-box8 :dur="5">
-  <GlobalTitle title="到货及时率"/>
+  <GlobalTitle title="到货不及时工单数"/>
   <!-- 图表容器 -->
   <div class="chartsbox w-full h-full flex">
     <div v-if="!isDataEmpty" ref="Indicators1" class="w-full h-[100%] flex-3"></div>

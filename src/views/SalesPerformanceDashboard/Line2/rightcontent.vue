@@ -55,7 +55,6 @@ const chartData = computed(() => {
   return {
     categories: filteredData.map(item => item.empCategory),
     ysAmtYear: filteredData.map(item => parseFloat(item.ysAmtYear) || 0),
-    ysAmtAgain: filteredData.map(item => parseFloat(item.ysAmtAgain) || 0),
     xdTotal: filteredData.map(item => parseFloat(item.xdTotal) || 0)
   }
 })
@@ -76,14 +75,13 @@ const chartOption = computed(() => ({
     }
   },
   legend: {
-    data: ['年度预算金额', '再次预算金额', '已下单金额'],
+    data: ['年度预算金额', '已下单金额'],
     textStyle: {
       color: '#fff'
     },
     formatter: (name: string) => {
       const unitMap: Record<string, string> = {
         '年度预算金额': '$',
-        '再次预算金额': '$',
         '已下单金额': '$'
       };
       return `${name}（${unitMap[name] || '$'}）`;
@@ -132,26 +130,6 @@ const chartOption = computed(() => ({
       },
       itemStyle: {
         color: '#00eeff'
-      },
-      label: {
-        show: true,
-        position: 'top',
-        formatter: '{c}$',
-        color: '#fff'
-      }
-    },
-    {
-      name: '再次预算金额',
-      type: 'line',
-      data: chartData.value.ysAmtAgain,
-      symbol: 'circle',
-      symbolSize: 8,
-      lineStyle: {
-        width: 2,
-        color: '#00ff9d'
-      },
-      itemStyle: {
-        color: '#00ff9d'
       },
       label: {
         show: true,

@@ -139,3 +139,24 @@ export const getPmcKpi = ( ) => {
     method: 'get',
   })
 }
+
+// extra/pmcKpiList
+// zrr:采购员名称 cust:产品类别  cust一个是 常规类 一个是 A类
+export const getPmcKpiList = (zrr, cust) => {
+  return request({
+    url: '/extra/pmcKpiList',
+    method: 'post',
+    data: {
+      zrr,
+      cust
+    }
+  })
+}
+
+// SCM/pmcKpiPie 
+export const getPmcKpiPie = () => {
+  return request({
+    url: '/SCM/pmcKpiPie',
+    method: 'get',
+  })
+}

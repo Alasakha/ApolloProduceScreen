@@ -3,7 +3,8 @@
         <dv-border-box8 :dur="5">
             <!-- 标题和提示 -->
             <div class="flex items-center">
-                <GlobalTitle title="到货不及时各采购员占比" :size="1"/>
+                <GlobalTitle title="到货不及时各采购员占比(A类,常规类)" :size="1"/>
+                A
                 <TooltipInfo
                     class="ml-2"
                     tooltip-content="显示各采购员的到货不及时情况统计"
@@ -25,9 +26,24 @@
                 </TooltipInfo>
             </div>
 
-            <div class="chartsbox w-full h-[17vh] mt-4">
-                <div v-if="!isDataEmpty" ref="chartRef" class="w-full h-full"></div>
-                <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl">今日暂无数据</div>
+            <div class="charts-container w-full h-[17vh] mt-4 flex gap-4">
+                <!-- A类订单图表 -->
+                <div class="chart-wrapper flex-1">
+                    <!-- <div class="chart-title text-white text-sm mb-2 text-center">A类订单统计</div> -->
+                    <div class="chart-box w-full h-full">
+                        <div v-if="!isDataEmpty" ref="aChartRef" class="w-full h-full"></div>
+                        <div v-else class="w-full h-full flex items-center justify-center text-white text-lg">暂无数据</div>
+                    </div>
+                </div>
+                
+                <!-- 常规订单图表 -->
+                <div class="chart-wrapper flex-1">
+                    <!-- <div class="chart-title text-white text-sm mb-2 text-center">常规订单统计</div> -->
+                    <div class="chart-box w-full h-full">
+                        <div v-if="!isDataEmpty" ref="bChartRef" class="w-full h-full"></div>
+                        <div v-else class="w-full h-full flex items-center justify-center text-white text-lg">暂无数据</div>
+                    </div>
+                </div>
             </div>  
         </dv-border-box8>
     </div>
@@ -35,7 +51,7 @@
     <!-- 使用通用详情弹窗组件 -->
     <DetailDialog
         v-model="dialogVisible"
-        :title="`${selectedPurchaser}的到货不及时详情`"
+        :title="`${selectedPurchaser}的异常订单详情`"
         :loading="tableLoading"
         :data="detailData"
         :columns="tableColumns"
@@ -45,33 +61,23 @@
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { getDeliveryRat } from '@/api/getnewInjection';
-import { getPurchaseDeliveryRateDetail } from '@/api/getScmInfo';
+import { getPmcKpi, getPmcKpiList } from '@/api/getScmInfo';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import { formatPieChartData } from '@/utils/map';
 import { useEcharts } from '@/utils/useEcharts';
 import { ElMessage } from 'element-plus';
 import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
 import { createChartOption } from './leftcharts';
 import TooltipInfo from '@/components/SCM/TooltipInfo/index.vue'
 
-const getYesterday = () => {
-    const date = new Date();
-    date.setDate(date.getDate() - 1);
-    const y = date.getFullYear();
-    const m = String(date.getMonth() + 1).padStart(2, '0');
-    const d = String(date.getDate()).padStart(2, '0');
-    return `${y}-${m}-${d}`;
-};
-
-const queryDate = getYesterday();
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
-const chartRef = ref(null);
+const aChartRef = ref(null);
+const bChartRef = ref(null);
 
-// 使用 useEcharts
-const { initChart, setOption, onClick, offClick } = useEcharts(chartRef);
+// 使用 useEcharts 为两个图表
+const { initChart: initAChart, setOption: setAOption, onClick: onAClick, offClick: offAClick } = useEcharts(aChartRef);
+const { initChart: initBChart, setOption: setBOption, onClick: onBClick, offClick: offBClick } = useEcharts(bChartRef);
 
 // 详情弹窗相关
 const dialogVisible = ref(false);
@@ -82,14 +88,14 @@ const currentRequestId = ref(0); // 添加请求标识符
 
 // 表格列配置
 const tableColumns = [
-    { label: '客户单号', prop: 'udf021' },
-    { label: '供应商', prop: 'supplier_full_name' },
-    { label: '采购员', prop: 'employee_name' },
-    { label: '采购单号', prop: 'doc_no' },
-    { label: '品号', prop: 'item_code' },
-    { label: '品名', prop: 'item_description' },
-    { label: '规格', prop: 'item_specification' },
-    { label: '预到货日', prop: 'plan_arrival_date' },
+    { label: '品号', prop: 'order_no' },
+    { label: '产品型号', prop: 'cx' },
+    { label: '不及时日期', prop: 'yc_date' },
+    { label: '不及时原因', prop: 'yc_reason' },
+    { label: '采购员', prop: 'zrr' },
+    { label: '工单号', prop: 'gd' },
+    { label: '', prop: 'cust' },
+    { label: '创建时间', prop: 'create_time' },
 ];
 
 // 处理饼图点击事件
@@ -101,7 +107,10 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getPurchaseDeliveryRateDetail(queryDate, params.name);
+            // 根据点击的图表类型确定产品类别
+            const cust = params.seriesName === 'A类订单' ? 'A类' : '常规类';
+            const res = await getPmcKpiList(params.name, cust);
+            
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
                 if (res.data && Array.isArray(res.data)) {
@@ -124,37 +133,83 @@ const handleChartClick = async (params) => {
     }
 };
 
-// 渲染图表的函数
-const drawMonthlyIndicators = (formattedData) => {
+// 渲染A类订单图表的函数
+const drawAChart = (formattedData) => {
     nextTick(() => {
-        const option = createChartOption(formattedData);
-        initChart(); // 初始化图表实例
-        setOption(option); // 设置配置
-        offClick(handleChartClick); // 先移除之前的事件监听
-        onClick(handleChartClick); // 添加新的事件监听
+        const option = createChartOption(formattedData, 'A类订单');
+        initAChart(); // 初始化图表实例
+        setAOption(option); // 设置配置
+        offAClick(handleChartClick); // 先移除之前的事件监听
+        onAClick(handleChartClick); // 添加新的事件监听
+    });
+};
+
+// 渲染B类订单图表的函数
+const drawBChart = (formattedData) => {
+    nextTick(() => {
+        const option = createChartOption(formattedData, '常规订单');
+        initBChart(); // 初始化图表实例
+        setBOption(option); // 设置配置
+        offBClick(handleChartClick); // 先移除之前的事件监听
+        onBClick(handleChartClick); // 添加新的事件监听
     });
 };
 
 // 处理数据
 const processData = (data) => {
-    const formattedData = formatPieChartData(data, 'purchaserName', 'bjsNum');
-    const processedData = formattedData
-        .filter(item => item.value !== 0)
+    // 根据新的数据结构处理：按采购员分组，分别计算A类和B类订单
+    const purchaserMap = new Map();
+    
+    data.forEach(item => {
+        const purchaser = item.purchaserName;
+        if (!purchaserMap.has(purchaser)) {
+            purchaserMap.set(purchaser, {
+                name: purchaser,
+                aCount: 0,
+                bCount: 0
+            });
+        }
+        const purchaserData = purchaserMap.get(purchaser);
+        purchaserData.aCount += item.a_count || 0;
+        purchaserData.bCount += item.b_count || 0;
+    });
+    
+    // 处理A类数据
+    const aFormattedData = Array.from(purchaserMap.values())
+        .filter(item => item.aCount > 0)
+        .map(item => ({
+            name: item.name,
+            value: item.aCount
+        }))
         .sort((a, b) => b.value - a.value);
 
-    if (processedData.length === 0) {
+    // 处理B类数据
+    const bFormattedData = Array.from(purchaserMap.values())
+        .filter(item => item.bCount > 0)
+        .map(item => ({
+            name: item.name,
+            value: item.bCount
+        }))
+        .sort((a, b) => b.value - a.value);
+
+    if (aFormattedData.length === 0 && bFormattedData.length === 0) {
         isDataEmpty.value = true;
     } else {
         isDataEmpty.value = false;
-        drawMonthlyIndicators(processedData);
+        drawAChart(aFormattedData);
+        drawBChart(bFormattedData);
     }
 };
 
 // 请求数据
 const fetchData = () => {
-    getDeliveryRat(queryDate).then(res => {
+    getPmcKpi().then(res => {
         isLoading.value = false;
-        processData(res.data);
+        if (res.code === 200) {
+            processData(res.data);
+        } else {
+            isDataEmpty.value = true;
+        }
     }).catch(() => {
         isLoading.value = false;
         isDataEmpty.value = true;

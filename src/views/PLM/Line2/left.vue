@@ -94,7 +94,7 @@ const scrollConfig = computed(() => {
             : [defaultRow],
         index: true,  // 显示序号列
         indexHeader: '序号',
-        columnWidth: [60, 100, 120, 100, 100, 100, 80, 100],  // 各列宽度
+        columnWidth: [60],  // 各列宽度
         align: ['center'],  // 对齐方式
         rowNum: 7,  // 显示行数
         headerBGC: '#0f2749',  // 表头背景色

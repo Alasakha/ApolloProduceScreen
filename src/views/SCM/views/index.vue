@@ -13,7 +13,7 @@ import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
 <body>
   <dv-full-screen-container>
 
-    <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
+    <dv-border-box11 title="浙江阿波罗运动科技股份有限公司" :title-width="400" >
 
      <Header></Header>
      <Row class=""></Row>

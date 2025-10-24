@@ -2,7 +2,7 @@
   <div class="demo-page">
     <div class="demo-header">
       <h1>🚀 阿波罗中控大屏演示</h1>
-      <p>浙江阿波罗科技运动有限公司 - 现代化数据看板系统</p>
+      <p>浙江阿波罗运动科技股份有限公司 - 现代化数据看板系统</p>
     </div>
     
     <div class="demo-content">

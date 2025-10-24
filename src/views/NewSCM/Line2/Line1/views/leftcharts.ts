@@ -1,7 +1,7 @@
 
 
 // chartOption.ts
-export function createChartOption(data) {
+export function createChartOption(data, title = '统计') {
     return {
       backgroundColor: 'transparent', // 或深色如 '#000' 视页面背景而定
       tooltip: {
@@ -12,7 +12,7 @@ export function createChartOption(data) {
       
       series: [
         {
-          name: '来源',
+          name: title,
           type: 'pie',
           radius: ['40%', '70%'],
           center: ['50%', '80%'], // 居中
@@ -26,14 +26,14 @@ export function createChartOption(data) {
             color: '#fff',
             fontSize: 14,
             formatter: function (params) {
-              // 假设 params.value 是“不合格数”，params.percent 是占比
+              // 假设 params.value 是"不合格数"，params.percent 是占比
               const roundedPercent = Math.round(params.percent);  // 四舍五入占比
               return `${params.name} ${params.value}个 (${roundedPercent}%)`;
             }
           },
           labelLine: {  
-            length: 50,     // 第一段（连接扇区）
-            length2: 40,    // 第二段（水平线）
+            length: 10,     // 第一段（连接扇区）
+            length2: 10,    // 第二段（水平线）
             lineStyle: {
               color: '#fff'
             }

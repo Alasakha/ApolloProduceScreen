@@ -1,116 +1,59 @@
 <template>
-  <div class="h-[20vh] w-full p-2 pt-0">
+  <div class="h-[6vh] w-full p-2 pt-0">
 
       <div class="box-content h-full">
         <!-- 年度能耗数据展示 -->
         <div class="energy-dashboard">
-          <div class="dashboard-title">
+          <!-- <div class="dashboard-title">
             <h2 class="title-elegant">年度能耗监控</h2>
-          </div>
+          </div> -->
           
           <div class="energy-grid">
             <!-- 电力数据 -->
             <div class="energy-section">
-              <div class="section-title">电力消耗</div>
+              <div class="section-title">车间总电力消耗</div>
               <div class="data-grid">
                 <div class="data-item">
-                  <div class="data-label">总标准</div>
+                  <div class="data-label">月</div>
                   <div class="data-value electric">{{ electricData.totalStandard }}</div>
                 </div>
                 <div class="data-item">
-                  <div class="data-label">总实际</div>
+                  <div class="data-label">年</div>
                   <div class="data-value electric">{{ electricData.totalActual }}</div>
                 </div>
-                <div class="data-item">
-                  <div class="data-label">总差额</div>
-                  <div class="data-value" :class="parseFloat(electricData.totalDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(electricData.totalDiff) > 0 ? '+' : '' }}{{ electricData.totalDiff }}
-                  </div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台标准</div>
-                  <div class="data-value electric">{{ electricData.perUnitStandard }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台实际</div>
-                  <div class="data-value electric">{{ electricData.perUnitActual }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台差额</div>
-                  <div class="data-value" :class="parseFloat(electricData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(electricData.perUnitDiff) > 0 ? '+' : '' }}{{ electricData.perUnitDiff }}
-                  </div>
-                </div>
+                
               </div>
             </div>
 
             <!-- 气体数据 -->
             <div class="energy-section">
-              <div class="section-title">气体消耗</div>
+              <div class="section-title">总燃气消耗</div>
               <div class="data-grid">
                 <div class="data-item">
-                  <div class="data-label">总标准</div>
+                  <div class="data-label">月</div>
                   <div class="data-value gas">{{ gasData.totalStandard }}</div>
                 </div>
                 <div class="data-item">
-                  <div class="data-label">总实际</div>
+                  <div class="data-label">年</div>
                   <div class="data-value gas">{{ gasData.totalActual }}</div>
                 </div>
-                <div class="data-item">
-                  <div class="data-label">总差额</div>
-                  <div class="data-value" :class="parseFloat(gasData.totalDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(gasData.totalDiff) > 0 ? '+' : '' }}{{ gasData.totalDiff }}
-                  </div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台标准</div>
-                  <div class="data-value gas">{{ gasData.perUnitStandard }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台实际</div>
-                  <div class="data-value gas">{{ gasData.perUnitActual }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台差额</div>
-                  <div class="data-value" :class="parseFloat(gasData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(gasData.perUnitDiff) > 0 ? '+' : '' }}{{ gasData.perUnitDiff }}
-                  </div>
-                </div>
+               
               </div>
             </div>
 
             <!-- 水数据 -->
             <div class="energy-section">
-              <div class="section-title">水消耗</div>
+              <div class="section-title">总水气消耗</div>
               <div class="data-grid">
                 <div class="data-item">
-                  <div class="data-label">总标准</div>
+                  <div class="data-label">月</div>
                   <div class="data-value water">{{ waterData.totalStandard }}</div>
                 </div>
                 <div class="data-item">
-                  <div class="data-label">总实际</div>
+                  <div class="data-label">年</div>
                   <div class="data-value water">{{ waterData.totalActual }}</div>
                 </div>
-                <div class="data-item">
-                  <div class="data-label">总差额</div>
-                  <div class="data-value" :class="parseFloat(waterData.totalDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(waterData.totalDiff) > 0 ? '+' : '' }}{{ waterData.totalDiff }}
-                  </div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台标准</div>
-                  <div class="data-value water">{{ waterData.perUnitStandard }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台实际</div>
-                  <div class="data-value water">{{ waterData.perUnitActual }}</div>
-                </div>
-                <div class="data-item">
-                  <div class="data-label">每台差额</div>
-                  <div class="data-value" :class="parseFloat(waterData.perUnitDiff) >= 0 ? 'positive' : 'negative'">
-                    {{ parseFloat(waterData.perUnitDiff) > 0 ? '+' : '' }}{{ waterData.perUnitDiff }}
-                  </div>
-                </div>
+              
               </div>
             </div>
           </div>
@@ -266,13 +209,12 @@ onUnmounted(() => {
 
 .box-content {
   padding: 8px;
-  height: 100%;
   padding-top: 0px;
 }
 
 /* 能耗仪表盘样式 */
 .energy-dashboard {
-  height: 100%;
+  margin-top: 8px;
   display: flex;
   flex-direction: column;
 }
@@ -303,18 +245,18 @@ onUnmounted(() => {
   border-radius: 4px;
   padding: 8px;
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
 }
 
 .section-title {
   color: #00eeff;
-  font-size: 0.9rem;
+  font-size: 1.8rem;
   font-weight: 500;
   text-align: center;
-  margin-bottom: 8px;
+  margin-right: 8px;
   text-shadow: 0 0 5px #00eeff;
-  border-bottom: 1px solid rgba(0, 238, 255, 0.3);
-  padding-bottom: 4px;
+  border-right: 1px solid rgba(0, 238, 255, 0.3);
+  padding-right: 8px;
 }
 
 .data-grid {
@@ -353,7 +295,7 @@ onUnmounted(() => {
 
 .data-label {
   color: #00eeff;
-  font-size: 0.7rem;
+  font-size: 1.2rem;
   font-weight: 300;
   margin-bottom: 2px;
   text-align: center;
@@ -441,7 +383,7 @@ onUnmounted(() => {
 @media (min-width: 1850px) and (max-width: 2499px) {
   .energy-grid {
     grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
+    gap: 20px;
   }
   
   .data-grid {
@@ -449,11 +391,11 @@ onUnmounted(() => {
   }
   
   .data-label {
-    font-size: 0.7rem;
+    font-size: 1.4rem;
   }
   
   .data-value {
-    font-size: 0.8rem;
+    font-size: 1.4rem;
   }
 }
 
@@ -468,7 +410,7 @@ onUnmounted(() => {
   }
   
   .data-label {
-    font-size: 0.8rem;
+    font-size: 1.4rem;
   }
   
   .data-value {

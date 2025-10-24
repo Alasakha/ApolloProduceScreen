@@ -2,7 +2,7 @@
   <body>
 <dv-full-screen-container>
 
-  <dv-border-box11 title="浙江阿波罗科技运动有限公司" :title-width="400" >
+  <dv-border-box11 title="浙江阿波罗运动科技股份有限公司" :title-width="400" >
     <div class="w-full h-full flex flex-col pl-4 pr-4">
       <div class="w-full h-[4vh] " ></div>
       <Header></Header>
