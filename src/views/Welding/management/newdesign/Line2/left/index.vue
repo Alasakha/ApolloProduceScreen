@@ -8,7 +8,7 @@
                 title="人员情况"
                 refresh-event="refreshData"
             />
-            <!-- <designSituation /> -->
+            <designSituation :device-type="8" />
         </Title>
     </div>
 </template>
@@ -25,7 +25,7 @@
 import { ref } from 'vue'
 import { useRoute } from 'vue-router'
 import Title from '../component/title.vue'
-// import designSituation from '../component/design/onSituation.vue'
+import designSituation from '../component/design/Leftcontent.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
 import { getEfficiencyToday, getSignInMember } from '@/api/getProduceinfo'
 
