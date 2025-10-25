@@ -4,7 +4,7 @@
 <template>
   <div class="w-[70%] h-[30vh]">
        <dv-border-box12>
-           <div class="title">暂无异常的详细数据</div>
+           <div class="title">本月转产计划</div>
            <div class="content-wrapper">
                <ScrollBoard
                    :config="scrollConfig"

@@ -1,239 +1,171 @@
 <template>
-  <div class="w-[30%] h-[30vh]">
-    <dv-border-box12 >  
-      <div class="content-wrapper">
-        <!-- 标题 -->
-        <div class="title mb-4">今日任务完成情况</div>
-        
-        <!-- 饼图和按钮区域 -->
-        <div class="chart-container">
-          <div ref="chartRef" class="chart"></div>
-          <div class="button-wrapper">
-            <el-button 
-              type="primary" 
-              class="detail-btn" 
-              @click="dialogVisible = true"
-            >
-              查看详情
-            </el-button>
+  <dv-border-box10>
+      <!-- <div class="box1"> 
+          <div class="w-full h-full">
+              <div ref="qualityIndicators" class="chart-container w-full h-[85%]"></div>
+            <dv-button class=" w-[6vw] pl-4" :color="'#23a7dc'"  :bg="false" @click="() => opendialog()">详细数据</dv-button>
           </div>
-        </div>
-
-        <!-- Element Plus 对话框 -->
-        <el-dialog
-          v-model="dialogVisible"
-          title="未完成任务详情"
-          width="80%"
-          :close-on-click-modal="false"
-          class="task-dialog"
-        >
-          <el-table
-            :data="taskList"
-            style="width: 100%"
-            :header-cell-style="headerStyle"
-            :cell-style="cellStyle"
-            height="500"
-          >
-            <el-table-column prop="pno" label="项目编号" width="180" />
-            <el-table-column prop="projName" label="项目名称" width="200" />
-            <el-table-column prop="taskName" label="任务名称" />
-            <el-table-column label="预期完成时间" width="180">
-              <template #default="scope">
-                {{ formatDate(scope.row.expectTime) }}
-              </template>
-            </el-table-column>
-            <el-table-column label="变更时间" width="180">
-              <template #default="scope">
-                {{ formatDate(scope.row.changeTime) || '-' }}
-              </template>
-            </el-table-column>
-            <el-table-column prop="sts" label="状态" width="100">
-              <template #default="scope">
-                <el-tag :type="scope.row.sts === '未完成' ? 'danger' : 'success'">
-                  {{ scope.row.sts }}
-                </el-tag>
-              </template>
-            </el-table-column>
-          </el-table>
-        </el-dialog>
+      </div> -->
+      <div class="w-full h-full flex justify-center items-center">
+        <div ref="qualityIndicators" class="chart-container w-full h-[85%]"></div>
+        <!-- <h1>质量改善计划暂未导入4N系统,8月起导入核算达成率</h1> -->
       </div>
-    </dv-border-box12>
-  </div>
+  </dv-border-box10>
+  <!-- getAtopDayInspector -->
+
+   <!-- 弹窗 -->
+     <TableDialog
+   v-model="dialogTableVisible"
+   :title= dialogTitle
+   width="90vw"
+   :tableData="gridData"
+   :columns="gridColumns"
+ />
 </template>
 
+
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
-import * as echarts from 'echarts'
-import { getDailyCompleteInfo } from '@/api/getPMLinfo'
+import { ref, onMounted, onBeforeUnmount, watch, nextTick } from 'vue';
+import { getPlan4nPie,getPlan4n} from '@/api/getQuiltyinfo'
+import { eventBus } from '@/utils/eventbus';
+import TableDialog from '../components/dialog.vue';
+import { createChartOption } from './piecharts';
+import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
-const chartRef = ref()
-let chart: echarts.ECharts | null = null
-const dialogVisible = ref(false)
-const taskList = ref([])
+const dialogTableVisible = ref(false);
+const title = ref('转产计划达成率');
+const dialogTitle = ref('转产计划达成率');
 
-// 简化表格样式
-const headerStyle = {
-  fontSize: '16px',
-  fontWeight: 'normal'
-}
+const qualityIndicators = ref(null);
+const rawData = ref([]);
+const isLoading = ref(true);
+const isDataEmpty = ref(false);
 
-const cellStyle = {
-  fontSize: '14px'
-}
 
-// 格式化日期
-const formatDate = (dateStr: string) => {
-  if (!dateStr) return ''
-  return dateStr.split(' ')[0]
-}
 
-// 初始化图表
-const initChart = (data: any[]) => {
-  if (!chartRef.value) return
-  
-  chart = echarts.init(chartRef.value)
-  const total = data.length
-  const unfinished = data.filter(item => item.sts === '未完成').length
-  
-  const option = {
-    color: ['#e7141b', '#4CAF50'],
-    series: [
-      { 
-        grid: {
-          left: '3%',
-          right: '4%',
-          bottom: '5%',
-          containLabel: true
-        },
-        type: 'pie',
-        radius: ['60%', '80%'],
-        avoidLabelOverlap: false,
-        label: {
-          show: true,
-          position: 'center',
-          formatter: `{a|${unfinished}}\n{b|未完成}\n{c|${total - unfinished}}\n{d|已完成}`,
-          rich: {
-            a: {
-              fontSize: 24,
-              color: '#e7141b',
-              fontWeight: 'bold'
-            },
-            b: {
-              fontSize: 12,
-              color: '#e7141b',
-              padding: [2, 0]
-            },
-            c: {
-              fontSize: 24,
-              color: '#4CAF50',
-              fontWeight: 'bold'
-            },
-            d: {
-              fontSize: 12,
-              color: '#4CAF50',
-              padding: [2, 0]
-            }
-          }
-        },
-        data: [
-          { value: unfinished, name: '未完成' },
-          { value: total - unfinished, name: '已完成' }
-        ]
-      }
-    ]
-  }
-  
-  chart.setOption(option)
-}
+const { initChart, setOption, resizeChart,onClick } = useEcharts(qualityIndicators); // 使用封装的逻辑
 
-// 获取数据
-const fetchData = async () => {
-  try {
-    const res = await getDailyCompleteInfo()
-    if (res.code === 200) {
-      taskList.value = res.data
-      initChart(res.data)
-    }
-  } catch (error) {
-    console.error('获取数据失败：', error)
-  }
-}
+const gridData = ref([]);
+const gridColumns = [
+  { prop: 'id', label: 'ID', width: '80' },
+  { prop: '计划编号', label: '计划编号', width: '150' },
+  { prop: '行动举措', label: '行动举措', width: '' }, // 不设置宽度，自动填充剩余空间
+  { prop: '成果要求', label: '成果要求', width: '200' },
+  { prop: '状态描述', label: '状态', width: '80' },
+  { prop: '负责人名称', label: '负责人', width: '100' },
+  { prop: '所属部门', label: '所属部门', width: '120' },
+  { prop: '计划完成时间', label: '计划完成时间', width: '120' },
+  { prop: '实际完成时间', label: '实际完成时间', width: '120' },
+  { prop: '重要紧急等级', label: '重要紧急等级', width: '120' },
+  { prop: '建立时间', label: '建立时间', width: '100' }
+];
+
+
+
+// const opendialog = () => {
+// dialogTableVisible.value = true;
+// dialogTitle.value = title.value;
+// getComplaint()
+//   .then(res => {
+//     gridData.value = res.data;
+//   });
+// };
+
+
+const fetchData = () => {
+  getPlan4nPie( )
+  .then(res => {
+    
+    isLoading.value = false;
+   const data = res.data
+   const chartData = data.map(data =>({
+    name: data.状态描述,
+    value: data.total
+   }))
+   rawData.value = chartData
+
+  //  const result = [
+  //   { value: data.greenCount, name: '及时处理', itemStyle: { color: '#28a745' } }, // 绿色
+  //   { value: data.yellowCount, name: '客诉响应', itemStyle: { color: '#ffc107' } }, // 黄色
+  //   { value: data.orangeCount, name: '处理预警', itemStyle: { color: '#fd7e14' } }, // 橙色
+  //   { value: data.redCount, name: '未及时处理', itemStyle: { color: '#dc3545' } }  // 红色
+  // ];
+  })
+  .catch(() => {
+    isLoading.value = false;
+    isDataEmpty.value = true;
+  });     
+};
+
+// 点击饼图区域，弹出对应信息
+const handleChartClick = (params) => {
+const clickedName = params.name;
+dialogTitle.value = `${clickedName}的详细数据`;
+dialogTableVisible.value = true;
+  console.log(clickedName)
+  getPlan4n(clickedName) // 假设 API 接口第三个参数是问题名
+  .then(res => {
+    gridData.value = res.data;
+  });
+};
+
+// const isColor =(name)=>{
+//   switch (name) {
+//       case '及时处理':
+//           return 'green'
+//       case '客诉响应':
+//           return 'yellow'
+//       case '处理预警':
+//           return 'orange'
+//       case '未及时处理':
+//           return 'red'
+//       default:
+//           return null
+//   }
+// }
+
+
+
+watch(rawData, () => {
+nextTick(() => {
+  initChart();
+  const option = createChartOption(title.value, rawData.value);
+  setOption(option);
+  onClick(handleChartClick); // ✅ 恢复点击事件绑定
+});
+}, { deep: true, immediate: true });
 
 onMounted(() => {
-  fetchData()
-  window.addEventListener('resize', () => chart?.resize())
-})
+fetchData();
+resizeChart()
+eventBus.on("refreshData", fetchData);
+});
 
-onUnmounted(() => {
-  chart?.dispose()
-  window.removeEventListener('resize', () => chart?.resize())
-})
+onBeforeUnmount(() => {
+eventBus.off("refreshData", fetchData); // 避免内存泄漏
+});
 </script>
 
+
 <style scoped>
-.content-wrapper {
-  width: 100%;
-  height: 100%;
-  padding: 16px;
-  position: relative;
+.box1{
   display: flex;
   flex-direction: column;
-}
-
-.title {
-  font-size: 1.6rem;
-  color: #00eaff;
-  text-align: center;
-  flex: none;
-}
-
-.chart-container {
-  position: relative;
-  width: 100%;
-  flex: 1;
-  min-height: 0;
-}
-
-.chart {
   width: 100%;
   height: 100%;
-}
+  align-items: center;
+  justify-content: start;
+  color:aliceblue;
 
-.button-wrapper {
-  position: absolute;
-  right: 20px;
-  top: 20px;
-  z-index: 1;
 }
-
-.detail-btn {
-  font-size: 14px;
+h1{
+  font-size: 1.5vw;
+  color:aliceblue;
+  letter-spacing: 0.5vw;
 }
-
-/* 精简对话框样式，主要保留必要的大屏风格 */
-.task-dialog .el-dialog {
-  border-radius: 8px;
-}
-
-/* 只保留未完成状态的红色样式 */
-.task-dialog .el-tag--danger {
-  background: rgba(255, 75, 75, 0.1);
-  border-color: rgba(255, 75, 75, 0.3);
-  color: #ff4b4b;
-}
-
-/* 保留基础的滚动条样式 */
-.task-dialog .el-table__body-wrapper::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
-}
-
-.task-dialog .el-table__body-wrapper::-webkit-scrollbar-thumb {
-  background: rgba(144, 147, 153, 0.3);
-  border-radius: 3px;
-}
-
-.task-dialog .el-table__body-wrapper::-webkit-scrollbar-track {
-  background: transparent;
+:deep(.inside-column) {
+height: 2vh !important; /* 这里改成你想要的宽度 */
 }
 </style>
+
+

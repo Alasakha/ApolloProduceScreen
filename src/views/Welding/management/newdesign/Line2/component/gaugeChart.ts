@@ -1,4 +1,3 @@
-
 // gaugeChart.ts
 const size = window.devicePixelRatio;
 export function createGaugeOption({ text = '标题', data , max  }: { text?: string; data: number; max: number }) {
@@ -154,4 +153,3 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
       ],
     };
   }
-  

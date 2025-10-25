@@ -1,7 +1,7 @@
 <template>
   <div class="w-[70%] h-[30vh]">
        <dv-border-box12>
-           <div class="title">项目逾期任务看板</div>
+           <div class="title">本月研发升级计划-未完成</div>
            <div class="content-wrapper">
                <ScrollBoard
                    :config="scrollConfig"

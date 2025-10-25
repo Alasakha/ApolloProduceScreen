@@ -64,7 +64,7 @@
                   <span class="info-value">{{ task.item_no || '暂无数据' }}</span>
                 </div>
               </div>
-            </div>
+            </div>  
 
             <!-- 数量信息 -->
             <div class="task-quantity">
@@ -75,16 +75,16 @@
                 </div>
                 <div class="quantity-item">
                   <div class="quantity-label">已完成数</div>
-                  <div class="quantity-value completed">{{ task.cycn || 0 }}</div>
+                  <div class="quantity-value completed">{{ task.cycn || '暂无数据'}}</div>
                 </div>
                 <div class="quantity-item">
                   <div class="quantity-label">剩余数量</div>
-                  <div class="quantity-value remaining">{{ (task.ty004 || 0) - (task.qty || 0) }}</div>
+                  <div class="quantity-value remaining">{{ (task.ty004 || 0) - (task.cycn || 0) }}</div>
                 </div>
                 <div class="quantity-item">
                   <div class="quantity-label">完成率</div>
                   <div class="quantity-value progress">
-                    {{ task.ty004 ? Math.round(((task.qty || 0) / task.ty004) * 100) : 0 }}%
+                    {{ task.ty004 ? Math.round(((task.cycn || 0) / task.ty004) * 100) : 0 }}%
                   </div>
                 </div>
               </div>
@@ -99,7 +99,7 @@
                 ></div>
               </div>
               <div class="progress-text">
-                {{ task.qty || 0 }} / {{ task.ty004 || 0 }}
+                {{ task.cycn || 0 }} / {{ task.ty004 || 0 }}
               </div>
             </div>
           </div>
