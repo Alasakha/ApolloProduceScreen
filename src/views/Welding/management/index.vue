@@ -8,6 +8,7 @@
                 <newdesign></newdesign>
                 <!-- <Line2></Line2>
                 <Line3></Line3> -->
+                <Line3></Line3>
             </div>
 
     </body>
@@ -18,7 +19,7 @@ import Header from './Header/index.vue'
 import Line1 from './Line1/index.vue'
 import newdesign from './newdesign/Line2/index.vue'
 // import Line2 from './Line2/index.vue'
-// import Line3 from './Line3/index.vue'
+import Line3 from './newdesign/Line3/index.vue'
 import { onMounted, onUnmounted } from 'vue'
 import { eventBus } from '@/utils/eventbus'
 

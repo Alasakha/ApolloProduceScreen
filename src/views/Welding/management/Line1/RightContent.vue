@@ -139,7 +139,7 @@ import { getEfficiencyToday, getSignInMember } from '@/api/getProduceinfo';
 
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import { createGaugeOption } from './gaugeChart';
+import { createGaugeOption } from '../newdesign/Line2/component/gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
 // import { WarningFilled } from '@element-plus/icons-vue'
 

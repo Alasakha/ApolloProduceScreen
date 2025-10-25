@@ -14,8 +14,8 @@
     
     <!-- 主体内容 -->
     <div class="flex-1 flex flex-row gap-4 p-4 min-h-0">
-      <!-- 左侧数量区块 -->
-      <div class="flex flex-col justify-center gap-4 w-28">
+      <!-- 左侧数量区块 - 已注释任务总数和已完成数 -->
+      <!-- <div class="flex flex-col justify-center gap-4 w-28">
         <div class="flex flex-col items-center bg-blue-900/60 border-2 border-cyan-400/50 rounded-xl px-3 py-3 shadow-lg cursor-pointer hover:bg-blue-800/70 hover:border-cyan-300/70 transition-all duration-200"
              @click="handleTotalQtyClick">
           <div class="text-sm text-cyan-200 mb-1">任务总数量</div>
@@ -26,7 +26,7 @@
           <div class="text-sm text-cyan-200 mb-1">已完成数量</div>
           <div class="text-3xl font-bold text-white drop-shadow-lg  3xl:text-xl  2xl:text-xl xl:text-sm">{{ doneQty }}</div>
         </div>
-      </div>
+      </div> -->
       
       <!-- 右侧设备统计区域 -->
       <div class="flex-1 flex flex-col justify-between min-w-0">
@@ -54,11 +54,10 @@
           </div>
         </div>
         
-        <!-- 设备组进度条区域 -->
-        <div class="bg-blue-800/40 border border-blue-400/50 rounded-xl p-4">
-          <!-- <div class="text-cyan-200 text-center mb-3 font-semibold">设备组进度条</div> -->
+        <!-- 设备组进度条区域 - 已注释进度条 -->
+        <!-- <div class="bg-blue-800/40 border border-blue-400/50 rounded-xl p-4">
+          <div class="text-cyan-200 text-center mb-3 font-semibold">设备组进度条</div>
           <div class="space-y-2">
-            <!-- 单个进度条 -->
             <div class="flex items-center gap-3">
               <span class="text-white text-sm w-12">进度:</span>
               <div class="flex-1 h-4 bg-blue-900/60 rounded-full overflow-hidden border border-blue-400/30">
@@ -68,7 +67,7 @@
               <span class="text-white text-sm font-bold w-12 text-right">{{ progress }}%</span>
             </div>
           </div>
-        </div>
+        </div> -->
         
         <!-- 设备参数已移除 -->
       </div>
@@ -86,33 +85,36 @@ const props = defineProps({
     }
 })
 
-// 定义事件发射
-const emit = defineEmits(['click-running', 'click-completed', 'click-total-qty', 'click-device-group', 'click-waiting'])
+// 定义事件发射 - 已注释任务总数和已完成数相关事件
+const emit = defineEmits(['click-running', 'click-device-group', 'click-waiting'])
+// 注释掉的任务总数和已完成数事件: 'click-completed', 'click-total-qty'
 
 
 
-// 从data中提取各个字段
+// 从data中提取各个字段 - 已注释任务总数、已完成数和进度条相关字段
 const orderName = computed(() => props.data.orderName || '未知设备组')
-const totalQty = computed(() => props.data.qty_total || 0)
-const doneQty = computed(() => props.data.num_total || 0)
-const progress = computed(() => props.data.progress || 0)
+// 注释掉的字段: totalQty, doneQty, progress
+// const totalQty = computed(() => props.data.qty_total || 0)
+// const doneQty = computed(() => props.data.num_total || 0)
+// const progress = computed(() => props.data.progress || 0)
 const gdNum = computed(() => props.data.gdNum || 1)
 const deviceGroupCount = computed(() => props.data.machine_count || 0)
 const runningCount = computed(() => props.data.doing_count || 0)
 const waitingCount = computed(() => Math.max(0, (props.data.machine_count || 0) - (props.data.doing_count || 0)))
 
-// 点击事件处理函数
+// 点击事件处理函数 - 已注释任务总数和已完成数相关事件
 const handleRunningClick = () => {
   emit('click-running', props.data)
 }
 
-const handleCompletedClick = () => {
-  emit('click-completed', props.data)
-}
+// 注释掉的已完成数和任务总数点击事件
+// const handleCompletedClick = () => {
+//   emit('click-completed', props.data)
+// }
 
-const handleTotalQtyClick = () => {
-  emit('click-total-qty', props.data)
-}
+// const handleTotalQtyClick = () => {
+//   emit('click-total-qty', props.data)
+// }
 
 const handleDeviceGroupClick = () => {
   emit('click-device-group', props.data)

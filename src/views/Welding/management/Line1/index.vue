@@ -2,7 +2,7 @@
     <div class="line2-container w-full h-[5%] flex mt-2">
         <!-- <LeftContent class="flex-2"/>
         <RightContent class="flex-1"/> -->
-        <Report />
+        <Report class="w-full h-full" />
     </div>
 </template>
 

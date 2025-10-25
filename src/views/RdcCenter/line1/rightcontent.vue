@@ -29,7 +29,7 @@
            :before-close="handleClose"
        >
            <div class="detail-content">
-               <el-table :data="detailData" border style="width: 100%">
+               <el-table :data="paginatedData" border style="width: 100%">
                    <el-table-column prop="pno" label="项目编号" width="120" />
                    <el-table-column prop="projName" label="项目名称" width="150" />
                    <el-table-column prop="taskName" label="任务名称" width="150" />
@@ -48,7 +48,13 @@
                            {{ formatDate(scope.row.completeTime) || '--' }}
                        </template>
                    </el-table-column>
-                   <el-table-column prop="sts" label="完成状态" width="100" />
+                   <el-table-column prop="completionStatus" label="完成状态" width="120">
+                       <template #default="scope">
+                           <span :class="getStatusClass(scope.row.completionStatus)">
+                               {{ scope.row.completionStatus }}
+                           </span>
+                       </template>
+                   </el-table-column>
                    <el-table-column prop="executant" label="责任人" width="100" />
                </el-table>
                
@@ -80,10 +86,58 @@ const currentPage = ref(1)
 const pageSize = ref(10)
 const totalItems = ref(0)
 
+// 计算分页后的数据，包含状态判断
+const paginatedData = computed(() => {
+   const start = (currentPage.value - 1) * pageSize.value
+   const end = start + pageSize.value
+   return detailData.value.slice(start, end).map(item => ({
+       ...item,
+       completionStatus: getCompletionStatus(item)
+   }))
+})
+
 // 格式化日期
 const formatDate = (dateStr) => {
    if (!dateStr) return '--'
    return new Date(dateStr).toLocaleDateString()
+}
+
+// 判断完成状态
+const getCompletionStatus = (item) => {
+   const { sts, expectTime, completeTime } = item
+   const now = new Date()
+   const expectDate = new Date(expectTime)
+   
+   // 1. 先判断是否为C（完成）
+   if (sts === 'C') {
+       // 2. 如果是C说明完成，判断实际完成时间是否超过计划完成时间
+       if (completeTime) {
+           const completeDate = new Date(completeTime)
+           return completeDate > expectDate ? '逾期完成' : '按时完成'
+       } else {
+           // 如果没有实际完成时间，按当前时间判断
+           return now > expectDate ? '逾期完成' : '按时完成'
+       }
+   } else {
+       // 3. 如果不是C说明未完成，判断是否超过计划完成时间
+       return now > expectDate ? '逾期' : '待完成'
+   }
+}
+
+// 获取状态样式类
+const getStatusClass = (status) => {
+   switch (status) {
+       case '按时完成':
+           return 'status-on-time'
+       case '逾期完成':
+           return 'status-overdue-complete'
+       case '待完成':
+           return 'status-pending'
+       case '逾期':
+           return 'status-overdue'
+       default:
+           return 'status-default'
+   }
 }
 
 // 配置轮播表格
@@ -99,10 +153,8 @@ const scrollConfig = computed(() => {
                formatDate(item.expectTime),
                formatDate(item.changeTime) || '--',
                formatDate(item.completeTime) || '--',
-         
-               '未完成',
+               getCompletionStatus(item),
                item.executant
-
            ])
            : [defaultRow],
        index: true,  // 显示序号列
@@ -297,6 +349,52 @@ onBeforeUnmount(() => {
 :deep(.el-dialog__body) {
     background-color: #0a1f3d;
     color: #fff;
+}
+
+/* 状态样式 */
+.status-on-time {
+    color: #4caf50;
+    font-weight: bold;
+    background: rgba(76, 175, 80, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #4caf50;
+}
+
+.status-overdue-complete {
+    color: #ff9800;
+    font-weight: bold;
+    background: rgba(255, 152, 0, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ff9800;
+}
+
+.status-pending {
+    color: #2196f3;
+    font-weight: bold;
+    background: rgba(33, 150, 243, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #2196f3;
+}
+
+.status-overdue {
+    color: #f44336;
+    font-weight: bold;
+    background: rgba(244, 67, 54, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #f44336;
+}
+
+.status-default {
+    color: #9e9e9e;
+    font-weight: bold;
+    background: rgba(158, 158, 158, 0.1);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #9e9e9e;
 }
 
 

@@ -137,7 +137,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
             length: '12%',
             width: 14,
             height: 14,
-            offsetCenter: [0, '-100%'],
+            offsetCenter: [0, '-85%'],
             itemStyle: {
               // color: 'rgba(140, 234, 174, 1)',
               color:'rgb(255, 255, 255)'

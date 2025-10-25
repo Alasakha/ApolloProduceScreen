@@ -4,12 +4,12 @@
         <div v-if="isLoading" class="w-full h-[85%] text-white">
           <dv-loading>Loading...</dv-loading>
         </div>
-        <div v-if="!isLoading" class="w-full h-[95%] p-3 grid grid-cols-2 grid-rows-2 gap-4">
+        <div v-if="!isLoading" class="w-full h-[95%] p-3 grid grid-cols-2 grid-rows-2 gap-2">
           <!-- 出勤人数 -->
           <div class="chuchai">
             <div 
               ref="Indicators2" 
-              class="w-full h-[300px] cursor-pointer"
+              class="w-full h-full cursor-pointer"
               @click="openAttendanceDialog"
             ></div>
           </div>
@@ -17,19 +17,19 @@
           <div class="peizhi">
             <div 
               ref="Indicators5" 
-              class="w-full h-[300px] cursor-pointer"
+              class="w-full h-full cursor-pointer"
               @click="openNighttimeAttendanceDialog"
             ></div>
           </div>
           <!-- 标准人效 -->
           <div class="biaozhun">
-            <div ref="Indicators3" class="w-full h-[300px]"></div>
+            <div ref="Indicators3" class="w-full h-full"></div>
           </div>
           <!-- 实际人效 -->
           <div class="shiji">
             <div 
               ref="Indicators4" 
-              class="w-full h-[300px]"
+              class="w-full h-full"
               @click="openReasonDialog"
               style="cursor: pointer;"
             ></div>
@@ -333,8 +333,8 @@ async function openReasonInfoDialog(device) {
 
 <style scoped>
 .efficency {
-  width: 50%;
-  height: 30%;
+  width: 100%;
+  height: 100%;
   display: flex;
   flex-wrap: wrap;
   font-size: 18px;
@@ -373,6 +373,8 @@ async function openReasonInfoDialog(device) {
   display: flex;
   justify-content: center;
   align-items: center;
+  min-height: 0; /* 允许flex子项缩小 */
+  overflow: hidden; /* 防止内容溢出 */
 }
 
 /* Reason信息弹窗样式 */

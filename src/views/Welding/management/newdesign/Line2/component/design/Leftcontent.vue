@@ -19,8 +19,6 @@
           <DataCard3 
             :data="card"
             @click-running="handleRunningClick"
-            @click-completed="handleCompletedClick"
-            @click-total-qty="handleTotalQtyClick"
             @click-device-group="handleDeviceGroupClick"
             @click-waiting="handleWaitingClick"
           />
@@ -245,38 +243,38 @@
     processDialogVisible.value = true
   }
   
-  // 点击已完成数事件处理 - 打开CompletedDialog显示已完成的工序
-  const handleCompletedClick = (cardData) => {
-    console.log('点击已完成数量，卡片数据:', cardData)
-    
-    // 设置选中的卡片数据
-    selectedCard.value = {
-      ...cardData,
-      title: `${cardData.orderName} - 已完成工序详情`,
-      orderName: cardData.orderName,
-    }
-    
-    // 打开CompletedDialog
-    completedDialogVisible.value = true
-  }
+  // 点击已完成数事件处理 - 已注释
+  // const handleCompletedClick = (cardData) => {
+  //   console.log('点击已完成数量，卡片数据:', cardData)
+  //   
+  //   // 设置选中的卡片数据
+  //   selectedCard.value = {
+  //     ...cardData,
+  //     title: `${cardData.orderName} - 已完成工序详情`,
+  //     orderName: cardData.orderName,
+  //   }
+  //   
+  //   // 打开CompletedDialog
+  //   completedDialogVisible.value = true
+  // }
   
-  // 点击任务总数量事件处理
-  const handleTotalQtyClick = (cardData) => {
-    console.log('点击任务总数量，卡片数据:', cardData)
-    
-    // 设置选中的卡片数据
-    selectedCard.value = {
-      ...cardData,
-      title: `${cardData.orderName} - 任务总数量详情`,
-      orderName: cardData.orderName,
-    }
-    
-    console.log('设置 selectedCard:', selectedCard.value)
-    
-    // 打开TotalQtyDialog
-    totalQtyDialogVisible.value = true
-    console.log('设置 totalQtyDialogVisible:', totalQtyDialogVisible.value)
-  }
+  // 点击任务总数量事件处理 - 已注释
+  // const handleTotalQtyClick = (cardData) => {
+  //   console.log('点击任务总数量，卡片数据:', cardData)
+  //   
+  //   // 设置选中的卡片数据
+  //   selectedCard.value = {
+  //     ...cardData,
+  //     title: `${cardData.orderName} - 任务总数量详情`,
+  //     orderName: cardData.orderName,
+  //   }
+  //   
+  //   console.log('设置 selectedCard:', selectedCard.value)
+  //   
+  //   // 打开TotalQtyDialog
+  //   totalQtyDialogVisible.value = true
+  //   console.log('设置 totalQtyDialogVisible:', totalQtyDialogVisible.value)
+  // }
   
   // 点击设备组数量事件处理
   const handleDeviceGroupClick = (cardData) => {
@@ -369,7 +367,8 @@
 }
 
 .card-wrapper {
-    width: calc(33.33% - 0.67rem);
+    height: 100%;
+    width: 100%;
     cursor: pointer;
     transition: transform 0.2s ease;
     align-self: flex-start; /* 确保卡片从顶部对齐 */

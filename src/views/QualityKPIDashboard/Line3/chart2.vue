@@ -52,19 +52,27 @@ const fetchData = async () => {
     try {
         const res = await getAfterServiceCxPie()
         if (res.code === 200 && Array.isArray(res.data)) {
-            // 转换数据格式，处理customer_code为空的情况
+            // 转换数据格式，处理全是null的数据
             console.log(res.data)
             chartData.value = res.data
-                .filter(item => item.feature_value_desc) // 过滤掉没有customer_code的数据
-                .map(item => ({
-                    value: item.total,
-                    name: item.feature_value_desc || '未知车型',  // 如果customer_code为null，显示为"未知客户"
-                    feature_d_id:item.feature_d_id,
-                    itemStyle: {
-                        // 为每个客户设置不同的颜色
-                        color: getRandomColor()  // 可以根据需要设置固定的颜色映射
+                .map(item => {
+                    // 检查是否所有字段都是null或空
+                    const isAllNull = !item.feature_value_desc && 
+                                    !item.feature_d_id && 
+                                    !item.total && 
+                                    Object.values(item).every(val => val === null || val === undefined || val === '')
+                    
+                    return {
+                        value: item.total || 0,
+                        name: isAllNull ? '其他（散件）' : (item.feature_value_desc || '未知车型'),
+                        feature_d_id: item.feature_d_id,
+                        itemStyle: {
+                            // 为每个客户设置不同的颜色
+                            color: getRandomColor()  // 可以根据需要设置固定的颜色映射
+                        }
                     }
-                }))
+                })
+                .filter(item => item.value > 0) // 过滤掉数量为0的数据
                 .sort((a, b) => b.value - a.value) // 按数量从大到小排序
         }
     } catch (error) {
@@ -76,8 +84,13 @@ const fetchData = async () => {
 // 图表点击事件处理
 const handleChartClick = (params) => {
     console.log('Chart clicked:', params)
-    if (params.data && params.data.feature_d_id) {
-        fetchDetailData(params.data.feature_d_id)
+    if (params.data) {
+        // 如果是"其他（散件）"，传递特殊标识
+        if (params.data.name === '其他（散件）') {
+            fetchDetailData('other') // 传递特殊标识
+        } else if (params.data.feature_d_id) {
+            fetchDetailData(params.data.feature_d_id)
+        }
     }
 }
 
@@ -85,9 +98,38 @@ const handleChartClick = (params) => {
 const fetchDetailData = async (feature_d_id) => {
     loading.value = true
     try {
-        const res = await getAfterService(null,null,feature_d_id)
-        if (res.code === 200 && Array.isArray(res.data)) {
-            detailData.value = res.data
+        let res
+        if (feature_d_id === 'other') {
+            // 对于"其他（散件）"，获取所有数据然后过滤出全是null的记录
+            res = await getAfterService()
+            if (res.code === 200 && Array.isArray(res.data)) {
+                // 过滤出所有字段都是null或空的记录
+                detailData.value = res.data.filter(item => {
+                    const isAllNull = !item.breakdown_name && 
+                                    !item.breakdown_name2 && 
+                                    !item.udf021 && 
+                                    !item.udf022 && 
+                                    !item.udf023 && 
+                                    !item.approvedate && 
+                                    !item.user_name && 
+                                    !item.item_description && 
+                                    !item.item_specification && 
+                                    !item.quantity && 
+                                    !item.unit_name && 
+                                    !item.doc_no && 
+                                    !item.khdh &&
+                                    Object.values(item).every(val => val === null || val === undefined || val === '')
+                    return isAllNull
+                })
+            }
+        } else {
+            res = await getAfterService(null,null,feature_d_id)
+            if (res.code === 200 && Array.isArray(res.data)) {
+                detailData.value = res.data
+            }
+        }
+        
+        if (res && res.code === 200) {
             dialogVisible.value = true
         }
     } catch (error) {

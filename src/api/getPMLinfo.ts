@@ -50,3 +50,11 @@ export const getProjectOverdueMainCountInfo = () => {
     method: 'get',
   })
 }
+
+// /PLM/warn
+export const getPlmWarnInfo = () => {
+  return request({
+    url: '/PLM/warn',
+    method: 'get',
+  })
+}

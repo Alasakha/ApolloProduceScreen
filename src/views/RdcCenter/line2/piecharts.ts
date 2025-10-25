@@ -13,10 +13,10 @@ export function createChartOption(title: string, rawData: any) {
     ],
     title: {
       text: title,
-      top: '4%',
-      left: 'left',
+      top: '0%',
+      left: 'center',
       textStyle: {
-        color: '#ffffff',
+        color: '#00eeff',
         fontSize: 25,
         fontWeight: 'bold',
         fontFamily: 'Microsoft YaHei',

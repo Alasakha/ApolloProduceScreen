@@ -1,5 +1,5 @@
 <template>
-    <div class="line2-container flex w-full h-[70vh] gap-2 mt-2">
+    <div class="line2-container flex w-full h-[65vh] gap-2 mt-2">
         <Left />
         <Middle />
         <Right />

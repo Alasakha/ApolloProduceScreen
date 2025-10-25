@@ -12,6 +12,7 @@
                 <div class="flex flex-col flex-1">
                     <Top class="flex-1" />
                     <Bottom class="flex-1" />
+                    <Middle class="flex-1" />
                 </div>
        </div> 
     </dv-border-box10>
@@ -20,6 +21,7 @@
 
 <script setup lang="ts">
 import Top from './top.vue';
+import Middle from './middle.vue'
 import Bottom from './bottom.vue';
 </script>
 
