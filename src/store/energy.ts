@@ -388,7 +388,7 @@ export const useEnergyStore = defineStore('energy', {
         
         if (gasData && this.dailyProduction > 0) {
           this.averageDaGasPower = Number(((Number(gasData.numberPower) / this.dailyProduction)).toFixed(1));
-          console.log(`📊 平均每台日气量: ${this.averageDaGasPower.toFixed(1)} (气量: ${gasData.numberPower}, 日产量: ${this.dailyProduction})`);
+          // console.log(`📊 平均每台日气量: ${this.averageDaGasPower.toFixed(1)} (气量: ${gasData.numberPower}, 日产量: ${this.dailyProduction})`);
           return true;
         } else {
           console.warn('⚠️ 当日气表数据或产量数据无效，无法计算平均每台日气量');
@@ -485,6 +485,16 @@ export const useEnergyStore = defineStore('energy', {
           this.lastDailyFetch = date;
           this.rawData = res.data; // 保持兼容性
           console.log('✅ 当日数据获取成功，共', res.data.length, '条记录');
+          
+          // 调试信息：检查每日数据中的电表数据
+          const electricDailyData = res.data.filter(item => MACHINE_CODES.ELECTRIC.includes(item.machCode));
+          console.log('🔍 当日电表数据详情:', electricDailyData.map(item => ({
+            machCode: item.machCode,
+            machName: item.machName,
+            numberPower: item.numberPower,
+            cl: item.cl
+          })));
+          
           return true;
         } else {
           console.warn('获取当日数据失败：', res.message);

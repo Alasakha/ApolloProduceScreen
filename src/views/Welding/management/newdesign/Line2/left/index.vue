@@ -42,25 +42,27 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
 import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
 import designSituation from '../component/design/Leftcontent.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
-import { getEfficiencyToday, getSignInMember } from '@/api/getProduceinfo'
+import { getMetalworkingEfficiency } from '@/api/getStampinfo'
 import OneProdLine from './oneProdLine.vue'
 
-const route = useRoute()
-const prodLine = ref(route.query.prodLine as string || '1003')
+// const route = useRoute()
+const prodLine = ref('9')
 
 // 定义 API 函数
 const efficiencyApi = async (prodLine: string) => {
-    return await getEfficiencyToday(prodLine)
+    return await getMetalworkingEfficiency(prodLine)
 }
 
+// 定义 attendanceApi 函数（与 efficiencyApi 使用同一个接口）
 const attendanceApi = async (prodLine: string) => {
-    return await getSignInMember(prodLine)
+    return await getMetalworkingEfficiency(prodLine)
 }
+
+
 
 // 定义表格数据接口
 interface DashboardData {

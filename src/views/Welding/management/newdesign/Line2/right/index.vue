@@ -37,79 +37,30 @@
     </div>
 </template>
 
-<style scoped>
-.left-container {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-}
 
-.content-wrapper {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
-    gap: 8px;
-    padding: 8px;
-}
-
-.plan-section {
-    height: 26%;
-    min-height: 200px;
-}
-
-.components-row {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 25%; /* 占30%高度 */
-    gap: 8px; /* 两个组件之间的间距 */
-}
-
-.components-3row {
-    display: flex;
-    flex-direction: row;
-    width: 100%;
-    height: 40%; /* 占30%高度 */
-    gap: 8px; /* 两个组件之间的间距 */
-}
-
-/* 中间空白区域 */
-.middle-space {
-    height: 30%;
-}
-
-.component-half {
-    flex: 1;
-    width: 50%;
-    height: 100%;
-    min-width: 0; /* 防止内容溢出 */
-    display: flex;
-    flex-direction: column;
-}
-</style>
 
 
 <script setup lang="ts">
 import { ref } from 'vue'
-import { useRoute } from 'vue-router'
+
 import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
 import designSituation from '../component/design/Leftcontent.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
-import { getEfficiencyToday, getSignInMember } from '@/api/getProduceinfo'
+import { getMetalworkingEfficiency } from '@/api/getStampinfo'
 import OneProdLine from './oneProdLine.vue'
-
-const route = useRoute()
-const prodLine = ref(route.query.prodLine as string || '1003')
-
+// const route = useRoute()
+const prodLine = ref('8')
 // 定义 API 函数
 const efficiencyApi = async (prodLine: string) => {
-    return await getEfficiencyToday(prodLine)
+    return await getMetalworkingEfficiency(prodLine)
 }
 
+// 定义 attendanceApi 函数（与 efficiencyApi 使用同一个接口）
 const attendanceApi = async (prodLine: string) => {
-    return await getSignInMember(prodLine)
+    return await getMetalworkingEfficiency(prodLine)
 }
+
 
 // 定义表格数据接口
 interface DashboardData {
@@ -170,3 +121,53 @@ const tableData = ref<TableRowData[]>([
 
 
 </script>
+<style scoped>
+.left-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}
+
+.content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    gap: 8px;
+    padding: 8px;
+}
+
+.plan-section {
+    height: 26%;
+    min-height: 200px;
+}
+
+.components-row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 25%; /* 占30%高度 */
+    gap: 8px; /* 两个组件之间的间距 */
+}
+
+.components-3row {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 40%; /* 占30%高度 */
+    gap: 8px; /* 两个组件之间的间距 */
+}
+
+/* 中间空白区域 */
+.middle-space {
+    height: 30%;
+}
+
+.component-half {
+    flex: 1;
+    width: 50%;
+    height: 100%;
+    min-width: 0; /* 防止内容溢出 */
+    display: flex;
+    flex-direction: column;
+}
+</style>

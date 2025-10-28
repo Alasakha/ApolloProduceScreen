@@ -186,3 +186,13 @@ export interface Equipment {
   total: number //总设备数
   hold: number //待机数
 }
+
+
+// /stampingWelding/metalworkingEfficiency 焊接一部人效 8 手工焊 9:安川 10:松下 11铁架焊
+export const getMetalworkingEfficiency = (prodLineType: string) => {
+  return request({
+    url: '/stampingWelding/metalworkingEfficiency',
+    method: 'get',
+    params: { prodLineType }
+  })
+}

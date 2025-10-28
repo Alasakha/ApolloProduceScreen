@@ -114,3 +114,12 @@ export const getStagnantAmount = (type:Number) => {
     params: { type}
   })
 }
+
+
+// /apollo/PLM/ysComplete 本月爆品上新达成情况
+export const getYsComplete = () => {
+  return request({
+    url: '/PLM/ysComplete',
+    method: 'get',
+  })
+}

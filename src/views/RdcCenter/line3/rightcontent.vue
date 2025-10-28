@@ -3,7 +3,7 @@
         <dv-border-box13>
             <div class="monthly-budget-container">
                 <!-- 标题 -->
-                <div class="title">月度预算目标完成情况</div>
+                <div class="title">年度爆品上新计划</div>
                 
                 <!-- 表格容器 -->
                 <div class="table-container">

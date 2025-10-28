@@ -67,7 +67,7 @@
           chart.dispose();
         }
         chart = echarts.init(Indicators1.value);
-        const option = createChartOption(data);
+        const option = createChartOption(data, '出入库异常次数');
         chart.setOption(option);
         
         // 添加窗口大小改变时的自适应
@@ -82,7 +82,7 @@
       try {
         isLoading.value = true;
         // 获取PMC KPI数据
-        const res = await getPmcKpi('B');
+        const res = await getPmcKpi('A');
         
         isLoading.value = false;
         

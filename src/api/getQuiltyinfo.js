@@ -287,10 +287,11 @@ export const getCheckTotalDone = ( ) => {
 }
 
 // /quality/plan4nPie
-export const getPlan4nPie = () =>{
+export const getPlan4nPie = (projectName ) =>{
   return request({
     url: '/quality/plan4nPie',
     method: 'get',
+    params: { projectName }
   })
 }
 

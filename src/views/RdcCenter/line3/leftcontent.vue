@@ -26,9 +26,31 @@
           width="80%"
           :close-on-click-modal="false"
           class="task-dialog"
+          @close="handleDialogClose"
         >
+          <!-- 筛选条件 -->
+          <div class="filter-wrapper">
+            <el-select
+              v-model="filterStatus"
+              placeholder="选择完成状态"
+              clearable
+              class="filter-item"
+              @change="handleFilterChange"
+            >
+              <el-option label="已完成" value="已完成" />
+              <el-option label="未完成" value="未完成" />
+            </el-select>
+            <el-input
+              v-model="filterPno"
+              placeholder="输入项目编号"
+              clearable
+              class="filter-item"
+              @input="handleFilterChange"
+            />
+          </div>
+          
           <el-table
-            :data="taskList"
+            :data="filteredTaskList"
             style="width: 100%"
             :header-cell-style="headerStyle"
             :cell-style="cellStyle"
@@ -68,14 +90,52 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import * as echarts from 'echarts'
-import { getPmcKpi } from '@/api/getScmInfo'
+import { getYsComplete } from '@/api/getPmcinfo'
 
 const chartRef = ref()
 let chart: echarts.ECharts | null = null
 const dialogVisible = ref(false)
 const taskList = ref([])
+
+// 筛选条件
+const filterStatus = ref('')
+const filterPno = ref('')
+
+// 筛选后的数据
+const filteredTaskList = computed(() => {
+  let result = taskList.value
+  
+  // 按状态筛选
+  if (filterStatus.value) {
+    if (filterStatus.value === '已完成') {
+      result = result.filter(item => item.state === 'C')
+    } else if (filterStatus.value === '未完成') {
+      result = result.filter(item => item.state !== 'C')
+    }
+  }
+  
+  // 按项目编号筛选
+  if (filterPno.value) {
+    result = result.filter(item => 
+      item.pno && item.pno.includes(filterPno.value)
+    )
+  }
+  
+  return result
+})
+
+// 筛选变化处理
+const handleFilterChange = () => {
+  // 数据已通过computed自动更新
+}
+
+// 弹窗关闭时重置筛选
+const handleDialogClose = () => {
+  filterStatus.value = ''
+  filterPno.value = ''
+}
 
 // 简化表格样式
 const headerStyle = {
@@ -99,13 +159,12 @@ const initChart = (data: any[]) => {
   
   chart = echarts.init(chartRef.value)
   
-  // 计算A类和常规订单的总数
-  const aCount = data.reduce((sum, item) => sum + (item.a_count || 0), 0)
-  const bCount = data.reduce((sum, item) => sum + (item.b_count || 0), 0)
-  // const total = aCount + bCount
+  // 根据state字段统计完成和未完成数量
+  const completedCount = data.filter(item => item.state === 'C').length
+  const uncompletedCount = data.filter(item => item.state !== 'C').length
   
   const option = {
-    color: ['#e7141b', '#4CAF50'],
+    color: ['#4CAF50', '#e7141b'], // 已完成绿色，未完成红色
     series: [
       { 
         grid: {
@@ -120,33 +179,33 @@ const initChart = (data: any[]) => {
         label: {
           show: true,
           position: 'center',
-          formatter: `{a|${aCount}}\n{b|A类数量}\n{c|${bCount}}\n{d|常规订单}`,
+          formatter: `{a|${completedCount}}\n{b|已完成}\n{c|${uncompletedCount}}\n{d|未完成}`,
           rich: {
             a: {
               fontSize: 24,
-              color: '#e7141b',
+              color: '#4CAF50',
               fontWeight: 'bold'
             },
             b: {
               fontSize: 12,
-              color: '#e7141b',
+              color: '#4CAF50',
               padding: [2, 0]
             },
             c: {
               fontSize: 24,
-              color: '#4CAF50',
+              color: '#e7141b',
               fontWeight: 'bold'
             },
             d: {
               fontSize: 12,
-              color: '#4CAF50',
+              color: '#e7141b',
               padding: [2, 0]
             }
           }
         },
         data: [
-          { value: aCount, name: 'A类数量' },
-          { value: bCount, name: '常规订单' }
+          { value: completedCount, name: '已完成' },
+          { value: uncompletedCount, name: '未完成' }
         ]
       }
     ]
@@ -158,7 +217,7 @@ const initChart = (data: any[]) => {
 // 获取数据
 const fetchData = async () => {
   try {
-    const res = await getPmcKpi()
+    const res = await getYsComplete()
     if (res.code === 200) {
       taskList.value = res.data
       initChart(res.data)
@@ -245,4 +304,19 @@ onUnmounted(() => {
 .task-dialog .el-table__body-wrapper::-webkit-scrollbar-track {
   background: transparent;
 }
+
+/* 筛选区域样式 */
+.filter-wrapper {
+  margin-bottom: 16px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.filter-item {
+  flex: 1;
+  max-width: 300px;
+}
+
+
 </style>

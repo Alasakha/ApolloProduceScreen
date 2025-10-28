@@ -16,14 +16,21 @@
               >
                 查看详情
               </el-button>
-              <el-button 
-                type="warning" 
-                class="detail-btn warning-btn" 
-                @click="warningDialogVisible = true"
-              >
-                预警计划
-              </el-button>
-            </div>
+              </div>
+              <div class="button-wrapper-bottom">
+                <div class="warning-count">
+                  <span class="warning-icon">⚠️</span>
+                  <span class="warning-text">预警计划数量：{{ warningList.length }}</span>
+                </div>
+                <el-button 
+                  type="warning" 
+                  class="detail-btn warning-btn" 
+                  @click="warningDialogVisible = true"
+                >
+                  预警计划
+                </el-button>
+              </div>
+          
           </div>
   
           <!-- Element Plus 对话框 -->
@@ -281,15 +288,68 @@
     gap: 8px;
   }
   
+  .button-wrapper-bottom {
+    position: absolute;
+    right: 20px;
+    bottom: 20px;
+    z-index: 1;
+    flex-direction: column;
+    display: flex;
+  }
+  
   .detail-btn {
     font-size: 14px;
+    width: 100%;
   }
 
-  .warning-btn {
+  .warning-count {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.15) 0%, rgba(255, 152, 0, 0.15) 100%);
+    border: 1px solid rgba(255, 193, 7, 0.4);
+    border-radius: 6px;
+    padding: 10px 16px;
+    margin-bottom: 8px;
+    font-size: 14px;
+    box-shadow: 0 2px 8px rgba(255, 193, 7, 0.2);
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+  }
+
+  .warning-count:hover {
+    background: linear-gradient(135deg, rgba(255, 193, 7, 0.25) 0%, rgba(255, 152, 0, 0.25) 100%);
+    border-color: rgba(255, 193, 7, 0.6);
+    box-shadow: 0 4px 12px rgba(255, 193, 7, 0.3);
+    transform: translateY(-2px);
+  }
+
+  .warning-icon {
+    font-size: 18px;
+    animation: pulse 2s ease-in-out infinite;
+  }
+
+  .warning-text {
+    color: #ffc107;
+    font-weight: 500;
+  }
+
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.15);
+    }
+  }
+
+  /* .warning-btn {
     background: rgba(255, 193, 7, 0.1);
     border-color: rgba(255, 193, 7, 0.3);
     color: #ffc107;
-  }
+  } */
 
   .warning-btn:hover {
     background: rgba(255, 193, 7, 0.2);

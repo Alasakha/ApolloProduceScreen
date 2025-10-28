@@ -1,38 +1,45 @@
-export const createChartOption = (data) => {
-  // 定义固定的采购员名字顺序
-  const fixedOrder = ['巩荣超', '李晓娅', '廖远美', '牛小环', '唐富群', '蒋智广', '徐程武'];
-  
-  // 按照固定顺序重新排列数据
-  const orderedData = fixedOrder.map(name => {
-    const item = data.find(d => d.purchaserName === name);
-    return item || { purchaserName: name, total: 0 };
-  });
-  
+export const createChartOption = (data, title) => {
+  // 直接使用原始数据，不进行固定排序
   // 处理数据，分离出名称和数值
-  const names = orderedData.map(item => item.purchaserName);
-  const totals = orderedData.map(item => item.total || 0);
+  const names = data.map(item => item.purchaserName);
+  const totals = data.map(item => item.total || 0);
   
   // 判断是否有数据
   const hasData = totals.some(count => count > 0);
 
   return {
+    grid: {
+      left: '3%',
+      right: '4%',
+      bottom: '0%',
+      top: '30%',
+      containLabel: true
+    },
+    title: {
+      text: title, // 传入标题
+      left: 'center', // 标题居中
+      textStyle: {
+        color: '#fff',
+        fontSize: 18,
+        fontWeight: 'bold'
+      }
+    },
     tooltip: {
       trigger: 'axis',
       axisPointer: {
         type: 'shadow'
       },
+      backgroundColor: 'rgba(0, 0, 0, 0.8)',
+      borderColor: '#333',
+      textStyle: {
+        color: '#fff',
+        fontSize: 14
+      },
       formatter: function(params) {
         const name = params[0].name;
         const value = params[0].value;
-        return `${name}<br/>总订单数: ${value}个`;
+        return `<div style="margin-bottom: 5px; font-weight: bold;">${name}</div><div>总订单数: ${value}次</div>`;
       }
-    },
-    grid: {
-      left: '3%',
-      right: '4%',
-      bottom: '15%',
-      top: '15%',
-      containLabel: true
     },
     xAxis: {
       type: 'category',
@@ -55,7 +62,7 @@ export const createChartOption = (data) => {
       type: 'value',
       axisLabel: {
         color: '#fff',
-        formatter: '{value}个'
+        formatter: '{value}次'
       }
     },
     series: [
@@ -70,7 +77,7 @@ export const createChartOption = (data) => {
         label: {
           show: hasData,
           position: 'top',
-          formatter: '{c}个',
+          formatter: '{c}次',
           color: '#fff',
           fontSize: 12
         }

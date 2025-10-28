@@ -119,6 +119,86 @@
         </div>
       </el-dialog>
 
+      <!-- 低于标准人效填写弹窗 -->
+      <el-dialog 
+        v-model="reasonDialogVisible" 
+        title="填写原因" 
+        width="50%" 
+        :z-index="99999999"
+      >
+        <el-input
+          v-model="customReason"
+          type="textarea"
+          :rows="6"
+          placeholder="请填写实际人效低于标准人效的原因..."
+          maxlength="500"
+          show-word-limit
+        />
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="reasonDialogVisible = false">取消</el-button>
+            <el-button type="primary" @click="submitReason">提交</el-button>
+          </div>
+        </template>
+      </el-dialog>
+
+      <!-- Reason信息弹窗 -->
+      <el-dialog 
+        v-model="reasonInfoDialogVisible" 
+        :title="selectedDevice?.name + ' - 详细信息'" 
+        width="40%" 
+        :z-index="99999999"
+      >
+        <div v-if="selectedDevice" class="reason-info-content">
+          <div class="info-header p-4 mb-4 rounded">
+            <h3 class="text-lg font-bold mb-2">员工信息</h3>
+          </div>
+          <div class="info-section mb-4">
+            <h4 class="section-title font-semibold mb-2">姓名</h4>
+            <p class="text-gray-700">{{ selectedDevice.name || '未知姓名' }}</p>
+          </div>
+          <div class="info-section mb-4">
+            <h4 class="section-title font-semibold mb-2">工号</h4>
+            <p class="text-gray-700">{{ selectedDevice.employeeId || '未知工号' }}</p>
+          </div>
+          <div class="info-section mb-4">
+            <h4 class="section-title font-semibold mb-2">部门</h4>
+            <p class="text-gray-700">{{ selectedDevice.department || '未知部门' }}</p>
+          </div>
+          <div class="info-section mb-4" v-if="selectedDevice.reason">
+            <h4 class="section-title font-semibold mb-2">原因说明</h4>
+            <div class="reason-content p-3 rounded">
+              <p class="text-gray-700">{{ selectedDevice.reason }}</p>
+            </div>
+          </div>
+          <div class="info-section mb-4" v-if="feedbackMessage">
+            <h4 class="section-title font-semibold mb-2">反馈信息</h4>
+            <div class="feedback-content p-3 rounded">
+              <p class="text-gray-700">{{ feedbackMessage }}</p>
+            </div>
+          </div>
+          <div v-if="showWarning" class="mt-4 p-4 bg-yellow-50 border border-yellow-200 rounded">
+            <h4 class="section-title font-semibold mb-2">原因填写</h4>
+            <el-input
+              v-model="newReason"
+              type="textarea"
+              :rows="4"
+              placeholder="请填写导致实际人效低于标准人效的原因..."
+              maxlength="500"
+              show-word-limit
+            />
+            <div class="mt-3 text-right">
+              <el-button type="primary" size="small" @click="submitDeviceReason">提交原因</el-button>
+            </div>
+          </div>
+        </div>
+        <template #footer>
+          <div class="dialog-footer">
+            <el-button @click="reasonInfoDialogVisible = false">关闭</el-button>
+          </div>
+        </template>
+      </el-dialog>
+
     </div>
 </template>
 
@@ -127,6 +207,8 @@ import { ref, onMounted, onBeforeUnmount, reactive, nextTick, computed } from 'v
 import { eventBus } from '@/utils/eventbus';
 import { createGaugeOption } from './gaugeChart';
 import { useEcharts } from '@/utils/useEcharts';
+import { getEfficiencyBelowAdd } from '@/api/getProduceinfo';
+import { ElMessage } from 'element-plus';
 
 // 定义 props
 interface Props {
@@ -144,14 +226,12 @@ const props = withDefaults(defineProps<Props>(), {
 
 const EfficentData = reactive({
   standardEfficiency: null,
-  efficiency: null,
-  total: null,
-  clTotal: null,
-  scanNum: null,
-  stanardNum: null,
+  actualEfficiency: null,
+  standardEmpNum: null,
+  signNum: null, // 白班签到人数
+  wanSignNum: null, // 晚班签到人数
   warning: 0,
   reason: '',
-  nightNum: null, // 晚班人数
 });
 
 const showWarning = computed(() => EfficentData.warning === 1);
@@ -185,26 +265,26 @@ const chart5 = useEcharts(Indicators5);
 const drawChart = () => {
   const option2 = createGaugeOption({
     text: "白班人数",
-    data: EfficentData.scanNum - EfficentData.nightNum,  
-    max: EfficentData.stanardNum
+    data: EfficentData.signNum,  
+    max: EfficentData.standardEmpNum
   });
 
   const option3 = createGaugeOption({
     text: "标准人效",
     data: EfficentData.standardEfficiency,
-    max: Math.max(EfficentData.standardEfficiency, EfficentData.standardEfficiency) || 100
+    max: Math.max(EfficentData.standardEfficiency || 0, EfficentData.actualEfficiency || 0) || 100
   });
 
   const option4 = createGaugeOption({
     text: "实际人效",
-    data: EfficentData.efficiency,
-    max: Math.max(EfficentData.standardEfficiency, EfficentData.efficiency) || 100
+    data: EfficentData.actualEfficiency,
+    max: Math.max(EfficentData.standardEfficiency || 0, EfficentData.actualEfficiency || 0) || 100
   });
 
   const option5 = createGaugeOption({
     text: "晚班人数",
-    data:  EfficentData.nightNum, 
-    max: EfficentData.stanardNum
+    data: EfficentData.wanSignNum, 
+    max: EfficentData.standardEmpNum
   });
 
   chart2.setOption(option2);
@@ -218,14 +298,19 @@ const fetchData = async () => {
   console.log('res:', res);
   
   EfficentData.standardEfficiency = Number(res.data.standardEfficiency) || 0;
-  EfficentData.efficiency = Number(res.data.efficiency) || 0;
-  EfficentData.total = res.data.total ?? 0;
-  EfficentData.clTotal = res.data.clTotal ?? 0;
-  EfficentData.scanNum = Number(res.data.scanNum) ?? 0;
-  EfficentData.stanardNum = Number(res.data.stanardNum) ?? 0;
-  EfficentData.warning = res.data.warning ?? 0;
-  EfficentData.reason = res.data.reason || '';
-  EfficentData.nightNum = res.data.nightNum ?? 0;
+  EfficentData.actualEfficiency = Number(res.data.actualEfficiency) || 0;
+  EfficentData.standardEmpNum = Number(res.data.standardEmpNum) || 0;
+  EfficentData.signNum = Number(res.data.signNum) || 0;
+  EfficentData.wanSignNum = Number(res.data.wanSignNum) || 0;
+  
+  // 判断是否需要警告（实际人效低于标准人效）
+  if (EfficentData.actualEfficiency < EfficentData.standardEfficiency) {
+    EfficentData.warning = 1;
+    EfficentData.reason = '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等';
+  } else {
+    EfficentData.warning = 0;
+    EfficentData.reason = '';
+  }
   
   isLoading.value = false;
   nextTick(() => {
@@ -254,11 +339,45 @@ function openReasonDialog() {
   customReason.value = '';
 }
 
-// async function submitReason() {
-//   await getEfficiencyBelowAdd(prodLine, customReason.value);
-//   reasonDialogVisible.value = false;
-//   fetchData();
-// }
+async function submitReason() {
+  if (!customReason.value.trim()) {
+    ElMessage.warning('请填写原因');
+    return;
+  }
+  
+  try {
+    await getEfficiencyBelowAdd(props.prodLine, customReason.value);
+    ElMessage.success('提交成功');
+    reasonDialogVisible.value = false;
+    customReason.value = '';
+    fetchData();
+  } catch (error) {
+    console.error('提交原因失败:', error);
+    ElMessage.error('提交失败，请重试');
+  }
+}
+
+async function submitDeviceReason() {
+  if (!newReason.value.trim()) {
+    ElMessage.warning('请填写原因');
+    return;
+  }
+  
+  try {
+    await getEfficiencyBelowAdd(props.prodLine, newReason.value);
+    ElMessage.success('有一些原因已更新！');
+    
+    // 更新选中设备的原因
+    if (selectedDevice.value) {
+      selectedDevice.value.reason = newReason.value;
+    }
+    
+    newReason.value = '';
+  } catch (error) {
+    console.error('提交原因失败:', error);
+    ElMessage.error('提交失败，请重试');
+  }
+}
 
 // 打开出勤人员弹窗
 async function openAttendanceDialog() {
@@ -267,17 +386,17 @@ async function openAttendanceDialog() {
   
   try {
     const res = await props.attendanceApi(props.prodLine);
-    const dayData = res.data.daytime;
-    console.log('dayData:', dayData);
-    if (dayData && Array.isArray(dayData)) {
+    const signDetail = res.data.signDetail;
+    console.log('signDetail:', signDetail);
+    if (signDetail && Array.isArray(signDetail)) {
       console.log('res.data:', res.data);
-      // 将姓名数组转换为对象数组，添加默认值
-      attendanceData.value = dayData.map(name => ({
-        name: name,
-        employeeId: '未知工号',
-        department: '未知部门',
-        reason: '暂无原因说明', // 添加默认的reason字段
-        macNo: name // 使用姓名作为临时的macNo，实际应该从API获取
+      // 将签到详情转换为信号数组
+      attendanceData.value = signDetail.map(item => ({
+        name: item.creatorName || item.emp_no,
+        employeeId: item.emp_no,
+        department: item.cx || '未知部门',
+        reason: '暂无原因说明',
+        macNo: item.emp_no
       }));
     } else {
       attendanceData.value = [];
@@ -297,17 +416,17 @@ async function openNighttimeAttendanceDialog() {
   
   try {
     const res = await props.attendanceApi(props.prodLine);
-    const nightData = res.data.nighttime;
-    console.log('nightData:', nightData);
-    if (nightData && Array.isArray(nightData)) {
+    const wanSignDetail = res.data.wanSignDetail;
+    console.log('wanSignDetail:', wanSignDetail);
+    if (wanSignDetail && Array.isArray(wanSignDetail)) {
       console.log('res.data:', res.data);
-      // 将姓名数组转换为对象数组，添加默认值
-      nighttimeAttendanceData.value = nightData.map(name => ({
-        name: name,
-        employeeId: '未知工号',
-        department: '未知部门',
-        reason: '暂无原因说明', // 添加默认的reason字段
-        macNo: name // 使用姓名作为临时的macNo，实际应该从API获取
+      // 将晚班签到详情转换为对象数组
+      nighttimeAttendanceData.value = wanSignDetail.map(item => ({
+        name: item.creatorName || item.emp_no,
+        employeeId: item.emp_no,
+        department: item.cx || '未知部门',
+        reason: '暂无原因说明',
+        macNo: item.emp_no
       }));
     } else {
       nighttimeAttendanceData.value = [];

@@ -1,7 +1,7 @@
 <template>
   <div class="w-[70%] h-[30vh]">
        <dv-border-box12>
-           <div class="title">本月研发升级计划-未完成</div>
+           <div class="title">本月研发升级计划</div>
            <div class="content-wrapper">
                <ScrollBoard
                    :config="scrollConfig"
@@ -27,8 +27,32 @@
            title="详细数据"
            width="90%"
            :before-close="handleClose"
+           @close="handleDialogClose"
        >
            <div class="detail-content">
+               <!-- 筛选条件 -->
+               <div class="filter-wrapper">
+                   <el-select
+                       v-model="filterStatus"
+                       placeholder="选择完成状态"
+                       clearable
+                       class="filter-item"
+                       @change="handleFilterChange"
+                   >
+                       <el-option label="按时完成" value="按时完成" />
+                       <el-option label="逾期完成" value="逾期完成" />
+                       <el-option label="待完成" value="待完成" />
+                       <el-option label="逾期" value="逾期" />
+                   </el-select>
+                   <el-input
+                       v-model="filterPno"
+                       placeholder="输入项目编号"
+                       clearable
+                       class="filter-item"
+                       @input="handleFilterChange"
+                   />
+               </div>
+               
                <el-table :data="paginatedData" border style="width: 100%">
                    <el-table-column prop="pno" label="项目编号" width="120" />
                    <el-table-column prop="projName" label="项目名称" width="150" />
@@ -82,15 +106,44 @@ import { getProjectOverdueMainInfo } from '@/api/getPMLinfo'
 const overdueList = ref([])
 const detailVisible = ref(false)
 const detailData = ref([])
+const filteredDetailData = ref([])
 const currentPage = ref(1)
 const pageSize = ref(10)
 const totalItems = ref(0)
+
+// 筛选条件
+const filterStatus = ref('')
+const filterPno = ref('')
+
+// 筛选数据
+const applyFilter = () => {
+   let result = detailData.value
+   
+   // 按状态筛选
+   if (filterStatus.value) {
+       result = result.filter(item => {
+           const status = getCompletionStatus(item)
+           return status === filterStatus.value
+       })
+   }
+   
+   // 按项目编号筛选
+   if (filterPno.value) {
+       result = result.filter(item => 
+           item.pno && item.pno.includes(filterPno.value)
+       )
+   }
+   
+   filteredDetailData.value = result
+   totalItems.value = result.length
+   currentPage.value = 1 // 重置到第一页
+}
 
 // 计算分页后的数据，包含状态判断
 const paginatedData = computed(() => {
    const start = (currentPage.value - 1) * pageSize.value
    const end = start + pageSize.value
-   return detailData.value.slice(start, end).map(item => ({
+   return filteredDetailData.value.slice(start, end).map(item => ({
        ...item,
        completionStatus: getCompletionStatus(item)
    }))
@@ -183,7 +236,18 @@ const handleClick = ({ row, ceil, rowIndex, columnIndex }) => {
 const showDetail = () => {
    detailVisible.value = true
    detailData.value = overdueList.value
-   totalItems.value = overdueList.value.length
+   applyFilter() // 应用筛选
+}
+
+// 筛选变化处理
+const handleFilterChange = () => {
+   applyFilter()
+}
+
+// 弹窗关闭时重置筛选
+const handleDialogClose = () => {
+   filterStatus.value = ''
+   filterPno.value = ''
 }
 
 // 关闭弹窗
@@ -395,6 +459,45 @@ onBeforeUnmount(() => {
     padding: 2px 6px;
     border-radius: 4px;
     border: 1px solid #9e9e9e;
+}
+
+/* 筛选区域样式 */
+.filter-wrapper {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+}
+
+.filter-item {
+    flex: 1;
+    max-width: 300px;
+}
+
+:deep(.filter-item .el-input__wrapper) {
+    background-color: #0f2749;
+    border-color: #003666;
+}
+
+:deep(.filter-item .el-input__wrapper:hover) {
+    border-color: #00eaff;
+}
+
+:deep(.filter-item .el-input__inner) {
+    color: #fff;
+}
+
+:deep(.filter-item .el-select__wrapper) {
+    background-color: #0f2749;
+    border-color: #003666;
+}
+
+:deep(.filter-item .el-select__wrapper:hover) {
+    border-color: #00eaff;
+}
+
+:deep(.filter-item .el-select__placeholder) {
+    color: #8c8c8c;
 }
 
 

@@ -4,9 +4,9 @@
        <div class="w-full h-full flex flex-col">
 
               <!-- 标题：固定高度（内容自然撑开） -->
-                <div class="text-center text-2xl font-bold text-white">
+                <!-- <div class="text-center text-2xl font-bold text-white">
                     账务处理及时率
-                </div>
+                </div> -->
 
                 <!-- 内容区域：用 flex-1 撑满剩余空间 -->
                 <div class="flex flex-col flex-1">

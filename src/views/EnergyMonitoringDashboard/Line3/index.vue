@@ -49,13 +49,13 @@
               <div class="number-display">
                 <span class="number-value" :style="{ 
                   fontSize: getFontSize(), 
-                  color: Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
+                  color: Number(item.actualPerUnitDaily) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
                 }">
-                  {{ Number(item.actualPerUnit).toFixed(1) }}
+                  {{ Number(item.actualPerUnitDaily).toFixed(2) }}
                 </span>
                 <span class="number-unit" :style="{ 
                   fontSize: getFontSize() * 0.7, 
-                  color: Number(item.actualPerUnit) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
+                  color: Number(item.actualPerUnitDaily) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
                 }">度</span>
               </div>
             </div>
@@ -65,14 +65,14 @@
               <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台月耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
-                  {{ Number(item.actualTotal).toFixed(1) }}
+                  {{ Number(item.actualPerUnit).toFixed(1) }}
                 </span>
                 <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
               </div>
             </div>
             <div class="flex items-center">
               <span class="data-icon">🔋</span>
-              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">实际每台年耗电量</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">月度实际耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
                   {{ Number(item.actualTotal).toFixed(1) }}
@@ -279,11 +279,17 @@ const energyData = computed(() => {
     // 从monthlyData中获取实际数据
     const actualItem = energyStore.monthlyData.find(storeItem => storeItem.machCode === item.machCode)
     
+    // 从dailyData中获取日实际数据
+    const dailyItem = energyStore.dailyData.find(storeItem => storeItem.machCode === item.machCode)
+    
     // 标准总电：优先使用标准接口的number，其次使用实际接口的number
-    const standardTotal = ((Number(standardItem?.number || item.number) || 0)).toFixed(1)
+    const standardTotal = ((Number(standardItem?.number || item.number) || 0)).toFixed(3)
     
     // 实际总电：优先使用实际接口的numberPower
     const actualTotal = ((actualItem?.numberPower || item.numberPower || 0)).toFixed(1)
+    
+    // 日实际总电：从日数据获取
+    const actualDailyTotal = ((dailyItem?.numberPower || 0)).toFixed(2)
     
     // 台数：优先使用标准接口的cl，其次使用props的cl
     const standardMachineCount = standardItem?.cl || item.cl || 1
@@ -291,12 +297,28 @@ const energyData = computed(() => {
     // 实际台数：优先使用实际接口的cl，其次使用props的cl
     const actualMachineCount = actualItem?.cl || item.cl || 1
     
+    // 日实际台数：优先使用日数据接口的cl，其次使用props的cl
+    const actualDailyMachineCount = dailyItem?.cl || item.cl || 1
+    
 
     
     // 标准每台 = 标准总电 ÷ 台数
     const standardPerUnit = standardMachineCount > 0 ? (Number(standardTotal) / standardMachineCount).toFixed(1) : '0.0'
-    // 实际每台 = 实际总电 ÷ 台数
-    const actualPerUnit = actualMachineCount > 0 ? (Number(actualTotal) / actualMachineCount).toFixed(1) : '0.0'
+    // 实际每台（月）= 实际总电 ÷ 台数
+    const actualPerUnit = actualMachineCount > 0 ? (Number(actualTotal) / actualMachineCount).toFixed(2) : '0.0'
+    // 实际每台（日）= 日实际总电 ÷ 台数
+    const actualPerUnitDaily = actualDailyMachineCount > 0 ? (Number(actualDailyTotal) / actualDailyMachineCount).toFixed(2) : '0.00'
+    
+    // 调试信息：检查每日每台数据计算
+    if (item.machCode === '616506210005' || item.machCode === '616506210009') {
+      console.log(`🔍 调试每日每台数据 - ${item.machCode}:`, {
+        dailyItem: dailyItem,
+        actualDailyTotal: actualDailyTotal,
+        actualDailyMachineCount: actualDailyMachineCount,
+        actualPerUnitDaily: actualPerUnitDaily,
+        calculation: `${actualDailyTotal} ÷ ${actualDailyMachineCount} = ${actualPerUnitDaily}`
+      })
+    }
     
     // 计算差异和比例
     const difference = Number(actualPerUnit) - Number(standardPerUnit)
@@ -307,9 +329,10 @@ const energyData = computed(() => {
     const result = {
       ...item,
       standardTotal,        // 标准总电
-      actualTotal,          // 实际总电
+      actualTotal,          // 实际总电（月）
       standardPerUnit,      // 标准每台
-      actualPerUnit,        // 实际每台
+      actualPerUnit,        // 实际每台（月）
+      actualPerUnitDaily,   // 实际每台（日）
       ratio,
       workshopName: item.workshopName || item.machName || item.machCode
     }

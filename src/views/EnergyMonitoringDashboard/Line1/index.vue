@@ -65,115 +65,131 @@
 
 <script setup lang="ts">
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { getElectricPowerYear, getGasPower, getElectricCompare } from '@/api/enery'
+import { getConsume, type ConsumeData } from '@/api/enery'
 
 // 年度数据
-const yearlyElectricData = ref([])
-const yearlyGasData = ref([])
-const yearlyWaterData = ref([])
+const yearlyElectricData = ref<ConsumeData | null>(null) // 改为单个对象，使用consume接口
+const yearlyGasData = ref<ConsumeData | null>(null) // 改为单个对象
+const yearlyWaterData = ref<ConsumeData | null>(null) // 改为单个对象
 
-// 年度电力对比数据 - 电力数据写死
-const electricCompareData = ref({
-  cl2024: 4240,           // 标准台数
-  standard2024: 1740949,  // 标准电量 (写死)
-  standard2025: 0,        // 总实际 (从接口获取)
-  total2024: 133124,      // 标准产量 (写死)
-  cl2025: 0              // 实际台数 (从接口获取)
-})
-
-// 计算电力数据 - 使用新的年度对比数据结构
+// 计算电力数据 - 使用consume接口数据结构
 const electricData = computed(() => {
-  const data = electricCompareData.value
+  if (!yearlyElectricData.value) {
+    return {
+      totalStandard: '0.00',
+      totalActual: '0.00',
+      totalDiff: '0.00',
+      perUnitStandard: '0.00',
+      perUnitActual: '0.00',
+      perUnitDiff: '0.00'
+    }
+  }
   
-  // 使用新的数据结构
-  const totalStandard = data.standard2024 || 0  // 总标准
-  const totalActual = data.standard2025 || 0    // 总实际
-  const totalDiff = totalActual - totalStandard
-  
-  // 计算每台数据
-  const standardUnits = data.cl2024 || 1        // 标准台数
-  const actualUnits = data.cl2025 || 1          // 实际台数
-  const perUnitStandard = standardUnits > 0 ? (totalStandard / standardUnits).toFixed(2) : '0.00'
-  const perUnitActual = actualUnits > 0 ? (totalActual / actualUnits).toFixed(2) : '0.00'
-  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  // numberPower 是月数据，number 是年数据
+  const monthlyValue = yearlyElectricData.value.numberPower || 0
+  const yearlyValue = parseFloat(yearlyElectricData.value.number || '0')
+  const totalUnits = yearlyElectricData.value.cl || 1
   
   return {
-    totalStandard: totalStandard.toFixed(2),
-    totalActual: totalActual.toFixed(2),
-    totalDiff: totalDiff.toFixed(2),
-    perUnitStandard,
-    perUnitActual,
-    perUnitDiff
+    totalStandard: monthlyValue.toFixed(2), // 月数据
+    totalActual: yearlyValue.toFixed(2),     // 年数据
+    totalDiff: (yearlyValue - monthlyValue).toFixed(2),
+    perUnitStandard: '0.00',
+    perUnitActual: totalUnits > 0 ? (yearlyValue / totalUnits).toFixed(2) : '0.00',
+    perUnitDiff: '0.00'
   }
 })
 
 // 计算气体数据
 const gasData = computed(() => {
-  const totalStandard = yearlyGasData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
-  const totalActual = yearlyGasData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
-  const totalDiff = totalActual - totalStandard
+  if (!yearlyGasData.value) {
+    return {
+      totalStandard: '0.00',
+      totalActual: '0.00',
+      totalDiff: '0.00',
+      perUnitStandard: '0.00',
+      perUnitActual: '0.00',
+      perUnitDiff: '0.00'
+    }
+  }
   
-  const totalUnits = yearlyGasData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
-  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
-  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
-  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  // numberPower 是月数据，number 是年数据
+  const monthlyValue = yearlyGasData.value.numberPower || 0
+  const yearlyValue = parseFloat(yearlyGasData.value.number || '0')
+  const totalUnits = yearlyGasData.value.cl || 1
   
   return {
-    totalStandard: totalStandard.toFixed(2),
-    totalActual: totalActual.toFixed(2),
-    totalDiff: totalDiff.toFixed(2),
-    perUnitStandard,
-    perUnitActual,
-    perUnitDiff
+    totalStandard: monthlyValue.toFixed(2), // 月数据
+    totalActual: yearlyValue.toFixed(2),     // 年数据
+    totalDiff: (yearlyValue - monthlyValue).toFixed(2),
+    perUnitStandard: '0.00',
+    perUnitActual: totalUnits > 0 ? (yearlyValue / totalUnits).toFixed(2) : '0.00',
+    perUnitDiff: '0.00'
   }
 })
 
 // 计算水数据
 const waterData = computed(() => {
-  const totalStandard = yearlyWaterData.value.reduce((sum, item) => sum + (item.standardConsumption || 0), 0)
-  const totalActual = yearlyWaterData.value.reduce((sum, item) => sum + (item.numberPower || 0), 0)
-  const totalDiff = totalActual - totalStandard
+  if (!yearlyWaterData.value) {
+    return {
+      totalStandard: '0.00',
+      totalActual: '0.00',
+      totalDiff: '0.00',
+      perUnitStandard: '0.00',
+      perUnitActual: '0.00',
+      perUnitDiff: '0.00'
+    }
+  }
   
-  const totalUnits = yearlyWaterData.value.reduce((sum, item) => sum + (item.cl || 1), 0)
-  const perUnitStandard = totalUnits > 0 ? (totalStandard / totalUnits).toFixed(2) : '0.00'
-  const perUnitActual = totalUnits > 0 ? (totalActual / totalUnits).toFixed(2) : '0.00'
-  const perUnitDiff = (parseFloat(perUnitActual) - parseFloat(perUnitStandard)).toFixed(2)
+  // numberPower 是月数据，number 是年数据
+  const monthlyValue = yearlyWaterData.value.numberPower || 0
+  const yearlyValue = parseFloat(yearlyWaterData.value.number || '0')
+  const totalUnits = yearlyWaterData.value.cl || 1
   
   return {
-    totalStandard: totalStandard.toFixed(2),
-    totalActual: totalActual.toFixed(2),
-    totalDiff: totalDiff.toFixed(2),
-    perUnitStandard,
-    perUnitActual,
-    perUnitDiff
+    totalStandard: monthlyValue.toFixed(2), // 月数据
+    totalActual: yearlyValue.toFixed(2),     // 年数据
+    totalDiff: (yearlyValue - monthlyValue).toFixed(2),
+    perUnitStandard: '0.00',
+    perUnitActual: totalUnits > 0 ? (yearlyValue / totalUnits).toFixed(2) : '0.00',
+    perUnitDiff: '0.00'
   }
 })
 
 // 获取年度数据
 const fetchYearlyData = async () => {
   try {
-    // 获取年度电力对比数据 - 只获取实际数据，标准数据已写死
-    const electricCompareRes = await getElectricCompare()
-    if (electricCompareRes.code === 200 && electricCompareRes.data) {
-      // 只更新实际数据，标准数据保持写死的值
-      electricCompareData.value.standard2025 = electricCompareRes.data.standard2025 || 0
-      electricCompareData.value.cl2025 = electricCompareRes.data.cl2025 || 0
-    }
+    // 获取当月1号的日期
+    const today = new Date()
+    const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`
     
-    // 获取年度电力数据（保留原有逻辑作为备用）
-    const electricRes = await getElectricPowerYear()
-    if (electricRes.code === 200 && Array.isArray(electricRes.data)) {
+    // 获取电力数据 - 使用consume接口，machCode为616506210007
+    const electricRes = await getConsume(firstDayOfMonth, '616506210007')
+    if (electricRes.code === 200 && electricRes.data) {
       yearlyElectricData.value = electricRes.data
+      console.log(yearlyElectricData.value)
+      console.log('✅ 电力数据获取成功:', electricRes.data)
+    } else {
+      console.warn('获取电力数据失败:', electricRes.message)
     }
     
-    // 获取年度气体数据
-    const gasRes = await getGasPower(new Date().toISOString().split('T')[0])
-    if (gasRes.code === 200 && Array.isArray(gasRes.data)) {
+    // 获取用气数据 - 使用consume接口，machCode为000025061801
+    const gasRes = await getConsume(firstDayOfMonth, '000025061801')
+    if (gasRes.code === 200 && gasRes.data) {
       yearlyGasData.value = gasRes.data
+      console.log('✅ 用气数据获取成功:', gasRes.data)
+    } else {
+      console.warn('获取用气数据失败:', gasRes.message)
     }
     
-    // 水数据暂时使用电力数据作为示例，实际应该调用水数据接口
-    yearlyWaterData.value = electricRes.data || []
+    // 获取用水数据 - 使用consume接口，machCode为82522504270042
+    const waterRes = await getConsume(firstDayOfMonth, '82522504270042')
+    if (waterRes.code === 200 && waterRes.data) {
+      yearlyWaterData.value = waterRes.data
+      console.log('✅ 用水数据获取成功:', waterRes.data)
+    } else {
+      console.warn('获取用水数据失败:', waterRes.message)
+    }
     
   } catch (error) {
     console.error('获取年度数据失败:', error)

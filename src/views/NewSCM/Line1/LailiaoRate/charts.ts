@@ -25,6 +25,27 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
 
     return {
       color: ["#006cff", "#60cda0", "#ed8884", "#ff9f7f", "#0096ff", "#9fe6b8", "#32c5e9", "#1d9dff"],
+      tooltip: {
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        backgroundColor: 'rgba(0, 0, 0, 0.8)',
+        borderColor: '#333',
+        textStyle: {
+          color: '#fff',
+          fontSize: 14
+        },
+        formatter: function(params: any) {
+          let result = `<div style="margin-bottom: 5px; font-weight: bold;">${params[0].name}</div>`;
+          params.forEach((item: any) => {
+            const value = item.value;
+            const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
+            result += `<div>${item.marker} ${item.seriesName}: ${formattedValue}%</div>`;
+          });
+          return result;
+        }
+      },
       grid: {
         left: '3%',
         right: '4%',
@@ -76,17 +97,6 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
           }
         }
       },
-      label: {
-        show: true,
-        position: 'top', // 显示在柱子顶部
-        color: '#fff',   // 文字颜色
-        formatter: (params: any) => {
-          const value = params.value;
-          // 如果小数位是0，就显示整数；否则显示一位小数
-          const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
-          return `${formattedValue}%`
-        }
-      },
       series: [
         {
           name: '常规客户',
@@ -95,6 +105,17 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
             normal: {
               color: '#2a8afc'
             },
+          },
+          label: {
+            show: true,
+            position: 'top', // 显示在柱子顶部
+            color: '#fff',   // 文字颜色
+            formatter: (params: any) => {
+              const value = params.value;
+              // 如果小数位是0，就显示整数；否则显示一位小数
+              const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
+              return `${formattedValue}%`
+            }
           },
           data: orderedRegularData.map(item => item.value),
         },
@@ -105,6 +126,17 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
             normal: {
               color: '#7ad7b6'
             },
+          },
+          label: {
+            show: true,
+            position: 'top', // 显示在柱子顶部
+            color: '#fff',   // 文字颜色
+            formatter: (params: any) => {
+              const value = params.value;
+              // 如果小数位是0，就显示整数；否则显示一位小数
+              const formattedValue = value % 1 === 0 ? value.toFixed(0) : value.toFixed(1);
+              return `${formattedValue}%`
+            }
           },
           data: orderedAClassData.map(item => item.value),
         }

@@ -1,5 +1,5 @@
 <template>
-  <div class="h-full w-full ">
+  <div class="h-[25vh] w-full ">
     <dv-border-box-2>
       <div class="flex flex-col h-full">
         <!-- 标题 -->
@@ -413,6 +413,7 @@ const submitReason = async () => {
   gap: 12px;
   padding: 12px;
   flex: 1;
+  align-items: stretch; /* 确保所有卡片高度一致 */
 }
 
 /* 2K分辨率 (2560x1440) 样式 */
@@ -424,6 +425,7 @@ const submitReason = async () => {
   
   .data-card {
     padding: 20px;
+    min-height: 180px; /* 增加最小高度 */
   }
   
   .card-title {
@@ -431,7 +433,7 @@ const submitReason = async () => {
   }
   
   .value-label {
-    font-size: 14px;
+    font-size: 20px;
   }
   
   .comparison-label,
@@ -455,6 +457,7 @@ const submitReason = async () => {
   
   .data-card {
     padding: 16px;
+    min-height: 160px; /* 增加最小高度 */
   }
   
   .card-title {
@@ -462,7 +465,7 @@ const submitReason = async () => {
   }
   
   .value-label {
-    font-size: 12px;
+    font-size: 20px;
     flex-direction: row;
   }
   
@@ -475,9 +478,6 @@ const submitReason = async () => {
     width: 100px;
     height: 28px;
   }
-  .value-item{
-
-  }
 }
 
 /* 小屏1080p (1366x768) 样式 */
@@ -489,6 +489,7 @@ const submitReason = async () => {
   
   .data-card {
     padding: 12px;
+    min-height: 150px; /* 增加最小高度 */
   }
   
   .card-title {
@@ -496,7 +497,7 @@ const submitReason = async () => {
   }
   
   .value-label {
-    font-size: 11px;
+    font-size: 15px;
   }
   
   .comparison-label,
@@ -582,6 +583,9 @@ const submitReason = async () => {
   position: relative;
   overflow: hidden;
   min-height: 140px;
+  height: 100%; /* 让卡片填满网格单元格的高度 */
+  display: flex;
+  flex-direction: column;
 }
 
 .data-card::before {
@@ -625,6 +629,8 @@ const submitReason = async () => {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  flex: 1; /* 让内容区域填充剩余空间 */
+  justify-content: space-between; /* 在内容之间分配空间 */
 }
 
 /* 数值行 */
@@ -648,7 +654,7 @@ const submitReason = async () => {
 
 .value-label {
   color: #ffffff;
-  font-size: 11px;
+  font-size: 20px;
   opacity: 0.9;
   text-align: center;
   font-weight: 500;
@@ -684,7 +690,7 @@ const submitReason = async () => {
 
 .comparison-label {
   color: #ffffff;
-  font-size: 11px;
+  font-size: 20px;
   opacity: 0.9;
   font-weight: 500;
 }

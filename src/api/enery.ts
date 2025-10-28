@@ -100,3 +100,39 @@ export interface SixWeekElectricItem {
     message: string;
     data: SixWeekElectricItem[];
   }
+
+
+  // /energy/consume 获取消耗数据（气、水）
+  export const getConsume = (monthDay: string, machCode: string) => {
+    return request({
+        url: '/energy/consume',
+        method: 'get',
+        params: {
+            monthDay,
+            machCode
+        }
+      })
+}
+
+// Consume接口的响应数据类型
+export interface ConsumeData {
+  monthDay: string | null;
+  number: string;
+  machCode: string | null;
+  machName: string;
+  cl: number | null;
+  tipNumber: string | null;
+  peakNumber: string | null;
+  flatNumber: string | null;
+  valleyNumber: string | null;
+  numberPower: number;
+  doneMonth: number;
+  doneDay: number;
+  ehour: number;
+}
+
+export interface ConsumeResponse {
+  code: number;
+  message: string;
+  data: ConsumeData;
+}

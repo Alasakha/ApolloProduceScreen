@@ -73,7 +73,7 @@ const gridColumns = [
 
 
 const fetchData = () => {
-  getPlan4nPie( )
+  getPlan4nPie('转产计划')
   .then(res => {
     
     isLoading.value = false;

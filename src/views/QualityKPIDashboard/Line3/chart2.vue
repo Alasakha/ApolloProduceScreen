@@ -61,10 +61,9 @@ const fetchData = async () => {
                                     !item.feature_d_id && 
                                     !item.total && 
                                     Object.values(item).every(val => val === null || val === undefined || val === '')
-                    
                     return {
                         value: item.total || 0,
-                        name: isAllNull ? '其他（散件）' : (item.feature_value_desc || '未知车型'),
+                        name: isAllNull ? '其他（散件）' : (item.feature_value_desc || '其他(散件)'),
                         feature_d_id: item.feature_d_id,
                         itemStyle: {
                             // 为每个客户设置不同的颜色
