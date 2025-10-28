@@ -7,6 +7,7 @@
     <materialScrollBoard :config="config" style="width:47vw;height:19vh;"/>
     <el-dialog v-model="dialogVisible" title="原材料监控明细" width="60vw" >
       <el-table :data="tableData"  :loading="tableLoading" style="width: 100%" >
+        <el-table-column label="序号" type="index" width="80" align="center" />
         <el-table-column v-for="(col, idx) in config2.header" :key="col" :label="col" :prop="'col' + idx" align="center" />
         <el-table-column label="操作" align="center">
           <template #default="scope">

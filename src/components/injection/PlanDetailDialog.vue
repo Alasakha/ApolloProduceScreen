@@ -46,12 +46,12 @@
             <div class="task-info">
               <div class="info-row">
                 <div class="info-item">
-                  <span class="info-label">品号:</span>
-                  <span class="info-value">{{ task.ty009 || '暂无数据' }}</span>
+                  <span class="info-label">规格:</span>
+                  <span class="info-value">{{ task.item_spec || '暂无数据' }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">客户单号:</span>
-                  <span class="info-value">{{ (task.ty001 || '') + (task.ty002 || '') || '暂无数据' }}</span>
+                  <span class="info-label">工单单号:</span>
+                  <span class="info-value">{{ (task.ty001 || '') +'-'+ (task.ty002 || '') || '暂无数据' }}</span>
                 </div>
               </div> 
               <div class="info-row">
@@ -60,7 +60,7 @@
                   <span class="info-value">{{ task.item_name || '暂无数据' }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">物料编号:</span>
+                  <span class="info-label">品号:</span>
                   <span class="info-value">{{ task.item_no || '暂无数据' }}</span>
                 </div>
               </div>
@@ -149,6 +149,10 @@ const props = defineProps({
   machineCode: {
     type: String,
     default: ''
+  },
+  ta006: {
+    type: [String, Number],
+    default: ''
   }
 })
 
@@ -203,6 +207,15 @@ const fetchDetailData = async () => {
 const getTaskStatus = (task) => {
   const completed = task.qty || 0
   const total = task.ty004 || 0
+  
+  // 如果品号匹配，且已完成数量大于0，则状态为"进行中"
+  if (props.ta006 && task.item_no && String(task.item_no) === String(props.ta006)) {
+    if (completed > 0) {
+      return '进行中'
+    }
+  }
+  
+  // 其他任务按原逻辑判断
   if (completed === 0) return '未开始'
   if (completed >= total) return '已完成'
   return '进行中'
@@ -212,6 +225,15 @@ const getTaskStatus = (task) => {
 const getTaskStatusClass = (task) => {
   const completed = task.qty || 0
   const total = task.ty004 || 0
+  
+  // 如果品号匹配，且已完成数量大于0，则状态样式为"进行中"
+  if (props.ta006 && task.item_no && String(task.item_no) === String(props.ta006)) {
+    if (completed > 0) {
+      return 'status-in-progress'
+    }
+  }
+  
+  // 其他任务按原逻辑判断
   if (completed === 0) return 'status-not-started'
   if (completed >= total) return 'status-completed'
   return 'status-in-progress'

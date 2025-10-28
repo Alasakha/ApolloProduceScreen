@@ -46,12 +46,12 @@
             <div class="task-info">
               <div class="info-row">
                 <div class="info-item">
-                  <span class="info-label">品号:</span>
-                  <span class="info-value">{{ task.ty009 || '暂无数据' }}</span>
+                  <span class="info-label">规格:</span>
+                  <span class="info-value">{{ task.item_spec || '暂无数据' }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">客户单号:</span>
-                  <span class="info-value">{{ (task.ty001 || '') + (task.ty002 || '') || '暂无数据' }}</span>
+                  <span class="info-label">工单号:</span>
+                  <span class="info-value">{{ (task.ty001 || '') +'-' + (task.ty002 || '') || '暂无数据' }}</span>
                 </div>
               </div>
               <div class="info-row">
@@ -60,7 +60,7 @@
                   <span class="info-value">{{ task.item_name || '暂无数据' }}</span>
                 </div>
                 <div class="info-item">
-                  <span class="info-label">工单号:</span>
+                  <span class="info-label">品号:</span>
                   <span class="info-value">{{ task.item_no || '暂无数据' }}</span>
                 </div>
               </div>

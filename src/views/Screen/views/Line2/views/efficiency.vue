@@ -228,6 +228,7 @@ const drawChart = () => {
     max: EfficentData.stanardNum
   });
 
+
   const option2 = createGaugeOption({
     text: "出勤人数",
     data: EfficentData.scanNum, 

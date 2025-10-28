@@ -270,6 +270,7 @@ onBeforeUnmount(() => {
 }
 
 .marquee-container {
+  height: 5vh;
   width: 100%;
   /* background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); */
   border-top: 3px solid #1976d2;
@@ -548,7 +549,7 @@ onBeforeUnmount(() => {
   align-items: center;
   gap: 12px;
   white-space: nowrap;
-  font-size: 18px;
+  font-size: 25px;
   font-weight: 600;
   color: #d32f2f;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);

@@ -44,7 +44,7 @@
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
                     {{ Number(item.standardPerUnit).toFixed(2) }}
                   </span>
-                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#00eeff' }">度</span>
+                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#00eeff' }">m³</span>
                 </div>
               </div>
               
@@ -64,7 +64,7 @@
                   <span class="number-unit" :style="{ 
                     fontSize: getFontSize() * 0.7, 
                     color: Number(item.actualPerUnitDaily) > Number(item.standardPerUnit) + 0.5 ? '#ff0000' : '#00ff00' 
-                  }">度</span>
+                  }">m³</span>
                 </div>
               </div>
               
@@ -78,7 +78,7 @@
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
                     {{ Number(item.actualPerUnit).toFixed(1) }}
                   </span>
-                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
+                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">m³</span>
                 </div>
               </div>
               
@@ -92,7 +92,7 @@
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
                     {{ Number(item.actualTotal).toFixed(1) }}
                   </span>
-                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
+                  <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">m³</span>
                 </div>
               </div>
             </div>

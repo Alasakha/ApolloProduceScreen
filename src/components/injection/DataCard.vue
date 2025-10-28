@@ -137,6 +137,7 @@
       :visible="showDialog"
       :order-name="orderName"
       :machine-code="machineCode"
+      :ta006="ta006"
       @close="closeDetailDialog"
     />
     

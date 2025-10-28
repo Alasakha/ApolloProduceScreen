@@ -2,7 +2,7 @@ const size = window.devicePixelRatio ;
 export function createChartOption({
   category,
   value1 = [],
-  value2 = [],
+  value2 = [], // 暂时隐藏PMC排产，后续需要时取消注释
   value3 = [],
   remarks = [],
   duties = [],
@@ -10,7 +10,7 @@ export function createChartOption({
 }: {
   category: string[],
   value1?: number[],
-  value2?: number[],
+  value2?: number[], // 暂时隐藏PMC排产，后续需要时取消注释
   value3?: number[],
   remarks?: string[],
   duties?: string[],
@@ -37,10 +37,9 @@ tooltip: {
     let str = `时段${hourNum-1}-${hourNum}时 产能<br/>`;
     // 获取各个系列的值
     const actualValue = params.find(p => p.seriesName === '实际产能')?.value || 0;
-    // const planValue = params.find(p => p.seriesName === '生产排产')?.value || 0;
     const planValue2 = params.find(p => p.seriesName === 'PMC排产')?.value || 0;
     
-    // 计算产量差异
+    // 计算产量差异（使用PMC排产计算）
     const diff = planValue2 - actualValue;
     
     // 添加各个系列的值
@@ -129,6 +128,7 @@ tooltip: {
           fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
         }
       },
+      // 暂时隐藏PMC排产，后续需要时取消注释
       {
         name: 'PMC排产',
         type: 'line',
@@ -160,13 +160,7 @@ tooltip: {
           fontSize: size >= 2 ? 6 : size >= 1.5 ? 8 : 12
         },
         
-      },
-      // {
-      //   name: '实际产能',
-      //   type: 'line',
-      //   data: value2,
-      //    color: '#fff'
-      // }
+      }
     ]
   };
 }
