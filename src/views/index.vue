@@ -17,7 +17,7 @@
 
 
         <!-- 走马灯第 1 组：前 5 个 -->
-          <div class="small  h-[30vh] flex items-center gap-4 flex flex-wrap pl-4 ">
+          <div class="small h-auto flex gap-4 flex-wrap pl-4 py-2">
 
 
         <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
@@ -74,11 +74,13 @@ const lines = ref([
   { id: "BudgetvsActualPerformanceDashboard", name: "预算与实际达成对比",router:"/BudgetvsActualPerformanceDashboard" },
   { id: "EnergyMonitoringDashboard", name: "能源监控看板",router:"/EnergyMonitoringDashboard" },
   { id: "ManufacturingPerformanceManagementDashboard", name: "制造绩效管理看板",router:"/ManufacturingPerformanceManagementDashboard" },
-  { id: "PurchasePerformanceManagementDashboard", name: "采购绩效管理看板",router:"/PurchasePerformanceManagementDashboard" },
+  // { id: "PurchasePerformanceManagementDashboard", name: "采购绩效管理看板",router:"/PurchasePerformanceManagementDashboard" },
   { id: "ControlBoard", name: "中控看板",router:"/control-board" },
-  { id: "AdvancedEarthDemo", name: "🌍 高级3D地球演示",router:"/advanced-earth-demo" },
+  // { id: "AdvancedEarthDemo", name: "🌍 高级3D地球演示",router:"/advanced-earth-demo" },
   { id: "2006", name: "金工二部焊接看板",router:"/welding2" },
   { id: "rdc", name: "研发智驱中枢",router:"/rdcCenter" },
+  { id: "JinGongDashboard", name: "金工绩效看板",router:"/jingongdashboard" },
+  { id: "ZongZhuangDashboard", name: "总装绩效看板",router:"/zongzhuangdashboard" },
 ]);
 
 // 获取 lines 中指定范围的数据
@@ -116,12 +118,12 @@ body{
   height: 100%;
 }
 .custom-btn {
-  width: 10vw;
-  height: 10vh;
+  width: 5.5vw;
+  height: 3.5vh;
   color: #fff;
   border-radius: 5px;
   font-family: 'Lato', sans-serif;
-  font-weight: 500;
+  font-weight: 300;
   background: transparent;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -134,11 +136,12 @@ body{
 }
 .button_box {
   display: flex;
-  flex-direction: row;
-  justify-content: space-around;
-  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
   height: 100%;
   width: 100%;
+  gap: 1rem;
 }
 .title {
   position: absolute;  /* 绝对定位 */
@@ -164,14 +167,14 @@ body{
 
 
 .btn-5 {
-  width: 8vw;
-  height: 8vh;
+  width: 5.5vw;
+  height: 4.5vh;
   line-height: 42px;
   padding: 0;
   border: none;
   background: aliceblue;
   color: #000000;
-  font-size: 1vw;
+  font-size: 0.5vw;
   font-family: 'Microsoft YaHei';
   font-weight: bold;
 }
@@ -245,7 +248,7 @@ h2{
   color: black;
   border: 2px solid black;
   cursor: pointer;
-  font-size: 1rem;
+  font-size: 0.8rem;
   font-weight: bold;
 }
 
@@ -253,7 +256,9 @@ h2{
   width: 100%;
   height: 100%;
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  gap: 1rem;
 }
 </style>

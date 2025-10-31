@@ -1,11 +1,10 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
-import { nextTick } from 'vue';
 import { getWarningNextDay } from '@/api/getScmInfo.js';
-import {getNextDay} from './nextday'
+import { getNextDay } from './nextday'
 import { eventBus } from '@/utils/eventbus';
-import * as echarts from 'echarts';
 import DetailTable from '@/components/WMS/DialogAbnormal/index.vue';
+
 const detailDialogVisible = ref(false);
 
 const tableLoading = ref(false);
@@ -24,7 +23,6 @@ const config1 = reactive({
 });
 
 
-let chartInstance: any = null; // 图表实例
 const dialogVisible = ref(false);
 const selectedItem = ref<any>({});
 //   const detailHeaders = [
@@ -85,68 +83,14 @@ config1.dataForElTable = name.value[0].map((row) => {
 };
 
 
-// 初始化图表
-const initChart = () => {
-  const chartContainer = document.querySelector('.chart-container') as HTMLElement; // 类型断言为 HTMLElement
-  if (chartContainer) {
-    chartInstance = echarts.init(chartContainer);
-    // 配置图表的初始选项（根据需求调整）
-    const option = {
-      title: {
-        text: '供应商欠料情况',
-        left: 'center',
-      },
-      tooltip: {},
-      xAxis: {
-        type: 'category',
-        data: name.value.map((item: any) => item[0]), // 使用供应商名称
-      },
-      yAxis: {
-        type: 'value',
-      },
-      series: [
-        {
-          data: name.value.map((item: any) => item[3]), // 使用欠料数量
-          type: 'bar',
-        },
-      ],
-    };
-    chartInstance.setOption(option);
-  } else {
-    console.error('chart-container 元素未找到');
-  }
-};
-
-// 监听窗口大小变化
-const resizeChart = () => {
-  if (chartInstance) {
-    chartInstance.resize();
-  }
-};
-
 onMounted(() => {
   eventBus.on('refreshData', fetchData);
   fetchData();
-  
-  // 确保 DOM 渲染完成再初始化图表
-  nextTick(() => {
-    initChart();
-  });
-
-  window.addEventListener('resize', resizeChart);
 });
 
 onBeforeUnmount(() => {
   // 移除全局事件监听
   eventBus.off('refreshData', fetchData);
-
-  // 销毁图表实例
-  if (chartInstance) {
-    chartInstance.dispose();
-  }
-
-  // 移除窗口大小变化监听器
-  window.removeEventListener('resize', resizeChart);
 });
 
 const openDialog = () => {
@@ -163,45 +107,42 @@ const clickHandler = (row: any) => {
 </script>
 
 <template>
-  <div class="qianliao h-[25vh]">
-    <dv-border-box12 >
-      <!-- 标题行 -->
-    <div class="flex justify-around items-center">
-    
-      <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">次日生产欠料预警</h2>
-      <el-button type="primary" class="mt-4 absolute right-4" @click="openDialog">查看详细</el-button>
-    </div>
-      
-      <div class="flex">
-      <div class='w-full'>        
-        <ScrollBoard
-          class="pl-4 pr-4 pt-2"
-          :config="{ ...config1, data: config1.dataForScrollBoard }"
-          style="width:100%;height:16vh"
-          @click="clickHandler"
-        />
-</div>
+  <div class="qianliao h-[25vh] w-[66%] ml-auto">
+    <dv-border-box12>
+      <div class="w-full h-full flex gap-3">
+        <!-- 左侧：新加三个图表（柱状图） -->
+        <!-- <div class="flex-1 h-full">
+          <NewChartsPage class="w-full h-full" />
+        </div> -->
 
+        <!-- 右侧：次日生产欠料预警 -->
+        <div class="w-[100%] h-full">
+          <!-- 标题行 -->
+          <div class="flex justify-around items-center">
+            <h2 class="text-white font-bold text-xl pt-4 flex justify-center items-center">次日生产欠料预警</h2>
+            <el-button type="primary" class="mt-4 absolute right-4" @click="openDialog">查看详细</el-button>
+          </div>
+          <div class='w-full'>
+            <ScrollBoard
+              class="pl-4 pr-4 pt-2"
+              :config="{ ...config1, data: config1.dataForScrollBoard }"
+              style="width:100%;height:16vh"
+              @click="clickHandler"
+            />
+          </div>
 
-
-</div>
-
-        <!-- 使用封装的详情表格组件 -->
-  <DetailTable
-    v-model="detailDialogVisible"
-    title="工单异常详情"
-    :headers="config1.header"
-    :data="config1.dataForElTable"
-    :loading="tableLoading"
-   
-  />
-
+          <!-- 使用封装的详情表格组件 -->
+          <DetailTable
+            v-model="detailDialogVisible"
+            title="工单异常详情"
+            :headers="config1.header"
+            :data="config1.dataForElTable"
+            :loading="tableLoading"
+          />
+        </div>
+      </div>
     </dv-border-box12>
   </div>
-
-
-<!-- 弹窗部分 -->
-
 </template>
 
 <style scoped>

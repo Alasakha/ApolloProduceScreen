@@ -3,9 +3,12 @@
     <!-- 通知滚动区域 -->
     <div class="marquee-container">
       <Vue3Marquee
+        :key="`marquee-${marqueeKey}`"
         :duration="20"
         :pause-on-hover="true"
         direction="normal"
+        :gradient="false"
+        :gradient-width="'0'"
         class="marquee-text"
       >
         <div class="marquee-content">
@@ -130,6 +133,7 @@ const props = withDefaults(defineProps<Props>(), {
 // 响应式数据
 const notices = ref<NoticeItem[]>([])
 const isLoading = ref(false)
+const marqueeKey = ref(0)
 
 // 对话框状态
 const showAddDialog = ref(false)
@@ -160,9 +164,13 @@ const fetchNotices = async () => {
     isLoading.value = true
     const data = await fetchNoticeList({ workshop: props.workshop })
     notices.value = data || []
+    // 更新marquee key以重新渲染组件
+    marqueeKey.value++
   } catch (error) {
     console.error('获取通知信息失败:', error)
     notices.value = []
+    // 更新marquee key以重新渲染组件
+    marqueeKey.value++
   } finally {
     isLoading.value = false
   }
@@ -185,6 +193,9 @@ const addNotice = async () => {
     // 添加成功后刷新列表
     await fetchNotices()
     
+    // 更新marquee key以重新渲染组件
+    marqueeKey.value++
+    
     // 关闭对话框并重置表单
     closeAddDialog()
     
@@ -206,6 +217,9 @@ const deleteNotice = async (uuid: string, index: number) => {
     
     // 删除成功后从本地数组中移除
     notices.value.splice(index, 1)
+    
+    // 更新marquee key以重新渲染组件
+    marqueeKey.value++
     
     alert('通知删除成功！')
   } catch (error) {
@@ -272,13 +286,16 @@ onBeforeUnmount(() => {
 .marquee-container {
   height: 5vh;
   width: 100%;
-  /* background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%); */
   border-top: 3px solid #1976d2;
   border-bottom: 3px solid #1976d2;
   display: flex;
   align-items: center;
   overflow: hidden;
   position: relative;
+  background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+  /* 防止内容变化导致高度跳动 */
+  min-height: 5vh;
+  max-height: 5vh;
 }
 
 /* 管理按钮样式 */
@@ -542,6 +559,9 @@ onBeforeUnmount(() => {
   height: 100%;
   display: flex;
   align-items: center;
+  /* 防止滚动跳跃 */
+  overflow: hidden;
+  position: relative;
 }
 
 .marquee-content {
@@ -553,6 +573,10 @@ onBeforeUnmount(() => {
   font-weight: 600;
   color: #d32f2f;
   text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+  /* 防止内容变化导致跳动 */
+  min-height: 100%;
+  line-height: 1.2;
+  padding: 0 20px;
 }
 
 .marquee-content .text {

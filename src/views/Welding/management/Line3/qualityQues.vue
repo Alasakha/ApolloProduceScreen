@@ -372,7 +372,7 @@ onUnmounted(() => {
     background: linear-gradient(135deg, #87CEEB, #98D8E8);
     padding: 8px 16px;
     border-radius: 6px;
-    margin-bottom: 16px;
+    /* margin-bottom: 16px; */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -440,7 +440,8 @@ onUnmounted(() => {
     align-items: center;
     margin-bottom: 16px;
     width: 100%;
-    min-height: 300px;
+    height: 90%;
+    /* min-height: 300px; */
 }
 
 .description-box {

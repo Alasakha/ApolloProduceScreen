@@ -190,6 +190,16 @@ const routes: RouteRecordRaw[] = [
     name: 'RdcCenter',   // 路由名
     component: () => import('@/views/RdcCenter/index.vue')
   },
+  {
+    path: '/jingongdashboard', // URL地址
+    name: 'JinGongDashboard',   // 路由名
+    component: () => import('@/views/JinGongDashboard/index.vue')
+  },
+  {
+    path: '/zongzhuangdashboard', // URL地址
+    name: 'ZongZhuangDashboard',   // 路由名
+    component: () => import('@/views/ZongZhuangDashboard/index.vue')
+  },
 ];
 
 

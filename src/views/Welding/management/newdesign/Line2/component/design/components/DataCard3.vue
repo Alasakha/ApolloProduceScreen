@@ -52,6 +52,13 @@
             <div class="text-yellow-200 text-sm mb-1">待机数量</div>
             <div class="text-2xl font-bold text-white">{{ waitingCount  }}</div>
           </div>
+
+                    <!-- 待机数量 -->
+                    <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-yellow-500/60 hover:border-yellow-300/70 transition-all duration-200"
+               @click="handleWaitingClick">
+            <div class="text-yellow-200 text-sm mb-1">开机率</div>
+            <div class="text-2xl font-bold text-white">{{ Math.round(runningCount/deviceGroupCount*100)   }}%</div>
+          </div>
         </div>
         
         <!-- 设备组进度条区域 - 已注释进度条 -->

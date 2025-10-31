@@ -1,34 +1,33 @@
 <template>
-  <div class="accounting w-full h-full pt-3 pb-3">
+  <div class="accounting w-full h-[160%] pt-3 pb-3">
     <dv-border-box10>
-       <div class="w-full h-full flex flex-col">
+      <div class="w-full h-full flex">
+        <!-- 左侧：上面三张 + 下面三张（新加） -->
+        <div class="flex-1 h-full flex flex-col gap-3 pr-3">
+          <Top class="flex-1" />
+          <Bottom class="flex-1" />
+          <Middle class="flex-1" />
+        </div>
 
-              <!-- 标题：固定高度（内容自然撑开） -->
-                <!-- <div class="text-center text-2xl font-bold text-white">
-                    账务处理及时率
-                </div> -->
 
-                <!-- 内容区域：用 flex-1 撑满剩余空间 -->
-                <div class="flex flex-col flex-1">
-                    <Top class="flex-1" />
-                    <Bottom class="flex-1" />
-                    <Middle class="flex-1" />
-                </div>
-       </div> 
+      </div>
     </dv-border-box10>
   </div>
+  
 </template>
 
 <script setup lang="ts">
 import Top from './top.vue';
 import Middle from './middle.vue'
 import Bottom from './bottom.vue';
+
 </script>
 
 
 
 
-<style scoped >
- 
-
+<style scoped lang="scss">
+.accounting {
+  .w-\[35%\] { min-width: 320px; }
+}
 </style>  

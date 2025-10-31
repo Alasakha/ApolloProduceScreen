@@ -98,10 +98,10 @@
               <el-table-column prop="executant" label="责任人" width="120" />
               <el-table-column label="预期完成时间" width="180">
                 <template #default="scope">
-                  {{ formatDate(scope.row.expectTime) }}
+                  {{ formatDate(scope.row.expetime) }}
                 </template>
               </el-table-column>
-              <el-table-column label="完成时间" width="180">
+              <!-- <el-table-column label="完成时间" width="180">
                 <template #default="scope">
                   {{ formatDate(scope.row.scwctime) || '-' }}
                 </template>
@@ -117,7 +117,7 @@
                     {{ scope.row.sts }}
                   </el-tag>
                 </template>
-              </el-table-column>
+              </el-table-column> -->
             </el-table>
           </el-dialog>
         </div>

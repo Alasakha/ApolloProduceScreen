@@ -28,7 +28,7 @@
               <th>产品</th>
               <th>车型</th>
               <th>计划</th>
-              <th>人效</th>
+              <!-- <th>人效</th> -->
               <th>实际</th>
               <th>差额</th>
               <th>完成率</th>
@@ -43,9 +43,9 @@
               <td>{{ row.product }}</td>
               <td>{{ row.model }}</td>
               <td>{{ row.plan }}</td>
-              <td>人效</td>
-              <td :class="{ 'text-red': row.actual < row.plan }">{{ row.actual }}</td>
-              <td :class="{ 'text-red': row.difference > 0 }">{{ row.difference }}</td>
+              <!-- <td>人效</td> -->
+              <td :class="{ 'text-red': row.actual !== '--' && Number(row.actual) < row.plan }">{{ row.actual }}</td>
+              <td :class="{ 'text-red': row.difference !== '--' && Number(row.difference) > 0 }">{{ row.difference }}</td>
               <td>{{ row.completionRate }}%</td>
             </tr>
           </tbody>
@@ -67,9 +67,9 @@ interface TableRowData {
   product: string
   model: string
   plan: number
-  actual: number
-  difference: number
-  completionRate: number
+  actual: string
+  difference: string
+  completionRate: string
   color: 'orange' | 'blue' | 'green'
 }
 

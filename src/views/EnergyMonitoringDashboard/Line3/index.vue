@@ -23,7 +23,7 @@
           <div class="card-header">
             <div class="workshop-info">
               <span class="energy-icon">⚡</span>
-              <div class="workshop-name">{{ item.workshopName }}</div>
+              <div class="workshop-name text-xl sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[12px] 4xl:text-xl">{{ item.workshopName }}</div>
             </div>
             <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0.5, 'saved': Number(item.ratio) <= 0.5 }">
               {{ Number(item.ratio) > 0 ? '+' : '' }}{{ item.ratio }}
@@ -31,10 +31,10 @@
           </div>
           
 
-          <div class="card-content">
+          <div class="card-content 3xl:gap-0">
             <div class="flex items-center">
               <span class="data-icon">🎯</span>
-              <span class="text-white  text-xl sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[14px] 4xl:text-xl">标准每台耗电量</span>
+              <span class="text-white  text-xl sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-xl">标准每台耗电量</span>
               <div class="number-display">
                 <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
                   {{ Number(item.standardPerUnit).toFixed(1) }}
@@ -599,7 +599,7 @@ const submitReason = async () => {
 
 .workshop-name {
   color: #00eeff;
-  font-size: 16px;
+  /* font-size: 16px; */
   font-weight: 600;
   line-height: 1.3;
   flex: 1;
@@ -635,7 +635,7 @@ const submitReason = async () => {
   flex: 1;
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 0;
   height: 100%;
 }
 
@@ -671,7 +671,7 @@ const submitReason = async () => {
   color: #ffffff;
   font-weight: 500;
   white-space: nowrap;
-  font-size: 13px;
+  /* font-size: 13px; */
   opacity: 0.9;
   transition: all 0.2s ease;
 }
@@ -976,7 +976,7 @@ const submitReason = async () => {
   }
   
   .workshop-name {
-    font-size: 14px;
+    font-size: 1px;
   }
   
   .ratio {
@@ -985,7 +985,7 @@ const submitReason = async () => {
   }
   
   .card-content .text-white {
-    font-size: 11px;
+    font-size: 13px;
   }
 }
 
@@ -1001,7 +1001,7 @@ const submitReason = async () => {
   }
   
   .workshop-name {
-    font-size: 12px;
+    font-size: 1px;
   }
   
   .ratio {
@@ -1029,7 +1029,7 @@ const submitReason = async () => {
   }
   
   .workshop-name {
-    font-size: 18px;
+    font-size: 1px;
   }
   
   .ratio {
@@ -1037,8 +1037,12 @@ const submitReason = async () => {
     padding: 3px 8px;
   }
   
+  .card-content {
+    gap: 8px;
+  }
+  
   .card-content .text-white {
-    font-size: 15px;
+    font-size: 17px;
   }
 }
 </style>

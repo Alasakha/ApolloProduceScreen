@@ -580,3 +580,43 @@ export const getMonthProduction = (prodLine: string): Promise<{code: number, mes
   })
 }
 
+// /stampingWelding/dayPlanDone?prodLineType=8  88手工焊
+// 9自动焊1线
+// 10自动焊2线
+// 11铁架焊
+export const getDayPlanDone = (prodLineType: string): Promise<{data: DayPlanDone[]}> => {
+  return request({
+    url: '/stampingWelding/dayPlanDone',
+    method: 'get',
+    params: { prodLineType }
+  })
+}
+
+export interface DayPlanDone {
+  te006: string       // 物料编码
+  te007: string       // 工单号
+  num: number         // 计划
+  te017: string | null
+  cx: string          // 车型
+  te018: string       // 品名
+  label: string       // 产品
+  done: number        // 已完成数
+}
+
+
+
+
+// /stampingWelding/dayPlanDoneTotal?prodLineType=8
+export const getDayPlanDoneTotal = (prodLineType: string): Promise<{data: DayPlanDoneTotal}> => {
+  return request({
+    url: '/stampingWelding/dayPlanDoneTotal',
+    method: 'get',
+    params: { prodLineType }
+  })
+}
+
+export interface DayPlanDoneTotal {
+  total: number       // 计划总数
+  done: number        // 已完成数
+  //效率 done/total
+}

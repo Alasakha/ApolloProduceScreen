@@ -1,163 +1,148 @@
 <template>
-    <dv-border-box8 :dur="5">
-      <!-- <GlobalTitle title="到货不及时工单数"/> -->
-      <!-- 图表容器 -->
-      <div class="chartsbox w-full h-full flex">
-        <div v-if="!isDataEmpty" ref="Indicators1" class="w-full h-[100%] flex-3"></div>
-        <div v-else class="w-full h-full flex items-center justify-center text-white text-3xl flex-3">今日暂无数据</div>
-        
-        <!-- 右侧数据展示区域
-        <div class="flex-1 pr-4">
-          <div v-if="!isDataEmpty" class="data-list flex flex-col justify-around h-full">
-            <div v-for="(item, index) in processDataByStatus()" :key="index" class="data-item bg-[#8f88f7] rounded-lg flex h-[15%] items-center pl-2 mb-2">
-              <div class="data-title text-white text-sm font-semibold flex-1">{{ item.purchaserName }}:</div>
-              <div class="data-detail text-white text-sm flex-2 flex justify-around">
-                <span>预交达成率: <span class="font-semibold text-cyan-300">{{ (item.deliveryRate * 100).toFixed(1) }}%</span></span>
-                <span>准时排交达成率: <span class="font-semibold text-green-300">{{ (item.productionRate * 100).toFixed(1) }}%</span></span>
-              </div>
-            </div>
-          </div>
-          <div v-else class="data-list flex flex-col justify-around h-full">
-            <div class="data-item bg-[#8f88f7] rounded-lg flex h-[15%] items-center pl-2">
-              <div class="data-title text-white text-sm font-semibold flex-1">暂无数据:</div>
-              <div class="data-detail text-white text-sm flex-2 flex justify-around">
-                <span>预交达成率: <span class="font-semibold text-cyan-300">0%</span></span>
-                <span>准时排交达成率: <span class="font-semibold text-green-300">0%</span></span>
-              </div>
-            </div>
-          </div> -->
-        <!-- </div> -->
-       </div>  
-      </dv-border-box8>
-    </template>
+  <dv-border-box8 :dur="5" class="w-full h-full">
+    <div class="chartsbox w-full h-full">
+      <div v-if="!isDataEmpty && !isLoading" ref="chartRef" class="w-full h-full"></div>
+      <div v-else-if="isLoading" class="text-white flex items-center justify-center h-full">正在加载配送异常数据...</div>
+      <div v-else class="text-white flex items-center justify-center h-full">暂无数据</div>
+    </div>
+  </dv-border-box8>
+</template>
+
+<script setup>
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue';
+import { getPmcKpiWithCk } from '@/api/getScmInfo.js'
+import { createChartOption } from './charts';
+import * as echarts from 'echarts';
+
+const chartRef = ref(null);
+const isLoading = ref(true);
+const isDataEmpty = ref(false);
+const data = ref([]);
+let chartInstance = null;
+let resizeHandler = null;
+let resizeObserver = null;
+
+const drawChart = (retryCount = 0) => {
+  nextTick(() => {
+    console.log('drawChart chartRef.value:', chartRef.value);
+    console.log('isDataEmpty:', isDataEmpty.value, 'data.length:', data.value.length);
     
-    
-    <script setup>
-    import BigScreenTitle from '@/components/title.vue'
-    import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-    import { getPmcKpi } from '@/api/getScmInfo';
-    import { useRoute } from 'vue-router';
-    import { eventBus } from '@/utils/eventbus';
-    import * as echarts from 'echarts';
-    import { createChartOption } from './chartsmiddle';
-    
-    const getYesterday = () => {
-      const date = new Date();
-      date.setDate(date.getDate() - 1);
-      const y = date.getFullYear();
-      const m = String(date.getMonth() + 1).padStart(2, '0');
-      const d = String(date.getDate()).padStart(2, '0');
-      return `${y}-${m}-${d}`;
-    };
-    
-    const queryDate = getYesterday(); // 昨天的日期
-    // Loading 和 数据为空的状态
-    const isLoading = ref(true);
-    const isDataEmpty = ref(false);
-    const dataStatus = ref('none'); // 'none' | 'onlyDelivery' | 'onlyProduction' | 'both'
-    const deliveryData = ref([]);
-    const productionData = ref([]);
-    const Indicators1 = ref(null);
-    let chart = null;
-    
-    // 渲染图表的函数
-    const drawMonthlyIndicators = (data) => {
-      nextTick(() => {
-        if (chart) {
-          chart.dispose();
-        }
-        chart = echarts.init(Indicators1.value);
-        const option = createChartOption(data, '出入库异常次数');
-        chart.setOption(option);
-        
-        // 添加窗口大小改变时的自适应
-        window.addEventListener('resize', () => {
-          chart && chart.resize();
-        });
-      });
-    };
-    
-    // 请求数据
-    const fetchData = async () => {
-      try {
-        isLoading.value = true;
-        // 获取PMC KPI数据
-        const res = await getPmcKpi('A');
-        
-        isLoading.value = false;
-        
-        // 保存原始数据
-        const rawData = res.data || [];
-        
-        // 判断数据状态
-        const hasData = rawData.length > 0;
-        
-        if (!hasData) {
-          dataStatus.value = 'none';
-          isDataEmpty.value = true;
-        } else {
-          dataStatus.value = 'both';
-          isDataEmpty.value = false;
-          // 直接使用原始数据，不需要分别处理
-          deliveryData.value = rawData;
-          productionData.value = rawData;
-        }
-        
-        // 根据状态处理数据并绘制图表
-        const processedData = processDataByStatus();
-        drawMonthlyIndicators(processedData);
-        
-      } catch (error) {
-        console.error('数据获取失败:', error);
-        isLoading.value = false;
-        isDataEmpty.value = true;
-        dataStatus.value = 'none';
+    if (!chartRef.value || isDataEmpty.value || data.value.length === 0) {
+      // 如果容器还没准备好，且重试次数少于20次，则延迟重试
+      if (!chartRef.value && retryCount < 20) {
+        setTimeout(() => drawChart(retryCount + 1), 100);
       }
-    };
-    
-    // 根据状态处理数据
-    const processDataByStatus = () => {
-      switch (dataStatus.value) {
-        case 'none':
-          return [{
-            purchaserName: '暂无数据',
-            total: 0
-          }];
-        
-        case 'both':
-          // 处理PMC KPI数据，使用total字段
-          return deliveryData.value.map(item => ({
-            purchaserName: item.purchaserName,
-            total: item.total || 0
-          }));
-        
-        default:
-          return [];
-      }
-    };
-    
-    onMounted(() => {
-      fetchData();
-      eventBus.on("refreshData", fetchData);
-    });
-    
-    onBeforeUnmount(() => {
-      eventBus.off("refreshData", fetchData);
-      // 清理图表实例
-      if (chart) {
-        chart.dispose();
-        chart = null;
-      }
-      // 移除窗口大小改变的监听
-      window.removeEventListener('resize', () => {
-        chart && chart.resize();
-      });
-    });
-    </script>
-    
-    
-    <style scoped>
-    .chartsbox {
-      padding: 20px;
+      return;
     }
-    </style>
+    
+    // 检查容器尺寸，使用 clientHeight 更准确
+    const width = chartRef.value.clientWidth || chartRef.value.offsetWidth;
+    const height = chartRef.value.clientHeight || chartRef.value.offsetHeight;
+    console.log('容器尺寸:', width, height, 'clientHeight:', chartRef.value.clientHeight);
+    
+    // 如果容器尺寸为0，延迟重试（增加重试次数）
+    if ((width === 0 || height === 0) && retryCount < 20) {
+      setTimeout(() => drawChart(retryCount + 1), 150);
+      return;
+    }
+    
+    // 如果容器有尺寸，初始化图表
+    try {
+      if (chartInstance) {
+        chartInstance.dispose();
+      }
+      
+      chartInstance = echarts.init(chartRef.value);
+      const option = createChartOption(data.value, '配送异常', ['total']);
+      console.log('option:', option);
+      chartInstance.setOption(option);
+      
+      // 使用 ResizeObserver 监听容器尺寸变化
+      if (!resizeObserver && chartRef.value) {
+        resizeObserver = new ResizeObserver(() => {
+          if (chartInstance && !chartInstance.isDisposed()) {
+            chartInstance.resize();
+          }
+        });
+        resizeObserver.observe(chartRef.value);
+      }
+      
+      // 确保 resize 事件监听器只添加一次（作为备用）
+      if (!resizeHandler) {
+        resizeHandler = () => {
+          if (chartInstance && !chartInstance.isDisposed()) {
+            chartInstance.resize();
+          }
+        };
+        window.addEventListener('resize', resizeHandler);
+      }
+    } catch (error) {
+      console.error('初始化图表失败:', error);
+      // 如果初始化失败，延迟重试
+      if (retryCount < 10) {
+        setTimeout(() => drawChart(retryCount + 1), 200);
+      }
+    }
+  });
+};
+
+const fetchData = async () => {
+  isLoading.value = true;
+  try {
+    const res = await getPmcKpiWithCk('E', '总仓');
+    console.log('fetchData 接口返回:', res);
+    if (res.code === 200 && res.data && res.data.length > 0) {
+      data.value = res.data;
+      isDataEmpty.value = false;
+    } else {
+      data.value = [];
+      isDataEmpty.value = true;
+    }
+  } catch (e) {
+    isDataEmpty.value = true;
+    data.value = [];
+    console.error('fetchData error:', e);
+  } finally {
+    isLoading.value = false;
+  }
+};
+
+watch(
+  [isLoading, isDataEmpty, data],
+  async ([loading, empty, d]) => {
+    if (!loading && !empty && d && d.length > 0) {
+      await nextTick();
+      // 给容器更多时间渲染，特别是 dv-border-box8 动画需要时间
+      setTimeout(() => {
+        drawChart();
+      }, 300);
+    }
+  },
+  { immediate: true, deep: true }
+);
+
+onMounted(() => {
+  fetchData();
+});
+
+onBeforeUnmount(() => {
+  if (chartInstance) {
+    chartInstance.dispose();
+    chartInstance = null;
+  }
+  if (resizeHandler) {
+    window.removeEventListener('resize', resizeHandler);
+    resizeHandler = null;
+  }
+  if (resizeObserver) {
+    resizeObserver.disconnect();
+    resizeObserver = null;
+  }
+});
+</script>
+
+<style scoped>
+.chartsbox {
+  min-height: 200px; /* 确保最小高度 */
+}
+</style>

@@ -43,12 +43,12 @@ export const getstagnantAmount= (type) => {
   }
 
   // /WMS/timelyAccountingRate // 及时入账率
-  export const gettimelyAccountingRate= () => {
-    return request({
-      url: '/WMS/timelyAccountingRate',
-      method: 'get',
-    })
-  }
+  // export const gettimelyAccountingRate= () => {
+  //   return request({
+  //     url: '/WMS/timelyAccountingRate',
+  //     method: 'get',
+  //   })
+  // }
 
   // /WMS/deliveryTimelinessRat 出库
     export const getdeliveryTimelinessRat= () => {
@@ -108,3 +108,27 @@ export const getstagnantAmount= (type) => {
       method: 'get',
     })
   }
+
+
+  // /WMS/deliveryTimelinessRate
+  export const getdeliveryTimelinessRate= () => {
+    return request({
+      url: '/WMS/deliveryTimelinessRate',
+      method: 'get',
+    })
+  }
+      //   "warehouseKeeper": "洪梦", X轴
+      //   "warehouseName": "包材仓",
+      //   "qty": 6517, 
+      //   "bjsNum": 23,
+      //   "rate": 99.7,  及时率
+      //   "pmcKpiCount": 0  异常次数
+    
+    // /\MS/timelyAccountingRate'
+    export const gettimelyAccountingRate= () => {
+      return request({
+        url: '/WMS/timelyAccountingRate',
+        method: 'get',
+      })
+    }
+

@@ -9,47 +9,52 @@
 
 
 <script setup lang="ts">
- import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
- import { eventBus } from '@/utils/eventbus'
- import { createChartOption } from './charts'
- import { useEcharts } from '@/utils/useEcharts'
- import { useAccountDataStore } from '@/store/getStoreData'
+import { ref, onMounted, nextTick, watch } from 'vue'
+import { eventBus } from '@/utils/eventbus'
+import { createChartOption1 } from './chartsNew'
+import { useEcharts } from '@/utils/useEcharts'
+import { getdeliveryTimelinessRate } from '@/api/getWMSinfo'
+
 const chartRef = ref(null)
 const isLoading = ref(true)
 const OutboundData = ref([]) // 存储数据
 const { initChart, setOption, resizeChart } = useEcharts(chartRef)
 
-const store = useAccountDataStore() // 使用数据存储
-
+// 直接拉取后端接口数据
 const fetchData = async () => {
-  await store.fetchOutboundData() // 等待数据加载
-  isLoading.value = store.Outboundloading // 数据加载完成后隐藏加载动画
-  OutboundData.value = store.OutboundData
-    console.log('OutboundData.value:', OutboundData.value)
-
+  isLoading.value = true
+  try {
+    const res = await getdeliveryTimelinessRate()
+    if (res.code === 200 && Array.isArray(res.data)) {
+      OutboundData.value = res.data
+    } else {
+      OutboundData.value = []
+    }
+  } catch (e) {
+    OutboundData.value = []
+  } finally {
+    isLoading.value = false
+  }
 }
 
+// 监听数据变化渲染图表
 watch(OutboundData, () => {
-    nextTick(() => {
-        initChart()
-        const option = createChartOption(OutboundData.value,'当月出库及时率')
-        setOption(option)
-        resizeChart() // 关键点：初始化后立即触发一次 resize
-    })
+  nextTick(() => {
+    initChart()
+    const option = createChartOption1(OutboundData.value, '当月出库及时率', ['rate', 'pmcKpiCount'])
+    setOption(option)
+    resizeChart()
+  })
 }, { deep: true, immediate: true })
-
 
 onMounted(() => {
   fetchData()
-  nextTick(() => { // 确保 DOM 挂载后再初始化
-      initChart();
-      resizeChart();
-  });
+  nextTick(() => {
+    initChart()
+    resizeChart()
+  })
   eventBus.on('refreshData', fetchData)
 })
-  onBeforeUnmount(() => {
-  eventBus.off('refreshData', fetchData)
-  })
 
 </script>
 

@@ -163,3 +163,14 @@ export const getPmcKpiPie = () => {
 }
 
 
+// /SCM/pmcKpi?kpi_type=C  
+// C入库异常
+// D 出库异常
+// E 配送异常  &ck=总仓  不变
+export const getPmcKpiWithCk = (kpi_type, ck) => {
+  return request({
+    url: '/SCM/pmcKpi',
+    method: 'get',
+    params: { kpi_type, ck }
+  })
+}
