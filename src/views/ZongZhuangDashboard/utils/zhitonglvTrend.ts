@@ -51,6 +51,13 @@ export function transformQualityReportTrendData(
     itemStyle?: { color: string }
     lineStyle?: { type?: 'dashed' | 'solid' }
     smooth?: boolean
+    label?: {
+      show: boolean
+      position: string
+      formatter: string | ((params: any) => string)
+      color: string
+      fontSize: number
+    }
   }>
 } {
   if (!apiData?.data) {
@@ -104,26 +111,70 @@ export function transformQualityReportTrendData(
         type: 'line',
         data: aClassStandardData,
         itemStyle: { color: '#10b981' },
-        lineStyle: { type: 'dashed' } // 标准线使用虚线
+        lineStyle: { type: 'dashed' }, // 标准线使用虚线
+        label: {
+          show: true,
+          position: 'right', // 标准线标签显示在右边
+          formatter: (params: any) => {
+            // 只在最后一个数据点显示标签
+            if (params.dataIndex === aClassStandardData.length - 1) {
+              return params.value.toFixed(1) + '%'
+            }
+            return ''
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       },
       {
         name: 'A类实际',
         type: 'bar', // 实际用柱状图
         data: aClassActualData,
-        itemStyle: { color: '#3b82f6' }
+        itemStyle: { color: '#3b82f6' },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return params.value.toFixed(1) + '%'
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       },
       {
         name: '常规标准',
         type: 'line',
         data: regularStandardData,
         itemStyle: { color: '#f59e0b' },
-        lineStyle: { type: 'dashed' } // 标准线使用虚线
+        lineStyle: { type: 'dashed' }, // 标准线使用虚线
+        label: {
+          show: true,
+          position: 'right', // 标准线标签显示在右边
+          formatter: (params: any) => {
+            // 只在最后一个数据点显示标签
+            if (params.dataIndex === regularStandardData.length - 1) {
+              return params.value.toFixed(1) + '%'
+            }
+            return ''
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       },
       {
         name: '常规实际',
         type: 'bar', // 实际用柱状图
         data: regularActualData,
-        itemStyle: { color: '#ef4444' }
+        itemStyle: { color: '#ef4444' },
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return params.value.toFixed(1) + '%'
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       }
     ]
   }

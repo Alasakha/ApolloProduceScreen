@@ -145,3 +145,103 @@ export interface QualityReportPerformanceTrendResponse {
     [monthKey: string]: QualityReportPerformanceMonthData // monthKey格式：YYYY-MM，如 "2025-10"
   }
 }
+
+
+
+// /quality/topDayCategory?prodLine=10041005&dayStart=2025-10-01&dayEnd=2025-11-01 开始日期取本月第一天  结束日期取今天   总之一课装配prodLine：1004  总之一课包装1005  总装二课装配：2004 总装二课包装：2005
+export const getTopDayCategory = (prodLine: string | number, dayStart: string, dayEnd: string) => {
+  return request({
+    url: '/quality/topDayCategory',
+    method: 'get',
+    params: { prodLine, dayStart, dayEnd }
+  })
+}
+
+// TOP质量问题数据项类型
+export interface TopQualityItem {
+  ngNO: string | null // 不良编号
+  ngName: string // 问题名称
+  total: number // 不良总数
+  grandTotal: number | null // 总计数
+  uid: string | null // 唯一标识
+  createDate: string | null // 创建日期
+  ih_uid: string | null // 
+  ta001: string | null // 
+  ta002: string | null // 
+  ta006: string | null // 
+  mb002: string | null // 
+  peopleName: string | null // 人员名称
+  ngResponPeople: string | null // 不良责任人
+  ngHandle: string | null // 不良处理
+  ngReason: string | null // 不良原因
+  nums: number | null // 数量
+  mb003: string | null // 
+  udf021: string | null // 
+  admin_UNIT_NAME: string | null // 管理单位名称
+  ratio?: number // 比例（0-1之间，可能由前端计算得出）
+  [key: string]: any // 其他可能的字段
+}
+
+// TOP质量问题API响应类型
+export interface TopQualityResponse {
+  code: number
+  message: string
+  data: TopQualityItem[]
+}
+
+
+// /report/productionAchievementRate_performance_trend?prodLine=1004  总装一课    1005:总装二课
+export const getProductionAchievementRatePerformanceTrend = (prodLine: string | number) => {
+  return request({
+    url: '/report/productionAchievementRate_performance_trend',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+// 人效达成率绩效趋势 - 损耗原因类型
+export interface EfficiencyReason {
+  reduce_type: number
+  reduce_minute: number
+  reduce_count: number
+  reduce_total: number
+  reason: string
+}
+
+// 人效达成率绩效趋势 - 每日数据项类型
+export interface EfficiencyTrendItem {
+  udf04: string // 日期，格式：YYYY-MM-DD
+  pcNum: number // 排产数量
+  completeNum: number // 完成数量
+  userNum: string // 人数（字符串格式）
+  hourNum: string // 工时（字符串格式，可能带小数）
+  standardEfficiency: number // 标准效率
+  actualEfficiency: number // 实际效率
+  achievementRate: string // 达成率（百分比字符串，如 "100.0%"）
+  averageHourlyOutput: number // 平均小时产出
+  averageAchievementRate: string // 平均达成率（百分比字符串）
+  reduceMinute_hx: number // 换线损耗分钟数
+  reduceMinute_jhw: number // 计划外损耗分钟数
+  hx_reason: EfficiencyReason[] // 换线损耗原因列表
+  jhw_reason: EfficiencyReason[] // 计划外损耗原因列表
+}
+
+// 人效达成率绩效趋势 - 月度数据
+export interface EfficiencyTrendMonthData {
+  [dateKey: string]: EfficiencyTrendItem[] | number | string // dateKey格式：YYYY-MM，如 "2025-10"
+  // 可选的月度汇总字段
+  pcDays?: number // 月度累计排产天数
+  achieveDays?: number // 月度人效达成天数
+  achieveRate?: string // 月度人效达成率
+}
+
+// 人效达成率绩效趋势 - API响应类型
+export interface ProductionAchievementRatePerformanceTrendResponse {
+  code: number
+  message: string
+  data: {
+    [monthKey: string]: EfficiencyTrendMonthData | string // monthKey格式：YYYY-MM，如 "2025-10"，或者 "achieveRate"
+  } & {
+    achieveRate?: string // 整体达成率（可能出现在最外层）
+  }
+}

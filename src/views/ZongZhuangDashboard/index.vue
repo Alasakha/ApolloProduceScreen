@@ -29,6 +29,7 @@
             :second-chart-type="panel.secondChartType"
             :second-chart-data="panel.secondChartData"
             :hide-regular="panel.hideRegular"
+            :loading="department1Loading[panel.id]"
           />
         </div>
       </div>
@@ -53,6 +54,7 @@
             :second-chart-type="panel.secondChartType"
             :second-chart-data="panel.secondChartData"
             :hide-regular="panel.hideRegular"
+            :loading="department2Loading[panel.id]"
           />
         </div>
       </div>
@@ -65,9 +67,11 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './Header/index.vue'
 import PerformancePanel from './components/PerformancePanel.vue'
-import { getOrderSettlementPerformance, getQualityReportPerformance, getProductionAchievementRate, getOrderSettlementPerformanceTrend, getQualityReportPerformanceTrend, type GetMesInfoResponse, type ThroughputTrendResponse, type QualityReportPerformanceTrendResponse } from '@/api/getMesInfo'
+import { getOrderSettlementPerformance, getQualityReportPerformance, getProductionAchievementRate, getOrderSettlementPerformanceTrend, getQualityReportPerformanceTrend, getProductionAchievementRatePerformanceTrend, type GetMesInfoResponse, type ThroughputTrendResponse, type QualityReportPerformanceTrendResponse, type ProductionAchievementRatePerformanceTrendResponse } from '@/api/getMesInfo'
 import { transformQualityReportData, type QualityReportData } from './utils/zhitonglv'
 import { transformQualityReportTrendData } from './utils/zhitonglvTrend'
+import { transformEfficiencyTrendData, mergeEfficiencyTrendData } from './utils/efficiencyTrend'
+import { fetchDepartment1TopQuality, fetchDepartment2TopQuality } from './utils/topQuality'
 
 // 定义面板数据类型
 interface PanelData {
@@ -191,14 +195,25 @@ function transformOrderSettlementData(
   }
 }
 
-// 加载状态
-const loading1 = ref(false)
-const loading2 = ref(false)
+// 为每个面板添加独立的加载状态（初始状态为 true，表示正在加载）
+const department1Loading = ref<Record<string, boolean>>({
+  '1': true, // 工单结单率
+  '2': true, // 直通率
+  '3': true, // 人效达成率
+  '4': true  // TOP质量问题
+})
+
+const department2Loading = ref<Record<string, boolean>>({
+  '1': true, // 工单结单率
+  '2': true, // 直通率
+  '3': true, // 人效达成率
+  '4': true  // TOP质量问题
+})
 
 // 获取总装一课工单结单率数据
 async function fetchDepartment1OrderSettlement() {
   try {
-    loading1.value = true
+    department1Loading.value['1'] = true
     const { startDate, endDate } = getDateRange()
     const response = await getOrderSettlementPerformance('总装一课', startDate, endDate)
     
@@ -206,7 +221,7 @@ async function fetchDepartment1OrderSettlement() {
       const transformedData = transformOrderSettlementData(response.data.orderSettlement, '总装一课')
       // 更新第一个面板（工单结单率）的数据
       if (department1Panels.value[0]) {
-        department1Panels.value[0].description = transformedData.description || department1Panels.value[0].description
+        department1Panels.value[0].description = transformedData.description || []
       }
       console.log('✅ 总装一课工单结单率数据获取成功')
     } else {
@@ -215,14 +230,14 @@ async function fetchDepartment1OrderSettlement() {
   } catch (err: any) {
     console.error('获取总装一课工单结单率数据失败:', err)
   } finally {
-    loading1.value = false
+    department1Loading.value['1'] = false
   }
 }
 
 // 获取总装二课工单结单率数据
 async function fetchDepartment2OrderSettlement() {
   try {
-    loading2.value = true
+    department2Loading.value['1'] = true
     const { startDate, endDate } = getDateRange()
     const response = await getOrderSettlementPerformance('总装二课', startDate, endDate)
     
@@ -230,7 +245,7 @@ async function fetchDepartment2OrderSettlement() {
       const transformedData = transformOrderSettlementData(response.data.orderSettlement, '总装二课')
       // 更新第一个面板（工单结单率）的数据
       if (department2Panels.value[0]) {
-        department2Panels.value[0].description = transformedData.description || department2Panels.value[0].description
+        department2Panels.value[0].description = transformedData.description || []
       }
       console.log('✅ 总装二课工单结单率数据获取成功')
     } else {
@@ -239,13 +254,14 @@ async function fetchDepartment2OrderSettlement() {
   } catch (err: any) {
     console.error('获取总装二课工单结单率数据失败:', err)
   } finally {
-    loading2.value = false
+    department2Loading.value['1'] = false
   }
 }
 
 // 获取总装一课直通率数据
 async function fetchDepartment1ThroughputRate() {
   try {
+    department1Loading.value['2'] = true
     const { startDate, endDate } = getDateRangeForQuality()
     const response = await getQualityReportPerformance('10041005', startDate, endDate)
     
@@ -253,7 +269,7 @@ async function fetchDepartment1ThroughputRate() {
       const transformedData = transformQualityReportData(response.data as QualityReportData, '总装一课')
       // 更新第二个面板（直通率）的数据
       if (department1Panels.value[1]) {
-        department1Panels.value[1].description = transformedData.description || department1Panels.value[1].description
+        department1Panels.value[1].description = transformedData.description || []
       }
       console.log('✅ 总装一课直通率数据获取成功')
     } else {
@@ -261,12 +277,15 @@ async function fetchDepartment1ThroughputRate() {
     }
   } catch (err: any) {
     console.error('获取总装一课直通率数据失败:', err)
+  } finally {
+    department1Loading.value['2'] = false
   }
 }
 
 // 获取总装二课直通率数据
 async function fetchDepartment2ThroughputRate() {
   try {
+    department2Loading.value['2'] = true
     const { startDate, endDate } = getDateRangeForQuality()
     const response = await getQualityReportPerformance('20042005', startDate, endDate)
     
@@ -274,7 +293,7 @@ async function fetchDepartment2ThroughputRate() {
       const transformedData = transformQualityReportData(response.data as QualityReportData, '总装二课')
       // 更新第二个面板（直通率）的数据
       if (department2Panels.value[1]) {
-        department2Panels.value[1].description = transformedData.description || department2Panels.value[1].description
+        department2Panels.value[1].description = transformedData.description || []
       }
       console.log('✅ 总装二课直通率数据获取成功')
     } else {
@@ -282,6 +301,8 @@ async function fetchDepartment2ThroughputRate() {
     }
   } catch (err: any) {
     console.error('获取总装二课直通率数据失败:', err)
+  } finally {
+    department2Loading.value['2'] = false
   }
 }
 
@@ -424,26 +445,70 @@ function transformOrderSettlementTrendData(
           type: 'line', // 标准用折线图
           data: aClassStandardData,
           itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
+          lineStyle: { type: 'dashed' }, // 标准线使用虚线
+          label: {
+            show: true,
+            position: 'right', // 标准线标签显示在右边
+            formatter: (params: any) => {
+              // 只在最后一个数据点显示标签
+              if (params.dataIndex === aClassStandardData.length - 1) {
+                return params.value.toFixed(1) + '%'
+              }
+              return ''
+            },
+            color: '#fff',
+            fontSize: 11
+          }
         },
         {
           name: 'A类实际',
           type: 'bar', // 实际用柱状图
           data: aClassActualData,
-          itemStyle: { color: '#3b82f6' }
+          itemStyle: { color: '#3b82f6' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params: any) => {
+              return params.value.toFixed(1) + '%'
+            },
+            color: '#fff',
+            fontSize: 11
+          }
         },
         {
           name: '常规标准',
           type: 'line', // 标准用折线图
           data: regularStandardData,
           itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
+          lineStyle: { type: 'dashed' }, // 标准线使用虚线
+          label: {
+            show: true,
+            position: 'right', // 标准线标签显示在右边
+            formatter: (params: any) => {
+              // 只在最后一个数据点显示标签
+              if (params.dataIndex === regularStandardData.length - 1) {
+                return params.value.toFixed(1) + '%'
+              }
+              return ''
+            },
+            color: '#fff',
+            fontSize: 11
+          }
         },
         {
           name: '常规实际',
           type: 'bar', // 实际用柱状图
           data: regularActualData,
-          itemStyle: { color: '#ef4444' }
+          itemStyle: { color: '#ef4444' },
+          label: {
+            show: true,
+            position: 'top',
+            formatter: (params: any) => {
+              return params.value.toFixed(1) + '%'
+            },
+            color: '#fff',
+            fontSize: 11
+          }
         }
       ]
     }
@@ -498,7 +563,7 @@ async function fetchDepartment2OrderSettlementTrend() {
 
 // 转换人效达成率接口数据为面板数据
 // 根据公式：实际达成 = (装配达成天数 + 包装达成天数) / (装配排产天数 + 包装排产天数)
-// 达成率 = 实际达成 / 标准(89%)
+// 达成率 = 实际达成 / 标准
 function transformEfficiencyData(
   assemblyData: GetMesInfoResponse | null,
   packagingData: GetMesInfoResponse | null,
@@ -521,13 +586,16 @@ function transformEfficiencyData(
     : '0%'
 
   // 计算达成率：实际达成 / 标准
-  const achievementRate = totalPcDays > 0 && standard > 0
-    ? ((totalAchieveDays / totalPcDays) / (standard / 100) * 100).toFixed(1) + '%'
+  const actualAchievementNum = totalPcDays > 0 
+    ? (totalAchieveDays / totalPcDays * 100)
+    : 0
+  const achievementRate = standard > 0
+    ? (actualAchievementNum / standard * 100).toFixed(1) + '%'
     : '0%'
 
   return {
     description: [
-      { label: '人效达成率标准', value: `${standard}%` },
+      { label: '人效达成率标准', value: standard + '%' },
       { label: '实际达成', value: actualAchievement },
       { label: '达成率', value: achievementRate }
     ]
@@ -537,6 +605,7 @@ function transformEfficiencyData(
 // 获取总装一课人效达成率数据
 async function fetchDepartment1Efficiency() {
   try {
+    department1Loading.value['3'] = true
     const monthDay = getCurrentMonth()
     
     // 并行获取装配(1004)和包装(1005)的数据
@@ -549,12 +618,12 @@ async function fetchDepartment1Efficiency() {
       const transformedData = transformEfficiencyData(
         assemblyResponse as GetMesInfoResponse,
         packagingResponse as GetMesInfoResponse,
-        89 // 标准89%
+        89
       )
       
       // 更新第三个面板（人效达成率）的数据
       if (department1Panels.value[2]) {
-        department1Panels.value[2].description = transformedData.description || department1Panels.value[2].description
+        department1Panels.value[2].description = transformedData.description || []
       }
       console.log('✅ 总装一课人效达成率数据获取成功')
     } else {
@@ -562,12 +631,15 @@ async function fetchDepartment1Efficiency() {
     }
   } catch (err: any) {
     console.error('获取总装一课人效达成率数据失败:', err)
+  } finally {
+    department1Loading.value['3'] = false
   }
 }
 
 // 获取总装二课人效达成率数据
 async function fetchDepartment2Efficiency() {
   try {
+    department2Loading.value['3'] = true
     const monthDay = getCurrentMonth()
     
     // 并行获取装配(2004)和包装(2005)的数据
@@ -580,12 +652,12 @@ async function fetchDepartment2Efficiency() {
       const transformedData = transformEfficiencyData(
         assemblyResponse as GetMesInfoResponse,
         packagingResponse as GetMesInfoResponse,
-        89 // 标准89%
+        89
       )
       
       // 更新第三个面板（人效达成率）的数据
       if (department2Panels.value[2]) {
-        department2Panels.value[2].description = transformedData.description || department2Panels.value[2].description
+        department2Panels.value[2].description = transformedData.description || []
       }
       console.log('✅ 总装二课人效达成率数据获取成功')
     } else {
@@ -593,323 +665,233 @@ async function fetchDepartment2Efficiency() {
     }
   } catch (err: any) {
     console.error('获取总装二课人效达成率数据失败:', err)
+  } finally {
+    department2Loading.value['3'] = false
+  }
+}
+
+// 获取总装一课人效达成率趋势数据
+async function fetchDepartment1EfficiencyTrend() {
+  try {
+    // 并行获取装配(1004)和包装(1005)的趋势数据
+    const [assemblyResponse, packagingResponse] = await Promise.all([
+      getProductionAchievementRatePerformanceTrend('1004'),
+      getProductionAchievementRatePerformanceTrend('1005')
+    ])
+    
+    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
+      // 合并装配和包装的趋势数据
+      const mergedData = mergeEfficiencyTrendData(
+        assemblyResponse as ProductionAchievementRatePerformanceTrendResponse,
+        packagingResponse as ProductionAchievementRatePerformanceTrendResponse
+      )
+      
+      if (mergedData) {
+        const transformedData = transformEfficiencyTrendData(mergedData)
+        
+        // 更新第三个面板（人效达成率）的图表数据
+        if (department1Panels.value[2]) {
+          if (transformedData.categories && transformedData.series) {
+            department1Panels.value[2].chartData = {
+              categories: transformedData.categories,
+              series: transformedData.series
+            }
+          }
+        }
+      }
+      console.log('✅ 总装一课人效达成率趋势数据获取成功')
+    } else {
+      console.warn('获取总装一课人效达成率趋势数据失败:', assemblyResponse.message || packagingResponse.message)
+    }
+  } catch (err: any) {
+    console.error('获取总装一课人效达成率趋势数据失败:', err)
+  }
+}
+
+// 获取总装二课人效达成率趋势数据
+async function fetchDepartment2EfficiencyTrend() {
+  try {
+    // 并行获取装配(2004)和包装(2005)的趋势数据
+    const [assemblyResponse, packagingResponse] = await Promise.all([
+      getProductionAchievementRatePerformanceTrend('2004'),
+      getProductionAchievementRatePerformanceTrend('2005')
+    ])
+    
+    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
+      // 合并装配和包装的趋势数据
+      const mergedData = mergeEfficiencyTrendData(
+        assemblyResponse as ProductionAchievementRatePerformanceTrendResponse,
+        packagingResponse as ProductionAchievementRatePerformanceTrendResponse
+      )
+      
+      if (mergedData) {
+        const transformedData = transformEfficiencyTrendData(mergedData)
+        
+        // 更新第三个面板（人效达成率）的图表数据
+        if (department2Panels.value[2]) {
+          if (transformedData.categories && transformedData.series) {
+            department2Panels.value[2].chartData = {
+              categories: transformedData.categories,
+              series: transformedData.series
+            }
+          }
+        }
+      }
+      console.log('✅ 总装二课人效达成率趋势数据获取成功')
+    } else {
+      console.warn('获取总装二课人效达成率趋势数据失败:', assemblyResponse.message || packagingResponse.message)
+    }
+  } catch (err: any) {
+    console.error('获取总装二课人效达成率趋势数据失败:', err)
+  }
+}
+
+// 获取总装一课TOP质量问题数据
+async function fetchDepartment1TopQualityData() {
+  try {
+    department1Loading.value['4'] = true
+    const qualityData = await fetchDepartment1TopQuality()
+    
+    // 更新第四个面板（TOP质量问题）的数据
+    if (department1Panels.value[3]) {
+      // 更新装配饼图数据
+      if (qualityData.assembly && qualityData.assembly.length > 0) {
+        department1Panels.value[3].chartData = {
+          series: qualityData.assembly
+        }
+      }
+      // 更新包装饼图数据
+      if (qualityData.packaging && qualityData.packaging.length > 0) {
+        department1Panels.value[3].secondChartData = {
+          series: qualityData.packaging
+        }
+      }
+    }
+    console.log('✅ 总装一课TOP质量问题数据获取成功')
+  } catch (err: any) {
+    console.error('获取总装一课TOP质量问题数据失败:', err)
+  } finally {
+    department1Loading.value['4'] = false
+  }
+}
+
+// 获取总装二课TOP质量问题数据
+async function fetchDepartment2TopQualityData() {
+  try {
+    department2Loading.value['4'] = true
+    const qualityData = await fetchDepartment2TopQuality()
+    
+    // 更新第四个面板（TOP质量问题）的数据
+    if (department2Panels.value[3]) {
+      // 更新装配饼图数据
+      if (qualityData.assembly && qualityData.assembly.length > 0) {
+        department2Panels.value[3].chartData = {
+          series: qualityData.assembly
+        }
+      }
+      // 更新包装饼图数据
+      if (qualityData.packaging && qualityData.packaging.length > 0) {
+        department2Panels.value[3].secondChartData = {
+          series: qualityData.packaging
+        }
+      }
+    }
+    console.log('✅ 总装二课TOP质量问题数据获取成功')
+  } catch (err: any) {
+    console.error('获取总装二课TOP质量问题数据失败:', err)
+  } finally {
+    department2Loading.value['4'] = false
   }
 }
 
 
-// 左侧金工一部的面板数据
+// 左侧总装一课的面板数据（初始化为空状态）
 const department1Panels = ref<PanelData[]>([
   {
     id: '1',
     title: '总装一课工单结单率',
-    description: [
-      { label: 'A类:月度累计排产工单', value: '1,250' },
-      { label: '累计准交工单', value: '1,180' },
-      { label: '结单率', value: '94.4%' },
-      { label: '常规:月度累计排产工单', value: '2,100' },
-      { label: '累计准交工单', value: '1,980' },
-      { label: '结单率', value: '94.3%' }
-    ],
+    description: [],
     chartTitle: '工单结单率趋势',
-    chartType: 'bar' as const, // 混合图表，但默认类型设为 bar
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: 'A类标准',
-          type: 'line', // 标准用折线图
-          data: [95, 95, 95, 95, 95, 95],
-          itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
-        },
-        {
-          name: 'A类实际',
-          type: 'bar', // 实际用柱状图
-          data: [94, 95, 93, 94, 95, 94],
-          itemStyle: { color: '#3b82f6' }
-        },
-        {
-          name: '常规标准',
-          type: 'line', // 标准用折线图
-          data: [94, 94, 94, 94, 94, 94],
-          itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
-        },
-        {
-          name: '常规实际',
-          type: 'bar', // 实际用柱状图
-          data: [93, 94, 92, 93, 94, 93],
-          itemStyle: { color: '#ef4444' }
-        }
-      ]
-    },
+    chartType: 'bar' as const,
+    chartData: null,
     chartTypeDescription: '折线图(标准) + 柱状图(实际)'
   },
   {
     id: '2',
     title: '总装一课直通率',
-    description: [
-      { label: 'A类直通率标准', value: '75%' },
-      { label: 'A类月度累计直通率', value: '97.2%' },
-      { label: '达成率', value: '95.7%' },
-      { label: '常规直通率标准', value: '72%' },
-      { label: '常规月度累计直通率', value: '96.5%' },
-      { label: '达成率', value: '94.3%' }
-    ],
+    description: [],
     chartTitle: '直通率趋势',
     chartType: 'line' as const,
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: 'A类标准',
-          type: 'line',
-          data: [75, 75, 75, 75, 75, 75],
-          itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' }
-        },
-        {
-          name: 'A类实际',
-          type: 'line',
-          data: [0, 0, 0, 0, 0, 0],
-          itemStyle: { color: '#3b82f6' },
-          smooth: true
-        },
-        {
-          name: '常规标准',
-          type: 'line',
-          data: [72, 72, 72, 72, 72, 72],
-          itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' }
-        },
-        {
-          name: '常规实际',
-          type: 'line',
-          data: [0, 0, 0, 0, 0, 0],
-          itemStyle: { color: '#ef4444' },
-          smooth: true
-        }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '折线图(每月标准和实际)'
   },
   {
     id: '3',
     title: '总装一课人效达成率',
-    description: [
-      { label: '人效达成率标准', value: '89%' },
-      { label: '实际达成', value: '0%' },
-      { label: '达成率', value: '0%' }
-    ],
+    description: [],
     chartTitle: '人效达成率',
     chartType: 'bar' as const,
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: '计划数',
-          type: 'bar',
-          data: [15000, 15000, 15000, 15000, 15000, 15000],
-          itemStyle: { color: '#6b7280' }
-        },
-        {
-          name: '完成数',
-          type: 'bar',
-          data: [14250, 14300, 14150, 14400, 14200, 14250],
-          itemStyle: { color: '#10b981' }
-        }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '柱状图(每月计划和实际)',
     hideRegular: true
   },
   {
     id: '4',
     title: 'TOP质量问题',
-    description: [], // 空数组，不显示数据区域
+    description: [],
     chartTitle: '总装TOP前5不良数',
     chartType: 'pie' as const,
-    chartData: {
-      series: [
-        { name: '装配错误', value: 35, itemStyle: { color: '#ef4444' } },
-        { name: '零件缺失', value: 28, itemStyle: { color: '#f59e0b' } },
-        { name: '尺寸偏差', value: 22, itemStyle: { color: '#3b82f6' } },
-        { name: '功能异常', value: 18, itemStyle: { color: '#10b981' } },
-        { name: '其他', value: 22, itemStyle: { color: '#6b7280' } }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '饼图(显示总装TOP前5不良数和占比)',
-    // TOP质量问题模式配置
     isTopQualityMode: true,
     secondChartTitle: '包装TOP前5不良数',
     secondChartType: 'pie' as const,
-    secondChartData: {
-      series: [
-        { name: '包装破损', value: 30, itemStyle: { color: '#ef4444' } },
-        { name: '标签错误', value: 25, itemStyle: { color: '#f59e0b' } },
-        { name: '密封不良', value: 20, itemStyle: { color: '#3b82f6' } },
-        { name: '尺寸不符', value: 15, itemStyle: { color: '#10b981' } },
-        { name: '其他', value: 15, itemStyle: { color: '#6b7280' } }
-      ]
-    }
+    secondChartData: null
   }
 ])
 
-// 右侧金工一部的面板数据
+// 右侧总装二课的面板数据（初始化为空状态）
 const department2Panels = ref<PanelData[]>([
   {
     id: '1',
     title: '总装二课工单结单率',
-    description: [
-      { label: 'A类:月度累计排产工单', value: '1,180' },
-      { label: '累计准交工单', value: '1,120' },
-      { label: '结单率', value: '94.9%' },
-      { label: '常规:月度累计排产工单', value: '1,950' },
-      { label: '累计准交工单', value: '1,850' },
-      { label: '结单率', value: '94.9%' }
-    ],
+    description: [],
     chartTitle: '工单结单率趋势',
-    chartType: 'bar' as const, // 混合图表，但默认类型设为 bar
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: 'A类标准',
-          type: 'line', // 标准用折线图
-          data: [95, 95, 95, 95, 95, 95],
-          itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
-        },
-        {
-          name: 'A类实际',
-          type: 'bar', // 实际用柱状图
-          data: [94, 95, 93, 94, 95, 94],
-          itemStyle: { color: '#3b82f6' }
-        },
-        {
-          name: '常规标准',
-          type: 'line', // 标准用折线图
-          data: [94, 94, 94, 94, 94, 94],
-          itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' } // 标准线使用虚线
-        },
-        {
-          name: '常规实际',
-          type: 'bar', // 实际用柱状图
-          data: [93, 94, 92, 93, 94, 93],
-          itemStyle: { color: '#ef4444' }
-        }
-      ]
-    },
+    chartType: 'bar' as const,
+    chartData: null,
     chartTypeDescription: '折线图(标准) + 柱状图(实际)'
   },
   {
     id: '2',
     title: '总装二课直通率',
-    description: [
-    { label: 'A类直通率标准', value: '75%' },
-      { label: 'A类月度累计直通率', value: '97.2%' },
-      { label: '达成率', value: '95.7%' },
-      { label: '常规直通率标准', value: '72%' },
-      { label: '常规月度累计直通率', value: '96.5%' },
-      { label: '达成率', value: '94.3%' }
-    ],
+    description: [],
     chartTitle: '直通率趋势',
     chartType: 'line' as const,
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: 'A类标准',
-          type: 'line',
-          data: [89, 89, 89, 89, 89, 89],
-          itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' }
-        },
-        {
-          name: 'A类实际',
-          type: 'line',
-          data: [0, 0, 0, 0, 0, 0],
-          itemStyle: { color: '#3b82f6' },
-          smooth: true
-        },
-        {
-          name: '常规标准',
-          type: 'line',
-          data: [87, 87, 87, 87, 87, 87],
-          itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' }
-        },
-        {
-          name: '常规实际',
-          type: 'line',
-          data: [0, 0, 0, 0, 0, 0],
-          itemStyle: { color: '#ef4444' },
-          smooth: true
-        }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '折线图(每月标准和实际)'
   },
   {
     id: '3',
     title: '总装二课人效达成率',
-    description: [
-      { label: '人效达成率标准', value: '89%' },
-      { label: '实际达成', value: '0%' },
-      { label: '达成率', value: '0%' }
-    ],
+    description: [],
     chartTitle: '人效达成率',
     chartType: 'bar' as const,
-    chartData: {
-      categories: ['1月', '2月', '3月', '4月', '5月', '6月'],
-      series: [
-        {
-          name: '计划天数',
-          type: 'bar',
-          data: [22, 22, 22, 22, 22, 22],
-          itemStyle: { color: '#6b7280' }
-        },
-        {
-          name: '达成天数',
-          type: 'bar',
-          data: [21, 21, 20, 22, 21, 21],
-          itemStyle: { color: '#10b981' }
-        }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '柱状图(每月计划和实际)',
     hideRegular: true
   },
   {
     id: '4',
     title: 'TOP质量问题',
-    description: [], // 空数组，不显示数据区域
+    description: [],
     chartTitle: '总装TOP前5不良数',
     chartType: 'pie' as const,
-    chartData: {
-      series: [
-        { name: '装配错误', value: 28, itemStyle: { color: '#ef4444' } },
-        { name: '零件缺失', value: 22, itemStyle: { color: '#f59e0b' } },
-        { name: '尺寸偏差', value: 18, itemStyle: { color: '#3b82f6' } },
-        { name: '功能异常', value: 15, itemStyle: { color: '#10b981' } },
-        { name: '其他', value: 15, itemStyle: { color: '#6b7280' } }
-      ]
-    },
+    chartData: null,
     chartTypeDescription: '饼图(显示总装TOP前5不良数和占比)',
-    // TOP质量问题模式配置
     isTopQualityMode: true,
     secondChartTitle: '包装TOP前5不良数',
     secondChartType: 'pie' as const,
-    secondChartData: {
-      series: [
-        { name: '包装破损', value: 25, itemStyle: { color: '#ef4444' } },
-        { name: '标签错误', value: 20, itemStyle: { color: '#f59e0b' } },
-        { name: '密封不良', value: 18, itemStyle: { color: '#3b82f6' } },
-        { name: '尺寸不符', value: 12, itemStyle: { color: '#10b981' } },
-        { name: '其他', value: 10, itemStyle: { color: '#6b7280' } }
-      ]
-    }
+    secondChartData: null
   }
 ])
 
@@ -930,7 +912,11 @@ onMounted(() => {
     fetchDepartment1ThroughputRateTrend(), // 获取总装一课直通率趋势数据
     fetchDepartment2ThroughputRateTrend(), // 获取总装二课直通率趋势数据
     fetchDepartment1Efficiency(),
-    fetchDepartment2Efficiency()
+    fetchDepartment2Efficiency(),
+    fetchDepartment1EfficiencyTrend(), // 获取总装一课人效达成率趋势数据
+    fetchDepartment2EfficiencyTrend(), // 获取总装二课人效达成率趋势数据
+    fetchDepartment1TopQualityData(), // 获取总装一课TOP质量问题数据
+    fetchDepartment2TopQualityData() // 获取总装二课TOP质量问题数据
   ])
   
   // 每5分钟更新一次数据（根据实际需求调整）
@@ -945,6 +931,10 @@ onMounted(() => {
     fetchDepartment2ThroughputRateTrend() // 获取总装二课直通率趋势数据
     fetchDepartment1Efficiency()
     fetchDepartment2Efficiency()
+    fetchDepartment1EfficiencyTrend() // 获取总装一课人效达成率趋势数据
+    fetchDepartment2EfficiencyTrend() // 获取总装二课人效达成率趋势数据
+    fetchDepartment1TopQualityData() // 获取总装一课TOP质量问题数据
+    fetchDepartment2TopQualityData() // 获取总装二课TOP质量问题数据
   }, 300000) // 5分钟
 })
 

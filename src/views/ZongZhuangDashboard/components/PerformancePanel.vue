@@ -4,10 +4,21 @@
       <h3 class="panel-title">{{ title }}</h3>
     </div>
     <div class="panel-content">
+      <!-- 加载状态 -->
+      <div v-if="loading" class="loading-state">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">数据加载中...</div>
+      </div>
+      
+      <!-- 空数据状态 -->
+      <div v-else-if="isEmpty" class="empty-state">
+        <div class="empty-text">暂无数据</div>
+      </div>
+      
       <!-- 普通模式：显示数据区域和图表 -->
-      <template v-if="!isTopQualityMode">
+      <template v-else-if="!isTopQualityMode">
         <!-- A类数据区域 -->
-        <div class="data-section class-a-data">
+        <div class="data-section class-a-data" v-if="description && description.length > 0">
           <div class="data-category">
             <h4 class="category-title">A类</h4>
             <div class="data-items">
@@ -17,7 +28,7 @@
               </div>
             </div>
           </div>
-          <div v-if="!hideRegular" class="data-category">
+          <div v-if="!hideRegular && description.length > 3" class="data-category">
             <h4 class="category-title">常规</h4>
             <div class="data-items">
               <div v-for="(item, index) in description.slice(3)" :key="index" class="data-item">
@@ -29,7 +40,7 @@
         </div>
         
         <!-- 图表区域 -->
-        <div class="chart-section" v-if="!isDualPieChart">
+        <div class="chart-section" v-if="!isDualPieChart && chartData && (chartData.categories || chartData.series)">
           <Chart
             :title="chartTitle"
             :type="chartType"
@@ -40,7 +51,7 @@
         </div>
         
         <!-- 双饼图区域 -->
-        <div class="dual-chart-section" v-if="isDualPieChart">
+        <div class="dual-chart-section" v-if="isDualPieChart && chartData && chartData.series">
           <div class="pie-chart-item">
             <Chart
               :title="chartTitle"
@@ -50,7 +61,7 @@
               :show-actions="false"
             />
           </div>
-          <div class="pie-chart-item">
+          <div class="pie-chart-item" v-if="secondChartData && secondChartData.series">
             <Chart
               :title="secondChartTitle"
               :type="secondChartType"
@@ -65,7 +76,7 @@
       <!-- TOP质量问题模式：只显示双饼图 -->
       <template v-else>
         <div class="top-quality-charts">
-          <div class="pie-chart-item">
+          <div class="pie-chart-item" v-if="chartData && chartData.series">
             <Chart
               :title="chartTitle"
               :type="chartType"
@@ -74,7 +85,7 @@
               :show-actions="false"
             />
           </div>
-          <div class="pie-chart-item">
+          <div class="pie-chart-item" v-if="secondChartData && secondChartData.series">
             <Chart
               :title="secondChartTitle"
               :type="secondChartType"
@@ -90,6 +101,7 @@
 </template>
 
 <script setup lang="ts">
+import { computed } from 'vue'
 import Chart from './Chart.vue'
 
 interface DescriptionItem {
@@ -114,16 +126,40 @@ interface Props {
   isTopQualityMode?: boolean
   // 隐藏常规部分
   hideRegular?: boolean
+  // 加载状态
+  loading?: boolean
 }
 
-withDefaults(defineProps<Props>(), {
+const props = withDefaults(defineProps<Props>(), {
   chartHeight: '200px',
   isDualPieChart: false,
   secondChartTitle: '',
   secondChartType: 'pie' as const,
   secondChartData: () => ({}),
   isTopQualityMode: false,
-  hideRegular: false
+  hideRegular: false,
+  loading: false
+})
+
+// 计算是否为空数据
+const isEmpty = computed(() => {
+  if (props.loading) return false
+  
+  // TOP质量问题模式：检查图表数据
+  if (props.isTopQualityMode) {
+    const hasChartData = props.chartData && props.chartData.series && props.chartData.series.length > 0
+    const hasSecondChartData = props.secondChartData && props.secondChartData.series && props.secondChartData.series.length > 0
+    return !hasChartData && !hasSecondChartData
+  }
+  
+  // 普通模式：检查描述数据和图表数据
+  const hasDescription = props.description && props.description.length > 0
+  const hasChartData = props.chartData && (
+    (props.chartData.categories && props.chartData.categories.length > 0) ||
+    (props.chartData.series && props.chartData.series.length > 0)
+  )
+  
+  return !hasDescription && !hasChartData
 })
 </script>
 
@@ -253,6 +289,7 @@ withDefaults(defineProps<Props>(), {
   display: flex;
   gap: 6px;
   height: 100%;
+  flex-direction: column;
 }
 
 .pie-chart-item {
@@ -290,5 +327,50 @@ withDefaults(defineProps<Props>(), {
   .chart-section {
     min-height: 0;
   }
+}
+
+/* 加载状态 */
+.loading-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+  gap: 12px;
+}
+
+.loading-spinner {
+  width: 32px;
+  height: 32px;
+  border: 3px solid rgba(0, 150, 255, 0.3);
+  border-top-color: #00d4ff;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.loading-text {
+  color: #00d4ff;
+  font-size: 14px;
+}
+
+/* 空数据状态 */
+.empty-state {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+}
+
+.empty-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 16px;
 }
 </style>
