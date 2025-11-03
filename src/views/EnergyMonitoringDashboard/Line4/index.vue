@@ -34,11 +34,11 @@
           <div class="card-content">
             <!-- 2x2 网格布局 -->
             <div class="energy-data-grid">
-              <!-- 标准每台耗电量 -->
+              <!-- 标准每台耗气量 -->
               <div class="energy-data-item">
                 <div class="data-header">
                   <span class="data-icon">🎯</span>
-                  <span class="data-label">标准每台耗电量</span>
+                  <span class="data-label">标准每台耗气量</span>
                 </div>
                 <div class="number-display">
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
@@ -48,11 +48,11 @@
                 </div>
               </div>
               
-              <!-- 实际每台日耗电量 -->
+              <!-- 实际每台日耗气量 -->
               <div class="energy-data-item">
                 <div class="data-header">
                   <span class="data-icon">⚡</span>
-                  <span class="data-label">实际每台日耗电量</span>
+                  <span class="data-label">实际每台日耗气量</span>
                 </div>
                 <div class="number-display">
                   <span class="number-value" :style="{ 
@@ -72,7 +72,7 @@
               <div class="energy-data-item">
                 <div class="data-header">
                   <span class="data-icon">🔋</span>
-                  <span class="data-label">实际每台月耗电量</span>
+                  <span class="data-label">实际每台月耗气量</span>
                 </div>
                 <div class="number-display">
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
@@ -86,7 +86,7 @@
               <div class="energy-data-item">
                 <div class="data-header">
                   <span class="data-icon">🔋</span>
-                  <span class="data-label">实际月度耗电量</span>
+                    <span class="data-label">实际月度耗气量</span>
                 </div>
                 <div class="number-display">
                   <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
@@ -315,9 +315,9 @@ const energyData = computed(() => {
     // 标准每台写死：根据气表代码设置（Line4组件专用）
     let standardPerUnit = '0.0'
     if (item.machCode === '000025061801') {
-      standardPerUnit = '0.15'  // 气表1的标准每台耗电量（金工二部四楼车间气表）
+      standardPerUnit = '0.15'  // 气表1的标准每台耗气量（金工二部四楼车间气表）
     } else if (item.machCode === '000025061802') {
-      standardPerUnit = '0.27'  // 气表2的标准每台耗电量（金工二部一楼车间气表）
+      standardPerUnit = '0.27'  // 气表2的标准每台耗气量（金工二部一楼车间气表）
     }
     
     
@@ -357,7 +357,17 @@ const energyData = computed(() => {
       actualPerUnit,        // 实际每台月耗电量
       actualPerUnitDaily,   // 实际每台日耗电量
       ratio,
-      workshopName: item.workshopName || item.machName || item.machCode
+      // 从machName中提取车间名称：如果以"气表"结尾，则去掉"气表"
+      workshopName: (() => {
+        if (!item.machName) {
+          return item.machCode || '-'
+        }
+        // 如果machName以"气表"结尾，去掉"气表"
+        if (item.machName.endsWith('气表')) {
+          return item.machName.replace('气表', '').trim()
+        }
+        return item.machName
+      })()
     }
     
 

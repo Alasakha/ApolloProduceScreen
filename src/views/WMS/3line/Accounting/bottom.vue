@@ -38,13 +38,15 @@ const fetchData = async () => {
 }
 
 // 监听数据变化渲染图表
-watch(OutboundData, () => {
-  nextTick(() => {
-    initChart()
-    const option = createChartOption1(OutboundData.value, '当月出库及时率', ['rate', 'pmcKpiCount'])
-    setOption(option)
-    resizeChart()
-  })
+watch(OutboundData, (newData) => {
+  if (newData && newData.length > 0) {
+    nextTick(() => {
+      initChart()
+      const option = createChartOption1(newData, '当月出库及时率', ['rate', 'pmcKpiCount'])
+      setOption(option)
+      resizeChart()
+    })
+  }
 }, { deep: true, immediate: true })
 
 onMounted(() => {

@@ -124,7 +124,7 @@ export const getstagnantAmount= (type) => {
       //   "rate": 99.7,  及时率
       //   "pmcKpiCount": 0  异常次数
     
-    // /\MS/timelyAccountingRate'
+    // /\MS/timelyAccountingRate
     export const gettimelyAccountingRate= () => {
       return request({
         url: '/WMS/timelyAccountingRate',

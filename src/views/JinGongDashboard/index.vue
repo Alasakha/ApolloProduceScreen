@@ -106,7 +106,7 @@ const department1Panels = ref([
     id: '2',
     title: '直通率',
     description: [
-      { label: 'A类:冲压月度累计合格率', value: '98.5%' },
+      { label: 'A类总装直通率标准', value: '98.5%' },
       { label: '喷涂月度累计合格率', value: '97.2%' },
       { label: '直通率', value: '95.7%' },
       { label: '常规:冲压月度累计合格率', value: '97.8%' },
@@ -297,9 +297,9 @@ const department2Panels = ref([
     id: '3',
     title: '人效达成率',
     description: [
-      { label: 'A类:月度累计排产天数', value: '22' },
-      { label: 'A类:月度累计达成天数', value: '21' },
-      { label: 'A类:月度达成率', value: '95.5%' },
+      { label: '人效达成率标准', value: '22' },
+      { label: '实际达成率', value: '21' },
+      { label: '达成率', value: '95.5%' },
       { label: '常规:月度累计排产天数', value: '20' },
       { label: '常规:月度累计达成天数', value: '19' },
       { label: '常规:月度达成率', value: '95.0%' }

@@ -26,7 +26,7 @@
 <script lang="ts" setup>
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { getTodayProductionInfo } from '@/api/getProduceinfo';
-// import { getTodayProduction } from '@/api/getStampWeldinfo';
+import { getTodayProduction } from '@/api/getStampWeldinfo';
 import { eventBus } from '@/utils/eventbus';
 
 const dayList = ref([
@@ -36,7 +36,6 @@ const dayList = ref([
   { name: '二课包装：', plan: '', done: '', rate: '' },
   { name: '一课总装：', plan: '', done: '', rate: '' },
   { name: '二课总装：', plan: '', done: '', rate: '' },
- 
 ]);
 
 const prodLines = {
@@ -44,8 +43,8 @@ const prodLines = {
   '二课包装：': '2005',
   '二课总装：': '2004',
   '一课总装：': '1004',
-  '一部焊接：': '1002',
-  '二部焊接：': '2002'
+  '一部焊接：': '1003',
+  '二部焊接：': '2006'
 };
 
 const fetchData = async () => {
@@ -55,6 +54,21 @@ const fetchData = async () => {
         const line = prodLines[item.name];
         if (!line) return item;
         
+        // 一部焊接和二部焊接使用 getTodayProduction 接口
+        if (item.name === '一部焊接：' || item.name === '二部焊接：') {
+          const res = await getTodayProduction(line);
+          const pcTotal = res.data?.pcTotal || 0;
+          const done = res.data?.done || 0;
+          const rate = pcTotal > 0 ? ((done / pcTotal) * 100).toFixed(1) : '0';
+          return {
+            ...item,
+            plan: pcTotal,
+            done: done,
+            rate: `${rate}%`
+          };
+        }
+        
+        // 其他项使用 getTodayProductionInfo 接口
         const res = await getTodayProductionInfo(line);
         return {
           ...item,

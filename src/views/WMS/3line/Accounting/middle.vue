@@ -1,11 +1,11 @@
 <template>
-  <dv-border-box8 :dur="5" class="w-full h-full">
+  <div :dur="5" class="w-full h-full">
     <div class="chartsbox w-full h-full">
       <div v-if="!isDataEmpty && !isLoading" ref="chartRef" class="w-full h-full"></div>
       <div v-else-if="isLoading" class="text-white flex items-center justify-center h-full">正在加载配送异常数据...</div>
       <div v-else class="text-white flex items-center justify-center h-full">暂无数据</div>
     </div>
-  </dv-border-box8>
+  </div>
 </template>
 
 <script setup>

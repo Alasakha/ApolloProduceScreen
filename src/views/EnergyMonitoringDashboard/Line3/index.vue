@@ -324,8 +324,18 @@ const energyData = computed(() => {
     const difference = Number(actualPerUnit) - Number(standardPerUnit)
     const ratio = difference.toFixed(1)
     
+    // 从machName中提取车间名称：如果以"气表"结尾，则去掉"气表"
+    const getWorkshopName = () => {
+      if (!item.machName) {
+        return item.machCode || '-'
+      }
+      // 如果machName以"气表"结尾，去掉"气表"
+      if (item.machName.endsWith('气表')) {
+        return item.machName.replace('气表', '').trim()
+      }
+      return item.machName
+    }
 
-    
     const result = {
       ...item,
       standardTotal,        // 标准总电
@@ -334,7 +344,7 @@ const energyData = computed(() => {
       actualPerUnit,        // 实际每台（月）
       actualPerUnitDaily,   // 实际每台（日）
       ratio,
-      workshopName: item.workshopName || item.machName || item.machCode
+      workshopName: getWorkshopName()
     }
     
 
@@ -1028,9 +1038,7 @@ const submitReason = async () => {
     padding: 16px;
   }
   
-  .workshop-name {
-    font-size: 1px;
-  }
+
   
   .ratio {
     font-size: 14px;

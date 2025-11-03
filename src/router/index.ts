@@ -200,6 +200,11 @@ const routes: RouteRecordRaw[] = [
     name: 'ZongZhuangDashboard',   // 路由名
     component: () => import('@/views/ZongZhuangDashboard/index.vue')
   },
+  {
+    path: '/equipmentdashboard', // URL地址
+    name: 'EquipmentDashboard',   // 路由名
+    component: () => import('@/views/EquipmentDashboard/index.vue')
+  },
 ];
 
 

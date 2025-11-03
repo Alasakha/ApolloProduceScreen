@@ -3,8 +3,6 @@
     <div v-if="!isLoading" ref="chartRef" class="w-full h-[100%]"></div>
     <div v-else class="text-white"> 正在加载......</div>
 </div>
-
-
 </template>
 
 
@@ -38,15 +36,17 @@ const fetchData = async () => {
 }
 
 // 监听数据变化渲染图表
-watch(chartData, () => {
-  nextTick(() => {
-    initChart()
-    // x轴 warehouseKeeper；两组柱 qty,bjsNum
-    // createChartOption1 支持第三参数用于双Y柱状图
-    const option = createChartOption1(chartData.value, '当月出库及时率', ['rate', 'pmcKpiCount'])
-    setOption(option)
-    resizeChart() // 初始化后立即resize
-  })
+watch(chartData, (newData) => {
+  if (newData && newData.length > 0) {
+    nextTick(() => {
+      initChart()
+      // x轴 warehouseKeeper；两组柱 rate,pmcKpiCount
+      // createChartOption1 支持第三参数用于双Y柱状图
+      const option = createChartOption1(newData, '当月入库及时率', ['rate', 'pmcKpiCount'])
+      setOption(option)
+      resizeChart() // 初始化后立即resize
+    })
+  }
 }, { deep: true, immediate: true })
 
 onMounted(() => {

@@ -43,7 +43,6 @@
       <dv-border-box-12 class="data-box ">
       <Datacard title="合格率" EnlishTitle="PassRateToday" :value="apolloStampingWeldingData.passPercent" />
       </dv-border-box-12> -->
-
     </div>
     <Dialog 
       v-model="dialogVisible" 

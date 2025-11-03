@@ -51,10 +51,10 @@
               </button>
             </div> -->
             <div class="video-monitors">
-              <H5PlayerMonitor  ip="192.168.20.86"/>
+              <H5PlayerMonitor  ip="192.168.10.64"/>
             </div>
             <div class="video-monitors">
-              <H5PlayerMonitor  ip="192.168.20.27"/>
+              <H5PlayerMonitor  ip="192.168.20.56"/>
             </div>
             <div class="video-monitors">
               <H5PlayerMonitor  ip="192.168.10.87"/>

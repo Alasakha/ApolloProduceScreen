@@ -64,7 +64,6 @@ import Datacard from '../components/Datacard.vue'
 import { getStampingPgAbnormal,getStampingBgAbnormal } from '@/api/getStampWeldinfo'
 import Dialog from '../components/Dialog.vue'
 
-
 const currentApi = ref<'getStampingPgAbnormal' | 'getStampingBgAbnormal'>('getStampingPgAbnormal')
 const route = useRoute()
 const prodLine = route.query.prodLine as string
@@ -81,16 +80,17 @@ const productionData = ref<TodayProduction>({
   done: 0,           // 报工数
   undone: 0,       // 未报工数
 })
+
  const header = [
  '工作中心','工单号','客户单号','排产日期','品号','品名','规格','工单数量','排产数'
 ]
+
 const apolloStampingWeldingData = ref<ApolloStampingWelding>({
   checkTotal: 0,
   firstHgTotal: 0,
   passPercent: '',
   toBeInspected: 0
 })
-
 
 
 const fetchData = async (prodLine) => {

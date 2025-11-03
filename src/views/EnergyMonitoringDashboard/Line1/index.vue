@@ -164,7 +164,7 @@ const fetchYearlyData = async () => {
     const firstDayOfMonth = `${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-01`
     
     // 获取电力数据 - 使用consume接口，machCode为616506210007
-    const electricRes = await getConsume(firstDayOfMonth, '616506210007')
+    const electricRes = await getConsume(firstDayOfMonth, '616506210005')
     if (electricRes.code === 200 && electricRes.data) {
       yearlyElectricData.value = electricRes.data
       console.log(yearlyElectricData.value)

@@ -33,28 +33,36 @@ export function createChartOption(data, title, barFields) {
   const isRateField = fields.includes('rate')
   
   // 如果是多个字段，生成多个 series
-  const seriesList = fields.map((field, idx) => ({
-    name: fieldNameMap[field] || field,
-    type: 'bar',
-    data: data.map(item => item[field] ?? 0),
-    itemStyle: {
-      color: ["#006cff", "#60cda0", "#ed8884", "#ff9f7f", "#0096ff", "#9fe6b8", "#32c5e9", "#1d9dff"][idx % 8]
-    },
-    barWidth: fields.length > 1 ? '40%' : undefined,
-    label: {
-      show: true,
-      position: 'top',
-      color: '#fff',
-      formatter: isRateField && fields.length === 1 ? '{c}%' : '{c}'
+  const seriesList = fields.map((field, idx) => {
+    // 根据字段类型设置标签格式
+    let labelFormatter = '{c}次'; // 默认所有数值都加"次"
+    if (field === 'rate') {
+      labelFormatter = '{c}%'; // 及时率添加百分号，不加"次"
     }
-  }))
+    
+    return {
+      name: fieldNameMap[field] || field,
+      type: 'bar',
+      data: data.map(item => item[field] ?? 0),
+      itemStyle: {
+        color: ["#006cff", "#60cda0", "#ed8884", "#ff9f7f", "#0096ff", "#9fe6b8", "#32c5e9", "#1d9dff"][idx % 8]
+      },
+      barWidth: fields.length > 1 ? '40%' : undefined,
+      label: {
+        show: true,
+        position: 'top',
+        color: '#fff',
+        formatter: labelFormatter
+      }
+    }
+  })
   
   return {
     grid: { 
       left: '3%', 
       right: '4%', 
       bottom: fields.length > 1 ? '0%' : '40', 
-      top: fields.length > 1 ? '15%' : '10%', 
+      top: fields.length > 1 ? '15%' : '20%', 
       containLabel: true 
     },
     title: {

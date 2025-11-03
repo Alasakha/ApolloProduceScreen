@@ -17,7 +17,7 @@
               </div>
             </div>
           </div>
-          <div class="data-category">
+          <div v-if="!hideRegular" class="data-category">
             <h4 class="category-title">常规</h4>
             <div class="data-items">
               <div v-for="(item, index) in description.slice(3)" :key="index" class="data-item">
@@ -112,6 +112,8 @@ interface Props {
   secondChartData?: any
   // TOP质量问题模式
   isTopQualityMode?: boolean
+  // 隐藏常规部分
+  hideRegular?: boolean
 }
 
 withDefaults(defineProps<Props>(), {
@@ -120,7 +122,8 @@ withDefaults(defineProps<Props>(), {
   secondChartTitle: '',
   secondChartType: 'pie' as const,
   secondChartData: () => ({}),
-  isTopQualityMode: false
+  isTopQualityMode: false,
+  hideRegular: false
 })
 </script>
 
@@ -176,6 +179,10 @@ withDefaults(defineProps<Props>(), {
   padding: 10px;
   display: flex;
   flex-direction: column;
+}
+
+.data-section:has(.data-category:only-child) .data-category {
+  max-width: 100%;
 }
 
 .category-title {
