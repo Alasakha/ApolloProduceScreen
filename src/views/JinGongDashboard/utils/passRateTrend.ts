@@ -1,47 +1,45 @@
-// 直通率趋势数据工具函数
-import type { QualityReportPerformanceTrendResponse, QualityReportPerformanceMonthData, QualityReportPerformanceItem } from '@/api/getMesInfo'
+// 金工直通率趋势数据工具函数
+import type { PassRatePerformanceTrendResponse, PassRatePerformanceTrendMonthData } from '@/api/getMesInfo'
 
-// 解析first_ok_rate字符串为数字（百分比转为小数）
-function parseRate(rate: string | null | undefined): number {
-  if (!rate) return 1
-  const parsed = parseFloat(rate)
-  return isNaN(parsed) ? 1 : parsed / 100 // 转换为小数（如86.46% -> 0.8646）
-}
-
-// 获取数组中第一个有效项的first_ok_rate，如果没有则返回1
-function getFirstRate(items: (QualityReportPerformanceItem | null)[] | undefined): number {
+// 获取数组第一项的rate，如果没有则返回1
+function getFirstRate(items: Array<{ rate: number }> | undefined): number {
   if (!items || items.length === 0) return 1
-  const firstItem = items[0]
-  if (!firstItem) return 1
-  return parseRate(firstItem.first_ok_rate)
+  const rate = items[0]?.rate
+  // 如果 rate 是 undefined 或 null，返回 1
+  if (rate === undefined || rate === null) return 1
+  return rate
 }
 
-// 计算当日直通率：xxj_a × cpj_a × chhj_a 的first_ok_rate相乘
-export function calculateDailyThroughputRate(
-  data: QualityReportPerformanceMonthData
-): number {
-  const xxjRate = getFirstRate(data.xxj_a)
-  const cpjRate = getFirstRate(data.cpj_a)
-  const chhjRate = getFirstRate(data.chhj_a)
+// 计算A类直通率：painting_a × chongya
+function calculateAClassThroughput(data: PassRatePerformanceTrendMonthData): number {
+  const paintingRate = getFirstRate(data.painting_a) // 小数格式，如 0.875
+  const chongyaRate = getFirstRate(data.chongya) / 100 // 百分比转小数，如 98.5 -> 0.985
   
-  return xxjRate * cpjRate * chhjRate
+  // 如果 chongyaRate 为 0，直接返回 paintingRate（避免乘以0导致结果为0）
+  if (chongyaRate === 0) {
+    return paintingRate
+  }
+  
+  return paintingRate * chongyaRate
 }
 
-// 计算常规类当日直通率：xxj_normal × cpj_normal × chhj_normal 的first_ok_rate相乘
-export function calculateDailyRegularThroughputRate(
-  data: QualityReportPerformanceMonthData
-): number {
-  const xxjRate = getFirstRate(data.xxj_normal)
-  const cpjRate = getFirstRate(data.cpj_normal)
-  const chhjRate = getFirstRate(data.chhj_normal)
+// 计算常规类直通率：painting_normal × chongya
+function calculateRegularThroughput(data: PassRatePerformanceTrendMonthData): number {
+  const paintingRate = getFirstRate(data.painting_normal) // 小数格式，如 0.883
+  const chongyaRate = getFirstRate(data.chongya) / 100 // 百分比转小数，如 98.5 -> 0.985
   
-  return xxjRate * cpjRate * chhjRate
+  // 如果 chongyaRate 为 0，直接返回 paintingRate（避免乘以0导致结果为0）
+  if (chongyaRate === 0) {
+    return paintingRate
+  }
+  
+  return paintingRate * chongyaRate
 }
 
 // 转换趋势接口数据为图表数据
-export function transformQualityReportTrendData(
-  apiData: QualityReportPerformanceTrendResponse | null,
-  department: '总装一课' | '总装二课'
+export function transformPassRateTrendData(
+  apiData: PassRatePerformanceTrendResponse | null,
+  department: '金工一部' | '金工二部'
 ): {
   categories: string[]
   series: Array<{
@@ -67,10 +65,10 @@ export function transformQualityReportTrendData(
     }
   }
 
-  // 定义标准值
+  // 定义标准值（根据实际需求调整）
   const standards = {
-    '总装一课': { A: 75, 常规: 72 },
-    '总装二课': { A: 89, 常规: 87 }
+    '金工一部': { A: 75, 常规: 72 },
+    '金工二部': { A: 75, 常规: 72 }
   }
   const aClassStandard = standards[department].A
   const regularStandard = standards[department].常规
@@ -86,9 +84,9 @@ export function transformQualityReportTrendData(
   monthKeys.forEach(monthKey => {
     const monthData = apiData.data[monthKey]
     
-    // 计算该月的A类和常规类当日直通率
-    const monthAThroughput = calculateDailyThroughputRate(monthData)
-    const monthRegularThroughput = calculateDailyRegularThroughputRate(monthData)
+    // 计算该月的A类和常规类直通率
+    const monthAThroughput = calculateAClassThroughput(monthData)
+    const monthRegularThroughput = calculateRegularThroughput(monthData)
     
     // 转换为百分比值
     aClassActualData.push(parseFloat((monthAThroughput * 100).toFixed(2)))

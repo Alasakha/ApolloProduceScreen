@@ -1,6 +1,6 @@
 import request from '../utils/request'
 
-// /report/orderSettlement_performance 开始日期取本月第一天  结束日期取今天   workCenter：总装一课 总装二课
+// /report/orderSettlement_performance 开始日期取本月第一天  结束日期取今天   workCenter：总装一课 总装二课 金工一部焊接 金工二部焊接
 export const getOrderSettlementPerformance = (workCenter,dateTimeStart,dateTimeStop) => {
   return request({
     url: '/report/orderSettlement_performance',
@@ -244,4 +244,99 @@ export interface ProductionAchievementRatePerformanceTrendResponse {
   } & {
     achieveRate?: string // 整体达成率（可能出现在最外层）
   }
+}
+
+
+
+// /report/passRate_performance?prodLine=1003&dayStart=2025-11-07&dayEnd=2025-11-07 开始日期取本月第一天  结束日期取今天    金工一部：1003 金工二部：2003
+export const getPassRatePerformance = (prodLine,dayStart,dayEnd) => {
+  return request({
+    url: '/report/passRate_performance',
+    method: 'get',
+    params: { prodLine, dayStart, dayEnd }
+  })
+}
+
+// 金工直通率数据项类型
+export interface PassRatePaintingItem {
+  inspectionDate: string | null
+  cjTotal: number
+  hchTotal: number
+  wjTotal: number
+  cjNg: number
+  hchNg: number
+  wjNg: number
+  cjHg: number
+  hchHg: number
+  wjHg: number
+  cjFirstNg: number
+  hchFirstNg: number
+  wjFirstNg: number
+  rate: number // 小数格式，如 0.875 表示 87.5%
+  firstRate: number | null
+}
+
+export interface PassRateChongyaItem {
+  inspectionDate: string | null
+  total: number
+  hg: number
+  ng: number
+  rate: number // 百分比格式，如 98.5 表示 98.5%
+}
+
+// 金工直通率绩效数据
+export interface PassRatePerformanceData {
+  hjPassRate_a: number | null
+  hjPassRate_normal: number | null
+  painting_a: PassRatePaintingItem[]
+  painting_normal: PassRatePaintingItem[]
+  chongya: PassRateChongyaItem[]
+  zhusu: number | null
+}
+
+// 金工直通率绩效响应类型
+export interface PassRatePerformanceResponse {
+  code: number
+  message: string
+  data: PassRatePerformanceData
+}
+
+// 金工直通率绩效趋势月度数据
+export interface PassRatePerformanceTrendMonthData {
+  hjPassRate_a: number | null
+  hjPassRate_normal: number | null
+  painting_a: PassRatePaintingItem[]
+  painting_normal: PassRatePaintingItem[]
+  chongya: PassRateChongyaItem[]
+  zhusu: number | null
+}
+
+// 金工直通率绩效趋势响应类型
+export interface PassRatePerformanceTrendResponse {
+  code: number
+  message: string
+  data: {
+    [monthKey: string]: PassRatePerformanceTrendMonthData // monthKey格式：YYYY-MM，如 "2025-10"
+  }
+}
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/report/passRate_performance_trend?prodLine=1003' \ 金工一部二部趋势图 1003 2003
+//   -H 'accept: */*'
+export const getPassRatePerformanceTrend = (prodLine) => {
+  return request({
+    url: '/report/passRate_performance_trend',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+
+// /stampingWelding/monthProductionCust?prodLine=1003 金工一部1003 金工二部2003
+export const getMonthProductionCust = (prodLine) => {
+  return request({
+    url: '/stampingWelding/monthProductionCust',
+    method: 'get',
+    params: { prodLine }
+  })
 }

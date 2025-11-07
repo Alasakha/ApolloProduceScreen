@@ -85,14 +85,19 @@
               :show-actions="false"
             />
           </div>
-          <div class="pie-chart-item" v-if="secondChartData && secondChartData.series">
+          <div class="pie-chart-item" v-if="secondChartTitle && secondChartData !== undefined">
             <Chart
+              v-if="secondChartData && secondChartData.series && secondChartData.series.length > 0"
               :title="secondChartTitle"
               :type="secondChartType"
               :data="secondChartData"
               height="100%"
               :show-actions="false"
             />
+            <div v-else class="empty-chart">
+              <div class="empty-chart-title">{{ secondChartTitle }}</div>
+              <div class="empty-chart-text">暂无数据</div>
+            </div>
           </div>
         </div>
       </template>
@@ -372,5 +377,31 @@ const isEmpty = computed(() => {
 .empty-text {
   color: rgba(255, 255, 255, 0.5);
   font-size: 16px;
+}
+
+/* 空图表样式 */
+.empty-chart {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+  min-height: 200px;
+  height: 100%;
+  gap: 12px;
+}
+
+.empty-chart-title {
+  color: #00d4ff;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: center;
+  margin-bottom: 8px;
+}
+
+.empty-chart-text {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 14px;
+  text-align: center;
 }
 </style>

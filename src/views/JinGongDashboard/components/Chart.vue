@@ -126,7 +126,9 @@ const getChartOption = () => {
   }
 
   switch (props.type) {
-    case 'line':
+    case 'line': {
+      // 判断是否为直通率趋势，需要设置y轴最小值以便更好地观察数据变化
+      const isThroughputTrend = props.title === '直通率趋势'
       return {
         ...baseOption,
         xAxis: {
@@ -137,14 +139,18 @@ const getChartOption = () => {
         },
         yAxis: {
           type: 'value',
+          min: isThroughputTrend ? 60 : undefined, // 对于直通率趋势，设置最小值为85，放大数据变化
           axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.3)' } },
           axisLabel: { color: '#fff' },
           splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
         },
         series: props.data.series || []
       }
+    }
     
-    case 'bar':
+    case 'bar': {
+      // 判断是否为工单结单率趋势，需要设置y轴最小值以便更好地观察数据变化
+      const isOrderSettlementTrend = props.title === '工单结单率趋势'
       return {
         ...baseOption,
         xAxis: {
@@ -155,12 +161,14 @@ const getChartOption = () => {
         },
         yAxis: {
           type: 'value',
+          min: isOrderSettlementTrend ? 45 : undefined, // 对于工单结单率趋势，设置最小值为85，放大数据变化
           axisLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.3)' } },
           axisLabel: { color: '#fff' },
           splitLine: { lineStyle: { color: 'rgba(255, 255, 255, 0.1)' } }
         },
         series: props.data.series || []
       }
+    }
     
     case 'pie':
       return {

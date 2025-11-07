@@ -16,7 +16,7 @@
             <el-table-column prop="breakdown_name2" label="故障子类型" />
             <el-table-column prop="udf021" label="故障原因" />
             <el-table-column prop="udf022" label="解决方案" />
-            <el-table-column prop="udf023" label="处理方式" />
+            <el-table-column prop="udf023" label="责任部门" />
             <el-table-column prop="approvedate" label="审批日期" />
             <el-table-column prop="user_name" label="处理人" />
             <el-table-column prop="item_description" label="产品描述" />

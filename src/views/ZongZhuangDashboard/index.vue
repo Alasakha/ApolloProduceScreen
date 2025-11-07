@@ -70,7 +70,7 @@ import PerformancePanel from './components/PerformancePanel.vue'
 import { getOrderSettlementPerformance, getQualityReportPerformance, getProductionAchievementRate, getOrderSettlementPerformanceTrend, getQualityReportPerformanceTrend, getProductionAchievementRatePerformanceTrend, type GetMesInfoResponse, type ThroughputTrendResponse, type QualityReportPerformanceTrendResponse, type ProductionAchievementRatePerformanceTrendResponse } from '@/api/getMesInfo'
 import { transformQualityReportData, type QualityReportData } from './utils/zhitonglv'
 import { transformQualityReportTrendData } from './utils/zhitonglvTrend'
-import { transformEfficiencyTrendData, mergeEfficiencyTrendData } from './utils/efficiencyTrend'
+import { transformEfficiencyTrendData } from './utils/efficiencyTrend'
 import { fetchDepartment1TopQuality, fetchDepartment2TopQuality } from './utils/topQuality'
 
 // 定义面板数据类型
@@ -371,8 +371,8 @@ function transformOrderSettlementTrendData(
 
   // 定义标准值
   const standards = {
-    '总装一课': { A: 95, 常规: 94 },
-    '总装二课': { A: 95, 常规: 94 }
+    '总装一课': { A: 100, 常规: 95 },
+    '总装二课': { A: 100, 常规: 95 }
   }
   const aClassStandard = standards[department].A
   const regularStandard = standards[department].常规
@@ -499,7 +499,7 @@ function transformOrderSettlementTrendData(
           name: '常规实际',
           type: 'bar', // 实际用柱状图
           data: regularActualData,
-          itemStyle: { color: '#ef4444' },
+          itemStyle: { color: '#a855f7' },
           label: {
             show: true,
             position: 'top',
@@ -564,19 +564,20 @@ async function fetchDepartment2OrderSettlementTrend() {
 // 转换人效达成率接口数据为面板数据
 // 根据公式：实际达成 = (装配达成天数 + 包装达成天数) / (装配排产天数 + 包装排产天数)
 // 达成率 = 实际达成 / 标准
+// 如果只提供单个数据源，则只使用该数据源
 function transformEfficiencyData(
   assemblyData: GetMesInfoResponse | null,
-  packagingData: GetMesInfoResponse | null,
+  packagingData: GetMesInfoResponse | null = null,
   standard: number = 89
 ): Partial<PanelData> {
-  if (!assemblyData?.data || !packagingData?.data) {
+  if (!assemblyData?.data) {
     return {}
   }
 
   const assemblyPcDays = assemblyData.data.pcDays || 0
   const assemblyAchieveDays = assemblyData.data.achieveDays || 0
-  const packagingPcDays = packagingData.data.pcDays || 0
-  const packagingAchieveDays = packagingData.data.achieveDays || 0
+  const packagingPcDays = packagingData?.data?.pcDays || 0
+  const packagingAchieveDays = packagingData?.data?.achieveDays || 0
 
   // 计算实际达成：装配+包装达成天数 / 装配+包装排产天数
   const totalPcDays = assemblyPcDays + packagingPcDays
@@ -608,16 +609,13 @@ async function fetchDepartment1Efficiency() {
     department1Loading.value['3'] = true
     const monthDay = getCurrentMonth()
     
-    // 并行获取装配(1004)和包装(1005)的数据
-    const [assemblyResponse, packagingResponse] = await Promise.all([
-      getProductionAchievementRate('1004', monthDay),
-      getProductionAchievementRate('1005', monthDay)
-    ])
+    // 获取1004的数据
+    const response = await getProductionAchievementRate('1004', monthDay)
     
-    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
+    if (response.code === 200) {
       const transformedData = transformEfficiencyData(
-        assemblyResponse as GetMesInfoResponse,
-        packagingResponse as GetMesInfoResponse,
+        response as GetMesInfoResponse,
+        null,
         89
       )
       
@@ -627,7 +625,7 @@ async function fetchDepartment1Efficiency() {
       }
       console.log('✅ 总装一课人效达成率数据获取成功')
     } else {
-      console.warn('获取总装一课人效达成率数据失败:', assemblyResponse.message || packagingResponse.message)
+      console.warn('获取总装一课人效达成率数据失败:', response.message)
     }
   } catch (err: any) {
     console.error('获取总装一课人效达成率数据失败:', err)
@@ -642,16 +640,13 @@ async function fetchDepartment2Efficiency() {
     department2Loading.value['3'] = true
     const monthDay = getCurrentMonth()
     
-    // 并行获取装配(2004)和包装(2005)的数据
-    const [assemblyResponse, packagingResponse] = await Promise.all([
-      getProductionAchievementRate('2004', monthDay),
-      getProductionAchievementRate('2005', monthDay)
-    ])
+    // 获取2004的数据
+    const response = await getProductionAchievementRate('2004', monthDay)
     
-    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
+    if (response.code === 200) {
       const transformedData = transformEfficiencyData(
-        assemblyResponse as GetMesInfoResponse,
-        packagingResponse as GetMesInfoResponse,
+        response as GetMesInfoResponse,
+        null,
         89
       )
       
@@ -661,7 +656,7 @@ async function fetchDepartment2Efficiency() {
       }
       console.log('✅ 总装二课人效达成率数据获取成功')
     } else {
-      console.warn('获取总装二课人效达成率数据失败:', assemblyResponse.message || packagingResponse.message)
+      console.warn('获取总装二课人效达成率数据失败:', response.message)
     }
   } catch (err: any) {
     console.error('获取总装二课人效达成率数据失败:', err)
@@ -673,35 +668,26 @@ async function fetchDepartment2Efficiency() {
 // 获取总装一课人效达成率趋势数据
 async function fetchDepartment1EfficiencyTrend() {
   try {
-    // 并行获取装配(1004)和包装(1005)的趋势数据
-    const [assemblyResponse, packagingResponse] = await Promise.all([
-      getProductionAchievementRatePerformanceTrend('1004'),
-      getProductionAchievementRatePerformanceTrend('1005')
-    ])
+    // 获取1004的趋势数据
+    const response = await getProductionAchievementRatePerformanceTrend('1004')
     
-    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
-      // 合并装配和包装的趋势数据
-      const mergedData = mergeEfficiencyTrendData(
-        assemblyResponse as ProductionAchievementRatePerformanceTrendResponse,
-        packagingResponse as ProductionAchievementRatePerformanceTrendResponse
+    if (response.code === 200) {
+      const transformedData = transformEfficiencyTrendData(
+        response as ProductionAchievementRatePerformanceTrendResponse
       )
       
-      if (mergedData) {
-        const transformedData = transformEfficiencyTrendData(mergedData)
-        
-        // 更新第三个面板（人效达成率）的图表数据
-        if (department1Panels.value[2]) {
-          if (transformedData.categories && transformedData.series) {
-            department1Panels.value[2].chartData = {
-              categories: transformedData.categories,
-              series: transformedData.series
-            }
+      // 更新第三个面板（人效达成率）的图表数据
+      if (department1Panels.value[2]) {
+        if (transformedData.categories && transformedData.series) {
+          department1Panels.value[2].chartData = {
+            categories: transformedData.categories,
+            series: transformedData.series
           }
         }
       }
       console.log('✅ 总装一课人效达成率趋势数据获取成功')
     } else {
-      console.warn('获取总装一课人效达成率趋势数据失败:', assemblyResponse.message || packagingResponse.message)
+      console.warn('获取总装一课人效达成率趋势数据失败:', response.message)
     }
   } catch (err: any) {
     console.error('获取总装一课人效达成率趋势数据失败:', err)
@@ -711,35 +697,26 @@ async function fetchDepartment1EfficiencyTrend() {
 // 获取总装二课人效达成率趋势数据
 async function fetchDepartment2EfficiencyTrend() {
   try {
-    // 并行获取装配(2004)和包装(2005)的趋势数据
-    const [assemblyResponse, packagingResponse] = await Promise.all([
-      getProductionAchievementRatePerformanceTrend('2004'),
-      getProductionAchievementRatePerformanceTrend('2005')
-    ])
+    // 获取2004的趋势数据
+    const response = await getProductionAchievementRatePerformanceTrend('2004')
     
-    if (assemblyResponse.code === 200 && packagingResponse.code === 200) {
-      // 合并装配和包装的趋势数据
-      const mergedData = mergeEfficiencyTrendData(
-        assemblyResponse as ProductionAchievementRatePerformanceTrendResponse,
-        packagingResponse as ProductionAchievementRatePerformanceTrendResponse
+    if (response.code === 200) {
+      const transformedData = transformEfficiencyTrendData(
+        response as ProductionAchievementRatePerformanceTrendResponse
       )
       
-      if (mergedData) {
-        const transformedData = transformEfficiencyTrendData(mergedData)
-        
-        // 更新第三个面板（人效达成率）的图表数据
-        if (department2Panels.value[2]) {
-          if (transformedData.categories && transformedData.series) {
-            department2Panels.value[2].chartData = {
-              categories: transformedData.categories,
-              series: transformedData.series
-            }
+      // 更新第三个面板（人效达成率）的图表数据
+      if (department2Panels.value[2]) {
+        if (transformedData.categories && transformedData.series) {
+          department2Panels.value[2].chartData = {
+            categories: transformedData.categories,
+            series: transformedData.series
           }
         }
       }
       console.log('✅ 总装二课人效达成率趋势数据获取成功')
     } else {
-      console.warn('获取总装二课人效达成率趋势数据失败:', assemblyResponse.message || packagingResponse.message)
+      console.warn('获取总装二课人效达成率趋势数据失败:', response.message)
     }
   } catch (err: any) {
     console.error('获取总装二课人效达成率趋势数据失败:', err)
@@ -760,12 +737,14 @@ async function fetchDepartment1TopQualityData() {
           series: qualityData.assembly
         }
       }
-      // 更新包装饼图数据
-      if (qualityData.packaging && qualityData.packaging.length > 0) {
-        department1Panels.value[3].secondChartData = {
-          series: qualityData.packaging
-        }
-      }
+      // 更新包装饼图数据（即使为空也设置，保持UI一致性）
+      department1Panels.value[3].secondChartData = qualityData.packaging && qualityData.packaging.length > 0
+        ? {
+            series: qualityData.packaging
+          }
+        : {
+            series: []
+          }
     }
     console.log('✅ 总装一课TOP质量问题数据获取成功')
   } catch (err: any) {
@@ -789,12 +768,14 @@ async function fetchDepartment2TopQualityData() {
           series: qualityData.assembly
         }
       }
-      // 更新包装饼图数据
-      if (qualityData.packaging && qualityData.packaging.length > 0) {
-        department2Panels.value[3].secondChartData = {
-          series: qualityData.packaging
-        }
-      }
+      // 更新包装饼图数据（即使为空也设置，保持与总装一课一致的UI）
+      department2Panels.value[3].secondChartData = qualityData.packaging && qualityData.packaging.length > 0
+        ? {
+            series: qualityData.packaging
+          }
+        : {
+            series: []
+          }
     }
     console.log('✅ 总装二课TOP质量问题数据获取成功')
   } catch (err: any) {
