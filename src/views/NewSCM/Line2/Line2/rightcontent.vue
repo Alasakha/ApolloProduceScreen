@@ -85,12 +85,9 @@ function isPositiveIntegerString(val: string): boolean {
   return num > 0 && Number.isInteger(num);
 }
 
-// 获取标签
+// 获取标签 - 使用 pmc 字段
 function getResultLabel(item: Record<string, string>): string {
-  for (const { key, label } of RESULT_MAP) {
-    if (isPositiveIntegerString(item[key])) return label;
-  }
-  return '--';
+  return item.pmc || '--';
 }
 
 // 获取对应整数数值

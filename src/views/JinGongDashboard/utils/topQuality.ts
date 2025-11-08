@@ -1,92 +1,19 @@
 // TOP质量问题数据工具函数
 
-import { getTopDayCategory, type TopQualityItem, type TopQualityResponse } from '@/api/getMesInfo'
+import { getBadIssuesPerformance, type BadIssuesItem, type BadIssuesResponse } from '@/api/getMesInfo'
 
-// 日期工具函数：获取本月第一天和今天的日期（用于topDayCategory接口：YYYY-MM-DD格式）
-function getDateRangeForQuality() {
+// 日期工具函数：获取当前月份（格式：YYYY-MM）
+function getCurrentMonth(): string {
   const today = new Date()
   const year = today.getFullYear()
   const month = today.getMonth() + 1
-  const day = today.getDate()
   
-  // 本月第一天
-  const firstDay = `${year}-${String(month).padStart(2, '0')}-01`
-  // 今天
-  const todayStr = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
-  
-  return {
-    startDate: firstDay,
-    endDate: todayStr
-  }
-}
-
-// 获取总装一课装配TOP质量问题（prodLine: 1004）
-export async function fetchDepartment1AssemblyTopQuality(): Promise<TopQualityItem[]> {
-  try {
-    const { startDate, endDate } = getDateRangeForQuality()
-    const response = await getTopDayCategory('1004', startDate, endDate) as TopQualityResponse
-    
-    if (response.code === 200 && response.data) {
-      return response.data || []
-    }
-    return []
-  } catch (error) {
-    console.error('获取总装一课装配TOP质量问题失败:', error)
-    return []
-  }
-}
-
-// 获取总装一课包装TOP质量问题（prodLine: 1005）
-export async function fetchDepartment1PackagingTopQuality(): Promise<TopQualityItem[]> {
-  try {
-    const { startDate, endDate } = getDateRangeForQuality()
-    const response = await getTopDayCategory('1005', startDate, endDate) as TopQualityResponse
-    
-    if (response.code === 200 && response.data) {
-      return response.data || []
-    }
-    return []
-  } catch (error) {
-    console.error('获取总装一课包装TOP质量问题失败:', error)
-    return []
-  }
-}
-
-// 获取总装二课装配TOP质量问题（prodLine: 2004）
-export async function fetchDepartment2AssemblyTopQuality(): Promise<TopQualityItem[]> {
-  try {
-    const { startDate, endDate } = getDateRangeForQuality()
-    const response = await getTopDayCategory('2004', startDate, endDate) as TopQualityResponse
-    
-    if (response.code === 200 && response.data) {
-      return response.data || []
-    }
-    return []
-  } catch (error) {
-    console.error('获取总装二课装配TOP质量问题失败:', error)
-    return []
-  }
-}
-
-// 获取总装二课包装TOP质量问题（prodLine: 2005）
-export async function fetchDepartment2PackagingTopQuality(): Promise<TopQualityItem[]> {
-  try {
-    const { startDate, endDate } = getDateRangeForQuality()
-    const response = await getTopDayCategory('2005', startDate, endDate) as TopQualityResponse
-    
-    if (response.code === 200 && response.data) {
-      return response.data || []
-    }
-    return []
-  } catch (error) {
-    console.error('获取总装二课包装TOP质量问题失败:', error)
-    return []
-  }
+  return `${year}-${String(month).padStart(2, '0')}`
 }
 
 // 转换TOP质量问题数据为饼图格式（取前5个）
 export function transformTopQualityToPieChart(
-  data: TopQualityItem[],
+  data: BadIssuesItem[],
   colors: string[] = ['#f59e0b', '#3b82f6', '#10b981', '#6b7280', '#8b5cf6']
 ): Array<{ name: string; value: number; itemStyle: { color: string } }> {
   if (!data || data.length === 0) {
@@ -107,29 +34,34 @@ export function transformTopQualityToPieChart(
   }))
 }
 
-// 统一获取总装一课TOP质量问题（装配和包装）
+// 获取金工一部TOP质量问题
 export async function fetchDepartment1TopQuality() {
-  const [assemblyData, packagingData] = await Promise.all([
-    fetchDepartment1AssemblyTopQuality(),
-    fetchDepartment1PackagingTopQuality()
-  ])
-
-  return {
-    assembly: transformTopQualityToPieChart(assemblyData),
-    packaging: transformTopQualityToPieChart(packagingData)
+  try {
+    const monthDay = getCurrentMonth()
+    const response = await getBadIssuesPerformance('JG1', monthDay) as BadIssuesResponse
+    
+    if (response.code === 200 && response.data) {
+      return transformTopQualityToPieChart(response.data || [])
+    }
+    return []
+  } catch (error) {
+    console.error('获取金工一部TOP质量问题失败:', error)
+    return []
   }
 }
 
-// 统一获取总装二课TOP质量问题（装配和包装）
+// 获取金工二部TOP质量问题
 export async function fetchDepartment2TopQuality() {
-  const [assemblyData, packagingData] = await Promise.all([
-    fetchDepartment2AssemblyTopQuality(),
-    fetchDepartment2PackagingTopQuality()
-  ])
-
-  return {
-    assembly: transformTopQualityToPieChart(assemblyData),
-    packaging: transformTopQualityToPieChart(packagingData)
+  try {
+    const monthDay = getCurrentMonth()
+    const response = await getBadIssuesPerformance('JG2', monthDay) as BadIssuesResponse
+    
+    if (response.code === 200 && response.data) {
+      return transformTopQualityToPieChart(response.data || [])
+    }
+    return []
+  } catch (error) {
+    console.error('获取金工二部TOP质量问题失败:', error)
+    return []
   }
 }
-

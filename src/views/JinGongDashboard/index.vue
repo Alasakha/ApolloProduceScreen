@@ -25,9 +25,6 @@
             :chart-data="panel.chartData"
             :chart-type-description="panel.chartTypeDescription"
             :is-top-quality-mode="panel.isTopQualityMode"
-            :second-chart-title="panel.secondChartTitle"
-            :second-chart-type="panel.secondChartType"
-            :second-chart-data="panel.secondChartData"
             :hide-regular="panel.hideRegular"
             :loading="department1Loading[panel.id]"
           />
@@ -50,9 +47,6 @@
             :chart-data="panel.chartData"
             :chart-type-description="panel.chartTypeDescription"
             :is-top-quality-mode="panel.isTopQualityMode"
-            :second-chart-title="panel.secondChartTitle"
-            :second-chart-type="panel.secondChartType"
-            :second-chart-data="panel.secondChartData"
             :hide-regular="panel.hideRegular"
             :loading="department2Loading[panel.id]"
           />
@@ -83,9 +77,6 @@ interface PanelData {
   chartData: any
   chartTypeDescription: string
   isTopQualityMode?: boolean
-  secondChartTitle?: string
-  secondChartType?: 'line' | 'bar' | 'pie' | 'gauge'
-  secondChartData?: any
   hideRegular?: boolean
 }
 
@@ -326,11 +317,11 @@ async function fetchDepartment2ThroughputRateTrend() {
 }
 
 // 转换结单率趋势接口数据为图表数据
-// 标准：总装一课 A类95% 常规类94% | 总装二课 A类95% 常规类94%
+// 标准：金工一部 A类100% 常规类95% | 金工二部 A类100% 常规类95%
 // 标准用折线图，实际用柱状图
 function transformOrderSettlementTrendData(
   apiData: ThroughputTrendResponse | null,
-  department: '总装一课' | '总装二课'
+  department: '金工一部' | '金工二部'
 ): Partial<PanelData> {
   if (!apiData?.data) {
     return {}
@@ -338,8 +329,8 @@ function transformOrderSettlementTrendData(
 
   // 定义标准值
   const standards = {
-    '总装一课': { A: 100, 常规: 95 },
-    '总装二课': { A: 100, 常规: 95 }
+    '金工一部': { A: 100, 常规: 95 },
+    '金工二部': { A: 100, 常规: 95 }
   }
   const aClassStandard = standards[department].A
   const regularStandard = standards[department].常规
@@ -485,10 +476,10 @@ function transformOrderSettlementTrendData(
 // 获取总装一课结单率趋势数据
 async function fetchDepartment1OrderSettlementTrend() {
   try {
-    const response = await getOrderSettlementPerformanceTrend('总装一课')
+    const response = await getOrderSettlementPerformanceTrend('金工一部焊接')
     
     if (response.code === 200 && response.data) {
-      const transformedData = transformOrderSettlementTrendData(response as ThroughputTrendResponse, '总装一课')
+      const transformedData = transformOrderSettlementTrendData(response as ThroughputTrendResponse, '金工一部')
       
       // 更新第一个面板（结单率）的图表数据
       if (department1Panels.value[0]) {
@@ -504,10 +495,10 @@ async function fetchDepartment1OrderSettlementTrend() {
 // 获取总装二课结单率趋势数据
 async function fetchDepartment2OrderSettlementTrend() {
   try {
-    const response = await getOrderSettlementPerformanceTrend('总装二课')
+    const response = await getOrderSettlementPerformanceTrend('金工二部焊接')
     
     if (response.code === 200 && response.data) {
-      const transformedData = transformOrderSettlementTrendData(response as ThroughputTrendResponse, '总装二课')
+      const transformedData = transformOrderSettlementTrendData(response as ThroughputTrendResponse, '金工二部')
       
       // 更新第一个面板（结单率）的图表数据
       if (department2Panels.value[0]) {
@@ -611,7 +602,7 @@ async function fetchDepartment2ProductionPlan() {
 }
 
 
-// 获取总装一课TOP质量问题数据
+// 获取金工一部TOP质量问题数据
 async function fetchDepartment1TopQualityData() {
   try {
     department1Loading.value['4'] = true
@@ -619,20 +610,12 @@ async function fetchDepartment1TopQualityData() {
     
     // 更新第四个面板（TOP质量问题）的数据
     if (department1Panels.value[3]) {
-      // 更新装配饼图数据
-      if (qualityData.assembly && qualityData.assembly.length > 0) {
+      // 更新饼图数据
+      if (qualityData && qualityData.length > 0) {
         department1Panels.value[3].chartData = {
-          series: qualityData.assembly
+          series: qualityData
         }
       }
-      // 更新包装饼图数据（即使为空也设置，保持UI一致性）
-      department1Panels.value[3].secondChartData = qualityData.packaging && qualityData.packaging.length > 0
-        ? {
-            series: qualityData.packaging
-          }
-        : {
-            series: []
-          }
     }
   } catch (err: any) {
   } finally {
@@ -640,7 +623,7 @@ async function fetchDepartment1TopQualityData() {
   }
 }
 
-// 获取总装二课TOP质量问题数据
+// 获取金工二部TOP质量问题数据
 async function fetchDepartment2TopQualityData() {
   try {
     department2Loading.value['4'] = true
@@ -648,20 +631,12 @@ async function fetchDepartment2TopQualityData() {
     
     // 更新第四个面板（TOP质量问题）的数据
     if (department2Panels.value[3]) {
-      // 更新装配饼图数据
-      if (qualityData.assembly && qualityData.assembly.length > 0) {
+      // 更新饼图数据
+      if (qualityData && qualityData.length > 0) {
         department2Panels.value[3].chartData = {
-          series: qualityData.assembly
+          series: qualityData
         }
       }
-      // 更新包装饼图数据（即使为空也设置，保持与总装一课一致的UI）
-      department2Panels.value[3].secondChartData = qualityData.packaging && qualityData.packaging.length > 0
-        ? {
-            series: qualityData.packaging
-          }
-        : {
-            series: []
-          }
     }
   } catch (err: any) {
   } finally {
@@ -704,14 +679,11 @@ const department1Panels = ref<PanelData[]>([
     id: '4',
     title: 'TOP质量问题',
     description: [],
-    chartTitle: '总装TOP前5不良数',
+    chartTitle: 'TOP前5不良数',
     chartType: 'pie' as const,
     chartData: null,
-    chartTypeDescription: '饼图(显示总装TOP前5不良数和占比)',
-    isTopQualityMode: true,
-    secondChartTitle: '包装TOP前5不良数',
-    secondChartType: 'pie' as const,
-    secondChartData: null
+    chartTypeDescription: '饼图(显示TOP前5不良数和占比)',
+    isTopQualityMode: true
   }
 ])
 
@@ -749,14 +721,11 @@ const department2Panels = ref<PanelData[]>([
     id: '4',
     title: 'TOP质量问题',
     description: [],
-    chartTitle: '总装TOP前5不良数',
+    chartTitle: 'TOP前5不良数',
     chartType: 'pie' as const,
     chartData: null,
-    chartTypeDescription: '饼图(显示总装TOP前5不良数和占比)',
-    isTopQualityMode: true,
-    secondChartTitle: '包装TOP前5不良数',
-    secondChartType: 'pie' as const,
-    secondChartData: null
+    chartTypeDescription: '饼图(显示TOP前5不良数和占比)',
+    isTopQualityMode: true
   }
 ])
 

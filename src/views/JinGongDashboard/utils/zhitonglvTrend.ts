@@ -41,7 +41,7 @@ export function calculateDailyRegularThroughputRate(
 // 转换趋势接口数据为图表数据
 export function transformQualityReportTrendData(
   apiData: QualityReportPerformanceTrendResponse | null,
-  department: '总装一课' | '总装二课'
+  department: '金工一部' | '金工二部'
 ): {
   categories: string[]
   series: Array<{
@@ -69,8 +69,8 @@ export function transformQualityReportTrendData(
 
   // 定义标准值
   const standards = {
-    '总装一课': { A: 75, 常规: 72 },
-    '总装二课': { A: 89, 常规: 87 }
+    '金工一部': { A: 75, 常规: 72 },
+    '金工二部': { A: 89, 常规: 87 }
   }
   const aClassStandard = standards[department].A
   const regularStandard = standards[department].常规

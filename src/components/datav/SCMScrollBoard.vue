@@ -241,38 +241,40 @@
   defineExpose({
     updateRows,
   });
-  // 判断原因和处理实际是否缺失
+  // 判断判断结果列是否未填写或不满足
   function isMissingRequiredInfo(row: any) {
     if (!row || !row.ceils) {
       console.log('行数据无效:', row);
       return false;
     }
     
-    // 根据数据结构，查找原因和处理实际列
-    // 原因列是"问题点"（索引9），处理实际列是"处理结果"（索引13）
-    const reasonCell = row.ceils[9]; // 问题点/原因列
-    const processActualCell = row.ceils[13]; // 处理结果列
+    // 根据数据结构，查找判断结果列
+    // 在轮播图数据中，判断结果列的索引是10（去掉状态列后，加上索引列）
+    // 如果配置了index，第一列是索引，所以判断结果列索引是10
+    // 如果没有索引列，判断结果列索引是9
+    const hasIndex = state.mergedConfig?.index || false;
+    const judgmentResultIndex = hasIndex ? 10 : 9;
+    const judgmentResultCell = row.ceils[judgmentResultIndex]; // 判断结果列
     
-    console.log('检查原因和处理实际:', {
+    console.log('检查判断结果:', {
       行数据: row,
       所有列数据: row.ceils,
-      原因: reasonCell,
-      处理实际: processActualCell,
-      原因是否缺失: !reasonCell || reasonCell === '--' || reasonCell.toString().trim() === '',
-      处理实际是否缺失: !processActualCell || processActualCell === '--' || processActualCell.toString().trim() === ''
+      判断结果: judgmentResultCell,
+      判断结果是否缺失: !judgmentResultCell || judgmentResultCell === '--' || judgmentResultCell.toString().trim() === '',
+      判断结果是否为不满足: judgmentResultCell === '不满足' || judgmentResultCell === '未满足'
     });
     
-    // 检查原因是否缺失
-    const isReasonMissing = !reasonCell || reasonCell === '--' || reasonCell.toString().trim() === '';
+    // 检查判断结果是否未填写
+    const isJudgmentResultMissing = !judgmentResultCell || judgmentResultCell === '--' || judgmentResultCell.toString().trim() === '';
     
-    // 检查处理实际是否缺失
-    const isProcessActualMissing = !processActualCell || processActualCell === '--' || processActualCell.toString().trim() === '';
+    // 检查判断结果是否为不满足
+    const isJudgmentResultNotMet = judgmentResultCell === '不满足' || judgmentResultCell === '未满足';
     
-    // 如果原因或处理实际中任何一个缺失，就返回true
-    const isMissing = isReasonMissing || isProcessActualMissing;
+    // 如果判断结果未填写或不满足，就返回true
+    const shouldHighlight = isJudgmentResultMissing || isJudgmentResultNotMet;
     
-    console.log(`原因或处理实际是否缺失:`, isMissing);
-    return isMissing;
+    console.log(`判断结果是否需要高亮:`, shouldHighlight);
+    return shouldHighlight;
   }
   
   // 获取行背景颜色（恢复正常背景色）

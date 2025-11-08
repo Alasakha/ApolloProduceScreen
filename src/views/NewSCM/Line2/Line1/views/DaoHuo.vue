@@ -98,6 +98,24 @@ const tableColumns = [
     { label: '创建时间', prop: 'create_time' },
 ];
 
+// 获取日期区间：本月1号到今日
+const getDateRange = () => {
+    const today = new Date();
+    const year = today.getFullYear();
+    const month = today.getMonth() + 1;
+    const day = today.getDate();
+    
+    // 本月第一天
+    const startDate = `${year}-${String(month).padStart(2, '0')}-01`;
+    // 今天
+    const endDate = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+    
+    return {
+        startDate,
+        endDate
+    };
+};
+
 // 处理饼图点击事件
 const handleChartClick = async (params) => {
     if (params && params.name) {
@@ -109,7 +127,9 @@ const handleChartClick = async (params) => {
         try {
             // 根据点击的图表类型确定产品类别
             const cust = params.seriesName === 'A类订单' ? 'A类' : '常规类';
-            const res = await getPmcKpiList(params.name, cust);
+            // 获取日期区间：本月1号到今日
+            const { startDate, endDate } = getDateRange();
+            const res = await getPmcKpiList(params.name, cust, endDate, startDate);
             
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {

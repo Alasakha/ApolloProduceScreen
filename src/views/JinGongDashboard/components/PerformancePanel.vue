@@ -40,7 +40,7 @@
         </div>
         
         <!-- 图表区域 -->
-        <div class="chart-section" v-if="!isDualPieChart && chartData && (chartData.categories || chartData.series)">
+        <div class="chart-section" v-if="chartData && (chartData.categories || chartData.series)">
           <Chart
             :title="chartTitle"
             :type="chartType"
@@ -50,32 +50,11 @@
           />
         </div>
         
-        <!-- 双饼图区域 -->
-        <div class="dual-chart-section" v-if="isDualPieChart && chartData && chartData.series">
-          <div class="pie-chart-item">
-            <Chart
-              :title="chartTitle"
-              :type="chartType"
-              :data="chartData"
-              height="100%"
-              :show-actions="false"
-            />
-          </div>
-          <div class="pie-chart-item" v-if="secondChartData && secondChartData.series">
-            <Chart
-              :title="secondChartTitle"
-              :type="secondChartType"
-              :data="secondChartData"
-              height="100%"
-              :show-actions="false"
-            />
-          </div>
-        </div>
       </template>
       
-      <!-- TOP质量问题模式：只显示双饼图 -->
+      <!-- TOP质量问题模式：只显示一个饼图 -->
       <template v-else>
-        <div class="top-quality-charts">
+        <div class="top-quality-chart">
           <div class="pie-chart-item" v-if="chartData && chartData.series">
             <Chart
               :title="chartTitle"
@@ -84,20 +63,6 @@
               height="100%"
               :show-actions="false"
             />
-          </div>
-          <div class="pie-chart-item" v-if="secondChartTitle && secondChartData !== undefined">
-            <Chart
-              v-if="secondChartData && secondChartData.series && secondChartData.series.length > 0"
-              :title="secondChartTitle"
-              :type="secondChartType"
-              :data="secondChartData"
-              height="100%"
-              :show-actions="false"
-            />
-            <div v-else class="empty-chart">
-              <div class="empty-chart-title">{{ secondChartTitle }}</div>
-              <div class="empty-chart-text">暂无数据</div>
-            </div>
           </div>
         </div>
       </template>
@@ -122,11 +87,6 @@ interface Props {
   chartData: any
   chartTypeDescription: string
   chartHeight?: string
-  // 双饼图相关props
-  isDualPieChart?: boolean
-  secondChartTitle?: string
-  secondChartType?: 'line' | 'bar' | 'pie' | 'gauge'
-  secondChartData?: any
   // TOP质量问题模式
   isTopQualityMode?: boolean
   // 隐藏常规部分
@@ -137,10 +97,6 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   chartHeight: '200px',
-  isDualPieChart: false,
-  secondChartTitle: '',
-  secondChartType: 'pie' as const,
-  secondChartData: () => ({}),
   isTopQualityMode: false,
   hideRegular: false,
   loading: false
@@ -153,8 +109,7 @@ const isEmpty = computed(() => {
   // TOP质量问题模式：检查图表数据
   if (props.isTopQualityMode) {
     const hasChartData = props.chartData && props.chartData.series && props.chartData.series.length > 0
-    const hasSecondChartData = props.secondChartData && props.secondChartData.series && props.secondChartData.series.length > 0
-    return !hasChartData && !hasSecondChartData
+    return !hasChartData
   }
   
   // 普通模式：检查描述数据和图表数据
@@ -278,23 +233,13 @@ const isEmpty = computed(() => {
   flex-direction: column;
 }
 
-/* 双饼图区域 */
-.dual-chart-section {
-  flex: 1;
-  min-height: 0;
-  display: flex;
-  gap: 4px;
-  height: 100%;
-}
 
-/* TOP质量问题模式：全屏双饼图 */
-.top-quality-charts {
+/* TOP质量问题模式：单个饼图 */
+.top-quality-chart {
   flex: 1;
   min-height: 0;
   display: flex;
-  gap: 6px;
   height: 100%;
-  flex-direction: column;
 }
 
 .pie-chart-item {
@@ -379,29 +324,4 @@ const isEmpty = computed(() => {
   font-size: 16px;
 }
 
-/* 空图表样式 */
-.empty-chart {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  flex: 1;
-  min-height: 200px;
-  height: 100%;
-  gap: 12px;
-}
-
-.empty-chart-title {
-  color: #00d4ff;
-  font-size: 14px;
-  font-weight: bold;
-  text-align: center;
-  margin-bottom: 8px;
-}
-
-.empty-chart-text {
-  color: rgba(255, 255, 255, 0.5);
-  font-size: 14px;
-  text-align: center;
-}
 </style>

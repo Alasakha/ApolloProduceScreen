@@ -104,7 +104,16 @@
             placeholder="请选择完成期限"
             format="YYYY/MM/DD"
             value-format="YYYY-MM-DD"
+            style="margin-top: 12px; width: 100%;"
           />
+          <el-select
+            v-model="pmc"
+            placeholder="请选择PMC"
+            style="margin-top: 12px; width: 100%;"
+          >
+            <el-option label="满足" value="满足" />
+            <el-option label="未满足" value="未满足" />
+          </el-select>
           <template #footer>
             <span class="dialog-footer">
               <el-button @click="handleResultVisible = false">取消</el-button>
@@ -203,6 +212,7 @@
   const docNo = ref('')
   const po_arrival_inspection_d_id = ref('')
   const completeDate = ref('')
+  const pmc = ref('')
   // const route = useRoute()
   // const prodLine = computed(() => route.query.prodLine as string)
 
@@ -304,7 +314,7 @@
     }
     try {
       await getAbnormalQualityReasonAdd(currentItemCode.value, handleResult.value,
-       docNo.value,po_arrival_inspection_d_id.value,completeDate.value)
+       docNo.value,po_arrival_inspection_d_id.value,completeDate.value, pmc.value)
       ElMessage.success('操作成功')
       handleResultVisible.value = false
 
@@ -316,6 +326,8 @@
       if (index !== -1) {
         detailData.value[index]['处理结果'] = handleResult.value
         detailData.value[index]['完成期限'] = completeDate.value
+        detailData.value[index]['判断结果'] = pmc.value // 更新判断结果列
+        detailData.value[index]['PMC'] = pmc.value
         detailData.value = [...detailData.value]
       } else {
         console.error('未找到匹配的行:', currentItemCode.value)
@@ -337,6 +349,8 @@
     docNo.value = row['到货单号'] || row['docNo'] || ''
     po_arrival_inspection_d_id.value = row.po_arrival_inspection_d_id
     completeDate.value = row['完成期限'] || ''
+    // 优先使用判断结果列的值，如果没有则使用PMC字段
+    pmc.value = row['判断结果'] || row['PMC'] || ''
     handleResultVisible.value = true
   }
   </script>

@@ -143,13 +143,15 @@ export const getPmcKpi = (kpi_type) => {
 
 // extra/pmcKpiList
 // zrr:采购员名称 cust:产品类别  cust一个是 常规类 一个是 A类
-export const getPmcKpiList = (zrr, cust) => {
+export const getPmcKpiList = (zrr, cust, end_date, start_date) => {
   return request({
     url: '/extra/pmcKpiList',
     method: 'post',
     data: {
       zrr,
-      cust
+      cust,
+      end_date,
+      start_date,
     }
   })
 }

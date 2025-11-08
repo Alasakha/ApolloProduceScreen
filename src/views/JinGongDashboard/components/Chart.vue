@@ -173,11 +173,46 @@ const getChartOption = () => {
     case 'pie':
       return {
         ...baseOption,
+        tooltip: {
+          trigger: 'item',
+          backgroundColor: 'rgba(0, 0, 0, 0.8)',
+          borderColor: 'rgba(255, 255, 255, 0.2)',
+          textStyle: {
+            color: '#fff'
+          },
+          formatter: '{b}: {c} ({d}%)'
+        },
         series: [{
           type: 'pie',
           radius: ['40%', '70%'],
           center: ['50%', '50%'],
           data: props.data.series || [],
+          label: {
+            show: true,
+            position: 'outside',
+            formatter: (params: any) => {
+              const percent = typeof params.percent === 'number' 
+                ? params.percent.toFixed(1) 
+                : params.percent
+              return `${params.name}\n${params.value} (${percent}%)`
+            },
+            fontSize: 12,
+            color: '#fff',
+            textShadowColor: 'rgba(0, 0, 0, 0.8)',
+            textShadowBlur: 2,
+            textShadowOffsetX: 1,
+            textShadowOffsetY: 1
+          },
+          labelLine: {
+            show: true,
+            length: 15,
+            length2: 10,
+            smooth: true,
+            lineStyle: {
+              color: 'rgba(255, 255, 255, 0.5)',
+              width: 1
+            }
+          },
           emphasis: {
             itemStyle: {
               shadowBlur: 10,

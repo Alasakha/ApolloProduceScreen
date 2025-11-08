@@ -85,12 +85,12 @@ export const getOutRate = () => {
 // params : item_code, reason
 // 单日来料质量异常问题原因记录
 export const getAbnormalQualityReasonAdd = (item_code, reason,docNo,po_arrival_inspection_d_id
-  ,  completeDate
+  ,  completeDate ,pmc
 ) => {
   return request({
     url: '/SCM/abnormalQualityReasonAdd',
     method: 'get',
-    params: { item_code, reason,docNo,po_arrival_inspection_d_id,completeDate }
+    params: { item_code, reason,docNo,po_arrival_inspection_d_id,completeDate,pmc }
   })
 }
 

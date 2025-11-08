@@ -340,3 +340,43 @@ export const getMonthProductionCust = (prodLine) => {
     params: { prodLine }
   })
 }
+
+// 金工月生产数据接口类型定义
+export interface MonthProductionCustData {
+  a_total: number //A类计划数
+  b_total: number //常规计划数
+  a_done: number //A类完成数
+  b_done: number //常规完成数
+}
+
+export interface MonthProductionCustResponse {
+  code: number
+  message: string
+  data: MonthProductionCustData
+}
+
+// TOP质量问题数据类型
+export interface BadIssuesItem {
+  ngNO: string | null
+  ngName: string
+  total: number
+  grandTotal: number
+  uid: string | null
+  createDate: string | null
+  [key: string]: any
+}
+
+export interface BadIssuesResponse {
+  code: number
+  message: string
+  data: BadIssuesItem[]
+}
+
+// 金工一部二部top质量问题  JG1 JG2  2025-11(填写今日所在月份 2025-xx格式)
+export const getBadIssuesPerformance = (prodLine: 'JG1' | 'JG2', monthDay: string): Promise<BadIssuesResponse> => {
+  return request({
+    url: '/report/badIssues_performance',
+    method: 'get',
+    params: { prodLine, monthDay }
+  })
+}

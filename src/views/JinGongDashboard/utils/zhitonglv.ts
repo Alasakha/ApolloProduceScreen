@@ -23,11 +23,11 @@ export interface QualityReportData {
 
 // 部门标准配置
 const DEPARTMENT_STANDARDS = {
-  '总装一课': {
+  '金工一部': {
     aClass: 75, // A类标准直通率 75%
     regular: 72 // 常规标准直通率 72%
   },
-  '总装二课': {
+  '金工二部': {
     aClass: 89, // A类标准直通率 89%
     regular: 87 // 常规标准直通率 87%
   }
@@ -79,7 +79,7 @@ function calculateAchievementRate(actual: number, standard: number): string {
 // 转换接口数据为面板描述数据
 export function transformQualityReportData(
   apiData: QualityReportData,
-  department: '总装一课' | '总装二课'
+  department: '金工一部' | '金工二部'
 ): {
   description: Array<{ label: string; value: string }>
 } {
