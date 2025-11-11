@@ -1,93 +1,56 @@
 <template>
   <div class="plan-container">
-    <!-- 标题和参数卡片在同一行 -->
-    <div class="header-row">
-      <div class="table-title">日生产计划(总)完成情况</div>
-      <div class="dashboard-cards">
-        <div class="card">
-          <div class="card-number">{{ dashboardData.total }}</div>
-          <div class="card-label">总数</div>
+    <!-- 生产计划进度 -->
+    <div class="section">
+      <div class="section-title">生产计划进度</div>
+      <div class="data-items">
+        <div class="data-item">
+          <span class="label">月度计划数</span>
+          <span class="value">{{ monthlyPlan }}</span>
         </div>
-        <div class="card">
-          <div class="card-number">{{ dashboardData.completed }}</div>
-          <div class="card-label">完成</div>
+        <div class="data-item">
+          <span class="label">已完成数</span>
+          <span class="value">{{ monthlyCompleted }}</span>
         </div>
-        <div class="card">
-          <div class="card-number">{{ dashboardData.efficiency }}%</div>
-          <div class="card-label">效率</div>
+        <div class="data-item">
+          <span class="label">完成率</span>
+          <span class="value">{{ monthlyRate }}%</span>
         </div>
       </div>
     </div>
 
-    <!-- 数据表格 - 占满剩余高度 -->
-    <div class="table-container">
-      <div class="table-wrapper">
-        <table class="plan-table">
-          <thead>
-            <tr class="table-header">
-              <th>产品</th>
-              <th>车型</th>
-              <th>计划</th>
-              <!-- <th>人效</th> -->
-              <th>实际</th>
-              <th>差额</th>
-              <th>完成率</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr 
-              v-for="(row, index) in tableData" 
-              :key="index"
-              :class="['table-row', `row-${row.color}`]"
-            >
-              <td>{{ row.product }}</td>
-              <td>{{ row.model }}</td>
-              <td>{{ row.plan }}</td>
-              <!-- <td>人效</td> -->
-              <td :class="{ 'text-red': row.actual !== '--' && Number(row.actual) < row.plan }">{{ row.actual }}</td>
-              <td :class="{ 'text-red': row.difference !== '--' && Number(row.difference) > 0 }">{{ row.difference }}</td>
-              <td>{{ row.completionRate }}%</td>
-            </tr>
-          </tbody>
-        </table>
+    <!-- 日计划完成情况 -->
+    <div class="section">
+      <div class="section-title">日计划完成情况</div>
+      <div class="data-items">
+        <div class="data-item">
+          <span class="label">计划数</span>
+          <span class="value">{{ dailyPlan }}</span>
+        </div>
+        <div class="data-item">
+          <span class="label">已完成数</span>
+          <span class="value">{{ dailyCompleted }}</span>
+        </div>
+        <div class="data-item">
+          <span class="label">完成率</span>
+          <span class="value">{{ dailyRate }}%</span>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-// 定义接口
-interface DashboardData {
-  total: number
-  completed: number
-  efficiency: number
-}
+import { ref } from 'vue'
 
-interface TableRowData {
-  product: string
-  model: string
-  plan: number
-  actual: string
-  difference: string
-  completionRate: string
-  color: 'orange' | 'blue' | 'green'
-}
+// Mock 数据
+const monthlyPlan = ref(1200)
+const monthlyCompleted = ref(980)
+const monthlyRate = ref(82)
 
-// 定义 props
-interface Props {
-  dashboardData: DashboardData
-  tableData: TableRowData[]
-}
-
-// 接收父组件传入的数据
-withDefaults(defineProps<Props>(), {
-  dashboardData: () => ({
-    total: 0,
-    completed: 0,
-    efficiency: 0
-  }),
-  tableData: () => []
-})
+const dailyPlan = ref(45)
+const dailyCompleted = ref(38)
+const dailyRate = ref(84)
 </script>
 
 <style scoped>
@@ -96,191 +59,121 @@ withDefaults(defineProps<Props>(), {
   height: 100%;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  padding: 5px;
+  padding: 8px 12px;
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  padding-bottom: 0px;
-}
-
-.header-row {
-  display: flex;
+  gap: 10px;
   justify-content: space-between;
-  align-items: center;
-  margin-bottom: 8px;
-  flex-shrink: 0;
+  overflow: hidden;
 }
 
-.dashboard-cards {
+.section {
   display: flex;
-  gap: 12px;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+  min-height: 0;
 }
 
-.card {
-    display: flex;
-  background: #1565c0;
-  border-radius: 6px;
-  padding: 8px 12px;
-  text-align: center;
-  min-width: 60px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+.section-title {
+  color: #72f0f5;
+  font-size: 13px;
+  font-weight: 600;
+  padding-bottom: 4px;
+  border-bottom: 1px solid rgba(114, 240, 245, 0.3);
+  line-height: 1.2;
 }
 
-.card-number {
-  color: white;
-  font-size: 18px;
-  font-weight: bold;
-  line-height: 1;
+.data-items {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  flex: 1;
 }
 
-.card-label {
-  color: white;
-  font-size: 10px;
-  margin-top: 2px;
+.data-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 6px 12px;
+  background: rgba(114, 240, 245, 0.1);
+  border: 1px solid rgba(114, 240, 245, 0.3);
+  border-radius: 4px;
+  min-width: 80px;
+  flex: 1;
+  transition: all 0.3s ease;
+}
+
+.data-item:hover {
+  background: rgba(114, 240, 245, 0.2);
+  border-color: rgba(114, 240, 245, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(114, 240, 245, 0.2);
+}
+
+.data-item .label {
+  color: #72f0f5;
+  font-size: 11px;
+  font-weight: 400;
   opacity: 0.9;
+  line-height: 1.2;
 }
 
-.table-title {
+.data-item .value {
   color: #72f0f5;
   font-size: 16px;
-  font-weight: bold;
+  font-weight: 600;
   text-shadow: 0 1px 2px rgba(21, 101, 192, 0.3);
-  flex: 1;
-}
-
-.table-container {
-  width: 100%;
-  flex: 1;
-  overflow: hidden;
-  min-height: 0;
-  position: relative;
-}
-
-.table-wrapper {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  overflow: auto;
-}
-
-.plan-table {
-  width: 100%;
-  height: 100%;
-  border-collapse: collapse;
-  font-size: 14px;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 4px;
-  overflow: hidden;
-  table-layout: fixed;
-}
-
-.table-header {
-  background: #f5f5f5;
-  color: #333;
-  font-weight: bold;
-  flex-shrink: 0;
-}
-
-.table-header th {
-  padding: 8px 12px;
-  text-align: center;
-  border: 1px solid #ddd;
-  font-size: 12px;
-}
-
-.table-row {
-  color: white;
-  font-weight: 500;
-}
-
-.table-row td {
-  padding: 8px 12px;
-  text-align: center;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  font-size: 12px;
-}
-
-.row-orange {
-  background: #ff9800;
-}
-
-.row-blue {
-  background: #2196f3;
-}
-
-.row-green {
-  background: #4caf50;
-}
-
-.text-red {
-  color: #f44336 !important;
-  font-weight: bold;
+  line-height: 1.2;
 }
 
 /* 响应式设计 */
 @media (max-width: 768px) {
-  .header-row {
-    flex-direction: column;
-    gap: 12px;
-    align-items: center;
+  .plan-container {
+    padding: 6px 10px;
+    gap: 8px;
   }
   
-  .dashboard-cards {
-    justify-content: center;
+  .section-title {
+    font-size: 12px;
   }
   
-  .card {
-    min-width: 50px;
-    padding: 6px 8px;
+  .data-items {
+    gap: 6px;
   }
   
-  .card-number {
-    font-size: 16px;
+  .data-item {
+    padding: 5px 10px;
+    min-width: 70px;
   }
   
-  .card-label {
-    font-size: 9px;
+  .data-item .label {
+    font-size: 10px;
   }
   
-  .table-title {
+  .data-item .value {
     font-size: 14px;
-  }
-  
-  .table-header th,
-  .table-row td {
-    padding: 6px 8px;
-    font-size: 11px;
   }
 }
 
 @media (max-width: 480px) {
   .plan-container {
-    padding: 12px;
+    padding: 5px 8px;
+    gap: 6px;
   }
   
-  .dashboard-cards {
-    gap: 8px;
+  .data-items {
+    flex-direction: column;
+    align-items: stretch;
   }
   
-  .card {
-    min-width: 45px;
-    padding: 4px 6px;
-  }
-  
-  .card-number {
-    font-size: 14px;
-  }
-  
-  .card-label {
-    font-size: 8px;
-  }
-  
-  .table-header th,
-  .table-row td {
-    padding: 4px 6px;
-    font-size: 10px;
+  .data-item {
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 6px 10px;
   }
 }
 </style>

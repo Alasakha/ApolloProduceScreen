@@ -77,13 +77,40 @@ onMounted(() => {
 </style> -->
 
 <template>
-  
-  <div class='pl-5 pt-1'>
-<div class="flex justify-center items-center text-lg text-white font-bold">
-  <p class="tracking-widest text-xl ">注塑产品自检合格率</p>
+  <div class='pl-5 pt-1 h-full flex flex-col'>
+    <!-- 标题 -->
+    <div class="flex justify-center items-center text-lg text-white font-bold mb-2">
+      <p class="tracking-widest text-xl">注塑产品质量监控</p>
+    </div>
+    
+    <!-- 合格检验工单数、合格工单数、合格率 -->
+    <div class="flex justify-around items-center mb-2">
+      <div class="stat-item">
+        <div class="stat-label">合格检验工单数</div>
+        <div class="stat-value">{{ qualityStats.qualifiedInspectionOrders }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">合格工单数</div>
+        <div class="stat-value">{{ qualityStats.qualifiedOrders }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">合格率</div>
+        <div class="stat-value">{{ qualityStats.qualifiedRate }}%</div>
+      </div>
 </div>
     
-    <ScrollBoard :config="config" style="width:97%;height:19vh;" @click='clickHandler'/>
+    <!-- 机台自检合格率表格 -->
+    <!-- <div class="flex-1 mb-2 flex flex-col" style="overflow: hidden;">
+      <ScrollBoard :config="config" style="width:97%;height:100%;" @click='clickHandler'/>
+    </div> -->
+
+    <!-- 不合格工单明细 -->
+    <div class="flex-1 flex flex-col" style="overflow: hidden;">
+      <div class="text-white font-bold mb-1 text-sm">不合格工单明细:</div>
+      <div class="flex-1" style="overflow: hidden;">
+        <ScrollBoard :config="defectiveConfig" style="width:97%;height:100%;" />
+      </div>
+    </div>
   </div>
 
   <!-- 弹窗部分 -->
@@ -101,7 +128,11 @@ import * as echarts from 'echarts';
 import { fetchClosingRateData } from './fetchMesData';
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
-import { getSelfCheck } from '@/api/getInjection';
+// import { getSelfCheck, getabnormalInfo } from '@/api/getInjection';
+// import { getabnormalInfo } from '@/api/getInjection'; // 已注释，使用mock数据
+import { getNgGdDetail } from '@/api/getInjection';
+import { mockQualityStats, mockDefectiveData } from './mockData';
+import { getZhsProductMonitoring } from '@/api/getInjection';
 
 const dialogVisible = ref(false);//弹窗控制
 const selectedItem = ref({});
@@ -114,6 +145,14 @@ const categories = ref([]); // X 轴数据
 const values = ref([]); // Y 轴数据
 let chartInstance = null;
 const scrollBoardRef = ref(null);
+
+// 合格检验工单数、合格工单数、合格率统计数据
+const qualityStats = ref({
+  qualifiedInspectionOrders: 0,
+  qualifiedOrders: 0,
+  qualifiedRate: 0
+})
+
 const config = reactive({
   header: ['机台', '生产数量', '良品', '不良品', '废品', '自检合格率'],
   data: [
@@ -130,6 +169,17 @@ const config = reactive({
   showTooltip: true,
 })
 
+// 不合格工单明细表格配置
+const defectiveConfig = reactive({
+  header: ['工单单号', '品名', '规格', '工单数', '不良数', '不良原因', '责任人'],
+  data: [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']],
+  index: true,
+  columnWidth: [],
+  align: ['center', 'center', 'center', 'center', 'center', 'center', 'center'],
+  rowNum: 5,
+  showTooltip: true,
+})
+
 
 // 机台ID到机台名称的映射
 const getMachineName = (machineId) => {
@@ -142,94 +192,195 @@ const getMachineName = (machineId) => {
   return machineMap[machineId] || machineId;
 };
 
-const fetchData = async () => {
+// 格式化日期为 YYYY-MM-DD
+const formatDate = (date) => {
+  const y = date.getFullYear();
+  const m = String(date.getMonth() + 1).padStart(2, '0');
+  const d = String(date.getDate()).padStart(2, '0');
+  return `${y}-${m}-${d}`;
+};
+
+// 获取不合格工单明细数据 - 本月数据
+const fetchDefectiveData = async () => {
   try {
-    isLoading.value = true;
-    const res = await getSelfCheck();
-    
-    if (res && res.code === 200 && res.data && res.data.length > 0) {
-      // 处理API返回的数据
-      const processedData = res.data.map(item => {
-        const productionQuantity = item.qty || 0;
-        const scrapProducts = item.lot_att23 || 0;
-        const defectiveProducts = item.lot_att24 || 0;
-        const goodProducts = productionQuantity - scrapProducts - defectiveProducts;
-        const passRate = productionQuantity > 0 ? ((goodProducts / productionQuantity) * 100).toFixed(1) : 0;
-        
-        return {
-          machine: getMachineName(item.ty009),
-          productionQuantity,
-          goodProducts,
-          defectiveProducts,
-          scrapProducts,
-          passRate: parseFloat(passRate)
-        };
-      });
+    const today = new Date();
+    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+    const startDay = formatDate(startOfMonth);
+    const endDay = formatDate(today);
 
-      // 计算合计数据
-      const totalProduction = processedData.reduce((sum, item) => sum + item.productionQuantity, 0);
-      const totalGood = processedData.reduce((sum, item) => sum + item.goodProducts, 0);
-      const totalDefective = processedData.reduce((sum, item) => sum + item.defectiveProducts, 0);
-      const totalScrap = processedData.reduce((sum, item) => sum + item.scrapProducts, 0);
-      const totalPassRate = totalProduction > 0 ? ((totalGood / totalProduction) * 100).toFixed(1) : 0;
+    const res = await getNgGdDetail(startDay, endDay);
+    if (res && res.code === 200 && Array.isArray(res.data) && res.data.length > 0) {
+      defectiveConfig.data = res.data.map(item => [
+        (item.ta002 && typeof item.ta002 === 'string') ? item.ta002.trim() : (item.ta002 || '暂无数据'), // 工单单号
+        item.mb002 || '暂无数据', // 品名
+        item.mb003 || '暂无数据', // 规格
+        (item.plan_qty ?? item.ta015 ?? '暂无数据'), // 工单数
+        (item.cjbhgNum ?? item.ngNO ?? '暂无数据'), // 不良数
+        (item.ngName ?? item.ngReason ?? '暂无数据'), // 不良原因
+        (item.ngResponPeople ?? item.peopleName ?? '暂无数据') // 责任人
+      ]);
+      return;
+    }
 
-      // 更新表格数据
-      config.data = [
-        ...processedData.map(item => [
-          item.machine,
-          item.productionQuantity.toString(),
-          item.goodProducts.toString(),
-          item.defectiveProducts.toString(),
-          item.scrapProducts.toString(),
-          item.passRate + '%'
-        ]),
-        [
-          '合计',
-          totalProduction.toString(),
-          totalGood.toString(),
-          totalDefective.toString(),
-          totalScrap.toString(),
-          totalPassRate + '%'
-        ]
-      ];
-
-      isDataEmpty.value = false;
+    // 接口无数据时，回退到 mock 数据
+    if (mockDefectiveData && mockDefectiveData.length > 0) {
+      defectiveConfig.data = mockDefectiveData.map(item => [
+        item.ta002 || '暂无数据',
+        item.mb002 || '暂无数据',
+        item.mb003 || '暂无数据',
+        item.ta004 || '暂无数据',
+        item.nums || '暂无数据',
+        item.ngReason || '暂无数据',
+        item.ngResponPeople || '暂无数据'
+      ]);
     } else {
-      // 如果没有数据，显示暂无数据
-      config.data = [
-        ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-        ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-        ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-        ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-        ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
-      ];
-      isDataEmpty.value = true;
+      defectiveConfig.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
     }
   } catch (error) {
-    console.error('获取注塑产品自检质量数据失败:', error);
-    // 发生错误时显示暂无数据
-    config.data = [
-      ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-      ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-      ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-      ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
-      ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
-    ];
-    isDataEmpty.value = true;
-  } finally {
-    isLoading.value = false;
+    console.error('获取不合格工单明细失败:', error);
+    defectiveConfig.data = [['暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']];
   }
+}
+
+// 机台自检合格率表格数据获取函数（已注释，使用mock数据替代）
+// const fetchData = async () => {
+//   try {
+//     isLoading.value = true;
+//     const res = await getSelfCheck();
+//     
+//     if (res && res.code === 200 && res.data && res.data.length > 0) {
+//       // 处理API返回的数据
+//       const processedData = res.data.map(item => {
+//         const productionQuantity = item.qty || 0;
+//         const scrapProducts = item.lot_att23 || 0;
+//         const defectiveProducts = item.lot_att24 || 0;
+//         const goodProducts = productionQuantity - scrapProducts - defectiveProducts;
+//         const passRate = productionQuantity > 0 ? ((goodProducts / productionQuantity) * 100).toFixed(1) : 0;
+//         
+//         return {
+//           machine: getMachineName(item.ty009),
+//           productionQuantity,
+//           goodProducts,
+//           defectiveProducts,
+//           scrapProducts,
+//           passRate: parseFloat(passRate)
+//         };
+//       });
+
+//       // 计算合计数据
+//       const totalProduction = processedData.reduce((sum, item) => sum + item.productionQuantity, 0);
+//       const totalGood = processedData.reduce((sum, item) => sum + item.goodProducts, 0);
+//       const totalDefective = processedData.reduce((sum, item) => sum + item.defectiveProducts, 0);
+//       const totalScrap = processedData.reduce((sum, item) => sum + item.scrapProducts, 0);
+//       const totalPassRate = totalProduction > 0 ? ((totalGood / totalProduction) * 100).toFixed(1) : 0;
+
+//       // 更新表格数据
+//       config.data = [
+//         ...processedData.map(item => [
+//           item.machine,
+//           item.productionQuantity.toString(),
+//           item.goodProducts.toString(),
+//           item.defectiveProducts.toString(),
+//           item.scrapProducts.toString(),
+//           item.passRate + '%'
+//         ]),
+//         [
+//           '合计',
+//           totalProduction.toString(),
+//           totalGood.toString(),
+//           totalDefective.toString(),
+//           totalScrap.toString(),
+//           totalPassRate + '%'
+//         ]
+//       ];
+
+//       // 计算合格检验工单数、合格工单数、合格率
+//       const totalOrders = processedData.length;
+//       const qualifiedOrders = processedData.filter(item => item.defectiveProducts === 0 && item.scrapProducts === 0).length;
+//       const qualifiedRate = totalOrders > 0 ? ((qualifiedOrders / totalOrders) * 100).toFixed(1) : 0;
+//       
+//       qualityStats.value = {
+//         qualifiedInspectionOrders: totalOrders,
+//         qualifiedOrders: qualifiedOrders,
+//         qualifiedRate: parseFloat(qualifiedRate)
+//       };
+
+//       isDataEmpty.value = false;
+//     } else {
+//       config.data = [
+//         ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//         ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//         ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//         ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//         ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+//       ];
+//       qualityStats.value = {
+//         qualifiedInspectionOrders: 0,
+//         qualifiedOrders: 0,
+//         qualifiedRate: 0
+//       };
+//       isDataEmpty.value = true;
+//     }
+//   } catch (error) {
+//     console.error('获取注塑产品自检质量数据失败:', error);
+//     config.data = [
+//       ['HTF300注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//       ['HTF450注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//       ['HTF1600注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//       ['HTF2500注塑成型机', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据'],
+//       ['合计', '暂无数据', '暂无数据', '暂无数据', '暂无数据', '暂无数据']
+//     ];
+//     qualityStats.value = {
+//       qualifiedInspectionOrders: 0,
+//       qualifiedOrders: 0,
+//       qualifiedRate: 0
+//     };
+//     isDataEmpty.value = true;
+//   } finally {
+//     isLoading.value = false;
+//   }
+// };
+
+// 获取今日检验统计（合格检验工单数、合格工单数、合格率）
+const fetchQualityStats = async () => {
+  try {
+    const res = await getZhsProductMonitoring();
+    if (res && res.code === 200 && res.data) {
+      const { total, hg, rate } = res.data;
+      qualityStats.value = {
+        qualifiedInspectionOrders: total ?? 0,
+        qualifiedOrders: hg ?? 0,
+        qualifiedRate: typeof rate === 'number' ? rate : (parseFloat(rate) || 0)
+      };
+      return;
+    }
+  } catch (e) {
+    console.error('获取今日检验统计失败:', e);
+  }
+  // 回退到 mock
+  qualityStats.value = {
+    qualifiedInspectionOrders: mockQualityStats.qualifiedInspectionOrders,
+    qualifiedOrders: mockQualityStats.qualifiedOrders,
+    qualifiedRate: mockQualityStats.qualifiedRate
+  };
+};
+
+// 统一的刷新函数
+const refreshAllData = () => {
+  // fetchData(); // 机台自检合格率表格数据获取（已注释）
+  fetchQualityStats(); // 获取今日检验统计
+  fetchDefectiveData(); // 获取不合格工单明细数据
 };
 
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
-  fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  refreshAllData(); // 组件挂载时先请求一次
+  eventBus.on("refreshData", refreshAllData); // 监听全局刷新事件
 });
 
   // 清理定时器，避免组件卸载后定时器继续执行
   onBeforeUnmount(() => {
-    eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+    eventBus.off("refreshData", refreshAllData); // 组件销毁时取消监听
   });
 
 
@@ -254,6 +405,30 @@ onMounted(() => {
 
 :deep(.ScrollBoard .rows .row-item:hover) {
   background: rgba(79,142,247,0.1);
+}
+
+.stat-item {
+  display: flex;
+  align-items: center;
+  text-align: center;
+  padding: 0.5rem 1rem;
+  background: rgba(79,142,247,0.1);
+  border-radius: 4px;
+  min-width: 120px;
+  gap: 10px;
+}
+
+.stat-label {
+  font-size: 0.7vw;
+  color: rgb(255, 255, 255);
+  margin-bottom: 0.3rem;
+}
+
+.stat-value {
+  font-size: 1.2vw;
+  font-weight: bold;
+  color: #00eaff;
+  text-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
 }
 
 h2 {

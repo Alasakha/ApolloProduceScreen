@@ -2,9 +2,7 @@
 import type { MonthProductionCustResponse } from '@/api/getMesInfo'
 
 // 转换产量计划达成率趋势接口数据为图表数据
-// 根据图片，图表显示的是计划数和完成数的柱状图
-// 计划数 = A类计划数 + 常规计划数
-// 完成数 = A类完成数 + 常规完成数
+// 分别显示A类和常规类的计划数和完成数
 export function transformProductionPlanTrendData(
   apiData: MonthProductionCustResponse | null
 ): {
@@ -14,6 +12,13 @@ export function transformProductionPlanTrendData(
     type: 'bar'
     data: number[]
     itemStyle?: { color: string }
+    label?: {
+      show: boolean
+      position: string
+      formatter: string | ((params: any) => string)
+      color: string
+      fontSize: number
+    }
   }>
 } {
   if (!apiData?.data) {
@@ -25,16 +30,14 @@ export function transformProductionPlanTrendData(
 
   const { a_total, b_total, a_done, b_done } = apiData.data
 
-  // 计算总计划数和总完成数
-  const totalPlan = a_total + b_total
-  const totalDone = a_done + b_done
-
   // 由于API只返回当前月份的数据，我们需要生成6个月的数据
   // 这里假设当前月份是最后一个月，前面的月份使用当前月份的数据作为示例
   // 实际应用中，应该调用趋势接口获取多个月份的数据
   const categories: string[] = []
-  const planData: number[] = []
-  const doneData: number[] = []
+  const aClassPlanData: number[] = []
+  const aClassDoneData: number[] = []
+  const regularPlanData: number[] = []
+  const regularDoneData: number[] = []
 
   // 生成最近6个月的数据
   const today = new Date()
@@ -44,27 +47,82 @@ export function transformProductionPlanTrendData(
     categories.push(`${month}月`)
     
     // 使用当前月份的数据（实际应该从API获取各个月份的数据）
-    planData.push(totalPlan)
-    doneData.push(totalDone)
+    aClassPlanData.push(a_total)
+    aClassDoneData.push(a_done)
+    regularPlanData.push(b_total)
+    regularDoneData.push(b_done)
   }
 
   return {
     categories,
     series: [
       {
-        name: '计划数',
+        name: 'A类计划数',
         type: 'bar',
-        data: planData,
-        itemStyle: { color: '#808080' } // 灰色，根据图片描述
+        data: aClassPlanData,
+        itemStyle: { color: '#808080' }, // 灰色
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return formatNumber(params.value)
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       },
       {
-        name: '完成数',
+        name: 'A类完成数',
         type: 'bar',
-        data: doneData,
-        itemStyle: { color: '#00ff00' } // 绿色，根据图片描述
+        data: aClassDoneData,
+        itemStyle: { color: '#3b82f6' }, // 蓝色
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return formatNumber(params.value)
+          },
+          color: '#fff',
+          fontSize: 11
+        }
+      },
+      {
+        name: '常规计划数',
+        type: 'bar',
+        data: regularPlanData,
+        itemStyle: { color: '#808080' }, // 灰色
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return formatNumber(params.value)
+          },
+          color: '#fff',
+          fontSize: 11
+        }
+      },
+      {
+        name: '常规完成数',
+        type: 'bar',
+        data: regularDoneData,
+        itemStyle: { color: '#10b981' }, // 绿色
+        label: {
+          show: true,
+          position: 'top',
+          formatter: (params: any) => {
+            return formatNumber(params.value)
+          },
+          color: '#fff',
+          fontSize: 11
+        }
       }
     ]
   }
+}
+
+// 格式化数字，添加千分位
+function formatNumber(num: number): string {
+  return num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')
 }
 
 

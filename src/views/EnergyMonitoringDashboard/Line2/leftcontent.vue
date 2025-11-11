@@ -71,11 +71,11 @@
                 <div class="comparison-item">
                   <span class="comparison-label">同比：</span>
                   <span :class="{
-                    'comparison-value increase': dayDiff > 0,
-                    'comparison-value decrease': dayDiff < 0,
-                    'comparison-value neutral': dayDiff === 0
+                    'comparison-value increase': monthDiff > 0,
+                    'comparison-value decrease': monthDiff < 0,
+                    'comparison-value neutral': monthDiff === 0
                   }">
-                    {{dayDiff > 0 ? '↑' : dayDiff < 0 ? '↓' : '→'}}{{Math.abs(dayDiff)}}吨
+                    {{monthDiff > 0 ? '↑' : monthDiff < 0 ? '↓' : '→'}}{{Math.abs(monthDiff)}}吨
                   </span>
                 </div>
               </div>
@@ -120,7 +120,7 @@
         </div>
         
         <!-- 添加填写原因按钮 -->
-        <div class="reason-section" v-if="dayDiff > 0">
+        <div class="reason-section" v-if="dayDiff > 0 || monthDiff > 0">
           <div class="reason-info">
             <span class="reason-label">超过原因：</span>
             <span class="reason-text">{{ waterReason || '暂无' }}</span>
@@ -148,7 +148,7 @@
         </div>
         <div class="form-item">
           <label class="form-label">超支数值：</label>
-          <span class="form-value exceeded">{{ dayDiff > 0 ? '+' : '' }}{{ dayDiff }}吨</span>
+          <span class="form-value exceeded">{{ (dayDiff > 0 ? dayDiff : monthDiff) > 0 ? '+' : '' }}{{ dayDiff > 0 ? dayDiff : monthDiff }}吨</span>
         </div>
         <div class="form-item">
           <label class="form-label">超支原因：</label>
@@ -246,7 +246,7 @@ const standardTotal = computed(() => Math.round(actualTotal.value * 1.2)) // 总
 
 // 差值计算
 const dayDiff = computed(() => actualDay.value - standardDay.value)
-// const monthDiff = computed(() => actualMonth.value - standardMonth.value)
+const monthDiff = computed(() => actualMonth.value - standardMonth.value)
 
 
 

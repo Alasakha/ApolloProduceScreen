@@ -380,3 +380,22 @@ export const getBadIssuesPerformance = (prodLine: 'JG1' | 'JG2', monthDay: strin
     params: { prodLine, monthDay }
   })
 }
+
+// 金工人效达成率接口 /report/efficiency_jg_performance?monthDay=202511
+export const getEfficiencyJgPerformance = (monthDay: string) => {
+  return request({
+    url: '/report/efficiency_jg_performance',
+    method: 'get',
+    params: { monthDay }
+  })
+}
+
+// 金工人效达成率响应类型
+export interface EfficiencyJgPerformanceResponse {
+  code: number
+  message: string
+  data: {
+    achieveDay: number // 月度累计达成天数
+    standardDay: number // 月度累计排产天数
+  }
+}

@@ -61,7 +61,7 @@
 import { ref, onMounted, onUnmounted } from 'vue'
 import Header from './Header/index.vue'
 import PerformancePanel from './components/PerformancePanel.vue'
-import { getOrderSettlementPerformance, getOrderSettlementPerformanceTrend, getPassRatePerformanceTrend, getPassRatePerformance, getMonthProductionCust, type ThroughputTrendResponse, type PassRatePerformanceTrendResponse, type MonthProductionCustResponse } from '@/api/getMesInfo'
+import { getOrderSettlementPerformance, getOrderSettlementPerformanceTrend, getPassRatePerformanceTrend, getPassRatePerformance, getMonthProductionCust, getEfficiencyJgPerformance, type ThroughputTrendResponse, type PassRatePerformanceTrendResponse, type MonthProductionCustResponse, type EfficiencyJgPerformanceResponse } from '@/api/getMesInfo'
 import { transformPassRateData } from './utils/passRate'
 import { transformPassRateTrendData } from './utils/passRateTrend'
 import { transformProductionPlanTrendData } from './utils/productionPlanTrend'
@@ -457,7 +457,7 @@ function transformOrderSettlementTrendData(
           name: '常规实际',
           type: 'bar', // 实际用柱状图
           data: regularActualData,
-          itemStyle: { color: '#a855f7' },
+          itemStyle: { color: '#10b981' },
           label: {
             show: true,
             position: 'top',
@@ -521,24 +521,44 @@ function transformMonthProductionData(
 
   const { a_total, b_total, a_done, b_done } = apiData.data
 
-  // 计算A类达成率
-  const aRate = a_total > 0 
-    ? ((a_done / a_total) * 100).toFixed(1) + '%'
-    : '0%'
-
-  // 计算常规达成率
-  const bRate = b_total > 0 
-    ? ((b_done / b_total) * 100).toFixed(1) + '%'
-    : '0%'
+  // A类数据计算
+  const aClassRate = calculateRate(a_done, a_total)
+  
+  // 常规类数据计算
+  const regularRate = calculateRate(b_done, b_total)
 
   return {
     description: [
       { label: 'A类:月度计划数', value: formatNumber(a_total) },
-      { label: 'A类:月度累计完成数', value: formatNumber(a_done) },
-      { label: 'A类:月度达成率', value: aRate },
+      { label: '月度累计完成数', value: formatNumber(a_done) },
+      { label: '月度达成率', value: aClassRate },
       { label: '常规:月度计划数', value: formatNumber(b_total) },
-      { label: '常规:月度累计完成数', value: formatNumber(b_done) },
-      { label: '常规:月度达成率', value: bRate }
+      { label: '月度累计完成数', value: formatNumber(b_done) },
+      { label: '月度达成率', value: regularRate }
+    ]
+  }
+}
+
+// 转换人效达成率接口数据为面板数据（金工二部专用）
+function transformEfficiencyData(
+  apiData: EfficiencyJgPerformanceResponse | null
+): Partial<PanelData> {
+  if (!apiData?.data) {
+    return {}
+  }
+
+  const { standardDay, achieveDay } = apiData.data
+
+  // 计算月度达成率
+  const rate = standardDay > 0 
+    ? ((achieveDay / standardDay) * 100).toFixed(1) + '%'
+    : '0%'
+
+  return {
+    description: [
+      { label: '月度累计排产天数', value: formatNumber(standardDay) },
+      { label: '月度累计达成天数', value: formatNumber(achieveDay) },
+      { label: '月度达成率', value: rate }
     ]
   }
 }
@@ -572,27 +592,31 @@ async function fetchDepartment1ProductionPlan() {
   }
 }
 
-// 获取金工二部产量计划达成率数据
+// 获取当前月份（YYYYMM格式，如 202511）
+function getCurrentMonthDay(): string {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth() + 1
+  return `${year}${String(month).padStart(2, '0')}`
+}
+
+// 获取金工二部人效达成率数据
 async function fetchDepartment2ProductionPlan() {
   try {
     department2Loading.value['3'] = true
     
-    // 获取2003的数据
-    const response = await getMonthProductionCust('2003')
+    // 获取人效达成率数据
+    const monthDay = getCurrentMonthDay()
+    const response = await getEfficiencyJgPerformance(monthDay)
     
     if (response.code === 200) {
-      const transformedData = transformMonthProductionData(response as MonthProductionCustResponse)
-      const trendData = transformProductionPlanTrendData(response as MonthProductionCustResponse)
+      // 金工二部使用人效达成率数据格式
+      const transformedData = transformEfficiencyData(response as EfficiencyJgPerformanceResponse)
       
-      // 更新第三个面板（产量计划达成率）的数据
+      // 更新第三个面板（人效达成率）的数据
       if (department2Panels.value[2]) {
         department2Panels.value[2].description = transformedData.description || []
-        if (trendData.categories && trendData.series) {
-          department2Panels.value[2].chartData = {
-            categories: trendData.categories,
-            series: trendData.series
-          }
-        }
+        // 人效达成率不需要趋势图，保持原有chartData或清空
       }
     }
   } catch (err: any) {
@@ -649,7 +673,7 @@ async function fetchDepartment2TopQualityData() {
 const department1Panels = ref<PanelData[]>([
   {
     id: '1',
-    title: '总装一课工单结单率',
+    title: '金工一部工单结单率',
     description: [],
     chartTitle: '工单结单率趋势',
     chartType: 'bar' as const,
@@ -691,7 +715,7 @@ const department1Panels = ref<PanelData[]>([
 const department2Panels = ref<PanelData[]>([
   {
     id: '1',
-    title: '总装二课工单结单率',
+    title: '金工二部工单结单率',
     description: [],
     chartTitle: '工单结单率趋势',
     chartType: 'bar' as const,
@@ -709,7 +733,7 @@ const department2Panels = ref<PanelData[]>([
   },
   {
     id: '3',
-    title: '产量计划达成率',
+    title: '人效达成率',
     description: [],
     chartTitle: '产量计划达成率',
     chartType: 'bar' as const,

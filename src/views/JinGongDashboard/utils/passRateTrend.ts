@@ -163,7 +163,7 @@ export function transformPassRateTrendData(
         name: '常规实际',
         type: 'bar', // 实际用柱状图
         data: regularActualData,
-        itemStyle: { color: '#a855f7' },
+        itemStyle: { color: '#10b981' },
         label: {
           show: true,
           position: 'top',

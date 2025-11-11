@@ -5,38 +5,40 @@
           <dv-loading>Loading...</dv-loading>
         </div>
         <div v-if="!isLoading" class="w-full h-[95%] p-3 grid grid-cols-2 grid-rows-2 gap-2">
-          <!-- 出勤人数 -->
-          <div class="chuchai">
-            <div 
-              ref="Indicators2" 
-              class="w-full h-full cursor-pointer"
-              @click="openAttendanceDialog"
-            ></div>
-          </div>
-          <!-- 晚班人数 -->
-          <div class="peizhi">
-            <div 
-              ref="Indicators5" 
-              class="w-full h-full cursor-pointer"
-              @click="openNighttimeAttendanceDialog"
-            ></div>
-          </div>
-          <!-- 标准人效 -->
-          <div class="biaozhun">
-            <div ref="Indicators3" class="w-full h-full"></div>
-          </div>
-          <!-- 实际人效 -->
-          <div class="shiji">
-            <div 
-              ref="Indicators4" 
-              class="w-full h-full"
-              @click="openReasonDialog"
-              style="cursor: pointer;"
-            ></div>
+          <!-- 焊接三线布局 -->
+          <template v-if="isLine3">
+            <!-- 白班人数 -->
+            <div class="chuchai">
+              <div 
+                ref="Indicators2" 
+                class="w-full h-full cursor-pointer"
+                @click="openAttendanceDialog"
+              ></div>
+            </div>
+            <!-- 晚班人数 -->
+            <div class="peizhi">
+              <div 
+                ref="Indicators5" 
+                class="w-full h-full cursor-pointer"
+                @click="openNighttimeAttendanceDialog"
+              ></div>
+            </div>
+            <!-- 标准人数 -->
+            <div class="biaozhun">
+              <div ref="Indicators3" class="w-full h-full"></div>
+            </div>
+            <!-- 实际人数 -->
+            <div class="shiji">
+              <div 
+                ref="Indicators4" 
+                class="w-full h-full"
+                @click="openReasonDialog"
+                style="cursor: pointer;"
+              ></div>
               <!-- 警告图标 -->
               <div v-if="showWarning" class="warning-icon-container">
                 <el-tooltip
-                  :content="EfficentData.reason || '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等'"
+                  :content="EfficentData.reason || '实际人数低于标准人数，可能原因：出勤人数不足等'"
                   placement="left"
                   effect="dark"
                 >
@@ -48,6 +50,48 @@
                 </el-tooltip>
               </div>
             </div>
+          </template>
+          <!-- 焊接一线和二线布局 -->
+          <template v-else>
+            <!-- 白班配置人数 -->
+            <div class="peizhi">
+              <div ref="Indicators4" class="w-full h-full"></div>
+            </div>
+            <!-- 白班出勤人数 -->
+            <div class="chuchai">
+              <div 
+                ref="Indicators2" 
+                class="w-full h-full cursor-pointer"
+                @click="openAttendanceDialog"
+              ></div>
+            </div>
+            <!-- 晚班配置人数 -->
+            <div class="peizhi">
+              <div ref="Indicators3" class="w-full h-full"></div>
+            </div>
+            <!-- 晚班出勤人数 -->
+            <div class="chuchai">
+              <div 
+                ref="Indicators5" 
+                class="w-full h-full cursor-pointer"
+                @click="openNighttimeAttendanceDialog"
+              ></div>
+              <!-- 警告图标 -->
+              <div v-if="showWarning" class="warning-icon-container">
+                <el-tooltip
+                  :content="EfficentData.reason || '出勤人数低于配置人数，可能原因：出勤人数不足等'"
+                  placement="left"
+                  effect="dark"
+                >
+                  <svg class="warn-icon" width="38" height="38" viewBox="0 0 24 24">
+                    <polygon points="12,3 22,20 2,20" fill="#FFD600" stroke="#FFA000" stroke-width="2"/>
+                    <rect x="11" y="9" width="2" height="5" fill="#FFA000"/>
+                    <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
+                  </svg>
+                </el-tooltip>
+              </div>
+            </div>
+          </template>
         </div>
       </dv-border-box12>
 
@@ -130,7 +174,7 @@
           v-model="customReason"
           type="textarea"
           :rows="6"
-          placeholder="请填写实际人效低于标准人效的原因..."
+          :placeholder="isLine3 ? '请填写实际人数低于标准人数的原因...' : '请填写出勤人数低于配置人数的原因...'"
           maxlength="500"
           show-word-limit
         />
@@ -183,7 +227,7 @@
               v-model="newReason"
               type="textarea"
               :rows="4"
-              placeholder="请填写导致实际人效低于标准人效的原因..."
+              :placeholder="isLine3 ? '请填写导致实际人数低于标准人数的原因...' : '请填写导致出勤人数低于配置人数的原因...'"
               maxlength="500"
               show-word-limit
             />
@@ -230,11 +274,16 @@ const EfficentData = reactive({
   standardEmpNum: null,
   signNum: null, // 白班签到人数
   wanSignNum: null, // 晚班签到人数
+  standardDayEmpNum: null, // 白班配置人数
+  standardNightEmpNum: null, // 晚班配置人数
   warning: 0,
   reason: '',
 });
 
 const showWarning = computed(() => EfficentData.warning === 1);
+
+// 判断是否为焊接三线（prodLine === '8'）
+const isLine3 = computed(() => props.prodLine === '8');
 
 const Indicators2 = ref(null);
 const Indicators3 = ref(null);
@@ -263,34 +312,70 @@ const chart4 = useEcharts(Indicators4);
 const chart5 = useEcharts(Indicators5);
 
 const drawChart = () => {
-  const option2 = createGaugeOption({
-    text: "白班人数",
-    data: EfficentData.signNum,  
-    max: EfficentData.standardEmpNum
-  });
+  // 计算实际人数（白班人数 + 晚班人数）
+  const actualEmpNum = (EfficentData.signNum || 0) + (EfficentData.wanSignNum || 0);
+  
+  if (isLine3.value) {
+    // 焊接三线：左上-白班人数、右上-晚班人数、左下-标准人数、右下-实际人数
+    const option2 = createGaugeOption({
+      text: "白班人数",
+      data: EfficentData.signNum,  
+      max: EfficentData.standardEmpNum || 100
+    });
 
-  const option3 = createGaugeOption({
-    text: "标准人效",
-    data: EfficentData.standardEfficiency,
-    max: Math.max(EfficentData.standardEfficiency || 0, EfficentData.actualEfficiency || 0) || 100
-  });
+    const option5 = createGaugeOption({
+      text: "晚班人数",
+      data: EfficentData.wanSignNum, 
+      max: EfficentData.standardEmpNum || 100
+    });
 
-  const option4 = createGaugeOption({
-    text: "实际人效",
-    data: EfficentData.actualEfficiency,
-    max: Math.max(EfficentData.standardEfficiency || 0, EfficentData.actualEfficiency || 0) || 100
-  });
+    const option3 = createGaugeOption({
+      text: "标准人数",
+      data: EfficentData.standardEmpNum,
+      max: Math.max(EfficentData.standardEmpNum || 0, actualEmpNum) || 100
+    });
 
-  const option5 = createGaugeOption({
-    text: "晚班人数",
-    data: EfficentData.wanSignNum, 
-    max: EfficentData.standardEmpNum
-  });
+    const option4 = createGaugeOption({
+      text: "实际人数",
+      data: actualEmpNum,
+      max: Math.max(EfficentData.standardEmpNum || 0, actualEmpNum) || 100
+    });
 
-  chart2.setOption(option2);
-  chart3.setOption(option3);
-  chart4.setOption(option4);
-  chart5.setOption(option5);
+    chart2.setOption(option2);
+    chart5.setOption(option5);
+    chart3.setOption(option3);
+    chart4.setOption(option4);
+  } else {
+    // 焊接一线和二线：左上-白班配置人数、右上-白班出勤人数、左下-晚班配置人数、右下-晚班出勤人数
+    const option4 = createGaugeOption({
+      text: "白班配置人数",
+      data: EfficentData.standardDayEmpNum,
+      max: Math.max(EfficentData.standardDayEmpNum || 0, EfficentData.signNum || 0) || 100
+    });
+
+    const option2 = createGaugeOption({
+      text: "白班出勤人数",
+      data: EfficentData.signNum,  
+      max: Math.max(EfficentData.standardDayEmpNum || 0, EfficentData.signNum || 0) || 100
+    });
+
+    const option3 = createGaugeOption({
+      text: "晚班配置人数",
+      data: EfficentData.standardNightEmpNum,
+      max: Math.max(EfficentData.standardNightEmpNum || 0, EfficentData.wanSignNum || 0) || 100
+    });
+
+    const option5 = createGaugeOption({
+      text: "晚班出勤人数",
+      data: EfficentData.wanSignNum, 
+      max: Math.max(EfficentData.standardNightEmpNum || 0, EfficentData.wanSignNum || 0) || 100
+    });
+
+    chart4.setOption(option4);
+    chart2.setOption(option2);
+    chart3.setOption(option3);
+    chart5.setOption(option5);
+  }
 };
 
 const fetchData = async () => {
@@ -303,13 +388,34 @@ const fetchData = async () => {
   EfficentData.signNum = Number(res.data.signNum) || 0;
   EfficentData.wanSignNum = Number(res.data.wanSignNum) || 0;
   
-  // 判断是否需要警告（实际人效低于标准人效）
-  if (EfficentData.actualEfficiency < EfficentData.standardEfficiency) {
-    EfficentData.warning = 1;
-    EfficentData.reason = '实际人效低于标准人效，可能原因：出勤人数不足、生产异常等';
+  // 获取白班和晚班配置人数，如果API没有返回，则使用standardEmpNum的一半
+  EfficentData.standardDayEmpNum = Number(res.data.standardDayEmpNum) || Math.ceil((EfficentData.standardEmpNum || 0) / 2);
+  EfficentData.standardNightEmpNum = Number(res.data.standardNightEmpNum) || Math.floor((EfficentData.standardEmpNum || 0) / 2);
+  
+  if (isLine3.value) {
+    // 焊接三线：判断是否需要警告（实际人数低于标准人数）
+    const actualEmpNum = EfficentData.signNum + EfficentData.wanSignNum;
+    if (actualEmpNum < EfficentData.standardEmpNum) {
+      EfficentData.warning = 1;
+      EfficentData.reason = '实际人数低于标准人数，可能原因：出勤人数不足等';
+    } else {
+      EfficentData.warning = 0;
+      EfficentData.reason = '';
+    }
   } else {
-    EfficentData.warning = 0;
-    EfficentData.reason = '';
+    // 焊接一线和二线：判断是否需要警告（出勤人数低于配置人数）
+    const dayWarning = EfficentData.signNum < EfficentData.standardDayEmpNum;
+    const nightWarning = EfficentData.wanSignNum < EfficentData.standardNightEmpNum;
+    if (dayWarning || nightWarning) {
+      EfficentData.warning = 1;
+      let reasons = [];
+      if (dayWarning) reasons.push('白班出勤人数低于配置人数');
+      if (nightWarning) reasons.push('晚班出勤人数低于配置人数');
+      EfficentData.reason = reasons.join('，') + '，可能原因：出勤人数不足等';
+    } else {
+      EfficentData.warning = 0;
+      EfficentData.reason = '';
+    }
   }
   
   isLoading.value = false;

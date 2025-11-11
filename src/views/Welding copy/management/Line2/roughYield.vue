@@ -5,36 +5,45 @@
             <span class="click-note">(点击进入可以查看和编辑不合格问题明细)</span>
         </div>
         <div class="yield-content">
-            <div class="part-section flex w-full">
+            <!-- 指标标签行 -->
+            <div class="metrics-labels">
+                <span class="metric-label">今日检验数</span>
+                <span class="metric-label">一次合格数</span>
+                <span class="metric-label">直通率</span>
+                <span class="metric-label">合格数</span>
+                <span class="metric-label">合格率</span>
+            </div>
+            
+            <div class="part-section flex">
                 <div class="part-header">车架</div>
                 <div class="metrics-line">
-                    <span class="metric">今日检验数: {{ weldingData.cjTotal  }}</span>
-                    <span class="metric">一次合格数: --</span>
-                    <span class="metric">直通率: --</span>
-                    <span class="metric">合格数: {{ handleData(weldingData.cjPass)  }}</span>
-                    <span class="metric">合格率: {{ getQualifiedRate(weldingData.cjTotal, weldingData.cjPass) }}</span>
+                    <span class="metric">{{ weldingData.cjTotal }}</span>
+                    <span class="metric">--</span>
+                    <span class="metric">--</span>
+                    <span class="metric">{{ handleData(weldingData.cjPass) }}</span>
+                    <span class="metric">{{ getQualifiedRate(weldingData.cjTotal, weldingData.cjPass) }}</span>
                 </div>
             </div>
             
             <div class="part-section flex">
                 <div class="part-header">后叉</div>
                 <div class="metrics-line">
-                    <span class="metric">今日检验数: {{ handleData(weldingData.hchTotal)  }}</span>
-                    <span class="metric">一次合格数: --</span>
-                    <span class="metric">直通率: --</span>
-                    <span class="metric">合格数: {{ handleData(weldingData.hchPass)  }}</span>
-                    <span class="metric">合格率: {{ getQualifiedRate(weldingData.hchTotal, weldingData.hchPass) }}</span>
+                    <span class="metric">{{ handleData(weldingData.hchTotal) }}</span>
+                    <span class="metric">--</span>
+                    <span class="metric">--</span>
+                    <span class="metric">{{ handleData(weldingData.hchPass) }}</span>
+                    <span class="metric">{{ getQualifiedRate(weldingData.hchTotal, weldingData.hchPass) }}</span>
                 </div>
             </div>
             
             <div class="part-section flex">
                 <div class="part-header">尾架</div>
                 <div class="metrics-line">
-                    <span class="metric">今日检验数: {{ handleData(weldingData.wjTotal) }}</span>
-                    <span class="metric">一次合格数: --</span>
-                    <span class="metric">直通率: --</span>
-                    <span class="metric">合格数: {{ handleData(weldingData.wjPass)  }}</span>
-                    <span class="metric">合格率: {{ getQualifiedRate(weldingData.wjTotal, weldingData.wjPass) }}</span>
+                    <span class="metric">{{ handleData(weldingData.wjTotal) }}</span>
+                    <span class="metric">--</span>
+                    <span class="metric">--</span>
+                    <span class="metric">{{ handleData(weldingData.wjPass) }}</span>
+                    <span class="metric">{{ getQualifiedRate(weldingData.wjTotal, weldingData.wjPass) }}</span>
                 </div>
             </div>
         </div>
@@ -274,18 +283,20 @@ onMounted(() => {
     padding: 8px;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    border: 2px solid #32cd32;
+    border: 2px solid #1e90ff;
     cursor: pointer;
     transition: all 0.3s ease;
+    position: relative;
+    z-index: 1;
 }
 
 .yield-container:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(50, 205, 50, 0.3);
+    border-color: #00bfff;
+    box-shadow: 0 0 15px rgba(30, 144, 255, 0.3);
 }
 
 .yield-title {
-    background: linear-gradient(135deg, #32cd32, #228b22);
+    background: linear-gradient(135deg, #1e90ff, #4169e1);
     padding: 8px 12px;
     border-radius: 6px;
     margin-bottom: 8px;
@@ -319,20 +330,38 @@ onMounted(() => {
     gap: 8px;
 }
 
+.metrics-labels {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 8px;
+    padding: 6px 8px;
+    background: rgba(30, 144, 255, 0.1);
+    border-radius: 4px;
+    border: 1px solid rgba(30, 144, 255, 0.3);
+    margin-bottom: 4px;
+}
+
+.metric-label {
+    font-size: 11px;
+    color: #1e90ff;
+    font-weight: 600;
+    text-align: center;
+}
+
 .part-section {
     background: rgba(0, 0, 0, 0.15);
     border-radius: 6px;
     padding: 8px;
-    border: 1px solid #32cd32;
+    border: 1px solid #1e90ff;
 }
 
 .part-header {
     font-size: 14px;
     font-weight: 600;
-    color: #32cd32;
+    color: #1e90ff;
     margin-bottom: 8px;
     text-align: center;
-    background: rgba(50, 205, 50, 0.1);
+    background: rgba(30, 144, 255, 0.1);
     padding: 4px;
     border-radius: 4px;
 }
@@ -344,7 +373,7 @@ onMounted(() => {
     padding: 6px 8px;
     background: rgba(0, 0, 0, 0.2);
     border-radius: 4px;
-    border: 1px solid rgba(50, 205, 50, 0.3);
+    border: 1px solid rgba(30, 144, 255, 0.3);
     width: 90%;
 }
 

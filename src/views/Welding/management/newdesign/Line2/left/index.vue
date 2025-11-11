@@ -20,10 +20,7 @@
 
                 <!-- 第一行：日生产计划表格区域 (30%) -->
                 <div class="plan-section">
-                    <PlanTable 
-                        :dashboard-data="dashboardData"
-                        :table-data="tableData"
-                    />
+                    <PlanTable />
                 </div>
 
                 <!-- 第三行：其他组件区域 (30%) -->
@@ -41,13 +38,13 @@
 
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
 import designSituation from '../component/design/Leftcontent.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
 import { getMetalworkingEfficiency } from '@/api/getStampinfo'
-import { getDayPlanDone, getDayPlanDoneTotal } from '@/api/getStampWeldinfo'
+// import { getDayPlanDone, getDayPlanDoneTotal } from '@/api/getStampWeldinfo'
 import OneProdLine from './oneProdLine.vue'
 
 // const route = useRoute()
@@ -63,105 +60,52 @@ const attendanceApi = async (prodLine: string) => {
     return await getMetalworkingEfficiency(prodLine)
 }
 
-// 获取日生产计划数据
-const fetchPlanData = async () => {
-    try {
-        // 异步获取汇总数据
-        getDayPlanDoneTotal(prodLine.value).then(response => {
-            if (response && response.data) {
-                dashboardData.value = {
-                    total: response.data.total || 0,
-                    completed: response.data.done || 0,
-                    efficiency: response.data.total > 0 ? Math.round((response.data.done / response.data.total) * 100) : 0
-                }
-            }
-        }).catch(error => {
-            console.error('获取汇总数据失败:', error)
-        })
-        
-        // 异步获取详细表格数据
-        getDayPlanDone(prodLine.value).then(response => {
-            if (response && response.data) {
-                // 转换表格数据
-                tableData.value = response.data.map((item, index) => ({
-                    product: item.label || '--',
-                    model: item.cx || '--',
-                    plan: item.num || 0,
-                    actual: item.done.toString() || '--',
-                    difference: (item.num - item.done).toString() || '--',
-                    completionRate: item.done > 0 ? Math.round((item.done / item.num) * 100).toString() : '0 ',
-                    color: ['orange', 'blue', 'green'][index % 3] as 'orange' | 'blue' | 'green'
-                }))
-            }
-        }).catch(error => {
-            console.error('获取表格数据失败:', error)
-        })
-    } catch (error) {
-        console.error('获取日生产计划数据失败:', error)
-    }
-}
+// 获取日生产计划数据 - 暂时注释，使用暂无数据
+// const fetchPlanData = async () => {
+//     try {
+//         // 异步获取汇总数据
+//         getDayPlanDoneTotal(prodLine.value).then(response => {
+//             if (response && response.data) {
+//                 dashboardData.value = {
+//                     total: response.data.total || 0,
+//                     completed: response.data.done || 0,
+//                     efficiency: response.data.total > 0 ? Math.round((response.data.done / response.data.total) * 100) : 0
+//                 }
+//             }
+//         }).catch(error => {
+//             console.error('获取汇总数据失败:', error)
+//         })
+//         
+//         // 异步获取详细表格数据
+//         getDayPlanDone(prodLine.value).then(response => {
+//             if (response && response.data) {
+//                 // 转换表格数据
+//                 tableData.value = response.data.map((item, index) => ({
+//                     product: item.label || '--',
+//                     model: item.cx || '--',
+//                     plan: item.num || 0,
+//                     actual: item.done.toString() || '--',
+//                     difference: (item.num - item.done).toString() || '--',
+//                     completionRate: item.done > 0 ? Math.round((item.done / item.num) * 100).toString() : '0 ',
+//                     color: ['orange', 'blue', 'green'][index % 3] as 'orange' | 'blue' | 'green'
+//                 }))
+//             }
+//         }).catch(error => {
+//             console.error('获取表格数据失败:', error)
+//         })
+//     } catch (error) {
+//         console.error('获取日生产计划数据失败:', error)
+//     }
+// }
 
-// 组件挂载时获取数据
-onMounted(() => {
-    fetchPlanData()
-})
+// 组件挂载时获取数据 - 暂时注释
+// onMounted(() => {
+//     fetchPlanData()
+// })
 
 
 
-// 定义表格数据接口
-interface DashboardData {
-    total: number
-    completed: number
-    efficiency: number
-}
-
-interface TableRowData {
-    product: string
-    model: string
-    plan: number
-    actual: string
-    difference: string
-    completionRate: string
-    color: 'orange' | 'blue' | 'green'
-}
-
-// 右上角数据卡片数据
-const dashboardData = ref<DashboardData>({
-    total: 6865,
-    completed: 3323,
-    efficiency: 48
-})
-
-// 表格行数据 - 第二行数据完全由父组件传入
-const tableData = ref<TableRowData[]>([
-  {
-    product: '车架',
-    model: '34-2',
-    plan: 100,
-    actual: '--',
-    difference: '--',
-    completionRate: '--',
-    color: 'orange'
-  },
-  {
-    product: '后叉',
-    model: '战娃',
-    plan: 80,
-    actual: '--',
-    difference: '--',
-    completionRate: '--',
-    color: 'blue'
-  },
-  {
-    product: '尾架',
-    model: 'BE13',
-    plan: 60,
-    actual: '--',
-    difference: '--',
-    completionRate: '--',
-    color: 'green'
-  }
-])
+// PlanTable 组件已简化为只显示标签，不再需要数据
 
 
 
@@ -185,7 +129,8 @@ const tableData = ref<TableRowData[]>([
 
 .plan-section {
     height: 26%;
-    min-height: 200px;
+    min-height: 180px;
+    overflow: hidden;
 }
 
 .components-row {

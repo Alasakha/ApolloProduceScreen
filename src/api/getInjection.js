@@ -138,3 +138,95 @@ export const getRawMaterialMonitoring2 = () => {
     method: 'get',
   })
 }
+
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/injection/ngGdDetail?startDay=2025-11-01&endDay=2025-11-11' \
+//   -H 'accept: */*'
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": [
+//     {
+//       "ta001": "5103",
+//       "ta002": "251018009   ",
+//       "uid": "202511110824",
+//       "mb002": "前保险杠装饰板_磨砂黑色",
+//       "mb003": "AGA-18/250_共丙339g",
+//       "ta015": 100,
+//       "cjbhgNum": 1,
+//       "plan_qty": 400,
+//       "ngName": "毛刺",
+//       "ngResponPeople": "测试",
+//       "ngDutyType": "厂内"
+//     }
+//   ]
+// }
+export const getNgGdDetail = (startDay,endDay) => {
+  return request({
+    url: '/injection/ngGdDetail',
+    method: 'get',
+    params: { startDay,endDay }
+  })
+}
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/injection/monthCompleteGd' \
+//   -H 'accept: */*'月入库工单,准时工单,今日计划工单数,已完结工单
+// ·{
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": {
+//     "totalGd": 239,
+//     "jsGd": 224,
+//     "todayTotalGd": 39,
+//     "todayJsGd": 24
+//   }
+// }
+export const getMonthCompleteGd = () => {
+  return request({
+    url: '/injection/monthCompleteGd',
+    method: 'get',
+  })
+}
+
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/injection/todayPlanComplete' \
+//   -H 'accept: */*'今日计划量,已完成量
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": {
+//     "complete": 1610,
+//     "plan": 6070
+//   }
+// }
+export const getTodayPlanComplete = () => {
+  return request({
+    url: '/injection/todayPlanComplete',
+    method: 'get',
+  })
+}
+
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/injection/zhsProductMonitoring' \
+//   -H 'accept: */*'今日检验工单数,合格工单数
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": {
+//     "inspectionDate": "2025-11-11",
+//     "total": 18,
+//     "hg": 17,
+//     "ng": 1,
+//     "rate": 94.4
+//   }
+// }
+export const getZhsProductMonitoring = () => {
+  return request({
+    url: '/injection/zhsProductMonitoring',
+    method: 'get',
+  })
+}

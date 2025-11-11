@@ -620,3 +620,69 @@ export interface DayPlanDoneTotal {
   done: number        // 已完成数
   //效率 done/total
 }
+
+// 计划进度管控数据接口
+export interface PlanProgressControl {
+  monthTotalPlan: number      // 月总计划量（4台机总计划）
+  monthCompleted: number      // 月已完成量（4台机累计完成数）
+  monthCompletionRate: number // 月完成率
+  todayPlan: number           // 今日计划量（4台机今日总计划）
+  todayCompleted: number      // 今日已完成量（4台机总完成数）
+  todayCompletionRate: number // 今日完成率
+}
+
+// 工单结单率数据接口
+export interface WorkOrderClosingRate {
+  dailyInboundOrders: number  // 日入库工单
+  onTimeOrders: number        // 准时工单
+  closingRate: number         // 结单率
+  todayPlanOrders: number     // 今日计划工单数
+  todayCompletedOnTime: number // 已准时完结工单
+  todayClosingRate: number    // 今日结单率
+}
+
+// 获取计划进度管控数据（mock数据，后续连接真实接口）
+export const getPlanProgressControl = async (_prodLine: string): Promise<{code: number, data: PlanProgressControl}> => {
+  // TODO: 后续连接真实接口
+  // return request({
+  //   url: '/injection/planProgressControl',
+  //   method: 'get',
+  //   params: { prodLine: _prodLine }
+  // })
+  
+  // Mock数据
+  return Promise.resolve({
+    code: 200,
+    data: {
+      monthTotalPlan: 12500,
+      monthCompleted: 10200,
+      monthCompletionRate: 81.6,
+      todayPlan: 450,
+      todayCompleted: 380,
+      todayCompletionRate: 84.4
+    }
+  })
+}
+
+// 获取工单结单率数据（mock数据，后续连接真实接口）
+export const getWorkOrderClosingRate = async (_prodLine: string): Promise<{code: number, data: WorkOrderClosingRate}> => {
+  // TODO: 后续连接真实接口
+  // return request({
+  //   url: '/injection/workOrderClosingRate',
+  //   method: 'get',
+  //   params: { prodLine: _prodLine }
+  // })
+  
+  // Mock数据
+  return Promise.resolve({
+    code: 200,
+    data: {
+      dailyInboundOrders: 28,
+      onTimeOrders: 25,
+      closingRate: 89.3,
+      todayPlanOrders: 32,
+      todayCompletedOnTime: 28,
+      todayClosingRate: 87.5
+    }
+  })
+}

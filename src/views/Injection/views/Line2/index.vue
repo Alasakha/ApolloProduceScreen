@@ -1,7 +1,7 @@
 /<template>
-    <div class="w-screen h-[60vh] pl-[2vw] pr-[2vw] pt-[1vw] flex">
+    <div class="w-screen h-[60vh] pl-[2vw] pr-[2vw] pt-[0.5vw] flex flex-col">
   
-
+      <LeftContent/>
 
          <!-- 设备状态 -->
          <DashboardCard :isShowtilte="false" class="flex-1">
@@ -18,6 +18,7 @@
   </template>
   
   <script setup lang="ts">
+  import LeftContent from './LeftContent.vue';
 import DashboardCard from "@/components/DashboardCard.vue";
 import Category from '../Middle/RightContent/Statistic/index.vue'
   </script>
