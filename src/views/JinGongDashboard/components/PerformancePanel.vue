@@ -20,18 +20,21 @@
         <!-- A类数据区域 -->
         <div class="data-section class-a-data" v-if="description && description.length > 0">
           <div class="data-category">
-            <h4 class="category-title">A类</h4>
+            <!-- 当title为"产量计划达成率"或"人效达成率"时，不显示"A类"标题 -->
+            <h4 class="category-title" v-if="title !== '产量计划达成率' && title !== '人效达成率' && description.length > 3">A类</h4>
             <div class="data-items">
-              <div v-for="(item, index) in description.slice(0, 3)" :key="index" class="data-item">
+              <!-- 如果title为"产量计划达成率"或"人效达成率"，显示所有项；如果数组长度为8，显示前4项；否则显示前3项（兼容其他面板） -->
+              <div v-for="(item, index) in (title === '产量计划达成率' || title === '人效达成率' ? description : description.slice(0, description.length === 8 ? 4 : 3))" :key="index" class="data-item">
                 <span class="item-label">{{ item.label }}:</span>
                 <span class="item-value">{{ item.value }}</span>
               </div>
             </div>
           </div>
-          <div v-if="!hideRegular && description.length > 3" class="data-category">
+          <div v-if="!hideRegular && description.length > 3 && title !== '产量计划达成率' && title !== '人效达成率'" class="data-category">
             <h4 class="category-title">常规</h4>
             <div class="data-items">
-              <div v-for="(item, index) in description.slice(3)" :key="index" class="data-item">
+              <!-- 如果数组长度为8，显示后4项；否则显示从第4项开始的所有项（兼容其他面板） -->
+              <div v-for="(item, index) in description.slice(description.length === 8 ? 4 : 3)" :key="index" class="data-item">
                 <span class="item-label">{{ item.label }}:</span>
                 <span class="item-value">{{ item.value }}</span>
               </div>

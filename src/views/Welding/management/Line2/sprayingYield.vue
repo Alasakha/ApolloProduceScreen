@@ -5,45 +5,57 @@
             <!-- <div class="click-note 3xl:text-xs ">(点击进入可以查看和编辑不合格问题明细)</div> -->
         </div>
         <div class="yield-content">
-            <!-- 指标标签行 -->
-            <div class="metrics-labels">
-                <span class="metric-label">今日检验数</span>
-                <!-- <span class="metric-label">一次合格数</span> -->
-                <!-- <span class="metric-label">直通率</span> -->
-                <span class="metric-label">合格数</span>
-                <span class="metric-label">合格率</span>
-            </div>
-            
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">车架</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ frameData.inspectionCount }}</span>
-                    <!-- <span class="metric">{{ frameData.firstPassCount }}</span> -->
-                    <!-- <span class="metric">{{ frameData.firstPassRate }}</span> -->
-                    <span class="metric">{{ frameData.qualifiedCount }}</span>
-                    <span class="metric">{{ frameData.qualifiedRate }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ frameData.inspectionCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ frameData.qualifiedCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ frameData.qualifiedRate }}</span>
+                    </span>
                 </div>
             </div>
             
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">后叉</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ rearForkData.inspectionCount }}</span>
-                    <!-- <span class="metric">{{ rearForkData.firstPassCount }}</span> -->
-                    <!-- <span class="metric">{{ rearForkData.firstPassRate }}</span> -->
-                    <span class="metric">{{ rearForkData.qualifiedCount }}</span>
-                    <span class="metric">{{ rearForkData.qualifiedRate }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ rearForkData.inspectionCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ rearForkData.qualifiedCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ rearForkData.qualifiedRate }}</span>
+                    </span>
                 </div>
             </div>
             
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">尾架</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ tailFrameData.inspectionCount }}</span>
-                    <!-- <span class="metric">{{ tailFrameData.firstPassCount }}</span> -->
-                    <!-- <span class="metric">{{ tailFrameData.firstPassRate }}</span> -->
-                    <span class="metric">{{ tailFrameData.qualifiedCount }}</span>
-                    <span class="metric">{{ tailFrameData.qualifiedRate }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ tailFrameData.inspectionCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ tailFrameData.qualifiedCount }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ tailFrameData.qualifiedRate }}</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -161,29 +173,29 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 8px;
+    padding: 0;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    border: 2px solid #1e90ff;
+    border: none;
     cursor: pointer;
     transition: all 0.3s ease;
     position: relative;
     z-index: 1;
+    overflow: hidden;
 }
 
 .yield-container:hover {
-    border-color: #00bfff;
-    box-shadow: 0 0 15px rgba(30, 144, 255, 0.3);
+    box-shadow: 0 0 15px rgba(39, 159, 39, 0.3);
 }
 
 .yield-title {
-    background: linear-gradient(135deg, #1e90ff, #4169e1);
+    background: #279f27;
     padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
+    border-radius: 0;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     position: relative;
 }
 
@@ -192,6 +204,7 @@ onBeforeUnmount(() => {
     color: white;
     flex: 1;
     text-align: center;
+    font-weight: 600;
 }
 
 .click-note {
@@ -210,61 +223,81 @@ onBeforeUnmount(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .metrics-labels {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 6px 8px;
-    background: rgba(30, 144, 255, 0.1);
-    border-radius: 4px;
-    border: 1px solid rgba(30, 144, 255, 0.3);
-    margin-bottom: 4px;
+    display: none;
 }
 
 .metric-label {
     font-size: 11px;
-    color: #1e90ff;
+    color: white;
     font-weight: 600;
     text-align: center;
 }
 
 .part-section {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    background: transparent;
+    border-radius: 0;
     padding: 8px;
-    border: 1px solid #1e90ff;
+    border: 1px solid #279f27;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.part-section:last-child {
+    margin-bottom: 0;
 }
 
 .part-header {
     font-size: 14px;
     font-weight: 600;
-    color: #1e90ff;
-    margin-bottom: 8px;
-    text-align: center;
-    background: rgba(30, 144, 255, 0.1);
-    padding: 4px;
-    border-radius: 4px;
+    color: #279f27;
+    margin-bottom: 0;
+    text-align: left;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .metrics-line {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 8px;
-    padding: 6px 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    border: 1px solid rgba(30, 144, 255, 0.3);
-    width: 90%;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    flex: 1;
+    align-items: center;
 }
 
-.metric {
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.metric-label-inline {
     font-size: 12px;
-    color: #e0e0e0;
+    color: white;
     font-weight: 500;
-    text-align: center;
+}
+
+.metric-value {
+    font-size: 12px;
+    color: white;
+    font-weight: 500;
 }
 
 

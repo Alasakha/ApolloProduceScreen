@@ -16,9 +16,13 @@
             <div class="card-icon">✅已检验</div>
             <div class="stat-value">{{checkedCount1}}</div>
           </div>
-          <div class="stat-card">
+          <div 
+            class="stat-card stat-card-rate" 
+            :class="{ 'rate-low': progressRate1 < 85 }"
+            @click="openReasonDialog(1)"
+          >
             <div class="card-icon">📈完成率</div>
-            <div class="stat-value">{{progressRate1}}%</div>
+            <div class="stat-value" :class="{ 'text-red': progressRate1 < 85 }">{{progressRate1}}%</div>
           </div>
         </div>
         
@@ -35,9 +39,13 @@
             <div class="stat-value">{{checkedCount3}}</div>
             <div class="stat-label"></div>
           </div>
-          <div class="stat-card">
+          <div 
+            class="stat-card stat-card-rate" 
+            :class="{ 'rate-low': progressRate3 < 85 }"
+            @click="openReasonDialog(3)"
+          >
             <div class="card-icon">📈完成率</div>
-            <div class="stat-value">{{progressRate3}}%</div>
+            <div class="stat-value" :class="{ 'text-red': progressRate3 < 85 }">{{progressRate3}}%</div>
           </div>
         </div>
 
@@ -53,9 +61,13 @@
             <div class="card-icon">✅已检验</div>
             <div class="stat-value">{{checkedCount2}}</div>
           </div>
-          <div class="stat-card">
+          <div 
+            class="stat-card stat-card-rate" 
+            :class="{ 'rate-low': progressRate2 < 85 }"
+            @click="openReasonDialog(2)"
+          >
             <div class="card-icon">📈完成率</div>
-            <div class="stat-value">{{progressRate2}}%</div>
+            <div class="stat-value" :class="{ 'text-red': progressRate2 < 85 }">{{progressRate2}}%</div>
           </div>
         </div>
         
@@ -67,6 +79,15 @@
       </div>
 
     </dv-border-box8>
+    
+    <!-- 原因对策对话框 -->
+    <ReasonDialog
+      :visible="dialogVisible"
+      :metric-info="currentMetricInfo"
+      :code="currentCode"
+      @close="closeReasonDialog"
+      @submit="handleSubmitReason"
+    />
   </div>
 </template>
 
@@ -77,7 +98,9 @@ import { useEcharts } from '@/utils/useEcharts'
 import { createOption } from './jindu'
 import { getCheckTotalDone, getCheckTotalDoneJcx } from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus'
-
+import ReasonDialog from '@/components/ReasonDialog.vue'
+import { fillInReason } from '@/api/produceperformance'
+import { ElMessage } from 'element-plus'
 
 const dialogTitle = ref('装配检验超时');
 const chartRef1 = ref(null)
@@ -115,6 +138,70 @@ const progressRate3 = computed(() => {
   if (totalCount3.value === 0) return 0
   return Math.round((checkedCount3.value / totalCount3.value) * 100)
 })
+
+// 原因对策对话框相关
+const dialogVisible = ref(false)
+const currentCode = ref('')
+const currentMetricInfo = ref({
+  name: '',
+  period: '今日',
+  target: 85,
+  actual: 0,
+  achievement: 0
+})
+
+// 打开原因对话框
+const openReasonDialog = (index: number) => {
+  let rate = 0
+  let name = ''
+  let code = ''
+  
+  if (index === 1) {
+    rate = progressRate1.value
+    name = '总装一课检验完成率'
+    code = 'QUALITY_CHECK_RATE_ZHUANGPEI_1'
+  } else if (index === 2) {
+    rate = progressRate2.value
+    name = '总装二课检验完成率'
+    code = 'QUALITY_CHECK_RATE_ZHUANGPEI_2'
+  } else if (index === 3) {
+    rate = progressRate3.value
+    name = '上线检验完成率'
+    code = 'QUALITY_CHECK_RATE_ZHUANGPEI_3'
+  }
+  
+  currentCode.value = code
+  currentMetricInfo.value = {
+    name,
+    period: '今日',
+    target: 85,
+    actual: rate,
+    achievement: rate
+  }
+  
+  dialogVisible.value = true
+}
+
+// 关闭原因对话框
+const closeReasonDialog = () => {
+  dialogVisible.value = false
+}
+
+// 提交原因对策
+const handleSubmitReason = async (submitData: any) => {
+  try {
+    await fillInReason(
+      currentCode.value,
+      submitData.reason || '',
+      submitData.solution || ''
+    )
+    ElMessage.success('原因对策提交成功')
+    closeReasonDialog()
+  } catch (error) {
+    console.error('提交原因对策失败:', error)
+    ElMessage.error('提交失败，请重试')
+  }
+}
 
 const drawChart = () => {
 const option1 = createOption(chartData1.value,chartLabels1.value)
@@ -235,6 +322,25 @@ onBeforeUnmount(() => {
   font-size: 9px;
   color: #a0aec0;
   font-weight: 500;
+}
+
+/* 完成率卡片样式 */
+.stat-card-rate {
+  cursor: pointer;
+}
+
+.stat-card-rate.rate-low {
+  border-color: rgba(255, 68, 68, 0.5) !important;
+  background: linear-gradient(135deg, rgba(255, 68, 68, 0.15) 0%, rgba(255, 68, 68, 0.08) 100%) !important;
+}
+
+.stat-card-rate.rate-low:hover {
+  border-color: rgba(255, 68, 68, 0.8) !important;
+  box-shadow: 0 4px 12px rgba(255, 68, 68, 0.3) !important;
+}
+
+.text-red {
+  color: #ff4444 !important;
 }
 
 /* 响应式断点 - 使用 @media 查询 */

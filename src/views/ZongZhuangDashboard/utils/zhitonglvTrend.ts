@@ -111,7 +111,7 @@ export function transformQualityReportTrendData(
         type: 'line',
         data: aClassStandardData,
         itemStyle: { color: '#10b981' },
-        lineStyle: { type: 'dashed' }, // 标准线使用虚线
+        lineStyle: { type: 'solid' }, // 标准线使用实线
         label: {
           show: true,
           position: 'right', // 标准线标签显示在右边
@@ -130,7 +130,7 @@ export function transformQualityReportTrendData(
         name: 'A类实际',
         type: 'bar', // 实际用柱状图
         data: aClassActualData,
-        itemStyle: { color: '#3b82f6' },
+        itemStyle: { color: '#9ca3af' },
         label: {
           show: true,
           position: 'top',
@@ -146,7 +146,7 @@ export function transformQualityReportTrendData(
         type: 'line',
         data: regularStandardData,
         itemStyle: { color: '#f59e0b' },
-        lineStyle: { type: 'dashed' }, // 标准线使用虚线
+        lineStyle: { type: 'solid' }, // 标准线使用实线
         label: {
           show: true,
           position: 'right', // 标准线标签显示在右边
@@ -165,7 +165,7 @@ export function transformQualityReportTrendData(
         name: '常规实际',
         type: 'bar', // 实际用柱状图
         data: regularActualData,
-        itemStyle: { color: '#10b981' },
+        itemStyle: { color: '#3b82f6' },
         label: {
           show: true,
           position: 'top',

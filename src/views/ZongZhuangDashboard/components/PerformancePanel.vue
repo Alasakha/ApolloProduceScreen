@@ -22,16 +22,16 @@
           <div class="data-category">
             <h4 class="category-title">A类</h4>
             <div class="data-items">
-              <div v-for="(item, index) in description.slice(0, 3)" :key="index" class="data-item">
+              <div v-for="(item, index) in description.slice(0, aClassDataEndIndex)" :key="index" class="data-item">
                 <span class="item-label">{{ item.label }}:</span>
                 <span class="item-value">{{ item.value }}</span>
               </div>
             </div>
           </div>
-          <div v-if="!hideRegular && description.length > 3" class="data-category">
+          <div v-if="!hideRegular && description.length > aClassDataEndIndex" class="data-category">
             <h4 class="category-title">常规</h4>
             <div class="data-items">
-              <div v-for="(item, index) in description.slice(3)" :key="index" class="data-item">
+              <div v-for="(item, index) in description.slice(aClassDataEndIndex)" :key="index" class="data-item">
                 <span class="item-label">{{ item.label }}:</span>
                 <span class="item-value">{{ item.value }}</span>
               </div>
@@ -165,6 +165,18 @@ const isEmpty = computed(() => {
   )
   
   return !hasDescription && !hasChartData
+})
+
+// 计算A类和常规数据的分界点
+// 如果数据有6个元素（直通率），A类显示前3个；如果有8个元素（工单结单率），A类显示前4个
+const aClassDataEndIndex = computed(() => {
+  if (!props.description) return 4
+  // 直通率数据有6个元素，A类占3个
+  if (props.description.length === 6) return 3
+  // 工单结单率数据有8个元素，A类占4个
+  if (props.description.length === 8) return 4
+  // 默认显示前4个
+  return 4
 })
 </script>
 

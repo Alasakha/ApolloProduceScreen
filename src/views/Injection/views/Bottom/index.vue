@@ -9,7 +9,7 @@
   </div>
   <div class="right_part flex-1">
     <dv-border-box12>
-      <div dv-bg h-full>
+      <div class="dv-bg h-[100%]">
         <RightContent/>
       </div>
     </dv-border-box12>

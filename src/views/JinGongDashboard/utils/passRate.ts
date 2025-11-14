@@ -4,12 +4,12 @@ import type { PassRatePerformanceData } from '@/api/getMesInfo'
 // 部门标准配置
 const DEPARTMENT_STANDARDS = {
   '金工一部': {
-    aClass: 75, // A类标准直通率 75%
-    regular: 72 // 常规标准直通率 72%
+    aClass: 95, // A类标准直通率 75%
+    regular: 93 // 常规标准直通率 72%
   },
   '金工二部': {
-    aClass: 75, // A类标准直通率 75%
-    regular: 72 // 常规标准直通率 72%
+    aClass: 80, // A类标准直通率 75%
+    regular: 80 // 常规标准直通率 72%
   }
 } as const
 
@@ -79,12 +79,12 @@ export function transformPassRateData(
   
   return {
     description: [
-      { label: 'A类直通率标准', value: standards.aClass + '%' },
+      { label: 'A类直通率目标', value: standards.aClass + '%' },
       { label: 'A类月度累计直通率', value: formatPercent(aClassActual) },
-      { label: '达成率', value: aClassAchievement },
-      { label: '常规直通率标准', value: standards.regular + '%' },
+      { label: '目标达成率', value: aClassAchievement },
+      { label: '常规直通率目标', value: standards.regular + '%' },
       { label: '常规月度累计直通率', value: formatPercent(regularActual) },
-      { label: '达成率', value: regularAchievement }
+      { label: '目标达成率', value: regularAchievement }
     ]
   }
 }

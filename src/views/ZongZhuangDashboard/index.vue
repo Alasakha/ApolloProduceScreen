@@ -158,7 +158,7 @@ function calculateRate(numerator: number, denominator: number): string {
 // 转换工单结单率接口数据为面板数据
 function transformOrderSettlementData(
   apiData: OrderSettlementItem[],
-  _department: '总装一课' | '总装二课'
+  department: '总装一课' | '总装二课'
 ): Partial<PanelData> {
   // 按客户类型分组计算
   const aClassData = apiData.filter(item => item.customer === 'A')
@@ -182,14 +182,24 @@ function transformOrderSettlementData(
   }, 0)
   const regularRate = calculateRate(regularCompletedTotal, regularPlanTotal)
   
+  // 定义目标结单率标准值
+  const standards = {
+    '总装一课': { A: 100, 常规: 95 },
+    '总装二课': { A: 100, 常规: 95 }
+  }
+  const aClassTargetRate = standards[department].A + '%'
+  const regularTargetRate = standards[department].常规 + '%'
+  
   return {
     description: [
       { label: 'A类:月度累计排产工单', value: formatNumber(aClassPlanTotal) },
       { label: '累计准交工单', value: formatNumber(aClassCompletedTotal) },
       { label: '结单率', value: aClassRate },
+      { label: '工单目标结单率', value: aClassTargetRate },
       { label: '常规:月度累计排产工单', value: formatNumber(regularPlanTotal) },
       { label: '累计准交工单', value: formatNumber(regularCompletedTotal) },
-      { label: '结单率', value: regularRate }
+      { label: '结单率', value: regularRate },
+      { label: '工单目标结单率', value: regularTargetRate }
     ]
     // 注意：chartData 需要其他接口或历史数据，暂时保持原有数据
   }
@@ -445,7 +455,7 @@ function transformOrderSettlementTrendData(
           type: 'line', // 标准用折线图
           data: aClassStandardData,
           itemStyle: { color: '#10b981' },
-          lineStyle: { type: 'dashed' }, // 标准线使用虚线
+          lineStyle: { type: 'solid' }, // 标准线使用实线
           label: {
             show: true,
             position: 'right', // 标准线标签显示在右边
@@ -464,7 +474,7 @@ function transformOrderSettlementTrendData(
           name: 'A类实际',
           type: 'bar', // 实际用柱状图
           data: aClassActualData,
-          itemStyle: { color: '#3b82f6' },
+          itemStyle: { color: '#9ca3af' },
           label: {
             show: true,
             position: 'top',
@@ -480,7 +490,7 @@ function transformOrderSettlementTrendData(
           type: 'line', // 标准用折线图
           data: regularStandardData,
           itemStyle: { color: '#f59e0b' },
-          lineStyle: { type: 'dashed' }, // 标准线使用虚线
+          lineStyle: { type: 'solid' }, // 标准线使用实线
           label: {
             show: true,
             position: 'right', // 标准线标签显示在右边
@@ -499,7 +509,7 @@ function transformOrderSettlementTrendData(
           name: '常规实际',
           type: 'bar', // 实际用柱状图
           data: regularActualData,
-          itemStyle: { color: '#10b981' },
+          itemStyle: { color: '#3b82f6' },
           label: {
             show: true,
             position: 'top',

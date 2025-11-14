@@ -26,6 +26,7 @@ interface Props {
   color: string
   unit: string
   chartType: 'monthly' | 'weekly'
+  standardValue?: number  // 每周标准值
 }
 
 const props = defineProps<Props>()
@@ -74,13 +75,18 @@ const chartOption = computed(() => {
           })
           return result
         } else {
-          const data = params[0]
-          return `${data.name}<br/>${data.seriesName}: ${Math.round(data.value)} ${props.unit}`
+          let result = `${params[0].name}<br/>`
+          params.forEach((param: any) => {
+            result += `${param.seriesName}: ${Math.round(param.value)} ${props.unit}<br/>`
+          })
+          return result
         }
       }
     },
     legend: {
-      data: isMonthly ? ['标准用量', '实际用量'] : ['周增量'],
+      data: isMonthly 
+        ? ['标准用量', '实际用量'] 
+        : ['周增量'],
       top: 0,
       textStyle: {
         color: '#ffffff',
@@ -249,7 +255,31 @@ const chartOption = computed(() => {
             shadowBlur: 15,
             shadowColor: props.color + '50'
           }
-        }
+        },
+        // 使用 markLine 添加标准线
+        markLine: props.standardValue !== undefined ? {
+          silent: false,
+          symbol: 'none',
+          lineStyle: {
+            color: '#ff0000',
+            width: 2,
+            type: 'solid' as const
+          },
+          label: {
+            show: true,
+            position: 'end' as const,
+            formatter: `标准: {c} ${props.unit}`,
+            color: '#ff0000',
+            fontSize: 11,
+            fontWeight: 'bold' as const
+          },
+          data: [
+            {
+              yAxis: props.standardValue,
+              name: '标准线'
+            }
+          ]
+        } : undefined
       }
     ]
   }
@@ -277,6 +307,11 @@ const updateChart = () => {
 
 // 监听数据变化
 watch(() => props.data, () => {
+  updateChart()
+}, { deep: true })
+
+// 监听标准值和标签变化
+watch(() => [props.standardValue, props.weekLabels], () => {
   updateChart()
 }, { deep: true })
 

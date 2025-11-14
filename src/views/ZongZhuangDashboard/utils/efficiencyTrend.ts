@@ -135,7 +135,7 @@ export function transformEfficiencyTrendData(
         name: '达成天数',
         type: 'bar',
         data: achieveDaysData,
-        itemStyle: { color: '#10b981' },
+        itemStyle: { color: '#3b82f6' },
         label: {
           show: true,
           position: 'top',

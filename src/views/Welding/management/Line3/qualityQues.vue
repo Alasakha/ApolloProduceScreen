@@ -2,7 +2,7 @@
     <div class="quality-container">
         <div class="quality-title">
             <div class="title-content">
-                <h3>今日质量TOP问题</h3>
+                <h3>今日毛坯质量TOP问题</h3>
             </div>
             <div class="title-actions">
                 <el-button 

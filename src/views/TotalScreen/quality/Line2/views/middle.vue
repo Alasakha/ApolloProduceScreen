@@ -31,8 +31,8 @@ import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts'; // 引入封装
 
 const dialogTableVisible = ref(false);
-const title = ref('今日生产过程功性能不良'); // 对话框标题
-const pageTitle = ref('今日生产过程功性能不良'); // 新增：固定的页面标题
+const title = ref('今日功性能检验状况'); // 对话框标题
+const pageTitle = ref('今日功性能检验状况'); // 新增：固定的页面标题
 const reasonType = 1;
 const dayType = 1
 const qualityIndicators = ref(null);

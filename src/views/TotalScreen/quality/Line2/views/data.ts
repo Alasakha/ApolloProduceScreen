@@ -2,15 +2,23 @@
 export function createChartOption(title: string, rawData: any) {
     const isEmpty = !rawData || rawData.length === 0;
   
-    const data = isEmpty
-      ? [{ name: '暂无异常', value: 1, itemStyle: { color: '#7E8AA2	' } }]
-      : rawData;
+    // 处理柱状图数据：提取分类和数值
+    const categories = isEmpty 
+      ? ['暂无异常'] 
+      : rawData.map((item: any) => item.name || '未知');
+    
+    const values = isEmpty 
+      ? [1] 
+      : rawData.map((item: any) => item.value || 0);
+  
+    // 颜色数组，循环使用
+    const colors = [
+      '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
+      '#FF1654'
+    ];
   
     return {
-      color: [
-        '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-        '#FF1654'
-      ],
+      color: colors,
       title: {
         text: title,
         top: '4%',
@@ -24,46 +32,83 @@ export function createChartOption(title: string, rawData: any) {
         }
       },
       tooltip: {
-        trigger: 'item',
-        formatter: isEmpty ? '' : '{b}: {c} ({d}%)',
+        trigger: 'axis',
+        axisPointer: {
+          type: 'shadow'
+        },
+        formatter: (params: any) => {
+          if (isEmpty) return '';
+          const param = Array.isArray(params) ? params[0] : params;
+          return `${param.name}<br/>${param.seriesName}: ${param.value} 件`;
+        },
         textStyle: {
           color: 'black'
         }
       },
-      legend: {
-        orient: 'horizontal',
+      grid: {
+        left: '10%',
+        right: '10%',
         bottom: '0%',
-        left: 'center',
-        textStyle: {
+        top: '20%',
+        containLabel: true
+      },
+      xAxis: {
+        type: 'category',
+        data: categories,
+        axisLabel: {
+          color: '#ffffff',
+          fontSize: 12,
+          rotate: categories.length > 5 ? 45 : 0, // 如果分类太多，旋转标签
+          interval: 0 // 显示所有标签
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#ffffff'
+          }
+        },
+        axisTick: {
+          alignWithLabel: true
+        }
+      },
+      yAxis: {
+        type: 'value',
+        name: '数量',
+        nameTextStyle: {
           color: '#ffffff'
+        },
+        axisLabel: {
+          color: '#ffffff',
+          fontSize: 12
+        },
+        axisLine: {
+          lineStyle: {
+            color: '#ffffff'
+          }
+        },
+        splitLine: {
+          lineStyle: {
+            color: 'rgba(255, 255, 255, 0.2)'
+          }
         }
       },
       series: [
         {
-          type: 'pie',
-          radius: ['25%', '50%'],  // 修改为环形
-          data,
+          name: '数量',
+          type: 'bar',
+          data: values.map((value: number, index: number) => ({
+            value,
+            itemStyle: {
+              color: colors[index % colors.length]
+            }
+          })),
           label: {
             show: true,
-            position: 'outside',
+            position: 'top',
+            color: '#ffffff',
+            fontSize: 12,
             formatter: (params: any) => {
-                if (isEmpty) return `{name|暂无异常}`;
-                return `{name|${params.name}}\n{value|${params.value} 件}  {percent|${params.percent}%}`;
-              },
-            rich: {
-              name: {
-                fontSize: 14,
-                color: '#fff',
-                lineHeight: 22
-              },
-              value: {
-                fontSize: 12,
-                color: '#aaa'
-              },
-              percent: {
-                fontSize: 12,
-                color: '#66ccff'
-              }
+              if (isEmpty) return '';
+              return `${params.value} 件`;
             }
           },
           emphasis: {
@@ -72,7 +117,8 @@ export function createChartOption(title: string, rawData: any) {
               shadowOffsetX: 0,
               shadowColor: 'rgba(0, 0, 0, 0.5)'
             }
-          }
+          },
+          barWidth: '60%' // 柱状图宽度
         }
       ]
     };

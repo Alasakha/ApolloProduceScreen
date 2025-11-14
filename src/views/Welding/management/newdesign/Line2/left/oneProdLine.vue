@@ -2,7 +2,6 @@
     <div class="prod-line-container">
         <div class="prod-line-title">
             <h3>自动焊一线当日小时产能</h3>
-            <el-button type="primary" size="small" @click="openFillinDialog">填写产能</el-button>
         </div>
         <div class="prod-line-content">
             <div class="chart-container">
@@ -10,220 +9,62 @@
             </div>
             <div class="capacity-summary">
                 <div class="summary-item">
-                    <span class="summary-label">计划:</span>
-                    <span class="summary-value">{{ totalCapacity.plan }}</span>
+                    <span class="summary-label">实际产出:</span>
+                    <span class="summary-value">{{ totalActual }}</span>
                 </div>
-                <div class="summary-item">
-                    <span class="summary-label">车架:</span>
-                    <span class="summary-value">{{ totalCapacity.cj }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">后叉:</span>
-                    <span class="summary-value">{{ totalCapacity.hch }}</span>
-                </div>
-                <div class="summary-item">
-                    <span class="summary-label">尾架:</span>
-                    <span class="summary-value">{{ totalCapacity.wj }}</span>
-                </div>
-
             </div>
         </div>
-
-        <el-dialog 
-            v-model="fillinDialogVisible" 
-            title="填写自动焊1线小时产能" 
-            width="80%" 
-            :modal="true"
-            :append-to-body="true"
-            :lock-scroll="true"
-            :close-on-click-modal="false"
-            :close-on-press-escape="false"
-            class="capacity-fillin-dialog"
-        >
-            <div class="fillin-content">
-                <div class="hour-inputs" v-if="hourData.length === 24">
-                    <div v-for="hour in 24" :key="hour" class="hour-row">
-                        <span class="hour-label">{{ hour }}时</span>
-                        <div>计划小时产能：<el-input-number v-model="hourData[hour-1].plan" :min="0" size="small" placeholder="计划" /></div>
-                        <div>实际车架小时产能：<el-input-number v-model="hourData[hour-1].cj" :min="0" size="small" placeholder="车架" /></div>
-                        <div>实际后叉小时产能：<el-input-number v-model="hourData[hour-1].hch" :min="0" size="small" placeholder="后叉" /></div>
-                        <div>实际尾架小时产能：<el-input-number v-model="hourData[hour-1].wj" :min="0" size="small" placeholder="尾架" /></div>
-                    </div>
-                </div>
-                <div v-else class="loading-placeholder">
-                    <el-skeleton :rows="6" animated />
-                </div>
-            </div>
-            <template #footer>
-                <el-button @click="fillinDialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitCapacity" :loading="submitting">提交</el-button>
-            </template>
-        </el-dialog>
     </div>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted, computed, nextTick, onUnmounted } from 'vue'
-import { getAutomaticWelding, automaticWeldingFillin, type AutomaticWeldingFillin } from '@/api/getStampWeldinfo'
+import { getAnchuanHourCl, type AnchuanHourCl } from '@/api/getStampWeldinfo'
 import * as echarts from 'echarts'
-import { ElMessage } from 'element-plus'
 
 const chartRef = ref<HTMLElement>()
 const chart = ref<echarts.ECharts>()
-const fillinDialogVisible = ref(false)
-const submitting = ref(false)
 const resizeObserver = ref<ResizeObserver>()
 
 const hourData = ref(Array.from({ length: 24 }, (_, i) => ({
     hour: i + 1,
-    cj: 0,
-    hch: 0,
-    wj: 0,
-    plan: 0
+    actual: 0
 })))
 
-
-const totalCapacity = computed(() => ({
-    cj: hourData.value.reduce((sum, item) => sum + item.cj, 0),
-    hch: hourData.value.reduce((sum, item) => sum + item.hch, 0),
-    wj: hourData.value.reduce((sum, item) => sum + item.wj, 0),
-    plan: hourData.value.reduce((sum, item) => sum + item.plan, 0)
-}))
-
-const openFillinDialog = () => {
-    // 确保hourData数组完全初始化
-    if (hourData.value.length !== 24) {
-        hourData.value = Array.from({ length: 24 }, (_, i) => ({
-            hour: i + 1,
-            cj: 0,
-            hch: 0,
-            wj: 0,
-            plan: 0
-        }))
-    }
-    
-    // 确保在下一个tick后打开dialog，避免闪烁
-    nextTick(() => {
-        fillinDialogVisible.value = true
-    })
-}
-
-
-const submitCapacity = async () => {
-    submitting.value = true
-    try {
-        const data: AutomaticWeldingFillin = {
-            code: 'HJ1-1',
-            hourList: hourData.value
-        }
-        
-        // 详细日志输出
-        console.log('准备提交产能数据...')
-        console.log('请求数据:', data)
-        console.log('数据类型检查:', {
-            code: typeof data.code,
-            hourList: Array.isArray(data.hourList),
-            hourListLength: data.hourList.length,
-            firstHour: data.hourList[0],
-            lastHour: data.hourList[data.hourList.length - 1]
-        })
-        
-        // 数据验证
-        if (!data.code || !Array.isArray(data.hourList) || data.hourList.length === 0) {
-            throw new Error('数据格式无效')
-        }
-        
-        console.log('开始调用API...')
-        const result = await automaticWeldingFillin(data)
-        console.log('API调用成功，响应:', result)
-        
-        ElMessage.success('产能数据提交成功')
-        fillinDialogVisible.value = false
-        await loadCapacityData()
-    } catch (error) {
-        console.error('提交产能数据失败:', error)
-        
-        // 详细错误信息
-        if (error.response) {
-            console.error('HTTP错误详情:')
-            console.error('状态码:', error.response.status)
-            console.error('状态文本:', error.response.statusText)
-            console.error('响应头:', error.response.headers)
-            console.error('响应数据:', error.response.data)
-        } else if (error.request) {
-            console.error('网络请求错误:', error.request)
-        } else {
-            console.error('其他错误:', error.message)
-        }
-        
-        // 用户友好的错误提示
-        let errorMessage = '提交失败，请重试'
-        if (error.response?.status === 500) {
-            errorMessage = '服务器内部错误，请联系管理员'
-        } else if (error.response?.status === 400) {
-            errorMessage = '请求数据格式错误，请检查输入'
-        } else if (error.response?.status === 401) {
-            errorMessage = '权限不足，请重新登录'
-        } else if (error.response?.status === 403) {
-            errorMessage = '访问被拒绝，请联系管理员'
-        } else if (error.response?.status === 404) {
-            errorMessage = '接口不存在，请联系开发人员'
-        }
-        
-        ElMessage.error(errorMessage)
-    } finally {
-        submitting.value = false
-    }
-}
+const totalActual = computed(() => hourData.value.reduce((sum, item) => sum + item.actual, 0))
 
 const loadCapacityData = async () => {
     try {
-        const response = await getAutomaticWelding('HJ1-1')
-        console.log('产能数据响应:', response.data)
+        const response = await getAnchuanHourCl()
+        console.log('安川小时产能响应:', response.data)
         
-        // 检查响应数据结构并更新本地数据
-        if (response.data && response.data.hourList && Array.isArray(response.data.hourList)) {
-            // 创建24小时的完整数据结构
-            const newHourData = Array.from({ length: 24 }, (_, i) => {
-                const hour = i + 1
-                const apiData = response.data.hourList.find(item => item.hour === hour)
-                
-                return {
-                    hour: hour,
-                    cj: apiData?.cj || 0,
-                    hch: apiData?.hch || 0,
-                    wj: apiData?.wj || 0,
-                    plan: apiData?.plan || 0,
+        if (Array.isArray(response.data)) {
+            const dataMap = new Map<number, number>()
+            response.data.forEach((item: AnchuanHourCl) => {
+                if (item.hour2 != null) {
+                    const value = Number(item.total ?? item.cl ?? 0)
+                    dataMap.set(Number(item.hour2), Number.isFinite(value) ? value : 0)
                 }
             })
-            
-            // 更新本地数据
-            hourData.value = newHourData
-            
-            console.log('更新后的本地数据:', hourData.value)
-            
-            // 更新图表
-            updateChart()
+
+            hourData.value = Array.from({ length: 24 }, (_, i) => {
+                const hour = i + 1
+                return {
+                    hour,
+                    actual: dataMap.get(hour) ?? 0
+                }
+            })
         } else {
-            console.warn('接口返回的数据结构不符合预期:', response.data)
-            // 如果API数据无效，保持默认的24小时结构
-            hourData.value = Array.from({ length: 24 }, (_, i) => ({
-                hour: i + 1,
-                cj: 0,
-                hch: 0,
-                wj: 0,
-                plan: 0
-            }))
+            console.warn('安川小时产能返回的数据结构不符合预期:', response.data)
         }
+
+        updateChart()
     } catch (error) {
         console.error('加载产能数据失败:', error)
         // 发生错误时，保持默认的24小时结构
         hourData.value = Array.from({ length: 24 }, (_, i) => ({
             hour: i + 1,
-            cj: 0,
-            hch: 0,
-            wj: 0,
-            plan: 0
+            actual: 0
         }))
     }
 }
@@ -282,10 +123,7 @@ const updateChart = () => {
         console.warn('hourData数据不完整，重新初始化')
         hourData.value = Array.from({ length: 24 }, (_, i) => ({
             hour: i + 1,
-            cj: 0,
-            hch: 0,
-            wj: 0,
-            plan: 0
+            actual: 0
         }))
     }
 
@@ -296,21 +134,15 @@ const updateChart = () => {
         console.warn('检测到无效数据项，重新初始化')
         hourData.value = Array.from({ length: 24 }, (_, i) => ({
             hour: i + 1,
-            cj: 0,
-            hch: 0,
-            wj: 0,
-            plan: 0
+            actual: 0
         }))
     }
 
     const hours = hourData.value.map(item => item?.hour || 0)
-    const cjData = hourData.value.map(item => item?.cj || 0)
-    const hchData = hourData.value.map(item => item?.hch || 0)
-    const wjData = hourData.value.map(item => item?.wj || 0)
-    const planData = hourData.value.map(item => item?.plan || 0)
+    const actualData = hourData.value.map(item => item?.actual || 0)
 
     // 添加调试信息
-    console.log('更新图表数据:', { hours, cjData, hchData, wjData })
+    console.log('更新图表数据:', { hours, actualData })
     console.log('图表容器尺寸:', chartRef.value?.offsetWidth, chartRef.value?.offsetHeight)
 
     const option = {
@@ -374,9 +206,9 @@ const updateChart = () => {
         },
         series: [
             {
-                name: '车架',
+                name: '实际产出',
                 type: 'line',
-                data: cjData,
+                data: actualData,
                 smooth: true,
                 lineStyle: { 
                     color: '#00eeff', 
@@ -409,117 +241,6 @@ const updateChart = () => {
                     textShadowColor: 'rgba(0, 0, 0, 0.8)',
                     textShadowBlur: 2
                 }
-            },
-            {
-                name: '后叉',
-                type: 'line',
-                data: hchData,
-                smooth: true,
-                lineStyle: { 
-                    color: '#00ff9f', 
-                    width: 3,
-                    shadowColor: 'rgba(0, 255, 159, 0.5)',
-                    shadowBlur: 10
-                },
-                itemStyle: { 
-                    color: '#00ff9f',
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(0, 255, 159, 0.3)' },
-                            { offset: 1, color: 'rgba(0, 255, 159, 0.05)' }
-                        ]
-                    }
-                },
-                label: {
-                    show: true,
-                    position: 'top',
-                    formatter: '{c}',
-                    fontSize: 12,
-                    color: '#00ff9f',
-                    fontWeight: 'bold',
-                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                    textShadowBlur: 2
-                }
-            },
-            {
-                name: '尾架',
-                type: 'line',
-                data: wjData,
-                smooth: true,
-                lineStyle: { 
-                    color: '#ff9f00', 
-                    width: 3,
-                    shadowColor: 'rgba(255, 159, 0, 0.5)',
-                    shadowBlur: 10
-                },
-                itemStyle: { 
-                    color: '#ff9f00',
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(255, 159, 0, 0.3)' },
-                            { offset: 1, color: 'rgba(255, 159, 0, 0.05)' }
-                        ]
-                    }
-                },
-                label: {
-                    show: true,
-                    position: 'top',
-                    formatter: '{c}',
-                    fontSize: 12,
-                    color: '#ff9f00',
-                    fontWeight: 'bold',
-                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                    textShadowBlur: 2
-                }
-            },
-            {
-                name: '计划产量',
-                type: 'line',
-                data: planData,
-                smooth: true,
-                lineStyle: { 
-                    color: '#007bff', // 修改为蓝色
-                    width: 3,
-                    shadowColor: 'rgba(0, 123, 255, 0.5)',
-                    shadowBlur: 10
-                },
-                itemStyle: { 
-                    color: '#007bff',
-                    borderColor: '#ffffff',
-                    borderWidth: 2
-                },
-                areaStyle: {
-                    color: {
-                        type: 'linear',
-                        x: 0, y: 0, x2: 0, y2: 1,
-                        colorStops: [
-                            { offset: 0, color: 'rgba(0, 123, 255, 0.3)' },
-                            { offset: 1, color: 'rgba(0, 123, 255, 0.05)' }
-                        ]
-                    }
-                },
-                label: {
-                    show: true,
-                    position: 'top',
-                    formatter: '{c}',
-                    fontSize: 12,
-                    color: '#007bff',
-                    fontWeight: 'bold',
-                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                    textShadowBlur: 2
-                }
             }
         ]
     }
@@ -532,10 +253,7 @@ onMounted(async () => {
     if (hourData.value.length !== 24) {
         hourData.value = Array.from({ length: 24 }, (_, i) => ({
             hour: i + 1,
-            cj: 0,
-            hch: 0,
-            wj: 0,
-            plan: 0
+            actual: 0
         }))
     }
     

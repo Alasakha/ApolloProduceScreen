@@ -77,7 +77,7 @@
                 @click="openNighttimeAttendanceDialog"
               ></div>
               <!-- 警告图标 -->
-              <div v-if="showWarning" class="warning-icon-container">
+              <!-- <div v-if="showWarning" class="warning-icon-container">
                 <el-tooltip
                   :content="EfficentData.reason || '出勤人数低于配置人数，可能原因：出勤人数不足等'"
                   placement="left"
@@ -88,8 +88,8 @@
                     <rect x="11" y="9" width="2" height="5" fill="#FFA000"/>
                     <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
                   </svg>
-                </el-tooltip>
-              </div>
+                </el-tooltip> -->
+              <!-- </div> -->
             </div>
           </template>
         </div>
@@ -312,33 +312,38 @@ const chart4 = useEcharts(Indicators4);
 const chart5 = useEcharts(Indicators5);
 
 const drawChart = () => {
-  // 计算实际人数（白班人数 + 晚班人数）
-  const actualEmpNum = (EfficentData.signNum || 0) + (EfficentData.wanSignNum || 0);
-  
   if (isLine3.value) {
-    // 焊接三线：左上-白班人数、右上-晚班人数、左下-标准人数、右下-实际人数
+    // 焊接三线：左上-配置人数、右上-出勤人数、左下-标准人效、右下-实际人效
+    const standardEmpNum = EfficentData.standardEmpNum || 0;
+    const attendanceNum = EfficentData.signNum || 0;
+    const standardEfficiency = EfficentData.standardEfficiency ?? 0;
+    const actualEfficiency = EfficentData.actualEfficiency ?? 0;
+
+    const maxPeople = Math.max(standardEmpNum, attendanceNum, 1);
+    const maxEfficiency = Math.max(standardEfficiency, actualEfficiency, 1);
+
     const option2 = createGaugeOption({
-      text: "白班人数",
-      data: EfficentData.signNum,  
-      max: EfficentData.standardEmpNum || 100
+      text: "配置人数",
+      data: standardEmpNum,  
+      max: maxPeople
     });
 
     const option5 = createGaugeOption({
-      text: "晚班人数",
-      data: EfficentData.wanSignNum, 
-      max: EfficentData.standardEmpNum || 100
+      text: "出勤人数",
+      data: attendanceNum, 
+      max: maxPeople
     });
 
     const option3 = createGaugeOption({
-      text: "标准人数",
-      data: EfficentData.standardEmpNum,
-      max: Math.max(EfficentData.standardEmpNum || 0, actualEmpNum) || 100
+      text: "标准人效",
+      data: standardEfficiency,
+      max: maxEfficiency
     });
 
     const option4 = createGaugeOption({
-      text: "实际人数",
-      data: actualEmpNum,
-      max: Math.max(EfficentData.standardEmpNum || 0, actualEmpNum) || 100
+      text: "实际人效",
+      data: actualEfficiency,
+      max: maxEfficiency
     });
 
     chart2.setOption(option2);

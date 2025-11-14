@@ -43,7 +43,7 @@
 
             <!-- 水数据 -->
             <div class="energy-section">
-              <div class="section-title">总水气消耗</div>
+              <div class="section-title">总水量消耗</div>
               <div class="data-grid">
                 <div class="data-item">
                   <div class="data-label">月</div>

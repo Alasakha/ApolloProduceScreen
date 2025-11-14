@@ -81,6 +81,18 @@
               </div>
             </div>
             
+            <!-- 空压机月度分摊值（仅显示在需要分摊的车间） -->
+            <div class="flex items-center" v-if="item.airCompressorAllocation !== undefined">
+              <span class="data-icon">💨</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">空压机月度分摊值</span>
+              <div class="number-display">
+                <span class="number-value" :style="{ fontSize: getFontSize(), color: '#ffaa00' }">
+                  {{ Number(item.airCompressorAllocation).toFixed(1) }}
+                </span>
+                <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#ffaa00' }">度</span>
+              </div>
+            </div>
+            
             <!-- 添加填写原因按钮 -->
             <div class="reason-section" v-if="Number(item.ratio) > 0.5">
               <div class="reason-info">
@@ -370,9 +382,54 @@ const energyData = computed(() => {
     return 0
   })
   
-
+  // 计算空压机月度分摊值
+  // 空压机 machCode: '616506210001'
+  const airCompressorCode = '616506210001'
+  const airCompressor = sortedData.find(item => item.machCode === airCompressorCode)
   
-  return sortedData
+  // 分摊比例配置
+  const allocationRatios: Record<string, number> = {
+    '616506210007': 0.2,  // 金工一部冲压: 20%
+    '616506210003': 0.3,  // 金工一部焊接: 30%
+    '616506210010': 0.3,  // 总装一课装配: 30%
+    '616506210009': 0.2,  // 总装一课包装: 20%
+  }
+  
+  // 获取空压机的月度实际用电
+  let airCompressorMonthlyTotal = 0
+  if (airCompressor) {
+    const airCompressorActualItem = energyStore.monthlyData.find(storeItem => storeItem.machCode === airCompressorCode)
+    airCompressorMonthlyTotal = Number(airCompressorActualItem?.numberPower || airCompressor.numberPower || 0)
+  }
+  
+  // 为需要分摊的车间添加分摊值
+  const finalData = sortedData.map(item => {
+    // 如果是空压机，不添加分摊值
+    if (item.machCode === airCompressorCode) {
+      return {
+        ...item,
+        airCompressorAllocation: undefined
+      }
+    }
+    
+    // 如果是需要分摊的车间，计算分摊值
+    const ratio = allocationRatios[item.machCode]
+    if (ratio !== undefined) {
+      const allocationValue = (airCompressorMonthlyTotal * ratio).toFixed(1)
+      return {
+        ...item,
+        airCompressorAllocation: allocationValue
+      }
+    }
+    
+    // 其他车间不添加分摊值
+    return {
+      ...item,
+      airCompressorAllocation: undefined
+    }
+  })
+  
+  return finalData
 })
 
 // 字体大小计算 - 优化版本

@@ -26,6 +26,7 @@ function autoResize(
  
   let debounceInitWHFun: () => void;
   let domObserver: MutationObserver | null = null;
+  let resizeObserver: ResizeObserver | null = null;
   let domHtml: HTMLElement | null = null;
   const initWH = (resize = true) => {
     return new Promise((resolve) => {
@@ -57,12 +58,27 @@ function autoResize(
   const getDebounceInitWHFun = () => {
     debounceInitWHFun = useDebounceFn(initWH, 200);
   };
+  const bindResizeObserver = () => {
+    if (!domHtml || typeof ResizeObserver === "undefined") return;
+
+    resizeObserver = new ResizeObserver(() => {
+      debounceInitWHFun();
+    });
+
+    resizeObserver.observe(domHtml);
+  };
+
   const bindDomResizeCallback = () => {
     domObserver = observerDomResize(domHtml!, debounceInitWHFun);
- 
+
     useEventListener(window, "resize", debounceInitWHFun);
   };
   const unbindDomResizeCallback = () => {
+    if (resizeObserver) {
+      resizeObserver.disconnect();
+      resizeObserver = null;
+    }
+
     if (!domObserver) return;
     domObserver.disconnect();
     domObserver.takeRecords();
@@ -74,6 +90,8 @@ function autoResize(
     getDebounceInitWHFun();
  
     bindDomResizeCallback();
+
+    bindResizeObserver();
  
     if (typeof afterAutoResizeMixinInit === "function") afterAutoResizeMixinInit();
   };

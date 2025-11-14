@@ -14,6 +14,7 @@
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import {getStagnantAmount} from  '@/api/getPmcinfo'
 import { eventBus } from '@/utils/eventbus';
+import ScrollBoard from '@/components/datav/ScrollBoard.vue';
 
 const isLoading = ref(true);
 const rawData = ref([]);
@@ -86,15 +87,25 @@ font-family: Arial, sans-serif;
 }
 .table-area {
 min-height: 0;
+max-height: 100%;
 overflow: hidden;
 position: relative;
 height: 100%;
 display: flex;
 }
+
 :deep(.ScrollBoard) {
 height: 100% !important;
+max-height: 100% !important;
 width: 100% !important;
+overflow: hidden !important;
 }
+
+:deep(.ScrollBoard .rows) {
+max-height: 100% !important;
+overflow: hidden !important;
+}
+
 .loading {
 color: #fff;
 font-size: 20px;

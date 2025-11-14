@@ -20,7 +20,7 @@
 
                 <!-- 第一行：日生产计划表格区域 (30%) -->
                 <div class="plan-section">
-                    <PlanTable />
+                    <PlanTable :prod-line="'1003'" :type="'2'" />
                 </div>
 
                 <!-- 第三行：其他组件区域 (30%) -->

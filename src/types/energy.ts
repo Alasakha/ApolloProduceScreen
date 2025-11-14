@@ -15,6 +15,7 @@ export interface EnergyData {
   reason?: string;    // 超过原因
   standardConsumption?: number; // 标准用电量
   actualConsumption?: number;   // 实际用电量
+  airCompressorAllocation?: string; // 空压机月度分摊值
 }
 
 export enum EnergyType {

@@ -67,8 +67,8 @@ export function transformPassRateTrendData(
 
   // 定义标准值（根据实际需求调整）
   const standards = {
-    '金工一部': { A: 75, 常规: 72 },
-    '金工二部': { A: 75, 常规: 72 }
+    '金工一部': { A: 95, 常规: 93 },
+    '金工二部': { A: 80, 常规: 80 }
   }
   const aClassStandard = standards[department].A
   const regularStandard = standards[department].常规
@@ -163,7 +163,7 @@ export function transformPassRateTrendData(
         name: '常规实际',
         type: 'bar', // 实际用柱状图
         data: regularActualData,
-        itemStyle: { color: '#10b981' },
+        itemStyle: { color: '#9ca3af' },
         label: {
           show: true,
           position: 'top',

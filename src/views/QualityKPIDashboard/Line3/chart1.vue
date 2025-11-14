@@ -9,7 +9,7 @@
     <el-dialog
         v-model="dialogVisible"
         title="故障详细信息"
-        width="80%"
+        width="100%"
         class="custom-dialog"
     >
         <el-table :data="detailData" style="width: 100%" v-loading="loading">
@@ -26,6 +26,11 @@
             <el-table-column prop="unit_name" label="单位" />
             <el-table-column prop="doc_no" label="单号" />
             <el-table-column prop="khdh" label="客户代号" />
+            <el-table-column prop="udf021" label="责任判定" />
+
+            <el-table-column prop="udf022" label="临时措施" />
+            <el-table-column prop="udf024" label="永久措施" />
+
             <!-- doc_name -->
 
         </el-table>

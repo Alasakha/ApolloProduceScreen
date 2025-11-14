@@ -83,7 +83,7 @@
     <!-- 工单结单率 -->
     <div class="grid grid-cols-6 gap-2 h-full mt-2">
       <dv-border-box-12 class="data-box">
-        <Datacard title="日入库工单" EnlishTitle="DailyInboundOrders" :value="workOrderData.dailyInboundOrders" />
+        <Datacard title="月入库工单" EnlishTitle="DailyInboundOrders" :value="workOrderData.dailyInboundOrders" />
       </dv-border-box-12>
       <dv-border-box-12 class="data-box">
         <Datacard title="准时工单" EnlishTitle="OnTimeOrders" :value="workOrderData.onTimeOrders" />
@@ -140,7 +140,7 @@ const fetchData = async (_prodLine) => {
   try {
     const [todayRes, monthRes] = await Promise.all([
       getTodayPlanComplete(),
-      getMonthCompleteGd()
+      getMonthCompleteGd('注塑车间')
     ])
 
     if (todayRes && todayRes.code === 200 && todayRes.data) {
@@ -162,9 +162,9 @@ const fetchData = async (_prodLine) => {
       const monthCompleted = monthRes.data.jsGd ?? 0
       const monthCompletionRate = monthTotalPlan > 0 ? Math.round((monthCompleted / monthTotalPlan) * 1000) / 10 : 0
       // 填充月度计划
-      planProgressData.value.monthTotalPlan = monthTotalPlan
-      planProgressData.value.monthCompleted = monthCompleted
-      planProgressData.value.monthCompletionRate = monthCompletionRate
+      planProgressData.value.monthTotalPlan = todayRes.data.monthPlan ?? 0
+      planProgressData.value.monthCompleted = todayRes.data.monthDone ?? 0
+      planProgressData.value.monthCompletionRate =Math.round((todayRes.data.monthDone/todayRes.data.monthPlan)*1000)/10
       // “工单结单率”区块：用月度值映射“日入库工单/准时工单/结单率”，能连的先连
       workOrderData.value.dailyInboundOrders = monthTotalPlan
       workOrderData.value.onTimeOrders = monthCompleted

@@ -44,9 +44,8 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
-import { getQualityCheckPie, getQualityCheck } from '@/api/getQuiltyinfo';
+import { getQualityCheck, getMonthCxBad } from '@/api/getQuiltyinfo';
 import { eventBus } from '@/utils/eventbus';
-import { formatPieChartData } from '@/utils/map';
 import { createChartOption } from './data';
 import { useEcharts } from '@/utils/useEcharts';
 import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
@@ -82,20 +81,30 @@ const rawData = ref([]);
 
 // 饼图数据加载
 const fetchData = () => {
-  getQualityCheckPie({ type: 1 }).then(res => {
-    const formatted = formatPieChartData(res.data, 'jianyan', 'total');
-    rawData.value = formatted.filter(item => item.value !== 0).sort((a, b) => b.value - a.value);
-    isDataEmpty.value = rawData.value.length === 0;
-    nextTick(() => {
-      initChart();
-      const option = createChartOption('来料检验超时', rawData.value);
-      setOption(option);
-      offClick(handleChartClick);
-      onClick(handleChartClick);
+  getMonthCxBad()
+    .then(res => {
+      const formatted = Array.isArray(res.data)
+        ? res.data
+            .map(item => ({
+              name: item?.cx || '未知车型',
+              value: Number(item?.total ?? 0)
+            }))
+            .filter(item => item.value !== 0)
+            .sort((a, b) => b.value - a.value)
+        : [];
+      rawData.value = formatted;
+      isDataEmpty.value = rawData.value.length === 0;
+      nextTick(() => {
+        initChart();
+        const option = createChartOption('本月车型不良状况', rawData.value);
+        setOption(option);
+        offClick(handleChartClick);
+        onClick(handleChartClick);
+      });
+    })
+    .catch(() => {
+      isDataEmpty.value = true;
     });
-  }).catch(() => {
-    isDataEmpty.value = true;
-  });
 };
 
 // 饼图点击事件

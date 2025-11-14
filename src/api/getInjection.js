@@ -183,10 +183,11 @@ export const getNgGdDetail = (startDay,endDay) => {
 //     "todayJsGd": 24
 //   }
 // }
-export const getMonthCompleteGd = () => {
+export const getMonthCompleteGd = ( workCenter) => {
   return request({
     url: '/injection/monthCompleteGd',
     method: 'get',
+    params: { workCenter }
   })
 }
 
@@ -202,6 +203,7 @@ export const getMonthCompleteGd = () => {
 //     "plan": 6070
 //   }
 // }
+
 export const getTodayPlanComplete = () => {
   return request({
     url: '/injection/todayPlanComplete',
@@ -224,9 +226,68 @@ export const getTodayPlanComplete = () => {
 //     "rate": 94.4
 //   }
 // }
+
 export const getZhsProductMonitoring = () => {
   return request({
     url: '/injection/zhsProductMonitoring',
     method: 'get',
+  })
+}
+// /injection/inputOutput curl -X 'GET' \
+      // 'http://192.168.1.197:10999/apollo/injection/inputOutput?startDay=2025-11-01&endDay=2025-11-12' \
+      // -H 'accept: */*'
+      // {
+      //   "code": 200,
+      //   "message": "操作成功",
+      //   "data": {
+      //     "lot_date": null,
+      //     "ty004": 35381,
+      //     "te011": 26076,
+      //     "lot_att21": "742.05",
+      //     "itemList": [
+      //       {
+      //         "item_description": "共丙(新料)_白色",
+      //         "item_specification": "大庆T30S",
+      //         "required_qty": 646.2542,
+      //         "issued_qty": 646.2542
+      //       },
+      //       {
+      //         "item_description": "增强尼龙_黑色",
+      //         "item_specification": "B1级阻燃料_F-104_海王_可发性聚苯乙烯",
+      //         "required_qty": 22.2,
+      //         "issued_qty": 22.2
+      //       },
+      //       {
+      //         "item_description": "聚丙烯",
+      //         "item_specification": "/_台塑3204",
+      //         "required_qty": 734.114475,
+      //         "issued_qty": 620.0530875
+      //       },
+      //       {
+      //         "item_description": "低密度聚乙烯_本色",
+      //         "item_specification": "低密度聚乙烯(LDPE)",
+      //         "required_qty": 11,
+      //         "issued_qty": 11
+      //       },
+      //       {
+      //         "item_description": "聚丙烯",
+      //         "item_specification": "台塑3204",
+      //         "required_qty": 64.9884,
+      //         "issued_qty": 64.9884
+      //       },
+      //       {
+      //         "item_description": "共丙(新料)_白色",
+      //         "item_specification": "独山子K8003",
+      //         "required_qty": 3392.64743489796,
+      //         "issued_qty": 3171.28256023129
+      //       }
+      //     ]
+      //   }
+      // }
+export const getInputOutput = (startDay,endDay) => {
+  return request({
+    url: '/injection/inputOutput',
+    method: 'get',
+    params: { startDay,endDay }
   })
 }

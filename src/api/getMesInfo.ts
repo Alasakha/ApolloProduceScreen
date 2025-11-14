@@ -355,6 +355,32 @@ export interface MonthProductionCustResponse {
   data: MonthProductionCustData
 }
 
+// /stampingWelding/monthProductionCust_trend?prodLine=1003 金工 产量计划达成率 柱状图接口 金工一部1003 金工二部2003
+export const getMonthProductionCustTrend = (prodLine: string | number) => {
+  return request({
+    url: '/stampingWelding/monthProductionCust_trend',
+    method: 'get',
+    params: { prodLine }
+  })
+}
+
+// 金工月生产趋势数据月度数据
+export interface MonthProductionCustTrendMonthData {
+  a_total: number //A类计划数
+  b_total: number //常规计划数
+  a_done: number //A类完成数
+  b_done: number //常规完成数
+}
+
+// 金工月生产趋势响应类型
+export interface MonthProductionCustTrendResponse {
+  code: number
+  message: string
+  data: {
+    [monthKey: string]: MonthProductionCustTrendMonthData // monthKey格式：YYYY-MM，如 "2025-10"
+  }
+}
+
 // TOP质量问题数据类型
 export interface BadIssuesItem {
   ngNO: string | null
@@ -397,5 +423,27 @@ export interface EfficiencyJgPerformanceResponse {
   data: {
     achieveDay: number // 月度累计达成天数
     standardDay: number // 月度累计排产天数
+  }
+}
+
+// 金工人效达成率趋势接口 /report/efficiency_jg_performance_trend
+export const getEfficiencyJgPerformanceTrend = () => {
+  return request({
+    url: '/report/efficiency_jg_performance_trend',
+    method: 'get'
+  })
+}
+
+// 金工人效达成率趋势响应类型
+export interface EfficiencyJgPerformanceTrendMonthData {
+  achieveDay: number
+  standardDay: number
+}
+
+export interface EfficiencyJgPerformanceTrendResponse {
+  code: number
+  message: string
+  data: {
+    [monthKey: string]: EfficiencyJgPerformanceTrendMonthData
   }
 }

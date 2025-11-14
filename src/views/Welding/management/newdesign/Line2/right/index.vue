@@ -14,13 +14,16 @@
                         />
                     </div>
                     <div class="component-half">
-                        <designSituation :device-type="8" />
+                        <WorkOrderClosingRate />
                     </div>
                 </div>
 
                 <!-- 第一行：日生产计划表格区域 (30%) -->
                 <div class="plan-section">
-                    <PlanTable />
+                    <PlanTable 
+                        :daily-data-prop="dailyPlanData"
+                        :monthly-data-prop="monthlyPlanData"
+                    />
                 </div>
 
                 <!-- 第三行：其他组件区域 (30%) -->
@@ -38,17 +41,39 @@
 
 
 <script setup lang="ts">
-import { ref } from 'vue'
+import { ref, onMounted, onBeforeUnmount } from 'vue'
 
 import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
-import designSituation from '../component/design/Leftcontent.vue'
+import WorkOrderClosingRate from '../component/WorkOrderClosingRate.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
 import { getMetalworkingEfficiency } from '@/api/getStampinfo'
+import { getTodayProduction, getMonthProduction } from '@/api/getStampWeldinfo'
+import { eventBus } from '@/utils/eventbus'
 // import { getDayPlanDone, getDayPlanDoneTotal } from '@/api/getStampWeldinfo'
 import OneProdLine from './oneProdLine.vue'
 // const route = useRoute()
 const prodLine = ref('8')
+
+// 日生产计划和月生产计划数据
+const dailyPlanData = ref<any>(null)
+const monthlyPlanData = ref<any>(null)
+
+// 获取日生产计划和月生产计划数据
+const fetchPlanData = async () => {
+  try {
+    // 同时调用日数据和月数据接口，传入产线1003
+    const [dailyRes, monthlyRes] = await Promise.all([
+      getTodayProduction('1003'),
+      getMonthProduction('1003')
+    ])
+    
+    dailyPlanData.value = dailyRes
+    monthlyPlanData.value = monthlyRes
+  } catch (error) {
+    console.error('获取生产计划数据失败:', error)
+  }
+}
 // 定义 API 函数
 const efficiencyApi = async (prodLine: string) => {
     return await getMetalworkingEfficiency(prodLine)
@@ -97,13 +122,15 @@ const attendanceApi = async (prodLine: string) => {
 //     }
 // }
 
-// 组件挂载时获取数据 - 暂时注释
-// onMounted(() => {
-//     fetchPlanData()
-// })
+// 组件挂载时获取数据
+onMounted(() => {
+    fetchPlanData()
+    eventBus.on('refreshData', fetchPlanData)
+})
 
-
-// PlanTable 组件已简化为只显示标签，不再需要数据
+onBeforeUnmount(() => {
+    eventBus.off('refreshData', fetchPlanData)
+})
 
 
 

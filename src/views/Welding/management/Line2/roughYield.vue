@@ -14,36 +14,81 @@
                 <span class="metric-label">合格率</span>
             </div>
             
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">车架</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ weldingData.cjTotal }}</span>
-                    <span class="metric">{{ weldingData.cjPass }}</span>
-                    <span class="metric">{{ weldingData.cjTotal ? (weldingData.cjPass / weldingData.cjTotal * 100).toFixed(1) + '%' : '--' }}</span>
-                    <span class="metric">{{ handleData(weldingData.cjPass) }}</span>
-                    <span class="metric">{{ getQualifiedRate(weldingData.cjTotal, weldingData.cjPass) }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ weldingData.cjTotal }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">一次合格数</span>
+                        <span class="metric-value">{{ weldingData.cjPass }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">直通率</span>
+                        <span class="metric-value">{{ weldingData.cjTotal ? (weldingData.cjPass / weldingData.cjTotal * 100).toFixed(1) + '%' : '--' }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ handleData(weldingData.cjPass) }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ getQualifiedRate(weldingData.cjTotal, weldingData.cjPass) }}</span>
+                    </span>
                 </div>
             </div>
             
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">后叉</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ handleData(weldingData.hchTotal) }}</span>
-                    <span class="metric">{{ weldingData.hchPass }}</span>
-                    <span class="metric">{{ weldingData.hchTotal ? (weldingData.hchPass / weldingData.hchTotal * 100).toFixed(1) + '%' : '--' }}</span>
-                    <span class="metric">{{ handleData(weldingData.hchPass) }}</span>
-                    <span class="metric">{{ getQualifiedRate(weldingData.hchTotal, weldingData.hchPass) }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ handleData(weldingData.hchTotal) }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">一次合格数</span>
+                        <span class="metric-value">{{ weldingData.hchPass }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">直通率</span>
+                        <span class="metric-value">{{ weldingData.hchTotal ? (weldingData.hchPass / weldingData.hchTotal * 100).toFixed(1) + '%' : '--' }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ handleData(weldingData.hchPass) }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ getQualifiedRate(weldingData.hchTotal, weldingData.hchPass) }}</span>
+                    </span>
                 </div>
             </div>
             
-            <div class="part-section flex">
+            <div class="part-section">
                 <div class="part-header">尾架</div>
                 <div class="metrics-line">
-                    <span class="metric">{{ handleData(weldingData.wjTotal) }}</span>
-                    <span class="metric">{{ weldingData.wjPass }}</span>
-                    <span class="metric">{{ weldingData.wjTotal ? (weldingData.wjPass / weldingData.wjTotal * 100).toFixed(1) + '%' : '--' }}</span>
-                    <span class="metric">{{ handleData(weldingData.wjPass) }}</span>
-                    <span class="metric">{{ getQualifiedRate(weldingData.wjTotal, weldingData.wjPass) }}</span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">今日检验数</span>
+                        <span class="metric-value">{{ handleData(weldingData.wjTotal) }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">一次合格数</span>
+                        <span class="metric-value">{{ weldingData.wjPass }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">直通率</span>
+                        <span class="metric-value">{{ weldingData.wjTotal ? (weldingData.wjPass / weldingData.wjTotal * 100).toFixed(1) + '%' : '--' }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格数</span>
+                        <span class="metric-value">{{ handleData(weldingData.wjPass) }}</span>
+                    </span>
+                    <span class="metric-item">
+                        <span class="metric-label-inline">合格率</span>
+                        <span class="metric-value">{{ getQualifiedRate(weldingData.wjTotal, weldingData.wjPass) }}</span>
+                    </span>
                 </div>
             </div>
         </div>
@@ -296,27 +341,27 @@ onBeforeUnmount(() => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 8px;
+    padding: 0;
     background: rgba(0, 0, 0, 0.1);
     border-radius: 8px;
-    border: 2px solid #1e90ff;
+    border: none;
     cursor: pointer;
     transition: all 0.3s ease;
+    overflow: hidden;
 }
 
 .yield-container:hover {
-    border-color: #00bfff;
-    box-shadow: 0 0 15px rgba(30, 144, 255, 0.3);
+    box-shadow: 0 0 15px rgba(39, 159, 39, 0.3);
 }
 
 .yield-title {
-    background: linear-gradient(135deg, #1e90ff, #4169e1);
+    background: #279f27;
     padding: 8px 12px;
-    border-radius: 6px;
-    margin-bottom: 8px;
+    border-radius: 0;
+    margin-bottom: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
+    justify-content: center;
     position: relative;
 }
 
@@ -325,6 +370,7 @@ onBeforeUnmount(() => {
     color: white;
     flex: 1;
     text-align: center;
+    font-weight: 600;
 }
 
 .click-note {
@@ -344,61 +390,81 @@ onBeforeUnmount(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
+    padding: 8px;
+    background: rgba(0, 0, 0, 0.1);
 }
 
 .metrics-labels {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    padding: 6px 8px;
-    background: rgba(30, 144, 255, 0.1);
-    border-radius: 4px;
-    border: 1px solid rgba(30, 144, 255, 0.3);
-    margin-bottom: 4px;
+    display: none;
 }
 
 .metric-label {
     font-size: 11px;
-    color: #1e90ff;
+    color: white;
     font-weight: 600;
     text-align: center;
 }
 
 .part-section {
-    background: rgba(0, 0, 0, 0.15);
-    border-radius: 6px;
+    background: transparent;
+    border-radius: 0;
     padding: 8px;
-    border: 1px solid #1e90ff;
+    border: 1px solid #279f27;
+    margin-bottom: 8px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 16px;
+}
+
+.part-section:last-child {
+    margin-bottom: 0;
 }
 
 .part-header {
     font-size: 14px;
     font-weight: 600;
-    color: #1e90ff;
-    margin-bottom: 8px;
-    text-align: center;
-    background: rgba(30, 144, 255, 0.1);
-    padding: 4px;
-    border-radius: 4px;
+    color: #279f27;
+    margin-bottom: 0;
+    text-align: left;
+    background: transparent;
+    padding: 0;
+    border-radius: 0;
+    white-space: nowrap;
+    flex-shrink: 0;
 }
 
 .metrics-line {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 8px;
-    padding: 6px 8px;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 4px;
-    border: 1px solid rgba(30, 144, 255, 0.3);
-    width: 90%;
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 16px;
+    padding: 0;
+    background: transparent;
+    border-radius: 0;
+    border: none;
+    flex: 1;
+    align-items: center;
 }
 
-.metric {
+.metric-item {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex: 1;
+    justify-content: center;
+}
+
+.metric-label-inline {
     font-size: 12px;
-    color: #e0e0e0;
+    color: white;
     font-weight: 500;
-    text-align: center;
+}
+
+.metric-value {
+    font-size: 12px;
+    color: white;
+    font-weight: 500;
 }
 
 /* Dialog样式 */

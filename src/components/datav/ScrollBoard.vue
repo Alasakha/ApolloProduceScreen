@@ -76,9 +76,8 @@
   </template>
    
   <script lang="ts" setup>
-  import { ref, reactive, watch, onUnmounted, defineExpose } from 'vue'
+  import { ref, reactive, watch, onUnmounted, onMounted, nextTick, defineExpose } from 'vue'
   import { cloneDeep, merge } from "lodash";
-  import autoResize from "@/utils/autoResize";
    import { ElTooltip } from 'element-plus'
   const props = defineProps({
     config: {
@@ -98,7 +97,23 @@
   const emitEvent = defineEmits(["mouseover", "click", "getFirstRow"]);
    
   const scrollBoard = ref(null);
-  const { width, height } = autoResize(scrollBoard, onResize, afterAutoResizeMixinInit);
+  const width = ref(0);
+  const height = ref(0);
+  
+  // 初始化尺寸（只获取一次，不使用自适应）
+  const initSize = () => {
+    nextTick(() => {
+      if (scrollBoard.value) {
+        width.value = scrollBoard.value.clientWidth || 0;
+        height.value = scrollBoard.value.clientHeight || 0;
+        afterAutoResizeMixinInit();
+      }
+    });
+  };
+  
+  onMounted(() => {
+    initSize();
+  });
    
   const state = reactive({
     defaultConfig: {
@@ -270,13 +285,6 @@
   }
   function afterAutoResizeMixinInit() {
     calcData();
-  }
-  function onResize() {
-    if (!state.mergedConfig) return;
-   
-    calcWidths();
-   
-    calcHeights();
   }
   function calcData() {
     mergeConfig();

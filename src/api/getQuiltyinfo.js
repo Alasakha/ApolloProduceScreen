@@ -335,3 +335,49 @@ export const getIncomingInspectionDetail = (userName ) => {
     params: { userName }
   })
 }
+
+
+// /quality/topDayInspectorWeek
+export const getTopDayInspectorWeek = ( ) => {
+  return request({
+    url: '/quality/topDayInspectorWeek',
+    method: 'get',
+  })
+}
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": [
+//     {
+//       "sunday": "2025-11-16",
+//       "monday": "2025-11-10",
+//       "weekNumber": 46,
+//       "topInspectorList": {
+//         "peopleName": null,
+//         "cx": null,
+//         "total": null,
+//         "performanceTotal": 243,功性能数量
+//         "nonPerformanceTotal": 239 其他数量
+//       }
+
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/quality/monthCxBad' \
+//   -H 'accept: */*'
+export const getMonthCxBad = () => {
+  return request({
+    url: '/quality/monthCxBad',
+    method: 'get',
+  })
+}
+// {
+//   "code": 200,
+//   "message": "操作成功",
+//   "data": [
+//     {
+//       "peopleName": null,
+//       "cx": "AGA-10", 车型
+//       "total": "22", 不良数量
+//       "performanceTotal": null,
+//       "nonPerformanceTotal": null
+//     },

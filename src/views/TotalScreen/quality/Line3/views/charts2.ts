@@ -1,71 +1,107 @@
 
 
 // chartOption.ts
-export function createChartOption(data) {
-  const total = data.reduce((sum, item) => sum + item.value, 0);
+export function createChartOption(data: any[] = []) {
+  const categories = data.map((item) => item?.label || '');
+  const performanceData = data.map((item) => item?.performance ?? 0);
+  const nonPerformanceData = data.map((item) => item?.nonPerformance ?? 0);
 
-    return {
-      backgroundColor: 'transparent', // 或深色如 '#000' 视页面背景而定
-      tooltip: {
-        trigger: 'item',
-        formatter: '{b}: {c} ({d}%)'
+  return {
+    backgroundColor: 'transparent',
+    color: ['#006cff', '#60cda0', '#ed8884', '#ff9f7f', '#0096ff', '#9fe6b8', '#32c5e9', '#1d9dff'],
+    tooltip: {
+      trigger: 'axis',
+      axisPointer: {
+        type: 'shadow'
       },
-      legend: undefined, // 或直接删除整个 legend 配置
-      graphic: {
-        type: 'text',
-        left: '49%',
-        top: '75%',
-        style: {
-          text: `${total}`,
-          textAlign: 'center',
-          fill: '#fff',
-          fontSize: 18,
-          fontWeight: 'bold'
+      formatter: (params: any[]) => {
+        if (!Array.isArray(params) || params.length === 0) return '';
+        const dataIndex = params[0].dataIndex;
+        const meta = data[dataIndex] || {};
+        const lines: string[] = [];
+        if (meta.label) {
+          lines.push(meta.label);
+        }
+        if (meta.range) {
+          lines.push(meta.range);
+        }
+        params.forEach((item) => {
+          lines.push(`${item.marker}${item.seriesName}：${item.value}`);
+        });
+        return lines.join('<br/>');
+      }
+    },
+    legend: {
+      data: ['功性能数量', '他数量'],
+      textStyle: {
+        color: '#cfd8ff'
+      }
+    },
+    grid: {
+      left: '6%',
+      right: '6%',
+      top: '18%',
+      bottom: '14%',
+      containLabel: true
+    },
+    xAxis: {
+      type: 'category',
+      data: categories,
+      axisLabel: {
+        color: '#cfd8ff',
+        interval: 0
+      },
+      axisLine: {
+        lineStyle: {
+          color: 'rgba(255, 255, 255, 0.3)'
+        }
+      }
+    },
+    yAxis: {
+      type: 'value',
+      axisLabel: {
+        color: '#cfd8ff'
+      },
+      splitLine: {
+        lineStyle: {
+          color: 'rgba(255, 255, 255, 0.15)'
         }
       },
-      series: [
-        {
-          name: '来源',
-          type: 'pie',
-          radius: ['40%', '70%'],
-          center: ['50%', '80%'], // 居中
-          startAngle: 180,
-          endAngle: 360,
-          itemStyle: {
-            borderColor: '#000',
-            borderWidth: 0
-          },
-          label: {
-            color: '#fff',
-            fontSize: 14,
-            formatter: function (params) {
-              // 假设 params.value 是“不合格数”，params.percent 是占比
-              
-              const roundedPercent = Math.round(params.percent);  // 四舍五入占比
-              return `${params.name} ${params.data.purchase_total}单 ${params.value}批  (${roundedPercent}%)`;
-            }
-          },
-          labelLine: {  
-            length: 15,     // 第一段（连接扇区）
-            length2: 10,    // 第二段（水平线）
-            lineStyle: {
-              color: '#fff'
-            }
-          },
-          color: [
-            '#006cff',
-            '#60cda0',
-            '#ed8884',
-            '#ff9f7f',
-            '#0096ff',
-            '#9fe6b8',
-            '#32c5e9',
-            '#1d9dff'
-          ],
-          data: data
+      axisLine: {
+        show: false
+      }
+    },
+    series: [
+      {
+        name: '功性能数量',
+        type: 'bar',
+        barWidth: 18,
+        data: performanceData,
+        label: {
+          show: true,
+          position: 'top',
+          color: '#ffff'
+        },
+        itemStyle: {
+          color: '#006cff',
+          borderRadius: [4, 4, 0, 0]
         }
-      ]
-      
-    };
-  }
-  
+      },
+      {
+        name: '他数量',
+        type: 'bar',
+        barWidth: 18,
+        data: nonPerformanceData,
+        label: {
+          show: true,
+          position: 'top',
+          color: '#ffffff'
+        },
+        itemStyle: {
+          color: '#60cda0',
+          borderRadius: [4, 4, 0, 0]
+        }
+      }
+    ]
+  };
+}

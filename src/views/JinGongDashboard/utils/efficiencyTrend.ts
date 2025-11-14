@@ -1,7 +1,8 @@
 // 人效达成率趋势数据工具函数
-import type { 
-  ProductionAchievementRatePerformanceTrendResponse, 
-  EfficiencyTrendMonthData 
+import type {
+  ProductionAchievementRatePerformanceTrendResponse,
+  EfficiencyTrendMonthData,
+  EfficiencyJgPerformanceTrendResponse
 } from '@/api/getMesInfo'
 
 // 合并两个趋势数据（用于装配+包装）
@@ -55,7 +56,7 @@ export function mergeEfficiencyTrendData(
 
 // 转换人效达成率趋势接口数据为图表数据
 export function transformEfficiencyTrendData(
-  apiData: ProductionAchievementRatePerformanceTrendResponse | null
+  apiData: ProductionAchievementRatePerformanceTrendResponse | EfficiencyJgPerformanceTrendResponse | null
 ): {
   categories: string[]
   series: Array<{
@@ -83,8 +84,8 @@ export function transformEfficiencyTrendData(
   // 硬编码标准值：89%
   const standard = 89
 
-  // 按月份排序（YYYY-MM格式）
-  const monthKeys = Object.keys(apiData.data)
+  // 按月份排序
+  const monthKeys = Object.keys(apiData.data || {})
     .filter(key => key !== 'achieveRate') // 排除最外层的 achieveRate
     .sort()
   
@@ -95,22 +96,48 @@ export function transformEfficiencyTrendData(
   const categories: string[] = []
 
   monthKeys.forEach(monthKey => {
-    const monthData = apiData.data[monthKey] as EfficiencyTrendMonthData
-    
-    // 从月度数据中提取计划天数和达成天数
-    const pcDays = monthData.pcDays || 0
-    const achieveDays = monthData.achieveDays || 0
-    
-    planDaysData.push(pcDays)
+    const monthData = apiData.data[monthKey] as EfficiencyTrendMonthData | EfficiencyJgPerformanceTrendResponse['data'][string]
+
+    const getNumber = (value: unknown): number => {
+      return typeof value === 'number' && !Number.isNaN(value) ? value : 0
+    }
+
+    // 从月度数据中提取计划天数和达成天数，兼容不同字段
+    const planDays =
+      getNumber((monthData as EfficiencyTrendMonthData)?.pcDays) ||
+      getNumber((monthData as EfficiencyTrendMonthData)?.planDays) ||
+      getNumber((monthData as EfficiencyJgPerformanceTrendResponse['data'][string])?.standardDay)
+
+    const achieveDays =
+      getNumber((monthData as EfficiencyTrendMonthData)?.achieveDays) ||
+      getNumber((monthData as EfficiencyJgPerformanceTrendResponse['data'][string])?.achieveDay)
+
+    planDaysData.push(planDays)
     achieveDaysData.push(achieveDays)
-    
-    // 计算标准达成天数：计划天数 × 89%
-    const standardDays = Math.round(pcDays * standard / 100)
+
+    // 计算标准达成天数：计划天数 × 89%，优先使用接口提供的标准值
+    const providedStandardDay = getNumber(
+      (monthData as EfficiencyTrendMonthData)?.standardDay ??
+      (monthData as EfficiencyJgPerformanceTrendResponse['data'][string])?.standardDay
+    )
+    const standardDays = providedStandardDay > 0 ? providedStandardDay : Math.round(planDays * standard / 100)
     standardDaysData.push(standardDays)
-    
-    // 月份标签（从YYYY-MM转换为X月格式）
-    const month = parseInt(monthKey.substring(5, 7))
-    categories.push(`${month}月`)
+
+    // 月份标签（兼容 YYYY-MM 和 YYYYMM）
+    const monthLabel = (() => {
+      if (monthKey.includes('-')) {
+        const segment = monthKey.split('-')[1]
+        const month = parseInt(segment, 10)
+        return Number.isFinite(month) ? `${month}月` : monthKey
+      }
+      if (monthKey.length >= 6) {
+        const segment = monthKey.slice(-2)
+        const month = parseInt(segment, 10)
+        return Number.isFinite(month) ? `${month}月` : monthKey
+      }
+      return monthKey
+    })()
+    categories.push(monthLabel)
   })
 
   return {

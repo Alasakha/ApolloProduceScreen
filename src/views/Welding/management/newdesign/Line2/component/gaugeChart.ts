@@ -1,6 +1,42 @@
 // gaugeChart.ts
 const size = window.devicePixelRatio;
-export function createGaugeOption({ text = '标题', data , max  }: { text?: string; data: number; max: number }) {
+
+interface GaugeOptionParams {
+  text?: string;
+  data: number;
+  max: number;
+  unit?: string;
+  formatter?: (value: number) => string;
+}
+
+function formatValue(value: number, unit?: string, customFormatter?: (value: number) => string) {
+  if (typeof customFormatter === "function") {
+    return customFormatter(value);
+  }
+
+  if (!Number.isFinite(value)) {
+    return unit ? `0${unit}` : "0";
+  }
+
+  if (unit) {
+    const rounded = Math.round(value);
+    return `${rounded}${unit}`;
+  }
+
+  if (Number.isInteger(value)) {
+    return `${value}`;
+  }
+
+  const abs = Math.abs(value);
+  const fixedDigits = abs >= 10 ? 1 : abs >= 1 ? 2 : 3;
+  return Number(value.toFixed(fixedDigits)).toString();
+}
+
+export function createGaugeOption({ text = '标题', data, max, unit, formatter }: GaugeOptionParams) {
+    const safeMax = Number.isFinite(max) && max > 0 ? max : 1;
+    const gaugeValue = Math.min(Math.max(data, 0), safeMax);
+    const ratio = safeMax === 0 ? 0 : Math.min(Math.max(gaugeValue / safeMax, 0), 1);
+    const formattedValue = formatValue(data, unit, formatter);
     return {
       title: {
         text: text,
@@ -36,11 +72,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
             offsetCenter: size >= 2 ? [0, 15] : size >= 1.5 ? [0, 20] : [0, 35],
             fontSize: size >= 2 ? 12 : size >= 1.5 ? 16 : 24,
             formatter: () => {
-              // 判断标题是否是 'xx'，如果是加百分号
-              if (text === '点检及时率') {
-                return `${Math.round(data)}%`;
-              }
-              return `${Math.round(data)}`;
+              return formattedValue;
             },
             rich: {
               a: {
@@ -58,7 +90,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
               opacity: 1,
               color: [
                 [
-                  data / max,
+                  ratio,
                   {
                     x: 1,
                     y: 1,
@@ -102,7 +134,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
           label: { position: 'center' },
           data: [
             {
-              value: data,
+              value: gaugeValue,
               itemStyle: {
                 shadowBlur: 0,
                 shadowColor: '#fff',
@@ -110,7 +142,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
               },
             },
             {
-              value: max - data,
+              value: Math.max(safeMax - gaugeValue, 0),
               itemStyle: {
                 label: { show: false },
                 labelLine: { show: false },
@@ -146,7 +178,7 @@ export function createGaugeOption({ text = '标题', data , max  }: { text?: str
           detail: { show: false },
           title: { show: false },
           data: [
-            { value: data },
+            { value: gaugeValue },
             { value: 0 },
           ],
         },

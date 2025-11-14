@@ -79,7 +79,7 @@ onMounted(() => {
 <template>
   <div class='pl-5 pt-1 h-full flex flex-col'>
     <!-- 标题 -->
-    <div class="flex justify-center items-center text-lg text-white font-bold mb-2">
+    <div class="flex justify-center items-center text-lg text-white font-bold mb-2 ">
       <p class="tracking-widest text-xl">注塑产品质量监控</p>
     </div>
     
@@ -107,7 +107,7 @@ onMounted(() => {
     <!-- 不合格工单明细 -->
     <div class="flex-1 flex flex-col" style="overflow: hidden;">
       <div class="text-white font-bold mb-1 text-sm">不合格工单明细:</div>
-      <div class="flex-1" style="overflow: hidden;">
+      <div class="flex-1" >
         <ScrollBoard :config="defectiveConfig" style="width:97%;height:100%;" />
       </div>
     </div>
@@ -393,7 +393,7 @@ onMounted(() => {
 
 <style scoped> 
 
-:deep(.ScrollBoard .header) {
+/* :deep(.ScrollBoard .header) {
   background: rgba(79,142,247,0.3);
   font-size: 0.6vw;
   font-weight: bold;
@@ -405,7 +405,7 @@ onMounted(() => {
 
 :deep(.ScrollBoard .rows .row-item:hover) {
   background: rgba(79,142,247,0.1);
-}
+} */
 
 .stat-item {
   display: flex;

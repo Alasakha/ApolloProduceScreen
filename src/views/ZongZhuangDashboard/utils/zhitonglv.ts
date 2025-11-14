@@ -99,7 +99,7 @@ export function transformQualityReportData(
       { label: 'A类月度累计直通率', value: formatPercent(aClassActual) },
       { label: '达成率', value: aClassAchievement },
       { label: '常规直通率标准', value: standards.regular + '%' },
-      { label: '常规月度累计直通率', value: formatPercent(regularActual) },
+      { label: '月度累计直通率', value: formatPercent(regularActual) },
       { label: '达成率', value: regularAchievement }
     ]
   }

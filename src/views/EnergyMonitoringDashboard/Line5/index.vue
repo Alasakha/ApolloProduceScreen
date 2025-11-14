@@ -18,6 +18,7 @@
         color="#00d4ff"
         unit="m³"
         chart-type="weekly"
+        :standard-value="635"
       />
 
       <!-- 水能监测 -->
@@ -26,8 +27,9 @@
         :data="gasWaterData.water"
         :week-labels="weekLabels"
         color="#00d4ff"
-        unit="m³"
+        unit="吨"
         chart-type="weekly"
+        :standard-value="600"
       />
 
       <!-- 电能监测 -->
@@ -38,6 +40,7 @@
         color="#00d4ff"
         unit="kWh"
         chart-type="weekly"
+        :standard-value="48000"
       />
     </div>
   </div>

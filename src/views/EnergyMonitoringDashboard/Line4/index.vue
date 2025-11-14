@@ -24,6 +24,10 @@
             <div class="workshop-info">
               <span class="energy-icon">⚡</span>
               <div class="workshop-name">{{ item.workshopName }}</div>
+              <div class="monthly-amount">
+                <span class="amount-label">月度核算金额：</span>
+                <span class="amount-value">¥{{ (Number(item.actualTotal) * 4.619).toFixed(2) }}</span>
+              </div>
             </div>
             <div class="ratio" :class="{ 'exceeded': Number(item.ratio) > 0.5, 'saved': Number(item.ratio) <= 0.5 }">
               {{ Number(item.ratio) > 0 ? '+' : '' }}{{ item.ratio }}
@@ -616,6 +620,7 @@ const submitReason = async () => {
   display: flex;
   align-items: center;
   gap: 8px;
+  flex: 1;
 }
 
 .energy-icon {
@@ -636,9 +641,29 @@ const submitReason = async () => {
   font-size: 16px;
   font-weight: 600;
   line-height: 1.3;
-  flex: 1;
-  margin-right: 8px;
+  margin-right: 12px;
   transition: all 0.3s ease;
+  white-space: nowrap;
+}
+
+.monthly-amount {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: auto;
+  white-space: nowrap;
+}
+
+.amount-label {
+  color: rgba(255, 255, 255, 0.7);
+  font-size: 13px;
+  font-weight: 500;
+}
+
+.amount-value {
+  color: #ffaa00;
+  font-size: 14px;
+  font-weight: 700;
 }
 
 .ratio {

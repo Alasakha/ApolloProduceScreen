@@ -465,6 +465,25 @@ export const submitRuisongHourCl = (data: RuisongHourClSubmit[]): Promise<any> =
   })
 }
 
+// /stampingWelding/anchuanHourCl - 自动焊一线小时产能（安川）
+export interface AnchuanHourCl {
+  prodLine: string | null
+  hour: number | null
+  hour2: number | null
+  date: string | null
+  reason: string | null
+  cl: string | null
+  total: number | null
+  duty: string | null
+}
+
+export const getAnchuanHourCl = (): Promise<{data: AnchuanHourCl[]}> => {
+  return request({
+    url: '/stampingWelding/anchuanHourCl',
+    method: 'get'
+  })
+}
+
 // /stampingWelding/paintingPassRate
 export const getPaintingPassRate = (): Promise<{data: PaintingPassRate[]}> => {
   return request({
@@ -685,4 +704,31 @@ export const getWorkOrderClosingRate = async (_prodLine: string): Promise<{code:
       todayClosingRate: 87.5
     }
   })
+}
+
+
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/stampingWelding/productionScheduleProgress?prodLine=1003&type=1' \
+//   -H 'accept: */*'  type: 1:安川,2:松下
+export const getProductionScheduleProgress = (prodLine: string, type: string): Promise<{data: ProductionScheduleProgress[]}> => {
+  return request({
+    url: '/stampingWelding/productionScheduleProgress',
+    method: 'get',
+    params: { prodLine, type }
+  })
+}
+
+export interface ProductionScheduleProgress {
+  prodLine: string
+  type: string
+  data: any
+}
+
+// 类型
+export interface ProductionScheduleProgressItem {
+  type: number;           // 类型，1=月度数据，2=今日数据 
+  machName: string;       // 设备名称
+  pg: number;             // 计划数
+  done: number;           // 完成数
+  pgDetailList: any;      // 详细列表（可为null）
 }
