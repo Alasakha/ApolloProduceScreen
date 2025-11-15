@@ -732,3 +732,19 @@ export interface ProductionScheduleProgressItem {
   done: number;           // 完成数
   pgDetailList: any;      // 详细列表（可为null）
 }
+
+
+  // curl -X 'GET' \
+  //   'http://192.168.1.197:10999/apollo/stampingWelding/todayBadIssues_person?prodLine=1003' \
+  //   -H 'accept: */*'
+  export const getTodayBadIssuesPerson = (prodLine: string): Promise<{data: TodayBadIssuesPerson[]}> => {
+    return request({
+      url: '/stampingWelding/todayBadIssues_person',
+      method: 'get',
+      params: { prodLine }
+    })
+  }
+  export interface TodayBadIssuesPerson {
+    ngResponPeople: string;
+    total: number;
+  }

@@ -166,7 +166,7 @@ const fetchData = async () => {
         
         const baseData = [
 
-          item.item_description || item.item_specification || '-',
+        item.item_specifiation || item.item_specification || '-',
           planOutput,
           planUsage.toFixed(2) + 'kg',
           actualOutput,

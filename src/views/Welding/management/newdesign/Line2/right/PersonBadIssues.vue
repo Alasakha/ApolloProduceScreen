@@ -2,7 +2,7 @@
     <div class="quality-container">
         <div class="quality-title">
             <div class="title-content">
-                <h3>今日毛坯质量TOP问题</h3>
+                <h3>今日不良问题(责任人分类)</h3>
             </div>
             <div class="title-actions">
                 <el-button 
@@ -13,7 +13,6 @@
                 >
                     查看详细
                 </el-button>
-
             </div>
         </div>
         <div class="chart-container">
@@ -35,11 +34,10 @@
             />
         </div>
 
-        
         <!-- 明细Dialog -->
         <el-dialog
             v-model="dialogVisible"
-            title="质量问题明细"
+            title="责任人问题明细"
             width="80%"
             :before-close="handleClose"
             class="detail-dialog"
@@ -66,7 +64,6 @@
                     <el-table-column prop="ta006" label="品号" width="140" />
                     <el-table-column prop="mb002" label="品名" width="230" />
                     <el-table-column prop="mb003" label="规格型号" width="340" />
-                    <!-- <el-table-column prop="ngNO" label="不合格代码" width="120" /> -->
                     <el-table-column prop="ngName" label="不合格名称" width="150" />
                     <el-table-column prop="admin_UNIT_NAME" label="责任部门" width="120" />
                     <el-table-column prop="ngResponPeople" label="责任人" width="100" />
@@ -79,8 +76,6 @@
                         </template>
                     </el-table-column>
                 </el-table>
-                
-
             </div>
             
             <template #footer>
@@ -120,17 +115,22 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed,onUnmounted  } from 'vue'
+import { ref, onMounted, computed, onUnmounted } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
 import EChartsPieChart from '@/components/EChartsPieChart.vue'
 import type { PieChartItem } from '@/components/EChartsPieChart.vue'
-import { getTodayBadIssues, getTodayBadIssuesDetail, type TodayBadIssues } from '@/api/getStampWeldinfo'
+import { getTodayBadIssuesPerson, getTodayBadIssuesDetail, type TodayBadIssuesPerson } from '@/api/getStampWeldinfo'
 import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
-import { useRoute } from 'vue-router'
 
-const route = useRoute()
-const prodLine = route.query.prodLine as string
+// 定义 props
+interface Props {
+    prodLine?: string
+}
+
+const props = withDefaults(defineProps<Props>(), {
+    prodLine: '1003' // 默认使用1003，如果接口需要其他值可以传入
+})
 
 // 图表引用
 const pieChartRef = ref()
@@ -150,7 +150,7 @@ const reasonForm = ref({
 const currentRowUid = ref('')
 
 // 真实API数据
-const apiData = ref<TodayBadIssues[]>([])
+const apiData = ref<TodayBadIssuesPerson[]>([])
 
 // 图表数据 - 从API数据转换
 const chartData = computed((): PieChartItem[] => {
@@ -160,7 +160,7 @@ const chartData = computed((): PieChartItem[] => {
     
     // 将API数据转换为图表数据格式
     return apiData.value.map((item, index) => ({
-        name: item.ngName,
+        name: item.ngResponPeople || '未知',
         value: item.total,
         color: getDefaultColor(index)
     }))
@@ -178,7 +178,6 @@ const getDefaultColor = (index: number): string => {
 
 // 图表配置 - 半环图配置
 const chartConfig = computed(() => ({
-    // title: '质量TOP问题分布',
     radius: ['40%', '70%'] as [string, string], // 环形：内半径40%，外半径70%
     center: ['50%', '50%'] as [string, string], // 中心点居中
     startAngle: 180, // 从180度开始（左侧）
@@ -188,7 +187,6 @@ const chartConfig = computed(() => ({
     showPointer: true,
     showLegend: false, // 半环图隐藏图例，使用标签显示
     theme: 'dark',
-    // 自定义颜色配置，确保高对比度
     colors: [
         '#FF6B6B', // 红色 - 高对比度
         '#4ECDC4', // 青色 - 高对比度
@@ -199,24 +197,24 @@ const chartConfig = computed(() => ({
     ]
 }))
 
-// 获取今日不良TOP问题数据
-const fetchTodayBadIssues = async () => {
+// 获取今日不良问题(责任人分类)数据
+const fetchTodayBadIssuesPerson = async () => {
     try {
-        console.log('开始获取今日不良TOP问题数据，生产线:', prodLine)
+        console.log('开始获取今日不良问题(责任人分类)数据，生产线:', props.prodLine)
         
-        const response = await getTodayBadIssues(prodLine)
+        const response = await getTodayBadIssuesPerson(props.prodLine)
         console.log('API响应数据:', response)
         
         if (response && response.data && response.data.length > 0) {
             apiData.value = response.data
-            console.log('今日不良TOP问题数据:', apiData.value)
+            console.log('今日不良问题(责任人分类)数据:', apiData.value)
         } else {
             console.warn('API返回数据为空')
             apiData.value = []
         }
         
     } catch (error) {
-        console.error('获取今日不良TOP问题数据失败:', error)
+        console.error('获取今日不良问题(责任人分类)数据失败:', error)
         apiData.value = []
     }
 }
@@ -230,27 +228,27 @@ const handleChartClick = (params: any) => {
 }
 
 // 打开明细Dialog
-const openDetailDialog = (category: string) => {
-    console.log('打开明细Dialog，类别:', category)
+const openDetailDialog = (personName: string) => {
+    console.log('打开明细Dialog，责任人:', personName)
     dialogVisible.value = true
-    fetchDetailData(category)
+    fetchDetailData(personName)
 }
 
 // 获取明细数据
-const fetchDetailData = async (category: string) => {
+const fetchDetailData = async (personName: string) => {
     loading.value = true
     errorMessage.value = ''
     
     try {
-        console.log('开始获取明细数据，类别:', category, '生产线:', prodLine)
+        console.log('开始获取明细数据，责任人:', personName, '生产线:', props.prodLine)
         
-        const response = await getTodayBadIssuesDetail(prodLine)
+        const response = await getTodayBadIssuesDetail(props.prodLine)
         console.log('明细数据API响应:', response)
         
         if (response && response.data) {
-            // 如果选择了特定类别，过滤数据
-            if (category !== '全部') {
-                detailData.value = response.data.filter(item => item.ngName === category)
+            // 如果选择了特定责任人，过滤数据
+            if (personName !== '全部') {
+                detailData.value = response.data.filter(item => item.ngResponPeople === personName)
             } else {
                 detailData.value = response.data
             }
@@ -260,7 +258,7 @@ const fetchDetailData = async (category: string) => {
             console.warn('明细数据API返回为空')
         }
         
-    } catch (error) {
+    } catch (error: any) {
         console.error('获取明细数据失败:', error)
         errorMessage.value = `数据加载失败: ${error.message || '未知错误'}`
         detailData.value = []
@@ -275,7 +273,6 @@ const handleClose = () => {
     detailData.value = []
     errorMessage.value = ''
 }
-
 
 // 处理填写按钮点击
 const handleEdit = (row: any) => {
@@ -328,8 +325,7 @@ let refreshTimer: NodeJS.Timeout | null = null
 // 启动定时刷新
 const startAutoRefresh = () => {
     refreshTimer = setInterval(() => {
-        
-        fetchTodayBadIssues()
+        fetchTodayBadIssuesPerson()
     }, 180000) // 每3分钟刷新一次
 }
 
@@ -343,7 +339,7 @@ const stopAutoRefresh = () => {
 
 onMounted(async () => {
     // 初始加载数据
-    await fetchTodayBadIssues()
+    await fetchTodayBadIssuesPerson()
     
     // 启动自动刷新
     startAutoRefresh()
@@ -353,12 +349,6 @@ onMounted(async () => {
 onUnmounted(() => {
     stopAutoRefresh()
 })
-
-// 监听生产线变化
-// watch(prodLine, () => {
-//     fetchTodayBadIssues()
-// })
-
 
 </script>
 
@@ -377,7 +367,6 @@ onUnmounted(() => {
     background: #279f27;
     padding: 8px 16px;
     border-radius: 6px;
-    /* margin-bottom: 16px; */
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -403,13 +392,6 @@ onUnmounted(() => {
     text-align: center;
 }
 
-.department-info {
-    color: #2c3e50;
-    font-size: 12px;
-    margin-top: 4px;
-    font-weight: 500;
-}
-
 .detail-button {
     background: linear-gradient(135deg, #4A90E2, #357ABD);
     border: none;
@@ -424,20 +406,6 @@ onUnmounted(() => {
     box-shadow: 0 4px 8px rgba(74, 144, 226, 0.3);
 }
 
-.reason-button {
-    background: linear-gradient(135deg, #FF8C00, #FF7F00);
-    border: none;
-    color: white;
-    font-weight: 500;
-    transition: all 0.3s ease;
-}
-
-.reason-button:hover {
-    background: linear-gradient(135deg, #FF7F00, #FF6B00);
-    transform: translateY(-1px);
-    box-shadow: 0 4px 8px rgba(255, 140, 0, 0.3);
-}
-
 .chart-container {
     flex: 1;
     display: flex;
@@ -446,21 +414,6 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     overflow: hidden;
-}
-
-.description-box {
-    background: rgba(135, 206, 235, 0.2);
-    padding: 12px;
-    border-radius: 6px;
-    border: 1px solid rgba(135, 206, 235, 0.3);
-}
-
-.description-box p {
-    margin: 0;
-    font-size: 12px;
-    color: #2c3e50;
-    line-height: 1.4;
-    text-align: center;
 }
 
 /* Dialog样式 */
@@ -491,3 +444,4 @@ onUnmounted(() => {
     text-align: right;
 }
 </style>
+

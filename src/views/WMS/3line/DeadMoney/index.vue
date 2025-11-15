@@ -87,7 +87,6 @@ font-family: Arial, sans-serif;
 }
 .table-area {
 min-height: 0;
-max-height: 100%;
 overflow: hidden;
 position: relative;
 height: 100%;
@@ -95,13 +94,7 @@ display: flex;
 }
 :deep(.ScrollBoard) {
 height: 100% !important;
-max-height: 100% !important;
 width: 100% !important;
-overflow: hidden !important;
-}
-:deep(.ScrollBoard .rows) {
-max-height: 100% !important;
-overflow: hidden !important;
 }
 .loading {
 color: #fff;

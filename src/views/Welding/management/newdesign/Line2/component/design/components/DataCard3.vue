@@ -42,7 +42,7 @@
           <!-- 开机数量 -->
           <div class="bg-green-600/50 border border-green-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-green-500/60 hover:border-green-300/70 transition-all duration-200" 
                @click="handleRunningClick">
-            <div class="text-green-200 text-sm mb-1">开机数量</div>
+            <div class="text-green-200 text-sm mb-1">运行数量</div>
             <div class="text-2xl font-bold text-white">{{ runningCount  }}</div>
           </div>
           

@@ -24,11 +24,11 @@
                 </div>
 
                 <!-- 第三行：其他组件区域 (30%) -->
-                <div class="components-3row">
+                <!-- <div class="components-3row">
                     <div class="component-half">
                         <OneProdLine />
                     </div>
-                </div>
+                </div> -->
             </div>
         </Title>
     </div>
@@ -45,7 +45,7 @@ import designSituation from '../component/design/Leftcontent.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
 import { getMetalworkingEfficiency } from '@/api/getStampinfo'
 // import { getDayPlanDone, getDayPlanDoneTotal } from '@/api/getStampWeldinfo'
-import OneProdLine from './oneProdLine.vue'
+// import OneProdLine from './oneProdLine.vue'
 
 // const route = useRoute()
 const prodLine = ref('9')
@@ -128,7 +128,7 @@ const attendanceApi = async (prodLine: string) => {
 }
 
 .plan-section {
-    height: 26%;
+    height: 65%;
     min-height: 180px;
     overflow: hidden;
 }

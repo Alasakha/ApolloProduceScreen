@@ -29,7 +29,7 @@
                 <!-- 第三行：其他组件区域 (30%) -->
                 <div class="components-3row">
                     <div class="component-half">
-                        <OneProdLine />
+                        <PersonBadIssues />
                     </div>
                 </div>
             </div>
@@ -47,11 +47,12 @@ import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
 import WorkOrderClosingRate from '../component/WorkOrderClosingRate.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
+import PersonBadIssues from './PersonBadIssues.vue'
 import { getMetalworkingEfficiency } from '@/api/getStampinfo'
 import { getTodayProduction, getMonthProduction } from '@/api/getStampWeldinfo'
 import { eventBus } from '@/utils/eventbus'
 // import { getDayPlanDone, getDayPlanDoneTotal } from '@/api/getStampWeldinfo'
-import OneProdLine from './oneProdLine.vue'
+// import OneProdLine from './oneProdLine.vue'
 // const route = useRoute()
 const prodLine = ref('8')
 

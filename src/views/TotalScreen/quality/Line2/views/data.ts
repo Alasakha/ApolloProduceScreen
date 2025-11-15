@@ -12,10 +12,7 @@ export function createChartOption(title: string, rawData: any) {
       : rawData.map((item: any) => item.value || 0);
   
     // 颜色数组，循环使用
-    const colors = [
-      '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-      '#FF1654'
-    ];
+    const colors = ["#006cff"];
   
     return {
       color: colors,

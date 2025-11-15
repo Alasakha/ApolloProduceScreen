@@ -1,5 +1,3 @@
-
-
 // chartOption.ts
 export function createChartOption(data: any[] = []) {
   const categories = data.map((item) => item?.label || '');
@@ -32,7 +30,7 @@ export function createChartOption(data: any[] = []) {
       }
     },
     legend: {
-      data: ['功性能数量', '他数量'],
+      data: ['功性能数量', '其它数量'],
       textStyle: {
         color: '#cfd8ff'
       }
@@ -88,7 +86,7 @@ export function createChartOption(data: any[] = []) {
         }
       },
       {
-        name: '他数量',
+        name: '其它数量',
         type: 'bar',
         barWidth: 18,
         data: nonPerformanceData,

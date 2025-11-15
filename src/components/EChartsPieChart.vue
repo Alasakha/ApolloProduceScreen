@@ -20,13 +20,16 @@ export interface PieChartItem {
 interface Props {
     data: PieChartItem[]
     title?: string
-    radius?: string | number
+    radius?: string | number | [string | number, string | number]
     center?: [string | number, string | number]
     showLabel?: boolean
     showValue?: boolean
     showPointer?: boolean
     emptyText?: string
     emptyTextColor?: string
+    startAngle?: number
+    endAngle?: number
+    showLegend?: boolean
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -37,7 +40,10 @@ const props = withDefaults(defineProps<Props>(), {
     showValue: true,
     showPointer: true,
     emptyText: '暂无数据',
-    emptyTextColor: '#909399'
+    emptyTextColor: '#909399',
+    startAngle: undefined,
+    endAngle: undefined,
+    showLegend: true
 })
 
 // 定义事件
@@ -82,23 +88,25 @@ const initChart = () => {
     window.addEventListener('resize', handleResize)
 }
 
+// 当没有有效数据时，创建一个默认的"暂无数据"项
+const chartData = computed(() => {
+    const hasData = props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
+    if (hasData) {
+        return props.data
+    } else {
+        // value 设为 1 才能显示半环，0 不会显示
+        return [{
+            name: '暂无数据',
+            value: 1,
+            color: '#279f27' // 绿色
+        }]
+    }
+})
+
 // 获取图表配置
 const getChartOption = (): EChartsOption => {
     // 检查是否有数据
     const hasData = props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
-
-// 当没有有效数据时，创建一个默认的"暂无数据"项
-const chartData = computed(() => {
-    if (hasData) {
-        return props.data
-    } else {
-        return [{
-            name: '暂无数据',
-            value: 0,
-            color: '#3b7032' // 环保绿色
-        }]
-    }
-})
     
     return {
         title: props.title ? {
@@ -126,7 +134,7 @@ const chartData = computed(() => {
             }
         },
         
-        legend: {
+        legend: props.showLegend ? {
             orient: 'vertical',
             left: 'left',
             top: 'middle',
@@ -138,7 +146,7 @@ const chartData = computed(() => {
             itemGap: 8,
             itemWidth: 14,
             itemHeight: 14
-        },
+        } : undefined,
         
         series: [
             {
@@ -146,6 +154,8 @@ const chartData = computed(() => {
                 type: 'pie',
                 radius: props.radius,
                 center: props.center,
+                startAngle: props.startAngle,
+                endAngle: props.endAngle,
                 data: chartData.value.map((item, index) => ({
                     name: item.name,
                     value: item.value,
@@ -153,10 +163,23 @@ const chartData = computed(() => {
                         color: item.color || defaultColors[index % defaultColors.length]
                     }
                 })),
+                // 当没有数据时，隐藏标签线
+                labelLine: hasData ? {
+                    show: props.showLabel && props.showPointer,
+                    length: 15,
+                    length2: 10,
+                    smooth: true,
+                    lineStyle: {
+                        color: '#666',
+                        width: 2
+                    }
+                } : {
+                    show: false
+                },
                 
                 // 标签配置 - 优化字体颜色和可读性
                 label: {
-                    show: props.showLabel,
+                    show: hasData ? props.showLabel : false, // 无数据时隐藏标签
                     position: 'outside',
                     formatter: (params: any) => {
                         if (props.showValue && props.showPointer) {
@@ -177,18 +200,6 @@ const chartData = computed(() => {
                     textShadowBlur: 2,
                     textShadowOffsetX: 1,
                     textShadowOffsetY: 1
-                },
-                
-                // 标签线配置
-                labelLine: {
-                    show: props.showLabel && props.showPointer,
-                    length: 15,
-                    length2: 10,
-                    smooth: true,
-                    lineStyle: {
-                        color: '#666',
-                        width: 2
-                    }
                 },
                 
                 // 高亮效果
@@ -216,17 +227,17 @@ const chartData = computed(() => {
             }
         ],
         
-        // 空数据时的处理
+        // 空数据时的处理 - 在图表中心显示"暂无数据"文字
         graphic: hasData ? undefined : [
             {
                 type: 'text',
                 left: 'center',
-                top: 'middle',
+                top: 'center',
                 style: {
                     text: props.emptyText,
-                    fontSize: 16,
+                    fontSize: 18,
                     fontWeight: 'bold',
-                    fill: props.emptyTextColor
+                    fill: props.emptyTextColor || '#279f27'
                 }
             }
         ]

@@ -192,14 +192,15 @@ function transformOrderSettlementData(
   
   return {
     description: [
+    { label: '工单完结率目标', value: aClassTargetRate },
       { label: 'A类:月度累计排产工单', value: formatNumber(aClassPlanTotal) },
       { label: '累计准交工单', value: formatNumber(aClassCompletedTotal) },
-      { label: '结单率', value: aClassRate },
-      { label: '工单目标结单率', value: aClassTargetRate },
+      { label: '目标达成率', value: aClassRate },
+      { label: '工单完结率目标', value: regularTargetRate },
       { label: '常规:月度累计排产工单', value: formatNumber(regularPlanTotal) },
       { label: '累计准交工单', value: formatNumber(regularCompletedTotal) },
-      { label: '结单率', value: regularRate },
-      { label: '工单目标结单率', value: regularTargetRate }
+      { label: '目标达成率', value: regularRate },
+   
     ]
     // 注意：chartData 需要其他接口或历史数据，暂时保持原有数据
   }
@@ -247,6 +248,7 @@ async function fetchDepartment1OrderSettlement() {
 // 获取总装二课工单结单率数据
 async function fetchDepartment2OrderSettlement() {
   try {
+
     department2Loading.value['1'] = true
     const { startDate, endDate } = getDateRange()
     const response = await getOrderSettlementPerformance('总装二课', startDate, endDate)
@@ -606,9 +608,9 @@ function transformEfficiencyData(
 
   return {
     description: [
-      { label: '人效达成率标准', value: standard + '%' },
+      { label: '人效达成率目标', value: standard + '%' },
       { label: '实际达成', value: actualAchievement },
-      { label: '达成率', value: achievementRate }
+      { label: '目标达成率', value: achievementRate }
     ]
   }
 }

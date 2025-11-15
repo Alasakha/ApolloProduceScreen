@@ -2,7 +2,7 @@
   <div class="plan-container">
     <!-- 生产计划进度 -->
     <div class="section">
-      <div class="section-title">生产计划进度</div>
+
       <div v-if="loading" class="loading-text">加载中...</div>
       <div v-else-if="monthlyData.length === 0" class="empty-text">暂无数据</div>
       <div v-else class="device-list">
@@ -13,8 +13,9 @@
               :key="currentMonthlyIndex"
               class="device-item"
             >
-              <div class="device-name">{{ monthlyData[currentMonthlyIndex]?.machName }}</div>
+              <!-- <div class="device-name">{{ monthlyData[currentMonthlyIndex]?.machName }}</div> -->
               <div class="device-data">
+                <div class="section-title">生产计划进度</div>
                 <div class="data-item">
                   <span class="label">计划数</span>
                   <span class="value">{{ monthlyData[currentMonthlyIndex]?.pg }}</span>
@@ -43,43 +44,31 @@
     </div>
 
     <!-- 日计划完成情况 -->
-    <div class="section">
+    <div class="section daily-section">
       <div class="section-title">日计划完成情况</div>
       <div v-if="loading" class="loading-text">加载中...</div>
       <div v-else-if="dailyData.length === 0" class="empty-text">暂无数据</div>
       <div v-else class="device-list">
-        <div class="carousel-wrapper">
-          <transition name="fade" mode="out-in">
-            <div 
-              v-if="currentDailyIndex < dailyData.length"
-              :key="currentDailyIndex"
-              class="device-item"
-            >
-              <div class="device-name">{{ dailyData[currentDailyIndex]?.machName }}</div>
-              <div class="device-data">
-                <div class="data-item">
-                  <span class="label">计划数</span>
-                  <span class="value">{{ dailyData[currentDailyIndex]?.pg }}</span>
-                </div>
-                <div class="data-item">
-                  <span class="label">完成数</span>
-                  <span class="value">{{ dailyData[currentDailyIndex]?.done }}</span>
-                </div>
-                <div class="data-item">
-                  <span class="label">完成率</span>
-                  <span class="value">{{ dailyData[currentDailyIndex]?.rate }}%</span>
-                </div>
-              </div>
+        <div 
+          v-for="(item, index) in dailyData" 
+          :key="index"
+          class="device-item"
+        >
+          <div class="device-name">{{ item.machName }}</div>
+          <div class="device-data">
+            <div class="data-item">
+              <span class="label">计划数</span>
+              <span class="value">{{ item.pg }}</span>
             </div>
-          </transition>
-        </div>
-        <!-- 指示器 -->
-        <div v-if="dailyData.length > 1" class="carousel-indicators">
-          <span 
-            v-for="(_, index) in dailyData" 
-            :key="index"
-            :class="['indicator', { active: index === currentDailyIndex }]"
-          ></span>
+            <div class="data-item">
+              <span class="label">完成数</span>
+              <span class="value">{{ item.done }}</span>
+            </div>
+            <div class="data-item">
+              <span class="label">完成率</span>
+              <span class="value">{{ item.rate }}%</span>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -104,9 +93,7 @@ const dailyData = ref<Array<ProductionScheduleProgressItem & { rate: number }>>(
 
 // 轮播相关
 const currentMonthlyIndex = ref(0)
-const currentDailyIndex = ref(0)
 const monthlyTimer = ref<NodeJS.Timeout | null>(null)
-const dailyTimer = ref<NodeJS.Timeout | null>(null)
 
 // 轮播间隔时间（毫秒），默认3秒
 const carouselInterval = 3000
@@ -141,7 +128,6 @@ const processPropData = () => {
     
     // 重置轮播索引
     currentMonthlyIndex.value = 0
-    currentDailyIndex.value = 0
     
     // 启动轮播
     startCarousel()
@@ -216,7 +202,6 @@ const fetchData = async () => {
       
       // 重置轮播索引
       currentMonthlyIndex.value = 0
-      currentDailyIndex.value = 0
       
       // 启动轮播
       startCarousel()
@@ -250,13 +235,6 @@ const startCarousel = () => {
       currentMonthlyIndex.value = (currentMonthlyIndex.value + 1) % monthlyData.value.length
     }, carouselInterval)
   }
-  
-  // 今日数据轮播
-  if (dailyData.value.length > 1) {
-    dailyTimer.value = setInterval(() => {
-      currentDailyIndex.value = (currentDailyIndex.value + 1) % dailyData.value.length
-    }, carouselInterval)
-  }
 }
 
 // 停止轮播
@@ -264,10 +242,6 @@ const stopCarousel = () => {
   if (monthlyTimer.value) {
     clearInterval(monthlyTimer.value)
     monthlyTimer.value = null
-  }
-  if (dailyTimer.value) {
-    clearInterval(dailyTimer.value)
-    dailyTimer.value = null
   }
 }
 
@@ -292,7 +266,7 @@ onBeforeUnmount(() => {
   background: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
   padding: 8px 12px;
-  display: flex;
+  /* display: flex; */
   flex-direction: column;
   gap: 10px;
   justify-content: space-between;
@@ -301,11 +275,21 @@ onBeforeUnmount(() => {
 
 .section {
   display: flex;
-  flex-direction: column;
+  /* flex-direction: column; */
   gap: 6px;
   flex: 1;
   min-height: 0;
-  overflow-y: auto;
+  /* overflow-y: auto; */
+  align-items: center;
+}
+
+.daily-section {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 6px;
+  min-height: 0;
+  flex: 1;
+  overflow: hidden;
 }
 
 .section-title {
@@ -316,6 +300,12 @@ onBeforeUnmount(() => {
   border-bottom: 1px solid rgba(114, 240, 245, 0.3);
   line-height: 1.2;
   flex-shrink: 0;
+}
+
+.daily-section .section-title {
+  font-size: 12px;
+  padding-bottom: 3px;
+  margin-bottom: 2px;
 }
 
 .loading-text,
@@ -330,16 +320,17 @@ onBeforeUnmount(() => {
 .device-list {
   display: flex;
   flex-direction: column;
-  gap: 8px;
+  gap: 6px;
   flex: 1;
-  overflow: hidden;
+  overflow-y: auto;
+  overflow-x: hidden;
   position: relative;
 }
 
 .carousel-wrapper {
   flex: 1;
   position: relative;
-  min-height: 100px;
+  /* min-height: 100px; */
 }
 
 .device-item {
@@ -353,6 +344,7 @@ onBeforeUnmount(() => {
   border-radius: 4px;
   width: 100%;
 }
+
 
 .device-item:hover {
   background: rgba(114, 240, 245, 0.1);
@@ -373,6 +365,7 @@ onBeforeUnmount(() => {
   text-align: left;
 }
 
+
 .device-data {
   display: flex;
   flex-wrap: wrap;
@@ -382,9 +375,10 @@ onBeforeUnmount(() => {
   justify-content: flex-start;
 }
 
+
 .data-item {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: center;
   justify-content: center;
   gap: 3px;
@@ -396,6 +390,7 @@ onBeforeUnmount(() => {
   flex: 1;
   transition: all 0.3s ease;
 }
+
 
 .data-item:hover {
   background: rgba(114, 240, 245, 0.2);
@@ -417,6 +412,7 @@ onBeforeUnmount(() => {
   text-shadow: 0 1px 2px rgba(21, 101, 192, 0.3);
   line-height: 1.2;
 }
+
 
 /* 响应式设计 */
 @media (max-width: 768px) {
