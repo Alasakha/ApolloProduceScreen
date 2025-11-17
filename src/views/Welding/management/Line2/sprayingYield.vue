@@ -1,7 +1,7 @@
 <template>
     <div class="yield-container" @click="openDialog">
         <div class="yield-title">
-            <h3 class="3xl:text-sm">喷涂直通率</h3>
+            <h3>喷涂直通率</h3>
             <!-- <div class="click-note 3xl:text-xs ">(点击进入可以查看和编辑不合格问题明细)</div> -->
         </div>
         <div class="yield-content">
@@ -205,6 +205,121 @@ onBeforeUnmount(() => {
     flex: 1;
     text-align: center;
     font-weight: 600;
+    font-size: 14px;
+}
+
+/* 1080p (1920px) */
+@media (min-width: 1920px) {
+    .yield-title {
+        padding: 10px 14px;
+    }
+    
+    .yield-title h3 {
+        font-size: 16px;
+    }
+    
+    .yield-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    
+    .part-section {
+        padding: 10px;
+        gap: 18px;
+    }
+    
+    .part-header {
+        font-size: 16px;
+    }
+    
+    .metrics-line {
+        gap: 18px;
+    }
+    
+    .metric-item {
+        gap: 6px;
+    }
+    
+    .metric-label-inline,
+    .metric-value {
+        font-size: 14px;
+    }
+}
+
+/* 2K (2560px) */
+@media (min-width: 2060px) {
+    .yield-title {
+        padding: 12px 16px;
+    }
+    
+    .yield-title h3 {
+        font-size: 16px;
+    }
+    
+    .yield-content {
+        padding: 12px;
+        gap: 12px;
+    }
+    
+    .part-section {
+        padding: 12px;
+        gap: 20px;
+    }
+    
+    .part-header {
+        font-size: 28px;
+    }
+    
+    .metrics-line {
+        gap: 20px;
+    }
+    
+    .metric-item {
+        gap: 8px;
+    }
+    
+    .metric-label-inline,
+    .metric-value {
+        font-size: 26px;
+    }
+}
+
+/* 4K (3840px) */
+@media (min-width: 3800px) {
+    .yield-title {
+        padding: 16px 20px;
+    }
+    
+    .yield-title h3 {
+        font-size: 24px;
+    }
+    
+    .yield-content {
+        padding: 16px;
+        gap: 16px;
+    }
+    
+    .part-section {
+        padding: 16px;
+        gap: 24px;
+    }
+    
+    .part-header {
+        font-size: 29px;
+    }
+    
+    .metrics-line {
+        gap: 24px;
+    }
+    
+    .metric-item {
+        gap: 10px;
+    }
+    
+    .metric-label-inline,
+    .metric-value {
+        font-size: 25px;
+    }
 }
 
 .click-note {
@@ -223,9 +338,10 @@ onBeforeUnmount(() => {
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0;
+    gap: 8px;
     padding: 8px;
     background: rgba(0, 0, 0, 0.1);
+    overflow: hidden;
 }
 
 .metrics-labels {
@@ -244,19 +360,16 @@ onBeforeUnmount(() => {
     border-radius: 0;
     padding: 8px;
     border: 1px solid #279f27;
-    margin-bottom: 8px;
     display: flex;
     flex-direction: row;
     align-items: center;
     gap: 16px;
-}
-
-.part-section:last-child {
-    margin-bottom: 0;
+    flex: 1;
+    min-height: 0;
 }
 
 .part-header {
-    font-size: 14px;
+    /* font-size: 14px; */
     font-weight: 600;
     color: #279f27;
     margin-bottom: 0;
@@ -289,15 +402,15 @@ onBeforeUnmount(() => {
 }
 
 .metric-label-inline {
-    font-size: 12px;
+    /* font-size: 12px; */
     color: white;
     font-weight: 500;
 }
 
 .metric-value {
-    font-size: 12px;
+    /* font-size: 12px; */
     color: white;
-    font-weight: 500;
+    /* font-weight: 500; */
 }
 
 

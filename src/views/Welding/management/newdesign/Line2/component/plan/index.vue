@@ -49,6 +49,22 @@
       <div v-if="loading" class="loading-text">加载中...</div>
       <div v-else-if="dailyData.length === 0" class="empty-text">暂无数据</div>
       <div v-else class="device-list">
+        <!-- 表头 -->
+        <div class="device-item device-header">
+          <div class="device-name">号站</div>
+          <div class="device-data">
+            <div class="data-item">
+              <span class="value">计划数</span>
+            </div>
+            <div class="data-item">
+              <span class="value">完成数</span>
+            </div>
+            <div class="data-item">
+              <span class="value">完成率</span>
+            </div>
+          </div>
+        </div>
+        <!-- 数据行 -->
         <div 
           v-for="(item, index) in dailyData" 
           :key="index"
@@ -57,15 +73,12 @@
           <div class="device-name">{{ item.machName }}</div>
           <div class="device-data">
             <div class="data-item">
-              <span class="label">计划数</span>
               <span class="value">{{ item.pg }}</span>
             </div>
             <div class="data-item">
-              <span class="label">完成数</span>
               <span class="value">{{ item.done }}</span>
             </div>
             <div class="data-item">
-              <span class="label">完成率</span>
               <span class="value">{{ item.rate }}%</span>
             </div>
           </div>
@@ -353,6 +366,20 @@ onBeforeUnmount(() => {
   box-shadow: 0 2px 6px rgba(114, 240, 245, 0.15);
 }
 
+.device-header {
+  background: rgba(114, 240, 245, 0.15);
+  border-color: rgba(114, 240, 245, 0.4);
+  font-weight: 600;
+  cursor: default;
+}
+
+.device-header:hover {
+  background: rgba(114, 240, 245, 0.15);
+  border-color: rgba(114, 240, 245, 0.4);
+  transform: none;
+  box-shadow: none;
+}
+
 .device-name {
   color: #72f0f5;
   font-size: 12px;
@@ -413,6 +440,165 @@ onBeforeUnmount(() => {
   line-height: 1.2;
 }
 
+.device-header .data-item .value {
+  font-size: 12px;
+  font-weight: 600;
+  opacity: 0.95;
+}
+
+
+/* 1080p (1920px) */
+@media (min-width: 1920px) {
+  .plan-container {
+    padding: 10px 14px;
+    gap: 12px;
+  }
+  
+  .section-title {
+    font-size: 15px;
+  }
+  
+  .daily-section .section-title {
+    font-size: 14px;
+  }
+  
+  .device-item {
+    padding: 10px;
+    gap: 14px;
+  }
+  
+  .device-name {
+    font-size: 14px;
+  }
+  
+  .device-data {
+    gap: 8px;
+  }
+  
+  .data-item {
+    padding: 6px 12px;
+    gap: 4px;
+  }
+  
+  .data-item .label {
+    font-size: 12px;
+  }
+  
+  .data-item .value {
+    font-size: 16px;
+  }
+  
+  .device-header .data-item .value {
+    font-size: 14px;
+  }
+  
+  .loading-text,
+  .empty-text {
+    font-size: 14px;
+  }
+}
+
+/* 2K (2060px) */
+@media (min-width: 2060px) {
+  .plan-container {
+    padding: 12px 16px;
+    gap: 14px;
+  }
+  
+  .section-title {
+    font-size: 18px;
+  }
+  
+  .daily-section .section-title {
+    font-size: 16px;
+  }
+  
+  .device-item {
+    padding: 12px;
+    gap: 16px;
+  }
+  
+  .device-name {
+    font-size: 18px;
+  }
+  
+  .device-data {
+    gap: 10px;
+  }
+  
+  .data-item {
+    padding: 8px 14px;
+    gap: 6px;
+  }
+  
+  .data-item .label {
+    font-size: 14px;
+  }
+  
+  .data-item .value {
+    font-size: 18px;
+  }
+  
+  .device-header .data-item .value {
+    font-size: 18px;
+  }
+  
+  .loading-text,
+  .empty-text {
+    font-size: 16px;
+  }
+}
+
+/* 4K (3800px) */
+@media (min-width: 3800px) {
+  .plan-container {
+    padding: 16px 20px;
+    gap: 16px;
+  }
+  
+  .section-title {
+    font-size: 22px;
+  }
+  
+  .daily-section .section-title {
+    font-size: 20px;
+  }
+  
+  .device-item {
+    padding: 16px;
+    gap: 20px;
+  }
+  
+  .device-name {
+    font-size: 22px;
+  }
+  
+  .device-data {
+    gap: 12px;
+  }
+  
+  .data-item {
+    padding: 10px 16px;
+    gap: 8px;
+  }
+  
+  .data-item .label {
+    font-size: 20px;
+  }
+  
+  .data-item .value {
+    font-size: 26px;
+  }
+  
+  .device-header .data-item .value {
+    font-size: 22px;
+  }
+  
+  .loading-text,
+  .empty-text {
+    font-size: 20px;
+  }
+}
 
 /* 响应式设计 */
 @media (max-width: 768px) {

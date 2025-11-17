@@ -14,7 +14,7 @@
                         />
                     </div>
                     <div class="component-half">
-                        <WorkOrderClosingRate />
+                        <WorkOrderClosingRate :work-order-data-prop="workOrderData" />
                     </div>
                 </div>
 
@@ -59,6 +59,31 @@ const prodLine = ref('8')
 // 日生产计划和月生产计划数据
 const dailyPlanData = ref<any>(null)
 const monthlyPlanData = ref<any>(null)
+
+// 工单结单率 mock 数据
+const workOrderData = ref({
+  categoryData: {
+    categoryA: {
+      shouldComplete: 8,        // 今日应完结工单数（A类）
+      onTimeComplete: 7,        // 今日及时完结数（A类）
+      completionRate: 87.5,    // 完结率（A类）
+      canClick: true
+    },
+    regular: {
+      shouldComplete: 7,        // 今日应完结工单数（常规）
+      onTimeComplete: 5,        // 今日及时完结数（常规）
+      completionRate: 71.4,    // 完结率（常规）
+      canClick: true
+    }
+  },
+  // 保留原有字段用于兼容
+  monthCompletedOrders: 125,
+  onTimeOrders: 98,
+  closingRate: 78.4,
+  todayCompletedOnTime: 15,
+  todayOnTimeCompleted: 12,
+  todayClosingRate: 80.0
+})
 
 // 获取日生产计划和月生产计划数据
 const fetchPlanData = async () => {
