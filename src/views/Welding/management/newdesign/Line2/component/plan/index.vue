@@ -15,7 +15,7 @@
             >
               <!-- <div class="device-name">{{ monthlyData[currentMonthlyIndex]?.machName }}</div> -->
               <div class="device-data">
-                <div class="section-title">生产计划进度</div>
+                <div class="section-title">月度生产计划进度</div>
                 <div class="data-item">
                   <span class="label">计划数</span>
                   <span class="value">{{ monthlyData[currentMonthlyIndex]?.pg }}</span>
@@ -26,7 +26,7 @@
                 </div>
                 <div class="data-item">
                   <span class="label">完成率</span>
-                  <span class="value">{{ monthlyData[currentMonthlyIndex]?.rate }}%</span>
+                  <span class="value">{{ formatRate(monthlyData[currentMonthlyIndex]?.rate) }}%</span>
                 </div>
               </div>
             </div>
@@ -45,16 +45,17 @@
 
     <!-- 日计划完成情况 -->
     <div class="section daily-section">
-      <div class="section-title">日计划完成情况</div>
+
       <div v-if="loading" class="loading-text">加载中...</div>
       <div v-else-if="dailyData.length === 0" class="empty-text">暂无数据</div>
       <div v-else class="device-list">
         <!-- 表头 -->
         <div class="device-item device-header">
-          <div class="device-name">号站</div>
+          <!-- <div class="device-name">号站</div> -->
           <div class="device-data">
-            <div class="data-item">
-              <span class="value">计划数</span>
+            <div class="section-title mt-4">日计划完成情况</div>
+            <div class="data-item ml-[2%]">
+              <span class="value">PMC日机台排产数</span>
             </div>
             <div class="data-item">
               <span class="value">完成数</span>
@@ -76,10 +77,10 @@
               <span class="value">{{ item.pg }}</span>
             </div>
             <div class="data-item">
-              <span class="value">{{ item.done }}</span>
+              <span class="value">{{ item.done > 0 ? item.done : '未开机' }}</span>
             </div>
             <div class="data-item">
-              <span class="value">{{ item.rate }}%</span>
+              <span class="value">{{ Number(formatRate(item.rate)) > 0? formatRate(item.rate)+'%' : '未开机' }}</span>
             </div>
           </div>
         </div>
@@ -99,6 +100,14 @@ const props = defineProps<{
   dailyDataProp?: any  // 日数据
   monthlyDataProp?: any  // 月数据
 }>()
+
+// 格式化完成率：如果小数部分为0则省略小数点
+const formatRate = (rate: number | undefined | null): string => {
+  const value = rate ?? 0
+  const formatted = value.toFixed(1)
+  // 如果小数部分为0，去掉小数点
+  return formatted.replace(/\.0$/, '')
+}
 
 const loading = ref(false)
 const monthlyData = ref<Array<ProductionScheduleProgressItem & { rate: number }>>([])
@@ -123,7 +132,9 @@ const processPropData = () => {
       pgDetailList: null,
       rate: 0
     }
-    dailyItem.rate = dailyItem.pg > 0 ? Math.round((dailyItem.done / dailyItem.pg) * 100) : 0
+dailyItem.rate = dailyItem.pg > 0 
+  ? parseFloat(((dailyItem.done / dailyItem.pg) * 100).toFixed(1))
+  : 0
     
     // 处理月数据
     const monthlyItem: ProductionScheduleProgressItem & { rate: number } = {
@@ -134,7 +145,7 @@ const processPropData = () => {
       pgDetailList: null,
       rate: 0
     }
-    monthlyItem.rate = monthlyItem.pg > 0 ? Math.round((monthlyItem.done / monthlyItem.pg) * 100) : 0
+    monthlyItem.rate = monthlyItem.pg > 0 ? parseFloat(((monthlyItem.done / monthlyItem.pg) * 100).toFixed(1)) : 0
     
     dailyData.value = [dailyItem]
     monthlyData.value = [monthlyItem]
@@ -200,14 +211,14 @@ const fetchData = async () => {
         .filter(item => item.type === 1)
         .map(item => ({
           ...item,
-          rate: item.pg > 0 ? Math.round((item.done / item.pg) * 100) : 0
+          rate: item.pg > 0 ? parseFloat(((item.done / item.pg) * 100).toFixed(1)) : 0
         }))
       
       const daily = allItems
         .filter(item => item.type === 2)
         .map(item => ({
           ...item,
-          rate: item.pg > 0 ? Math.round((item.done / item.pg) * 100) : 0
+          rate: item.pg > 0 ? parseFloat(((item.done / item.pg) * 100).toFixed(1)) : 0
         }))
 
       monthlyData.value = monthly
@@ -463,12 +474,12 @@ onBeforeUnmount(() => {
   }
   
   .device-item {
-    padding: 10px;
+    /* padding: 10px; */
     gap: 14px;
   }
   
   .device-name {
-    font-size: 14px;
+    font-size: 12px;
   }
   
   .device-data {
@@ -476,20 +487,21 @@ onBeforeUnmount(() => {
   }
   
   .data-item {
-    padding: 6px 12px;
+    padding: 2px 6px;
     gap: 4px;
   }
   
   .data-item .label {
-    font-size: 12px;
+    font-size: 10px;
   }
   
   .data-item .value {
-    font-size: 16px;
+    font-size: 12px;
   }
   
   .device-header .data-item .value {
-    font-size: 14px;
+    font-size: 12px;
+    padding: 0px;
   }
   
   .loading-text,
@@ -514,20 +526,20 @@ onBeforeUnmount(() => {
   }
   
   .device-item {
-    padding: 12px;
+    /* padding: 12px; */
     gap: 16px;
   }
   
   .device-name {
-    font-size: 18px;
+    font-size: 15px;
   }
   
   .device-data {
-    gap: 10px;
+    gap: 12px;
   }
   
   .data-item {
-    padding: 8px 14px;
+    padding: 4px 7px;
     gap: 6px;
   }
   

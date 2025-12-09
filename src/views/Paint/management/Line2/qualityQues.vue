@@ -2,9 +2,9 @@
     <div class="quality-container w-full h-full p-2">
         <div class="quality-title">
             <div class="title-content">
-                <div class="text-lg font-bold text-white mb-1 text-center" style="letter-spacing: 2px;">
+                <!-- <div class="text-lg font-bold text-white mb-1 text-center" style="letter-spacing: 2px;">
                     今日质量TOP问题
-                </div>
+                </div> -->
             </div>
             <el-button 
                 type="primary" 
@@ -16,19 +16,10 @@
             </el-button>
         </div>
         <div class="chart-container">
-            <EChartsPieChart
-                :data="chartData"
-                :title="chartConfig.title"
-                :radius="chartConfig.radius"
-                :center="chartConfig.center"
-                :show-label="chartConfig.showLabel"
-                :show-value="chartConfig.showValue"
-                :show-pointer="chartConfig.showPointer"
-                :empty-text="chartData && chartData.length > 0 ? '' : '→ 暂无数据'"
-                :empty-text-color="'#00ff00'"
-                @click="handleChartClick"
-                ref="pieChartRef"
-            />
+            <div ref="chartRef" class="echarts-container"></div>
+            <div v-if="!hasValidChartData" class="empty-overlay">
+                暂无数据
+            </div>
         </div>
         
         <!-- 明细Dialog -->
@@ -115,20 +106,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed,onUnmounted  } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch, nextTick } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import EChartsPieChart from '@/components/EChartsPieChart.vue'
-import type { PieChartItem } from '@/components/EChartsPieChart.vue'
 import { getTodayBadIssues, getTodayBadIssuesDetail, type TodayBadIssues } from '@/api/getStampWeldinfo'
 import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
 import { useRoute } from 'vue-router'
+import { useEcharts } from '@/utils/useEcharts'
+import { createChartOption } from '../components/data'
 
 const route = useRoute()
 const prodLine = route.query.prodLine as string
 
 // 图表引用
-const pieChartRef = ref()
+const chartRef = ref<HTMLElement | null>(null)
+const { initChart, setOption, onClick, offClick } = useEcharts(chartRef)
 
 // Dialog控制
 const dialogVisible = ref(false)
@@ -149,19 +141,36 @@ const currentRowUid = ref('')
 // 真实API数据
 const apiData = ref<TodayBadIssues[]>([])
 
+const normalizeTotal = (value: unknown): number => {
+    if (value === null || value === undefined) return 0
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+
+    const numeric = Number(
+        String(value)
+            .replace(/,/g, '')
+            .replace(/[^0-9.-]/g, '')
+    )
+    return Number.isFinite(numeric) ? numeric : 0
+}
+
 // 图表数据 - 从API数据转换
-const chartData = computed((): PieChartItem[] => {
+const pieSeriesData = computed(() => {
     if (!apiData.value || apiData.value.length === 0) {
         return []
     }
-    
-    // 将API数据转换为图表数据格式
-    return apiData.value.map((item, index) => ({
-        name: item.ngName,
-        value: item.total,
-        color: getDefaultColor(index)
-    }))
+
+    const validData = apiData.value
+        .map((item, index) => ({
+            name: item.ngName || `问题${index + 1}`,
+            value: normalizeTotal(item.total),
+            itemStyle: { color: getDefaultColor(index) }
+        }))
+        .filter(item => item.value > 0)
+
+    return validData
 })
+
+const hasValidChartData = computed(() => pieSeriesData.value.length > 0)
 
 // 获取默认颜色
 const getDefaultColor = (index: number): string => {
@@ -172,26 +181,6 @@ const getDefaultColor = (index: number): string => {
     ]
     return colors[index % colors.length]
 }
-
-// 图表配置 - 优化字体颜色和可读性
-const chartConfig = computed(() => ({
-    title: '质量TOP问题分布',
-    radius: '70%',
-    center: ['50%', '50%'] as [string, string],
-    showLabel: true,
-    showValue: true,
-    showPointer: true,
-    theme: 'dark',
-    // 自定义颜色配置，确保高对比度
-    colors: [
-        '#FF6B6B', // 红色 - 高对比度
-        '#4ECDC4', // 青色 - 高对比度
-        '#45B7D1', // 蓝色 - 高对比度
-        '#96CEB4', // 绿色 - 高对比度
-        '#FFC53D', // 黄色 - 高对比度
-        '#B37FEB'  // 紫色 - 高对比度
-    ]
-}))
 
 // 获取今日不良TOP问题数据
 const fetchTodayBadIssues = async () => {
@@ -217,6 +206,11 @@ const fetchTodayBadIssues = async () => {
 
 // 处理图表点击
 const handleChartClick = (params: any) => {
+    if (!hasValidChartData.value) {
+        console.warn('⚠️ 当前无有效数据，忽略点击事件')
+        return
+    }
+
     console.log('🎯 Paint组件收到图表点击事件:', params)
     console.log('点击参数详情:', {
         name: params.name,
@@ -233,6 +227,20 @@ const handleChartClick = (params: any) => {
         console.warn('⚠️ 点击事件缺少name参数:', params)
     }
 }
+
+const updateChartOption = () => {
+    nextTick(() => {
+        initChart()
+        const option = createChartOption('质量TOP问题分布', pieSeriesData.value)
+        setOption(option)
+        offClick(handleChartClick)
+        onClick(handleChartClick)
+    })
+}
+
+watch(pieSeriesData, () => {
+    updateChartOption()
+}, { immediate: true })
 
 // 打开明细Dialog
 const openDetailDialog = (category: string) => {
@@ -421,11 +429,28 @@ const handleReasonDialogClose = () => {
     display: flex;
     justify-content: center;
     align-items: center;
+    position: relative;
     width: 100%;
     min-height: 0; /* 允许容器收缩 */
     padding: 8px;
     box-sizing: border-box;
 
+}
+
+.echarts-container {
+    width: 100%;
+    height: 100%;
+}
+
+.empty-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ff00;
+    font-size: 16px;
+    font-weight: bold;
+    pointer-events: none;
 }
 
 .description-box {

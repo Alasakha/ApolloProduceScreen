@@ -1,7 +1,7 @@
 <template>
     <!-- 留出标题的高度 -->
      <!-- <div class="h-[3vh] w-full flex justify-center items-center"></div> -->
-    <div class="h-[40vh] w-full flex justify-center items-center pl-1 mt-8 gap-4">
+    <div class="h-[35vh] w-full flex justify-center items-center pl-1 mt-2 gap-4">
         <Left></Left>
         <Middle></Middle>
         <Right></Right>

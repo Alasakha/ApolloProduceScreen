@@ -209,6 +209,7 @@ onBeforeUnmount(() => {
 }
 
 /* 1080p (1920px) */
+/* 1080p (1920px) */
 @media (min-width: 1920px) {
     .yield-title {
         padding: 10px 14px;
@@ -267,7 +268,7 @@ onBeforeUnmount(() => {
     }
     
     .part-header {
-        font-size: 28px;
+        font-size: 22px;
     }
     
     .metrics-line {
@@ -280,7 +281,7 @@ onBeforeUnmount(() => {
     
     .metric-label-inline,
     .metric-value {
-        font-size: 26px;
+        font-size: 17px;
     }
 }
 

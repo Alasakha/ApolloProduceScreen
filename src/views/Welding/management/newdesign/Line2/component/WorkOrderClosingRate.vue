@@ -12,11 +12,11 @@
       @row-click="handleRowClick"
       class="work-order-table"
     >
-      <el-table-column prop="project" label="项目" width="100" align="center" />
-      <el-table-column prop="category" label="分类" width="100" align="center" />
-      <el-table-column prop="shouldComplete" label="应完成数" align="center" />
-      <el-table-column prop="onTimeComplete" label="及时完成数" align="center" />
-      <el-table-column prop="completionRate" label="完结率" align="center">
+      <el-table-column prop="project" label="项目" min-width="50" align="center" />
+      <el-table-column prop="category" label="分类" min-width="50" align="center" />
+      <el-table-column prop="shouldComplete" label="应完成数" min-width="70" align="center" />
+      <el-table-column prop="onTimeComplete" label="及时完成数" min-width="80" align="center" />
+      <el-table-column prop="completionRate" label="完结率" min-width="60" align="center">
         <template #default="scope">
           <span>{{ scope.row.completionRate }}%</span>
         </template>
@@ -35,19 +35,11 @@
       class="detail-dialog"
     >
       <div class="detail-content">
-        <div v-if="dialogLoading" class="loading-container">
-          <el-icon class="is-loading"><Loading /></el-icon>
-          <span>数据加载中...</span>
-        </div>
-        
         <el-table 
-          v-else 
           :data="detailData" 
           border 
           style="width: 100%"
-          :empty-text="errorMessage || '暂无数据'"
-          v-loading="dialogLoading"
-          element-loading-text="数据加载中..."
+          :empty-text="detailData.length ? '' : '暂无数据'"
           max-height="600"
         >
           <el-table-column type="index" label="序号" width="60" align="center" />
@@ -88,69 +80,101 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, watch, computed } from 'vue'
 import { eventBus } from '@/utils/eventbus'
-import { Loading } from '@element-plus/icons-vue'
-import { ElMessage } from 'element-plus'
-import dayjs from 'dayjs'
-import axios from 'axios'
-import { getMonthCompleteGd } from '@/api/getInjection'
+import { getSghGdComplete, type OrderSettlementItem } from '@/api/getStampWeldinfo'
+
+const DEFAULT_PROD_LINE = '金工一部焊接'
+type CategoryKey = 'A类' | '常规'
+
+interface CategorySummary {
+  shouldComplete: number
+  onTimeComplete: number
+  completionRate: number
+  canClick?: boolean
+}
+
+interface CategoryStats {
+  categoryA: CategorySummary
+  regular: CategorySummary
+}
 
 const props = defineProps<{
   workOrderDataProp?: any  // 工单结单率数据
+  prodLine?: string
 }>()
 
-// 创建用于 /api/report 接口的 axios 实例
-const reportApi = axios.create({
-  withCredentials: true,
-  timeout: 130000,
-  headers: {
-    'Content-Type': 'application/json'
-  }
+const createEmptyCategoryDetails = (): Record<CategoryKey, OrderSettlementItem[]> => ({
+  'A类': [],
+  '常规': []
 })
-
-// 添加请求拦截器，自动携带 token 和 cookie
-reportApi.interceptors.request.use(
-  config => {
-    const token = localStorage.getItem('token')
-    if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`
-      console.log('Request with token:', {
-        url: config.url,
-        method: config.method,
-        hasToken: true,
-        tokenPrefix: token.substring(0, 20) + '...'
-      })
-    } else {
-      console.warn('Request without token:', {
-        url: config.url,
-        method: config.method,
-        hasToken: false
-      })
-    }
-    return config
-  },
-  error => {
-    return Promise.reject(error)
-  }
-)
-
-// 添加响应拦截器，用于调试
-reportApi.interceptors.response.use(
-  response => response,
-  error => {
-    console.error('Report API Error:', {
-      message: error.message,
-      status: error.response?.status,
-      statusText: error.response?.statusText,
-      url: error.config?.url,
-      headers: error.config?.headers
-    })
-    return Promise.reject(error)
-  }
-)
 
 // 工单结单率数据
 const workOrderData = ref<any>(null)
 const loading = ref(false)
+const monthCategoryData = ref<CategoryStats | null>(null)
+const todayCategoryDetails = ref<Record<CategoryKey, OrderSettlementItem[]>>(createEmptyCategoryDetails())
+
+const currentProdLine = computed(() => props.prodLine || DEFAULT_PROD_LINE)
+
+const normalizeCategory = (customer?: string | null): CategoryKey => {
+  const value = customer?.trim().toUpperCase()
+  return value === 'A' ? 'A类' : '常规'
+}
+
+const toNumber = (value?: string | number | null) => {
+  if (value === null || value === undefined || value === '') {
+    return 0
+  }
+  const num = Number(value)
+  return Number.isFinite(num) ? num : 0
+}
+
+const splitByCategory = (items: OrderSettlementItem[]) => {
+  const result = createEmptyCategoryDetails()
+  items.forEach(item => {
+    const key = normalizeCategory(item.customer)
+    result[key].push(item)
+  })
+  return result
+}
+
+const buildSummary = (items: OrderSettlementItem[]): CategorySummary => {
+  const shouldComplete = items.reduce((total, item) => total + toNumber(item.productionQuantity), 0)
+  const onTimeComplete = items.reduce((total, item) => total + toNumber(item.inboundQuantity), 0)
+  const completionRate = shouldComplete > 0
+    ? Math.round((onTimeComplete / shouldComplete) * 1000) / 10
+    : 0
+  return { shouldComplete, onTimeComplete, completionRate }
+}
+
+const buildFallbackMonthStats = (): CategoryStats => {
+  const monthTotalPlan = workOrderData.value?.monthPlanQuantity
+    ?? workOrderData.value?.monthCompletedOrders
+    ?? 0
+  const monthTotalInbound = workOrderData.value?.monthInboundQuantity
+    ?? workOrderData.value?.onTimeOrders
+    ?? 0
+  const categoryAShould = Math.floor(monthTotalPlan * 0.5) || 0
+  const categoryAOnTime = Math.floor(monthTotalInbound * 0.5) || 0
+  const regularShould = monthTotalPlan - categoryAShould
+  const regularOnTime = monthTotalInbound - categoryAOnTime
+
+  return {
+    categoryA: {
+      shouldComplete: categoryAShould,
+      onTimeComplete: categoryAOnTime,
+      completionRate: categoryAShould > 0
+        ? Math.round((categoryAOnTime / categoryAShould) * 1000) / 10
+        : 0
+    },
+    regular: {
+      shouldComplete: regularShould,
+      onTimeComplete: regularOnTime,
+      completionRate: regularShould > 0
+        ? Math.round((regularOnTime / regularShould) * 1000) / 10
+        : 0
+    }
+  }
+}
 
 // 将 categoryData 转换为表格数据（包含月度和每日）
 const tableData = computed(() => {
@@ -158,40 +182,24 @@ const tableData = computed(() => {
     return []
   }
   const { categoryA, regular } = workOrderData.value.categoryData
-  
-  // 获取月度和每日数据
-  const monthTotalGd = workOrderData.value.monthCompletedOrders || 0
-  const monthOnTimeGd = workOrderData.value.onTimeOrders || 0
-  
-  // 计算A类和常规的月度数据（假设平均分配）
-  const categoryAMonthShould = Math.floor(monthTotalGd * 0.5) || 0
-  const categoryAMonthOnTime = Math.floor(monthOnTimeGd * 0.5) || 0
-  const categoryAMonthRate = categoryAMonthShould > 0 
-    ? Math.round((categoryAMonthOnTime / categoryAMonthShould) * 1000) / 10 
-    : 0
-  
-  const regularMonthShould = Math.ceil(monthTotalGd * 0.5) || 0
-  const regularMonthOnTime = Math.ceil(monthOnTimeGd * 0.5) || 0
-  const regularMonthRate = regularMonthShould > 0 
-    ? Math.round((regularMonthOnTime / regularMonthShould) * 1000) / 10 
-    : 0
+  const monthStats = monthCategoryData.value || buildFallbackMonthStats()
   
   return [
     // A类 - 月度
     {
-      project: 'A类',
+      project: 'A类工单',
       category: '月度',
-      shouldComplete: categoryAMonthShould,
-      onTimeComplete: categoryAMonthOnTime,
-      completionRate: categoryAMonthRate,
+      shouldComplete: monthStats.categoryA.shouldComplete,
+      onTimeComplete: monthStats.categoryA.onTimeComplete,
+      completionRate: monthStats.categoryA.completionRate,
       canClick: false,
       categoryType: 'A类',
       periodType: 'month'
     },
     // A类 - 每日
     {
-      project: 'A类',
-      category: '每日',
+      project: 'A类工单',
+      category: '今日',
       shouldComplete: categoryA?.shouldComplete || 0,
       onTimeComplete: categoryA?.onTimeComplete || 0,
       completionRate: categoryA?.completionRate || 0,
@@ -201,19 +209,19 @@ const tableData = computed(() => {
     },
     // 常规 - 月度
     {
-      project: '常规',
+      project: '常规工单',
       category: '月度',
-      shouldComplete: regularMonthShould,
-      onTimeComplete: regularMonthOnTime,
-      completionRate: regularMonthRate,
+      shouldComplete: monthStats.regular.shouldComplete,
+      onTimeComplete: monthStats.regular.onTimeComplete,
+      completionRate: monthStats.regular.completionRate,
       canClick: false,
       categoryType: '常规',
       periodType: 'month'
     },
     // 常规 - 每日
     {
-      project: '常规',
-      category: '每日',
+      project: '常规工单',
+      category: '今日',
       shouldComplete: regular?.shouldComplete || 0,
       onTimeComplete: regular?.onTimeComplete || 0,
       completionRate: regular?.completionRate || 0,
@@ -281,6 +289,8 @@ const handleRowClick = (row: any) => {
 const processPropData = () => {
   if (props.workOrderDataProp) {
     workOrderData.value = props.workOrderDataProp
+    monthCategoryData.value = props.workOrderDataProp.monthCategoryData ?? null
+    todayCategoryDetails.value = createEmptyCategoryDetails()
     loading.value = false
     return true
   }
@@ -296,73 +306,60 @@ const fetchData = async () => {
 
   loading.value = true
   try {
-    const res = await getMonthCompleteGd('金工一部焊接')
+    const res = await getSghGdComplete(currentProdLine.value)
     if (res && res.code === 200 && res.data) {
-      // 根据接口注释：月入库工单,准时工单,今日计划工单数,已完结工单
-      // totalGd: 月入库工单（总数）
-      // jsGd: 准时工单（按时完成的工单数）
-      // todayTotalGd: 今日计划工单数
-      // todayJsGd: 今日已完结工单数
-      
-      // 月度数据
-      const monthTotalGd = res.data.totalGd ?? 0  // 月入库工单总数
-      const monthOnTimeGd = res.data.jsGd ?? 0    // 准时工单数（按时完成的工单数）
-      // 结单率 = 准时工单数 / 月入库工单总数 * 100
-      const monthClosingRate = monthTotalGd > 0 
-        ? Math.round((monthOnTimeGd / monthTotalGd) * 1000) / 10 
-        : 0
+      const monthList = res.data.orderSettlement_month || []
+      const todayList = res.data.orderSettlement_today || []
 
-      // 今日数据
-      const todayPlanGd = res.data.todayTotalGd ?? 0  // 今日计划工单数
-      const todayCompletedGd = res.data.todayJsGd ?? 0 // 今日已完结工单数
-      // 今日结单率 = 今日已完结工单数 / 今日计划工单数 * 100
-      const todayClosingRate = todayPlanGd > 0 
-        ? Math.round((todayCompletedGd / todayPlanGd) * 1000) / 10 
-        : 0
-      
-      // 根据接口数据，构造A类和常规的数据结构
-      // 这里假设接口返回的数据需要按分类处理，如果没有分类数据，则平均分配或使用默认值
-      const categoryAShouldComplete = Math.floor(todayPlanGd * 0.5) || 0
-      const categoryAOnTimeComplete = Math.floor(todayCompletedGd * 0.5) || 0
-      const categoryACompletionRate = categoryAShouldComplete > 0 
-        ? Math.round((categoryAOnTimeComplete / categoryAShouldComplete) * 1000) / 10 
-        : 0
-      
-      const regularShouldComplete = Math.ceil(todayPlanGd * 0.5) || 0
-      const regularOnTimeComplete = Math.ceil(todayCompletedGd * 0.5) || 0
-      const regularCompletionRate = regularShouldComplete > 0 
-        ? Math.round((regularOnTimeComplete / regularShouldComplete) * 1000) / 10 
-        : 0
-      
+      const monthSplit = splitByCategory(monthList)
+      const todaySplit = splitByCategory(todayList)
+
+      const monthStats = {
+        categoryA: buildSummary(monthSplit['A类']),
+        regular: buildSummary(monthSplit['常规'])
+      }
+
+      const todayStats = {
+        categoryA: { ...buildSummary(todaySplit['A类']), canClick: todaySplit['A类'].length > 0 },
+        regular: { ...buildSummary(todaySplit['常规']), canClick: todaySplit['常规'].length > 0 }
+      }
+
+      const monthShould = monthStats.categoryA.shouldComplete + monthStats.regular.shouldComplete
+      const monthOnTime = monthStats.categoryA.onTimeComplete + monthStats.regular.onTimeComplete
+      const todayShould = todayStats.categoryA.shouldComplete + todayStats.regular.shouldComplete
+      const todayOnTime = todayStats.categoryA.onTimeComplete + todayStats.regular.onTimeComplete
+
+      monthCategoryData.value = monthStats
+      todayCategoryDetails.value = todaySplit
+
       workOrderData.value = {
-        categoryData: {
-          categoryA: {
-            shouldComplete: categoryAShouldComplete,  // 今日应完结工单数（A类）
-            onTimeComplete: categoryAOnTimeComplete,  // 今日及时完结数（A类）
-            completionRate: categoryACompletionRate,  // 完结率
-            canClick: true
-          },
-          regular: {
-            shouldComplete: regularShouldComplete,  // 今日应完结工单数（常规）
-            onTimeComplete: regularOnTimeComplete,  // 今日及时完结数（常规）
-            completionRate: regularCompletionRate,  // 完结率
-            canClick: true
-          }
-        },
-        // 保留原有字段用于兼容
-        monthCompletedOrders: monthTotalGd,
-        onTimeOrders: monthOnTimeGd,
-        closingRate: monthClosingRate,
-        todayCompletedOnTime: todayPlanGd,
-        todayOnTimeCompleted: todayCompletedGd,
-        todayClosingRate: todayClosingRate
+        categoryData: todayStats,
+        monthCategoryData: monthStats,
+        monthPlanQuantity: monthShould,
+        monthInboundQuantity: monthOnTime,
+        monthCompletedOrders: monthList.length,
+        onTimeOrders: monthOnTime,
+        closingRate: monthShould > 0
+          ? Math.round((monthOnTime / monthShould) * 1000) / 10
+          : 0,
+        todayPlanQuantity: todayShould,
+        todayInboundQuantity: todayOnTime,
+        todayCompletedOnTime: todayList.length,
+        todayOnTimeCompleted: todayOnTime,
+        todayClosingRate: todayShould > 0
+          ? Math.round((todayOnTime / todayShould) * 1000) / 10
+          : 0
       }
     } else {
       workOrderData.value = null
+      monthCategoryData.value = null
+      todayCategoryDetails.value = createEmptyCategoryDetails()
     }
   } catch (error) {
     console.error('获取工单结单率数据失败:', error)
     workOrderData.value = null
+    monthCategoryData.value = null
+    todayCategoryDetails.value = createEmptyCategoryDetails()
   } finally {
     loading.value = false
   }
@@ -372,6 +369,10 @@ const fetchData = async () => {
 watch(() => props.workOrderDataProp, () => {
   processPropData()
 }, { deep: true })
+
+watch(() => props.prodLine, () => {
+  fetchData()
+})
 
 onMounted(() => {
   // 先尝试处理传入的数据，如果没有则调用原来的接口
@@ -387,65 +388,23 @@ onBeforeUnmount(() => {
 
 // Dialog控制
 const dialogVisible = ref(false)
-const detailData = ref([])
-const dialogLoading = ref(false)
-const errorMessage = ref('')
+const detailData = ref<OrderSettlementItem[]>([])
 const dialogTitle = ref('今日工单详细数据')
 
 // 打开今日详细数据Dialog
-const openTodayDetailDialog = async (category?: string) => {
+const openTodayDetailDialog = (category?: string) => {
   dialogVisible.value = true
-  dialogLoading.value = true
-  errorMessage.value = ''
   detailData.value = []
-  // 设置 Dialog 标题
   dialogTitle.value = category ? `${category} - 今日工单详细数据` : '今日工单详细数据'
-  
-  try {
-    // 获取今天的日期，格式：YYYYMMDD
-    const today = dayjs().format('YYYYMMDD')
-    // 参数：dateTimeStart, dateTimeStop (都是今天), workCenter = '焊接车间'
-    const workCenter = '焊接车间'
-    // 如果传入了分类，可以在请求中使用
-    const categoryType = category || ''
-    
-    // 通过代理调用接口（开发环境使用相对路径，生产环境使用完整URL）
-    // 开发环境：/api/report/workOrderClosingRate (通过 vite 代理转发到 http://192.168.1.197:10999/apollo/report/workOrderClosingRate)
-    // 生产环境：http://192.168.1.197:10999/apollo/report/workOrderClosingRate
-    const isDev = import.meta.env.DEV
-    const apiUrl = isDev 
-      ? '/api/report/workOrderClosingRate' 
-      : 'http://192.168.1.197:10999/apollo/report/workOrderClosingRate'
-    
-    console.log('Making request to:', apiUrl, {
-      dateTimeStart: today,
-      dateTimeStop: today,
-      workCenter
-    })
-    
-    const response = await reportApi({
-      url: apiUrl,
-      method: 'post',
-      data: {
-        workCenter,
-        dateTimeStart: today,
-        dateTimeStop: today,
-        ...(categoryType && { category: categoryType })
-      }
-    })
-    
-    if (response && response.data && response.data.code === 200 && response.data.data) {
-      detailData.value = response.data.data
-    } else {
-      errorMessage.value = response?.data?.message || '获取数据失败'
-      ElMessage.error(errorMessage.value)
-    }
-  } catch (error) {
-    console.error('获取今日工单详细数据失败:', error)
-    errorMessage.value = '获取数据失败，请稍后重试'
-    ElMessage.error(errorMessage.value)
-  } finally {
-    dialogLoading.value = false
+
+  if (category === 'A类' || category === '常规') {
+    detailData.value = todayCategoryDetails.value[category]
+  } else {
+    const combined = [
+      ...todayCategoryDetails.value['A类'],
+      ...todayCategoryDetails.value['常规']
+    ]
+    detailData.value = combined
   }
 }
 </script>
@@ -456,9 +415,9 @@ const openTodayDetailDialog = async (category?: string) => {
   height: 100%;
   background: rgba(0, 0, 0, 0.1);
   border-radius: 8px;
-  padding: 8px 12px;
+  /* padding: 8px 12px; */
   flex-direction: column;
-  gap: 10px;
+  /* gap: 10px; */
   justify-content: space-between;
   overflow: hidden;
 }
@@ -466,9 +425,9 @@ const openTodayDetailDialog = async (category?: string) => {
 .loading-text,
 .empty-text {
   color: #72f0f5;
-  font-size: 12px;
+  /* font-size: 12px; */
   text-align: center;
-  padding: 10px;
+  /* padding: 10px; */
   opacity: 0.7;
 }
 
@@ -476,11 +435,45 @@ const openTodayDetailDialog = async (category?: string) => {
 .work-order-table {
   flex: 1;
   overflow: hidden;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
 
 .work-order-table :deep(.el-table) {
   background: rgba(10, 119, 228, 0.3);
   color: #ececec;
+  width: 100% !important;
+  height: 100% !important;
+  table-layout: fixed;
+  font-size: 12px !important;
+  display: flex;
+  flex-direction: column;
+}
+
+.work-order-table :deep(.el-table__body) {
+  width: 100% !important;
+}
+
+.work-order-table :deep(.el-table__header) {
+  width: 100% !important;
+}
+
+.work-order-table :deep(.el-table__body colgroup col),
+.work-order-table :deep(.el-table__header colgroup col) {
+  width: auto !important;
+}
+
+.work-order-table :deep(.el-table__header-wrapper) {
+  overflow: hidden;
+  flex-shrink: 0;
+}
+
+.work-order-table :deep(.el-table__body-wrapper) {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
 }
 
 .work-order-table :deep(.el-table__header) {
@@ -490,12 +483,17 @@ const openTodayDetailDialog = async (category?: string) => {
 .work-order-table :deep(.el-table__header th) {
   background: rgb(0, 128, 255);
   border-color: rgba(0, 247, 255, 0.4);
-  color: #ffffff;
+  color: #ffffff !important;
   font-weight: 600;
-  font-size: 12px;
-  padding: 8px 0;
+  font-size: 12px !important;
+  padding: 6px 4px !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 1.2;
+  height: auto !important;
+  width: auto;
 }
-
 
 .work-order-table :deep(.el-table__body tr) {
   background: rgb(5, 69, 71);
@@ -505,12 +503,18 @@ const openTodayDetailDialog = async (category?: string) => {
 .work-order-table :deep(.el-table__body td) {
   border-color: rgba(36, 116, 207, 0.788);
   color: #ffffff;
-  font-size: 14px;
-  padding: 8px 0;
+  font-size: 12px !important;
+  padding: 6px 4px !important;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  line-height: 1.2;
+  height: auto !important;
 }
 
 .work-order-table :deep(.el-table__body tr:hover > td) {
   background: rgb(114, 241, 245);
+  color: #000000 !important;
 }
 
 .work-order-table :deep(.el-table--border) {
@@ -532,8 +536,9 @@ const openTodayDetailDialog = async (category?: string) => {
 }
 
 .work-order-table :deep(.clickable-row:hover td) {
-  background: rgba(114, 240, 245, 0.15) !important;
+  background: rgba(114, 240, 245, 0.3) !important;
   border-color: rgba(114, 240, 245, 0.5) !important;
+  color: #ffffff !important;
 }
 
 /* Dialog样式 */
@@ -559,5 +564,7 @@ const openTodayDetailDialog = async (category?: string) => {
   font-size: 32px;
   margin-bottom: 16px;
 }
+
+
 </style>
 

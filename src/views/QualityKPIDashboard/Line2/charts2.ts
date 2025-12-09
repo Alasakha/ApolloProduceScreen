@@ -1,4 +1,5 @@
 
+import { GLOBAL_PIE_CHART_COLORS } from '@/utils/pieChartColors';
 
 // chartOption.ts
 export function createChartOption(data) {
@@ -52,16 +53,7 @@ export function createChartOption(data) {
               color: '#fff'
             }
           },
-          color: [
-            '#006cff',
-            '#60cda0',
-            '#ed8884',
-            '#ff9f7f',
-            '#0096ff',
-            '#9fe6b8',
-            '#32c5e9',
-            '#1d9dff'
-          ],
+          color: GLOBAL_PIE_CHART_COLORS,
           data: data
         }
       ]

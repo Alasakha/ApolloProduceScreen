@@ -1,7 +1,7 @@
 
         <template>
         <dv-border-box10>
-        <GlobalTitle title="来料检验及时率"/>
+        <GlobalTitle title="责任划分"/>
         
             <!-- 图表容器 -->
             <div class="chartsbox w-full h-[90%]">
@@ -16,7 +16,7 @@
         <!-- 详情弹窗 -->
         <el-dialog
             v-model="dialogVisible"
-            :title="`${selectedUserName} - 来料检验详情`"
+            :title="`${selectedDeptName} - 来料检验详情`"
             width="80%"
             top="10vh"
             :before-close="handleClose"
@@ -124,8 +124,7 @@
         <script setup lang="ts">
         import GlobalTitle from '@/components/title.vue'
         import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
-        import { getIncomingInspection, getIncomingInspectionDetail } from '@/api/getQuiltyinfo'
-        import { useRoute } from 'vue-router'
+        import { getInspectorDept, getIncomingInspectionDetail } from '@/api/getQuiltyinfo'
         import { eventBus } from '@/utils/eventbus'
         import { formatPieChartData } from '@/utils/map'
         import { createChartOption } from './charts'
@@ -135,15 +134,13 @@
         import { Download } from '@element-plus/icons-vue'
         
         const chartRef = ref(null)
-        const route = useRoute()
-        const prodLine = route.query.prodLine as string || ''
         const isLoading = ref(true)
         const isDataEmpty = ref(false)
         const rawData = ref([])
         
         // 弹窗相关状态
         const dialogVisible = ref(false)
-        const selectedUserName = ref('')
+        const selectedDeptName = ref('')
         const detailData = ref([])
         const filteredDetailData = ref([])
         const detailLoading = ref(false)
@@ -170,7 +167,7 @@
         const { initChart, setOption, resizeChart, onClick, offClick } = useEcharts(chartRef)
         
         const processData = (data: any[]) => {
-        const formattedData = formatPieChartData(data, 'user_name', 'rate')
+        const formattedData = formatPieChartData(data, 'dept_name', 'total')
         console.log(formattedData)
         rawData.value = formattedData
         isDataEmpty.value = formattedData.length === 0
@@ -191,7 +188,7 @@
 
             
         const fetchData = () => {
-        getIncomingInspection(prodLine)
+        getInspectorDept()
             .then(res => {
             isLoading.value = false
             processData(res.data)
@@ -212,9 +209,9 @@
             console.log('点击的柱状图数据:', params)
             console.log('弹窗状态:', dialogVisible.value)
             if (params && params.name) {
-                selectedUserName.value = params.name
+                selectedDeptName.value = params.name
                 dialogVisible.value = true
-                console.log('设置弹窗可见，用户名:', params.name)
+                console.log('设置弹窗可见，部门名:', params.name)
                 // 立即显示加载状态
                 detailLoading.value = true
                 fetchDetailData(params.name)
@@ -224,8 +221,8 @@
         }
         
         // 获取详情数据
-        const fetchDetailData = (userName: string) => {
-            getIncomingInspectionDetail(userName)
+        const fetchDetailData = (deptName: string) => {
+            getIncomingInspectionDetail(deptName)
                 .then(res => {
                     detailData.value = res.data || []
                     filteredDetailData.value = res.data || []
@@ -265,7 +262,7 @@
         // 关闭弹窗
         const handleClose = () => {
             dialogVisible.value = false
-            selectedUserName.value = ''
+            selectedDeptName.value = ''
             detailData.value = []
             filteredDetailData.value = []
             filterForm.value.inspector = ''
@@ -396,15 +393,15 @@
                 
                 // 添加工作表到工作簿
                 const sheetName = filterForm.value.inspector || filterForm.value.arrivalDateRange?.length || filterForm.value.supplier 
-                    ? `${selectedUserName.value}_筛选结果` 
-                    : `${selectedUserName.value}_详情`
+                    ? `${selectedDeptName.value}_筛选结果` 
+                    : `${selectedDeptName.value}_详情`
                 XLSX.utils.book_append_sheet(wb, ws, sheetName)
                 
                 // 生成文件名
                 const now = new Date()
                 const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
                 const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '')
-                const fileName = `${selectedUserName.value}_来料检验详情_${dateStr}_${timeStr}.xlsx`
+                const fileName = `${selectedDeptName.value}_来料检验详情_${dateStr}_${timeStr}.xlsx`
                 
                 // 导出文件
                 XLSX.writeFile(wb, fileName)

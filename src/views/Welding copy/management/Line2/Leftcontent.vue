@@ -341,6 +341,7 @@
   
   <style scoped>
   .line2-container {
+    
     padding: 0.2rem 0.2rem 0 0;
     width: 100%;
     height: 100%;
@@ -363,6 +364,7 @@
     cursor: pointer;
     transition: transform 0.2s ease;
     align-self: flex-start; /* 确保卡片从顶部对齐 */
+    
 }
 
 /* 右侧轮播容器：占两列宽度，抵消 gap 影响，避免换行 */

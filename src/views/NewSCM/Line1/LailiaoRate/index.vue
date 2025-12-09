@@ -85,7 +85,7 @@ const fetchData = () => {
     getIncome0kRateChart(startDay, endDay, '2')
   ]).then(([regularRes, aClassRes]) => {
     isLoading.value = false;   // 加载完成，关闭 loading 状态
-    processData(regularRes.data, aClassRes.data);  // 处理数据并渲染图表
+    processData(aClassRes.data, regularRes.data);  // 处理数据并渲染图表
   }).catch(() => {
     isLoading.value = false;
     isDataEmpty.value = true;  // 如果请求失败，设置为空数据状态

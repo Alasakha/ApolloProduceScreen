@@ -1,8 +1,15 @@
 // Mock data for quality statistics
 export const mockQualityStats = {
-  qualifiedInspectionOrders: 0,
-  qualifiedOrders: 0,
-  qualifiedRate: 0
+  today: {
+    total: 0,
+    hg: 0,
+    rate: 0,
+  },
+  month: {
+    total: 0,
+    hg: 0,
+    rate: 0,
+  },
 };
 
 // Mock data for defective orders

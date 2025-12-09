@@ -44,7 +44,7 @@
 
         <div class="patent-breakdown">
               <div class="patent-item">
-                <span class="patent-type">境外专利</span>
+                <span class="patent-type">国际专利</span>
                 <span class="patent-count">{{ rdData.jw }}</span>
               </div>
               <div class="patent-item">

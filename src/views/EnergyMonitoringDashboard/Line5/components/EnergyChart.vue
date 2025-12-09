@@ -86,7 +86,7 @@ const chartOption = computed(() => {
     legend: {
       data: isMonthly 
         ? ['标准用量', '实际用量'] 
-        : ['周增量'],
+        : ['周用量'],
       top: 0,
       textStyle: {
         color: '#ffffff',
@@ -223,7 +223,7 @@ const chartOption = computed(() => {
       }
     ] : [
       {
-        name: '周增量',
+        name: '周用量',
         type: 'bar' as const,
         data: props.data.weeklyIncrement,
         barWidth: '50%',
@@ -261,15 +261,15 @@ const chartOption = computed(() => {
           silent: false,
           symbol: 'none',
           lineStyle: {
-            color: '#ff0000',
+            color: '#00ff00',
             width: 2,
-            type: 'solid' as const
+            type: 'dashed' as const
           },
           label: {
             show: true,
             position: 'end' as const,
             formatter: `标准: {c} ${props.unit}`,
-            color: '#ff0000',
+            color: '#00ff00',
             fontSize: 11,
             fontWeight: 'bold' as const
           },

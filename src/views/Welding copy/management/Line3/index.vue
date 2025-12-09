@@ -1,10 +1,11 @@
 <template>
     <div class="line3-container h-[30%] flex w-full">
-        <div class="abnormal-wrapper w-1/2">
+        <div class="abnormal-wrapper w-2/3">
           <Temperature />
         </div>
-        <div class="quality-wrapper w-1/2">
-          <Abnormal />
+        <div class="quality-wrapper w-1/3">
+          <!-- <Abnormal /> -->
+          <WorkOrderClosingRate :prod-line="workOrderProdLine" />
             <!-- <Quality /> -->
         </div>
     </div>  
@@ -17,8 +18,11 @@
 // import TwoProdLine from './twoProdLine.vue';
 // import Abnormal from './abnormal.vue';
 // import Quality from './qualityQues.vue';
-  import Abnormal from '../Line2/Abnormal.vue'
+  // import Abnormal from '../Line2/Abnormal.vue'
   import Temperature from './temperature.vue'
+  import WorkOrderClosingRate from '../components/WorkOrderClosingRate.vue'
+  import { ref } from 'vue'
+  const workOrderProdLine = ref('金工一部焊接')
 </script>
 
 <style scoped>
@@ -30,7 +34,7 @@
 }
 
 .abnormal-wrapper {
-  flex: 1; /* 2:1 比例 */
+  flex: 2; /* 2:1 比例 */
   min-width: 0; /* 防止 flex 子项溢出 */
 }
 

@@ -3,39 +3,48 @@
     <Header></Header>
     
     <div class="dashboard-container">
-      <!-- 顶部KPI指标区域 -->
-      <div class="kpi-section">
-        <KPIStats
-          :pending-repair="kpiData.pendingRepair"
-          :need-inspection="kpiData.needInspection"
-          :waiting-parts="kpiData.waitingParts"
-          :not-inspected="kpiData.notInspected"
-          :completed-repair="kpiData.completedRepair"
-          :inspected="kpiData.inspected"
-        />
-      </div>
-
-      <!-- 底部图表区域 2x2网格 -->
-      <div class="charts-section">
-        <div class="chart-grid">
-          <!-- 左上：设备状态实时滚动条 -->
-          <div class="chart-item">
-            <StatusScrollBar />
+      <div class="dashboard-content">
+        <!-- 第一列 -->
+        <div class="column-left">
+          <!-- 设备管理数据 -->
+          <div class="section-top">
+            <EquipmentData />
           </div>
-
-          <!-- 右上：设备故障占比 -->
-          <div class="chart-item">
-            <FaultRatioChart />
+          <!-- 关键设备稼动率 -->
+          <div class="section-middle">
+            <EquipmentUtilizationRate />
           </div>
-
-          <!-- 左下：设备故障类型统计 -->
-          <div class="chart-item">
-            <FaultTypeChart />
+          <!-- 易发生故障设备统计 -->
+          <div class="section-bottom">
+            <FaultTrendChart />
           </div>
+        </div>
 
-          <!-- 右下：易发故障设备统计 -->
-          <div class="chart-item">
-            <FrequentFaultChart />
+        <!-- 第二列 -->
+        <div class="column-middle">
+          <!-- 设备信息展示 -->
+          <div class="section-top">
+            <EquipmentInfo :selected-equipment="selectedEquipment" />
+          </div>
+          <!-- 设备图示 -->
+          <div class="section-bottom">
+            <EquipmentGallery @equipment-select="handleEquipmentSelect" />
+          </div>
+        </div>
+
+        <!-- 第三列 -->
+        <div class="column-right">
+          <!-- 关键设备OEE监控 -->
+          <div class="section-top">
+            <OEEMonitor />
+          </div>
+          <!-- 关键设备OEE状况滚动 -->
+          <div class="section-middle">
+            <OEEScroll />
+          </div>
+          <!-- 设备异常故障排行 -->
+          <div class="section-bottom">
+            <FaultRanking />
           </div>
         </div>
       </div>
@@ -44,31 +53,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref } from 'vue'
 import Header from './Header/index.vue'
-import KPIStats from './components/KPIStats.vue'
-import StatusScrollBar from './components/StatusScrollBar.vue'
-import FaultRatioChart from './components/FaultRatioChart.vue'
-import FaultTypeChart from './components/FaultTypeChart.vue'
-import FrequentFaultChart from './components/FrequentFaultChart.vue'
+import EquipmentData from './components/EquipmentData.vue'
+import EquipmentUtilizationRate from './components/EquipmentUtilizationRate.vue'
+import FaultTrendChart from './components/FaultTrendChart.vue'
+import EquipmentInfo from './components/EquipmentInfo.vue'
+import EquipmentGallery from './components/EquipmentGallery.vue'
+import OEEMonitor from './components/OEEMonitor.vue'
+import OEEScroll from './components/OEEScroll.vue'
+import FaultRanking from './components/FaultRanking.vue'
 
-// KPI数据
-const kpiData = ref({
-  pendingRepair: 12,
-  needInspection: 8,
-  waitingParts: 5,
-  notInspected: 3,
-  completedRepair: 45,
-  inspected: 42
-})
+const selectedEquipment = ref<any>(null)
 
-onMounted(() => {
-  // TODO: 调用API获取真实数据
-  console.log('设备管理看板已加载')
-})
+const handleEquipmentSelect = (equipment: any) => {
+  selectedEquipment.value = equipment
+}
 </script>
-
-
 
 <style scoped>
 body {
@@ -88,45 +89,79 @@ body {
   padding: 6px;
   height: calc(100vh - 7vh);
   width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
   overflow: hidden;
 }
 
-.kpi-section {
-  flex: 0 0 auto;
+.dashboard-content {
   width: 100%;
-}
-
-.charts-section {
-  flex: 1;
-  width: 100%;
-  min-height: 0;
-}
-
-.chart-grid {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  grid-template-rows: 1fr 1fr;
+  height: 100%;
+  display: flex;
   gap: 6px;
-  height: 100%;
 }
 
-.chart-item {
-  height: 100%;
+.column-left,
+.column-middle,
+.column-right {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 4px;
+  padding: 6px;
+  border: 1px solid rgba(0, 150, 255, 0.3);
+}
+
+.section-top,
+.section-middle,
+.section-bottom {
+  flex: 1;
   min-height: 0;
+  background: rgba(0, 0, 0, 0.2);
+  border-radius: 3px;
+  padding: 8px;
+  border: 1px solid rgba(0, 150, 255, 0.2);
+}
+
+.column-left .section-top {
+  flex: 0 0 33%;
+}
+
+.column-left .section-middle {
+  flex: 0 0 34%;
+}
+
+.column-left .section-bottom {
+  flex: 0 0 33%;
+}
+
+.column-right .section-top {
+  flex: 0 0 35%;
+}
+
+.column-right .section-middle {
+  flex: 0 0 30%;
+}
+
+.column-right .section-bottom {
+  flex: 0 0 35%;
 }
 
 /* 大屏优化 */
 @media (min-width: 1920px) {
   .dashboard-container {
     padding: 8px;
+  }
+  
+  .dashboard-content {
     gap: 8px;
   }
-
-  .chart-grid {
+  
+  .column-left,
+  .column-middle,
+  .column-right {
     gap: 8px;
+    padding: 8px;
   }
 }
 </style>

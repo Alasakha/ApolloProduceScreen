@@ -12,18 +12,7 @@
             </el-button>
         </div>
         <div class="chart-container">
-            <EChartsPieChart
-                :data="chartData"
-                :title="chartConfig.title"
-                :radius="chartConfig.radius"
-                :center="chartConfig.center"
-                :show-label="chartConfig.showLabel"
-                :show-value="chartConfig.showValue"
-                :show-pointer="chartConfig.showPointer"
-                theme="dark"
-                @click="handleChartClick"
-                ref="pieChartRef"
-            />
+            <div ref="chartRef" class="pie-chart"></div>
         </div>
 
         
@@ -117,17 +106,37 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch,onBeforeUnmount  } from 'vue'
+import { ref, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import EChartsPieChart from '@/components/EChartsPieChart.vue'
-import type { PieChartItem } from '@/components/EChartsPieChart.vue'
+import * as echarts from 'echarts/core'
+import {
+    TooltipComponent,
+    LegendComponent,
+    TitleComponent,
+    GraphicComponent
+} from 'echarts/components'
+import { PieChart } from 'echarts/charts'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { ECharts } from 'echarts/core'
 import { getTodayBadIssues, getTodayBadIssuesDetail, type TodayBadIssues } from '@/api/getStampWeldinfo'
 import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
 import { eventBus } from '@/utils/eventbus'
 import { useRoute } from 'vue-router'
+
+// 注册 ECharts 组件
+echarts.use([
+    TooltipComponent,
+    LegendComponent,
+    TitleComponent,
+    GraphicComponent,
+    PieChart,
+    CanvasRenderer
+])
+
 // 图表引用
-const pieChartRef = ref()
+const chartRef = ref<HTMLElement>()
+let chartInstance: ECharts | null = null
 
 // Dialog控制
 const dialogVisible = ref(false)
@@ -145,54 +154,196 @@ const currentRowUid = ref('')
 
 // 获取路由参数
 const route = useRoute()
-const prodLine = computed(() => route.query.prodLine as string || '2006')
+const prodLine = computed(() => route.query.prodLine as string || '2007')
 
 // 真实API数据
 const apiData = ref<TodayBadIssues[]>([])
 
-// 图表数据 - 从API数据转换
-const chartData = computed((): PieChartItem[] => {
-    if (!apiData.value || apiData.value.length === 0) {
-        return []
-    }
-    
-    // 将API数据转换为图表数据格式
-    return apiData.value.map((item, index) => ({
-        name: item.ngName,
-        value: item.total,
-        color: getDefaultColor(index)
-    }))
-})
+// 颜色配置
+const colors = [
+    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFC53D', '#B37FEB',
+    '#4A90E2', '#7B68EE', '#9370DB', '#8A2BE2', '#FFEAA7', '#DDA0DD'
+]
 
 // 获取默认颜色
 const getDefaultColor = (index: number): string => {
-    const colors = [
-        '#4A90E2', '#7B68EE', '#9370DB', '#8A2BE2', 
-        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
-        '#FFEAA7', '#DDA0DD', '#98D8E8', '#F7DC6F'
-    ]
     return colors[index % colors.length]
 }
 
-// 图表配置 - 优化字体颜色和可读性
-const chartConfig = computed(() => ({
-    title: '质量TOP问题分布',
-    radius: '70%',
-    center: ['50%', '50%'] as [string, string],
-    showLabel: true,
-    showValue: true,
-    showPointer: true,
-    theme: 'dark',
-    // 自定义颜色配置，确保高对比度
-    colors: [
-        '#FF6B6B', // 红色 - 高对比度
-        '#4ECDC4', // 青色 - 高对比度
-        '#45B7D1', // 蓝色 - 高对比度
-        '#96CEB4', // 绿色 - 高对比度
-        '#FFC53D', // 黄色 - 高对比度
-        '#B37FEB'  // 紫色 - 高对比度
-    ]
-}))
+// 初始化图表
+const initChart = () => {
+    if (!chartRef.value) return
+    
+    const width = chartRef.value.clientWidth
+    const height = chartRef.value.clientHeight
+    if (width === 0 || height === 0) {
+        setTimeout(() => initChart(), 100)
+        return
+    }
+    
+    if (chartInstance) {
+        chartInstance.dispose()
+    }
+    
+    chartInstance = echarts.init(chartRef.value)
+    updateChart()
+    
+    // 绑定点击事件
+    chartInstance.on('click', (params: any) => {
+        handleChartClick(params)
+    })
+    
+    // 监听窗口大小变化
+    window.addEventListener('resize', handleResize)
+}
+
+// 更新图表
+const updateChart = () => {
+    if (!chartInstance) return
+    
+    const hasData = apiData.value && apiData.value.length > 0 && apiData.value.some(item => item.total > 0)
+    
+    // 处理图表数据
+    let chartData: any[] = []
+    if (hasData) {
+        chartData = apiData.value.map((item, index) => ({
+            name: item.ngName,
+            value: item.total,
+            itemStyle: {
+                color: getDefaultColor(index)
+            }
+        }))
+    } else {
+        // 无数据时显示"暂无数据"的绿色饼图
+        chartData = [{
+            name: '暂无数据',
+            value: 100,
+            itemStyle: {
+                color: '#059142'
+            }
+        }]
+    }
+    
+    const option = {
+        title: {
+            text: '质量TOP问题分布',
+            left: 'center',
+            top: '5%',
+            textStyle: {
+                color: '#fff',
+                fontSize: 16,
+                fontWeight: 'bold'
+            }
+        },
+        tooltip: {
+            trigger: 'item',
+            formatter: (params: any) => {
+                if (!hasData) {
+                    return '暂无数据'
+                }
+                return `${params.name}: ${params.value}(${params.percent}%)`
+            },
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderColor: '#333',
+            textStyle: {
+                color: '#fff',
+                fontSize: 14
+            }
+        },
+        legend: hasData ? {
+            orient: 'vertical',
+            left: 'left',
+            top: 'middle',
+            textStyle: {
+                color: '#fff',
+                fontSize: 12,
+                fontWeight: 'bold'
+            },
+            itemGap: 8,
+            itemWidth: 14,
+            itemHeight: 14
+        } : undefined,
+        series: [
+            {
+                name: '质量TOP问题',
+                type: 'pie',
+                radius: '70%',
+                center: ['50%', '50%'],
+                data: chartData,
+                labelLine: {
+                    show: hasData,
+                    length: 15,
+                    length2: 10,
+                    smooth: true,
+                    lineStyle: {
+                        color: '#666',
+                        width: 2
+                    }
+                },
+                label: {
+                    show: hasData,
+                    position: 'outside',
+                    formatter: (params: any) => {
+                        if (!hasData) return ''
+                        return `${params.name}\n${params.value}(${params.percent}%)`
+                    },
+                    fontSize: 13,
+                    color: '#fff',
+                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
+                    textShadowBlur: 2,
+                    textShadowOffsetX: 1,
+                    textShadowOffsetY: 1
+                },
+                emphasis: {
+                    itemStyle: {
+                        shadowBlur: 15,
+                        shadowOffsetX: 0,
+                        shadowColor: 'rgba(0, 0, 0, 0.6)'
+                    },
+                    label: {
+                        fontSize: 15,
+                        fontWeight: 'bold',
+                        color: '#fff'
+                    }
+                },
+                animationType: 'scale',
+                animationEasing: 'elasticOut',
+                animationDelay: (idx: number) => idx * 200
+            }
+        ],
+        graphic: !hasData ? [
+            {
+                type: 'text',
+                left: '50%',
+                top: '50%',
+                z: 100,
+                style: {
+                    text: '暂无数据',
+                    fontSize: 18,
+                    fontWeight: 'bold',
+                    fill: '#00ff00',
+                    textAlign: 'center',
+                    textVerticalAlign: 'middle'
+                }
+            }
+        ] : undefined
+    }
+    
+    chartInstance.setOption(option, true)
+    
+    nextTick(() => {
+        if (chartInstance) {
+            chartInstance.resize()
+        }
+    })
+}
+
+// 处理窗口大小变化
+const handleResize = () => {
+    if (chartInstance) {
+        chartInstance.resize()
+    }
+}
 
 // 获取今日不良TOP问题数据
 const fetchTodayBadIssues = async () => {
@@ -210,9 +361,17 @@ const fetchTodayBadIssues = async () => {
             apiData.value = []
         }
         
+        // 更新图表
+        nextTick(() => {
+            updateChart()
+        })
+        
     } catch (error) {
         console.error('获取今日不良TOP问题数据失败:', error)
         apiData.value = []
+        nextTick(() => {
+            updateChart()
+        })
     }
 }
 
@@ -345,19 +504,30 @@ const handleReasonSubmit = async () => {
 
 
 onMounted(async () => {
+    // 初始化图表
+    nextTick(() => {
+        initChart()
+    })
+    
     // 初始加载数据
     await fetchTodayBadIssues()
     
     eventBus.on('refreshData', fetchTodayBadIssues)
 })
+
 onBeforeUnmount(() => {
     eventBus.off('refreshData', fetchTodayBadIssues)
+    
+    // 销毁图表
+    if (chartInstance) {
+        chartInstance.dispose()
+        chartInstance = null
+    }
+    window.removeEventListener('resize', handleResize)
 })
 
-
-
-    // 监听生产线变化
-    watch(prodLine, () => {
+// 监听生产线变化
+watch(prodLine, () => {
     fetchTodayBadIssues()
 })
 
@@ -417,6 +587,12 @@ onBeforeUnmount(() => {
     align-items: center;
     margin-bottom: 16px;
     width: 100%;
+    min-height: 300px;
+}
+
+.pie-chart {
+    width: 100%;
+    height: 100%;
     min-height: 300px;
 }
 

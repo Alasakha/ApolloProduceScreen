@@ -435,7 +435,7 @@ onBeforeUnmount(() => {
     }
     
     .part-header {
-        font-size: 28px;
+        font-size: 22px;
     }
     
     .metrics-line {
@@ -448,7 +448,7 @@ onBeforeUnmount(() => {
     
     .metric-label-inline,
     .metric-value {
-        font-size: 26px;
+        font-size: 17px;
     }
 }
 

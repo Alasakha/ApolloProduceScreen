@@ -6,7 +6,7 @@ import { ref, onMounted ,onBeforeUnmount} from 'vue';
   <div class="container flex flex-col items-center">
     <div class="title title-main">
       <!-- {{handleTitle(prodLine)}}{{handleTitle2(prodLine)}} -->
-      质量管理看板</div>
+      品控中心管理看板</div>
   </div>
 </template>
 

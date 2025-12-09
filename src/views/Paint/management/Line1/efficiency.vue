@@ -1,5 +1,5 @@
 <template>
-  <div class="efficency w-[25%]">
+  <div class="efficency w-[33%]">
     <dv-border-box12>
       <GlobalTitle title="当日人时效率"/>
       <!-- 如果正在加载，显示 loading -->

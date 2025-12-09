@@ -30,36 +30,49 @@
       
       <!-- 右侧设备统计区域 -->
       <div class="flex-1 flex flex-col justify-between min-w-0">
-        <!-- 设备统计卡片 -->
+        <!-- 设备统计卡片 - 两行三列 -->
         <div class="grid grid-cols-3 gap-3 mb-2">
-          <!-- 设备组数量 -->
+          <!-- 第一行：设备组数量 -->
           <div class="bg-blue-700/50 border border-blue-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-blue-600/60 hover:border-blue-300/70 transition-all duration-200"
                @click="handleDeviceGroupClick">
-            <div class="text-cyan-200 text-sm mb-1">设备组数量</div>
-            <div class="text-2xl font-bold text-white">{{ deviceGroupCount  }}</div>
+            <div class="text-cyan-200 text-sm mb-1 2xl:text-[10px] xl:text-sm">设备组数量</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ deviceGroupCount }}</div>
           </div>
           
-          <!-- 开机数量 -->
+          <!-- 第一行：运行数量 -->
           <div class="bg-green-600/50 border border-green-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-green-500/60 hover:border-green-300/70 transition-all duration-200" 
                @click="handleRunningClick">
-            <div class="text-green-200 text-sm mb-1">运行数量</div>
-            <div class="text-2xl font-bold text-white">{{ runningCount  }}</div>
+            <div class="text-green-200 text-sm mb-1 2xl:text-[12px]">运行数量</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ runningCount }}</div>
           </div>
           
-          <!-- 待机数量 -->
+          <!-- 第一行：待机数量 -->
           <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-yellow-500/60 hover:border-yellow-300/70 transition-all duration-200"
                @click="handleWaitingClick">
-            <div class="text-yellow-200 text-sm mb-1">待机数量</div>
-            <div class="text-2xl font-bold text-white">{{ waitingCount  }}</div>
+            <div class="text-yellow-200 text-sm mb-1 2xl:text-[12px]">待机数量</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ waitingCount }}</div>
           </div>
 
-                    <!-- 待机数量 -->
-                    <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-yellow-500/60 hover:border-yellow-300/70 transition-all duration-200"
+          <!-- 第二行：开机率 -->
+          <div class="bg-yellow-600/50 border border-yellow-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-yellow-500/60 hover:border-yellow-300/70 transition-all duration-200"
                @click="handleWaitingClick">
-            <div class="text-yellow-200 text-sm mb-1">开机率</div>
-            <div class="text-2xl font-bold text-white">{{ Math.round(runningCount/deviceGroupCount*100)   }}%</div>
+            <div class="text-yellow-200 text-sm mb-1 2xl:text-[12px]">开机率</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ deviceGroupCount > 0 ? Math.round(runningCount/deviceGroupCount*100) : 0 }}%</div>
+          </div>
+
+          <!-- 第二行：故障 -->
+          <div class="bg-orange-600/50 border border-orange-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-orange-500/60 hover:border-orange-300/70 transition-all duration-200">
+            <div class="text-orange-200 text-sm mb-1 2xl:text-[12px]">故障</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ faultCount }}</div>
+          </div>
+
+          <!-- 第二行：换型 -->
+          <div class="bg-purple-600/50 border border-purple-400/50 rounded-lg p-3 text-center cursor-pointer hover:bg-purple-500/60 hover:border-purple-300/70 transition-all duration-200">
+            <div class="text-purple-200 text-sm mb-1 2xl:text-[12px]">调机</div>
+            <div class="text-2xl font-bold text-white 2xl:text-[12px]">{{ changeCount }}</div>
           </div>
         </div>
+
         
         <!-- 设备组进度条区域 - 已注释进度条 -->
         <!-- <div class="bg-blue-800/40 border border-blue-400/50 rounded-xl p-4">
@@ -107,7 +120,9 @@ const orderName = computed(() => props.data.orderName || '未知设备组')
 const gdNum = computed(() => props.data.gdNum || 1)
 const deviceGroupCount = computed(() => props.data.machine_count || 0)
 const runningCount = computed(() => props.data.doing_count || 0)
-const waitingCount = computed(() => Math.max(0, (props.data.machine_count || 0) - (props.data.doing_count || 0)))
+const waitingCount = computed(() => Math.max(0, (props.data.machine_count || 0) - (props.data.doing_count || 0)-(props.data.warn_count || 0)-(props.data.teach_count || 0)))
+const faultCount = computed(() => props.data.warn_count || 0)
+const changeCount = computed(() => props.data.teach_count || 0)
 
 // 点击事件处理函数 - 已注释任务总数和已完成数相关事件
 const handleRunningClick = () => {
@@ -169,4 +184,5 @@ const handleWaitingClick = () => {
     opacity: 0.8;
   }
 }
+
 </style>

@@ -8,8 +8,14 @@ export function createChartOption(title: string, rawData: any) {
   
     return {
       color: [
-        '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-        '#FF1654'
+        '#0018A8', // 克莱因蓝
+        '#81D8D0', // 蒂芙尼蓝
+        '#367C2B', // 马尔斯绿
+        '#808066', // 橄榄灰
+        '#D4A373', // PANTONE 935U
+        '#D1A054', // PANTONE 728U
+        '#9B26B6', // PANTONE 2592U
+        '#C4E17F'  // PANTONE 374C
       ],
       title: {
         text: title,

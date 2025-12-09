@@ -1,0 +1,658 @@
+
+        <template>
+    <dv-border-box10>
+    <!-- <GlobalTitle title="本月来料合格率"/> -->
+        
+    <!-- 图表容器 -->
+    <div class="chartsbox w-full h-[90%]">
+        <div v-if="isLoading" class="loading-container">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <div class="loading-text">正在加载数据...</div>
+            </div>
+        </div>
+       
+        <div v-show="!isLoading" ref="chartRef" class="w-full h-[100%]"></div>
+    </div>
+            
+      
+        
+            
+        </dv-border-box10>
+        
+        <!-- 详情弹窗 -->
+        <el-dialog
+            v-model="dialogVisible"
+            :title="`${selectedUserName} - 来料检验详情`"
+            width="80%"
+            top="10vh"
+            :before-close="handleClose"
+            class="custom-dialog"
+        >
+            <!-- 加载状态 -->
+            <div v-if="detailLoading" class="loading-container">
+                <div class="loading-spinner">
+                    <div class="spinner"></div>
+                    <div class="loading-text">正在加载数据...</div>
+                </div>
+            </div>
+            <div v-else class="dialog-content">
+                <!-- 筛选和导出区域 -->
+                <div class="dialog-toolbar mb-4 flex justify-between items-center">
+                    <div class="filter-area flex gap-4 items-center">
+                        <el-select
+                            v-model="filterForm.inspector"
+                            placeholder="选择检验员"
+                            clearable
+                            style="width: 150px"
+                            @change="handleFilter"
+                        >
+                            <el-option
+                                v-for="option in inspectorOptions"
+                                :key="option.value"
+                                :label="option.label"
+                                :value="option.value"
+                            />
+                        </el-select>
+                        <el-date-picker
+                            v-model="filterForm.arrivalDateRange"
+                            type="daterange"
+                            range-separator="至"
+                            start-placeholder="开始日期"
+                            end-placeholder="结束日期"
+                            format="YYYY-MM-DD"
+                            value-format="YYYY-MM-DD"
+                            style="width: 240px"
+                            @change="handleFilter"
+                        />
+                        <el-select
+                            v-model="filterForm.supplier"
+                            placeholder="选择供应商"
+                            clearable
+                            style="width: 200px"
+                            @change="handleFilter"
+                        >
+                            <el-option
+                                v-for="option in supplierOptions"
+                                :key="option.value"
+                                :label="option.label"
+                                :value="option.value"
+                            />
+                        </el-select>
+                        <el-button @click="resetFilter" size="small" type="info" plain>
+                            重置
+                        </el-button>
+                    </div>
+                    <div class="export-area">
+                        <el-button @click="exportDialogToExcel" size="small" type="success" :icon="Download">
+                            导出Excel
+                        </el-button>
+                    </div>
+                </div>
+                
+                <el-table
+                    :data="paginatedData"
+                    style="width: 100%"
+                    :loading="detailLoading"
+                    stripe
+                    border
+                    height="400"
+                    :row-key="(_, index) => index"
+                >
+                    <el-table-column type="index" label="序号" width="80" />
+                    <el-table-column prop="doc_no" label="到货单号" />
+                    <el-table-column prop="supplier_full_name" label="供应商" />
+                    <el-table-column prop="itemDescription" label="品名" />
+                    <el-table-column prop="item_code" label="品号" />
+                    <el-table-column prop="arriveNum" label="到货数" />
+                    <el-table-column prop="arrivalTime" label="到货单审核时间" />
+                    <el-table-column prop="checkTime" label="检验完成时间" />
+                    <el-table-column prop="user_name" label="检验员" />        
+                </el-table>
+                
+                <!-- 分页组件 -->
+                <div class="pagination-container mt-4 flex justify-center">
+                    <el-pagination
+                        v-model:current-page="currentPage"
+                        v-model:page-size="pageSize"
+                        :page-sizes="[10, 20, 50, 100]"
+                        :total="totalCount"
+                        layout="total, sizes, prev, pager, next, jumper"
+                        background
+                        @size-change="handleSizeChange"
+                        @current-change="handleCurrentChange"
+                    />
+                </div>
+            </div>
+        </el-dialog>
+        </template>
+        
+        
+<script setup lang="ts">
+// import GlobalTitle from '@/components/title.vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
+import { getIncomingOkRate, getIncomingInspectionDetail } from '@/api/getQuiltyinfo'
+import { useRoute } from 'vue-router'
+import { eventBus } from '@/utils/eventbus'
+import { createChartOption, type ChartDataItem } from './charts'
+import { useEcharts } from '@/utils/useEcharts'
+import * as XLSX from 'xlsx'
+import { ElMessage } from 'element-plus'
+import { Download } from '@element-plus/icons-vue'
+        
+        const chartRef = ref(null)
+        const route = useRoute()
+        const prodLine = route.query.prodLine as string || ''
+const isLoading = ref(true)
+const isDataEmpty = ref(false)
+const chartTitle = '本月来料合格率'
+const chartData = ref<ChartDataItem[]>([])
+        
+        // 弹窗相关状态
+        const dialogVisible = ref(false)
+        const selectedUserName = ref('')
+        const detailData = ref([])
+        const filteredDetailData = ref([])
+        const detailLoading = ref(false)
+        
+        // 分页相关状态
+        const currentPage = ref(1)
+        const pageSize = ref(20)
+        const totalCount = ref(0)
+        const paginatedData = ref([])
+        
+        // 筛选表单
+        const filterForm = ref({
+            inspector: '', // 检验员
+            arrivalDateRange: [], // 到货日期范围
+            supplier: '' // 供应商
+        })
+        
+        // 检验员选项
+        const inspectorOptions = ref([])
+        
+        // 供应商选项
+        const supplierOptions = ref([])
+        
+const { initChart, setOption, resizeChart, onClick, offClick } = useEcharts(chartRef)
+
+const CATEGORY_MAP: Record<string, { label: string; inspectorName?: string }> = {
+    '徐程武': { label: '汽油车', inspectorName: '徐程武' },
+    '蒋智广': { label: '电动车', inspectorName: '蒋智广' },
+    '合计': { label: '合计' }
+}
+
+const toNumber = (value: unknown) => {
+    const num = Number(value)
+    return Number.isFinite(num) ? num : 0
+}
+
+const normalizeIncomingOkRateData = (payload: any[]): ChartDataItem[] => {
+    if (!Array.isArray(payload)) return []
+    return payload.reduce<ChartDataItem[]>((acc, entry) => {
+        const [key, records] = Object.entries(entry || {})[0] || []
+        if (!key) {
+            return acc
+        }
+        const mapping = CATEGORY_MAP[key] || { label: key, inspectorName: key }
+        const recordsArray = Array.isArray(records) ? records : []
+        
+        // 第一个对象作为 A类，第二个对象作为 常规
+        const aClassRecord = recordsArray[0]
+        const regularRecord = recordsArray[1]
+        
+        // 提取 ratio 值
+        const aClassRatio = aClassRecord ? toNumber(aClassRecord.ratio) : 0
+        const regularRatio = regularRecord ? toNumber(regularRecord.ratio) : 0
+        
+        acc.push({
+            name: mapping.label,
+            inspectorName: mapping.inspectorName,
+            aClassRatio: aClassRatio,
+            regularRatio: regularRatio
+        })
+        return acc
+    }, [])
+}
+
+const processData = (data: any[]) => {
+    const formattedData = normalizeIncomingOkRateData(data)
+    chartData.value = formattedData
+    isDataEmpty.value = formattedData.length === 0 || formattedData.every(item => item.aClassRatio === 0 && item.regularRatio === 0)
+}
+
+watch(chartData, () => {
+            nextTick(() => {
+                initChart()
+        const option = createChartOption(chartTitle, chartData.value)
+                setOption(option)
+                resizeChart() // 关键点：初始化后立即触发一次 resize
+                
+                // 添加图表点击事件
+                offClick(handleChartClick) // 先移除之前的监听器
+                onClick(handleChartClick)  // 添加新的监听器
+    })
+}, { deep: true, immediate: true })
+
+            
+const fetchData = () => {
+isLoading.value = true
+getIncomingOkRate(prodLine)
+            .then(res => {
+            isLoading.value = false
+            processData(res.data)
+            })
+            .catch(() => {
+            isLoading.value = false
+            isDataEmpty.value = true
+            })
+        }
+        
+        onMounted(() => {
+        fetchData()
+        eventBus.on('refreshData', fetchData)
+        })
+        
+        // 图表点击事件处理
+        const handleChartClick = (params: any) => {
+            if (params && params.name) {
+        const target = chartData.value.find(item => item.name === params.name)
+        if (!target?.inspectorName) {
+            console.warn('无可用的检验员信息，无法查看详情:', params.name)
+            return
+        }
+        selectedUserName.value = params.name
+        dialogVisible.value = true
+        detailLoading.value = true
+        fetchDetailData(target.inspectorName)
+            } else {
+                console.warn('点击事件参数无效:', params)
+            }
+        }
+        
+        // 获取详情数据
+        const fetchDetailData = (userName: string) => {
+            getIncomingInspectionDetail(userName)
+                .then(res => {
+                    detailData.value = res.data || []
+                    filteredDetailData.value = res.data || []
+                    
+                    // 生成检验员选项
+                    const inspectors = [...new Set(detailData.value.map(item => item.user_name).filter(Boolean))]
+                    inspectorOptions.value = inspectors.map(name => ({
+                        label: name,
+                        value: name
+                    }))
+                    
+                    // 生成供应商选项
+                    const suppliers = [...new Set(detailData.value.map(item => item.supplier_full_name).filter(Boolean))]
+                    supplierOptions.value = suppliers.map(name => ({
+                        label: name,
+                        value: name
+                    }))
+                    
+                    // 初始化分页
+                    currentPage.value = 1
+                    updatePagination()
+                    
+                    detailLoading.value = false
+                })
+                .catch(() => {
+                    detailData.value = []
+                    filteredDetailData.value = []
+                    inspectorOptions.value = []
+                    supplierOptions.value = []
+                    // 重置分页
+                    currentPage.value = 1
+                    updatePagination()
+                    detailLoading.value = false
+                })
+        }
+        
+        // 关闭弹窗
+        const handleClose = () => {
+            dialogVisible.value = false
+            selectedUserName.value = ''
+            detailData.value = []
+            filteredDetailData.value = []
+            filterForm.value.inspector = ''
+            filterForm.value.arrivalDateRange = []
+            filterForm.value.supplier = ''
+            inspectorOptions.value = []
+            supplierOptions.value = []
+            // 重置分页状态
+            currentPage.value = 1
+            pageSize.value = 20
+            totalCount.value = 0
+            paginatedData.value = []
+            // 重置加载状态
+            detailLoading.value = false
+        }
+        
+       
+        
+        // 筛选功能
+        const handleFilter = () => {
+            if (!filterForm.value.inspector && !filterForm.value.arrivalDateRange?.length && !filterForm.value.supplier) {
+                filteredDetailData.value = detailData.value
+            } else {
+                filteredDetailData.value = detailData.value.filter(item => {
+                    // 检验员筛选
+                    const inspectorMatch = !filterForm.value.inspector || 
+                        (item.user_name && item.user_name === filterForm.value.inspector)
+                    
+                    // 到货日期筛选
+                    let arrivalDateMatch = true
+                    if (filterForm.value.arrivalDateRange?.length === 2) {
+                        const [startDate, endDate] = filterForm.value.arrivalDateRange
+                        if (item.arrivalTime) {
+                            const itemDate = item.arrivalTime.split(' ')[0] // 提取日期部分
+                            arrivalDateMatch = itemDate >= startDate && itemDate <= endDate
+                        } else {
+                            arrivalDateMatch = false
+                        }
+                    }
+                    
+                    // 供应商筛选
+                    const supplierMatch = !filterForm.value.supplier || 
+                        (item.supplier_full_name && item.supplier_full_name === filterForm.value.supplier)
+                    
+                    return inspectorMatch && arrivalDateMatch && supplierMatch
+                })
+            }
+            
+            // 重置到第一页并更新分页
+            currentPage.value = 1
+            updatePagination()
+        }
+        
+        // 重置筛选
+        const resetFilter = () => {
+            filterForm.value.inspector = ''
+            filterForm.value.arrivalDateRange = []
+            filterForm.value.supplier = ''
+            filteredDetailData.value = detailData.value
+            updatePagination()
+        }
+        
+        // 分页处理函数
+        const updatePagination = () => {
+            totalCount.value = filteredDetailData.value.length
+            const start = (currentPage.value - 1) * pageSize.value
+            const end = start + pageSize.value
+            paginatedData.value = filteredDetailData.value.slice(start, end)
+        }
+        
+        // 分页大小改变
+        const handleSizeChange = (val: number) => {
+            pageSize.value = val
+            currentPage.value = 1
+            updatePagination()
+        }
+        
+        // 当前页改变
+        const handleCurrentChange = (val: number) => {
+            currentPage.value = val
+            updatePagination()
+        }
+        
+        // 弹窗Excel导出功能
+        const exportDialogToExcel = () => {
+            try {
+                if (filteredDetailData.value.length === 0) {
+                    ElMessage.warning('暂无数据可导出')
+                    return
+                }
+                
+                // 准备Excel数据
+                const excelData = filteredDetailData.value.map((item, index) => ({
+                    '序号': index + 1,
+                    '到货单号': item.doc_no || '',
+                    '供应商': item.supplier_full_name || '',
+                    '品名': item.itemDescription || '',
+                    '品号': item.item_code || '',
+                    '到货数': item.arriveNum || 0,
+                    '到货单审核时间': item.arrivalTime || '',
+                    '检验完成时间': item.checkTime || '',
+                    '检验员': item.user_name || '',
+                    // '及时数': item.jsNum || 0,
+                    // '不及时数': item.bjsNum || 0,
+                    // '及时率(%)': item.rate || 0
+                }))
+                
+                // 创建工作簿
+                const wb = XLSX.utils.book_new()
+                const ws = XLSX.utils.json_to_sheet(excelData)
+                
+                // 设置列宽
+                const colWidths = [
+                    { wch: 8 },   // 序号
+                    { wch: 15 },  // 到货单号
+                    { wch: 20 },  // 供应商
+                    { wch: 15 },  // 品名
+                    { wch: 15 },  // 品号
+                    { wch: 10 },  // 到货数
+                    { wch: 20 },  // 到货单审核时间
+                    { wch: 20 },  // 检验完成时间
+                    { wch: 12 },  // 检验员
+                    // { wch: 10 },  // 及时数
+                    // { wch: 12 },  // 不及时数
+                    // { wch: 12 }   // 及时率
+                ]
+                ws['!cols'] = colWidths
+                
+                // 添加工作表到工作簿
+                const sheetName = filterForm.value.inspector || filterForm.value.arrivalDateRange?.length || filterForm.value.supplier 
+                    ? `${selectedUserName.value}_筛选结果` 
+                    : `${selectedUserName.value}_详情`
+                XLSX.utils.book_append_sheet(wb, ws, sheetName)
+                
+                // 生成文件名
+                const now = new Date()
+                const dateStr = now.toISOString().slice(0, 10).replace(/-/g, '')
+                const timeStr = now.toTimeString().slice(0, 8).replace(/:/g, '')
+                const fileName = `${selectedUserName.value}_来料检验详情_${dateStr}_${timeStr}.xlsx`
+                
+                // 导出文件
+                XLSX.writeFile(wb, fileName)
+                
+                ElMessage.success(`Excel文件已导出: ${fileName}`)
+                
+            } catch (error) {
+                console.error('导出Excel失败:', error)
+                ElMessage.error('导出Excel失败，请重试')
+            }
+        }
+        
+     
+        onBeforeUnmount(() => {
+        eventBus.off('refreshData', fetchData)
+        })
+        </script>
+        
+        
+        
+        
+        <style scoped>
+        .custom-dialog {
+            :deep(.el-dialog) {
+                background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%);
+                border: 1px solid #4a90e2;
+                border-radius: 8px;
+            }
+            
+            :deep(.el-dialog__header) {
+                background: rgba(74, 144, 226, 0.1);
+                border-bottom: 1px solid #4a90e2;
+                padding: 15px 20px;
+            }
+            
+            :deep(.el-dialog__title) {
+                color: #fff;
+                font-size: 16px;
+                font-weight: 600;
+            }
+            
+            :deep(.el-dialog__body) {
+                padding: 20px;
+                background: rgba(0, 0, 0, 0.2);
+            }
+        }
+        
+        .dialog-content {
+            :deep(.el-table) {
+                background: transparent;
+                color: #fff;
+            }
+            
+            :deep(.el-table__header) {
+                background: rgba(74, 144, 226, 0.2);
+            }
+            
+            :deep(.el-table th) {
+                background: rgba(74, 144, 226, 0.3);
+                color: #fff;
+                border-color: #4a90e2;
+                font-weight: 600;
+            }
+            
+            :deep(.el-table td) {
+                background: rgba(255, 255, 255, 0.05);
+                color: #fff;
+                border-color: #4a90e2;
+            }
+            
+            :deep(.el-table--striped .el-table__body tr.el-table__row--striped td) {
+                background: rgba(74, 144, 226, 0.1);
+            }
+            
+            :deep(.el-table__body tr:hover > td) {
+                background: rgba(74, 144, 226, 0.2) !important;
+            }
+            
+            :deep(.el-table__empty-block) {
+                background: transparent;
+                color: #fff;
+            }
+        }
+        
+        .pagination-container {
+            :deep(.el-pagination) {
+                color: #fff;
+            }
+            
+            :deep(.el-pagination__total) {
+                color: #fff;
+            }
+            
+            :deep(.el-pagination__sizes) {
+                color: #fff;
+            }
+            
+            :deep(.el-pagination__jump) {
+                color: #fff;
+            }
+            
+            :deep(.el-pagination__total) {
+                color: #fff;
+            }
+            
+            :deep(.el-pagination .btn-prev),
+            :deep(.el-pagination .btn-next) {
+                background: rgba(74, 144, 226, 0.3);
+                color: #fff;
+                border-color: #4a90e2;
+            }
+            
+            :deep(.el-pagination .btn-prev:hover),
+            :deep(.el-pagination .btn-next:hover) {
+                background: rgba(74, 144, 226, 0.5);
+            }
+            
+            :deep(.el-pager li) {
+                background: rgba(74, 144, 226, 0.3);
+                color: #fff;
+                border-color: #4a90e2;
+            }
+            
+            :deep(.el-pager li:hover) {
+                background: rgba(74, 144, 226, 0.5);
+            }
+            
+            :deep(.el-pager li.is-active) {
+                background: #4a90e2;
+                color: #fff;
+            }
+            
+            :deep(.el-select .el-input__inner) {
+                background: rgba(74, 144, 226, 0.3);
+                color: #fff;
+                border-color: #4a90e2;
+            }
+            
+            :deep(.el-input__inner) {
+                background: rgba(74, 144, 226, 0.3);
+                color: #fff;
+                border-color: #4a90e2;
+            }
+        }
+
+        /* 加载状态样式 */
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 300px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 8px;
+        }
+
+        .loading-spinner {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(74, 144, 226, 0.3);
+            border-top: 4px solid #4a90e2;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        .loading-text {
+            color: #4a90e2;
+            font-size: 16px;
+            font-weight: 500;
+            text-align: center;
+        }
+
+.empty-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    /* min-height: 300px; */
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    color: #4a90e2;
+    gap: 0.5rem;
+}
+
+.empty-icon {
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.empty-text {
+    font-size: 16px;
+}
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        </style>

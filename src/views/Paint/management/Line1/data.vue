@@ -1,5 +1,5 @@
 <template>
-    <div class="data w-[25%] text-white">
+    <div class="data w-[33%] text-white">
         <dv-border-box12>
             <div class="content  w-full h-full flex flex-col p-4 gap-8  ">
       <div class="row flex-1 flex gap-1 justify-between">
@@ -46,22 +46,25 @@
           :smalltitle1="'人数'" 
           :smalltitle2="'效率'" 
           />  -->
-        <DataCard title="今日计划" :value="TodayData?.pcTotal ?? '无数据'" 
+        <DataCard title="本周计划" :value="TodayData?.monthPlan ?? '无数据'" 
           :titleFontSize="0.6"
                :valueFontSize="0.6"
           :squareHeight="70"
           /> 
-        <DataCard title="今日已完成数"  :value=" TodayData?.done ?? '无数据'"
+        <DataCard title="本周已完成数"  :value=" TodayData?.monthDone ?? '无数据'"
           :titleFontSize="0.6"
                 :valueFontSize="0.6"
           :squareHeight="70"
           />
-        <DataCard title="待生产数" :value="TodayData?.unProduce ??  '无数据'"
+        <DataCard title="本周待生产数" 
+          :value="(TodayData?.monthPlan != null && TodayData?.monthDone != null) ? 
+            (TodayData.monthPlan - TodayData.monthDone) : '无数据'"
           :titleFontSize="0.6"
-                :valueFontSize="0.6"
+          :valueFontSize="0.6"
           :squareHeight="70"
-          /> 
-        <DataCard title="今日达成率" :value="formatPercent(TodayData?.rate) ??  '无数据'"
+        /> 
+        <DataCard title="本周达成率" :value="TodayData?.monthPlan != null && TodayData?.monthDone != null ? 
+            ((TodayData.monthDone / TodayData.monthPlan) * 100).toFixed(1) + '%' : '无数据'"
           :titleFontSize="0.6"
               :valueFontSize="0.6"
           :squareHeight="70"
@@ -132,8 +135,8 @@
   <script setup>
   import { ref, onMounted,onBeforeUnmount ,nextTick,computed  } from 'vue';
   import DataCard from "@/components/DataCard.vue"; // 导入封装组件
-  import { getMonthTotalInfo ,getTodayProductionInfo,} from '@/api/getProduceinfo';
-  import { getPaintingPassRate } from '@/api/getStampWeldinfo';
+  import { getMonthTotalInfo } from '@/api/getProduceinfo';
+  import { getPaintingPassRate, getWeekDataTotal20062007 } from '@/api/getStampWeldinfo';
   import { getPaassedInfo } from '@/api/getQuiltyinfo';
   import { useRoute } from 'vue-router';
   import { eventBus } from '@/utils/eventbus';
@@ -158,7 +161,7 @@
     getMonthTotalInfo(prodLine).then(res => {
       MonthlyData.value = res.data
     }),
-    getTodayProductionInfo(prodLine).then(res => {
+    getWeekDataTotal20062007(prodLine).then(res => {
       TodayData.value = res.data
     }),
     getPaintingPassRate().then(res => {

@@ -83,21 +83,33 @@ onMounted(() => {
       <p class="tracking-widest text-xl">注塑产品质量监控</p>
     </div>
     
-    <!-- 合格检验工单数、合格工单数、合格率 -->
-    <div class="flex justify-around items-center mb-2">
+    <!-- 今日/本月检验指标 -->
+    <div class="stats-row mb-2">
       <div class="stat-item">
-        <div class="stat-label">合格检验工单数</div>
-        <div class="stat-value">{{ qualityStats.qualifiedInspectionOrders }}</div>
+        <div class="stat-label">今日检验工单数</div>
+        <div class="stat-value">{{ todayStats.total }}</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">合格工单数</div>
-        <div class="stat-value">{{ qualityStats.qualifiedOrders }}</div>
+        <div class="stat-label">今日合格工单数</div>
+        <div class="stat-value">{{ todayStats.hg }}</div>
       </div>
       <div class="stat-item">
-        <div class="stat-label">合格率</div>
-        <div class="stat-value">{{ qualityStats.qualifiedRate }}%</div>
+        <div class="stat-label">今日合格率</div>
+        <div class="stat-value">{{ todayStats.rate }}%</div>
       </div>
-</div>
+      <div class="stat-item">
+        <div class="stat-label">本月检验工单数</div>
+        <div class="stat-value">{{ monthStats.total }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">本月合格工单数</div>
+        <div class="stat-value">{{ monthStats.hg }}</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-label">本月合格率</div>
+        <div class="stat-value">{{ monthStats.rate }}%</div>
+      </div>
+    </div>
     
     <!-- 机台自检合格率表格 -->
     <!-- <div class="flex-1 mb-2 flex flex-col" style="overflow: hidden;">
@@ -146,12 +158,18 @@ const values = ref([]); // Y 轴数据
 let chartInstance = null;
 const scrollBoardRef = ref(null);
 
-// 合格检验工单数、合格工单数、合格率统计数据
-const qualityStats = ref({
-  qualifiedInspectionOrders: 0,
-  qualifiedOrders: 0,
-  qualifiedRate: 0
-})
+// 今日/本月检验统计
+const todayStats = ref({
+  total: 0,
+  hg: 0,
+  rate: 0,
+});
+
+const monthStats = ref({
+  total: 0,
+  hg: 0,
+  rate: 0,
+});
 
 const config = reactive({
   header: ['机台', '生产数量', '良品', '不良品', '废品', '自检合格率'],
@@ -342,27 +360,60 @@ const fetchDefectiveData = async () => {
 // };
 
 // 获取今日检验统计（合格检验工单数、合格工单数、合格率）
+const normalizeRate = (rate) => {
+  if (rate === null || rate === undefined || rate === '') return 0;
+  const num = Number(rate);
+  if (Number.isNaN(num)) return 0;
+  return Number(num.toFixed(1));
+};
+
+const deriveQualifiedRate = (total, hg, ngRate) => {
+  const totalNum = Number(total);
+  const hgNum = Number(hg);
+
+  if (Number.isFinite(totalNum) && totalNum > 0 && Number.isFinite(hgNum) && hgNum >= 0) {
+    return normalizeRate((hgNum / totalNum) * 100);
+  }
+
+  // 工单总数为 0 时直接返回 0%，避免显示 100%
+  if (!totalNum) return 0;
+
+  const ngRateNum = Number(ngRate);
+  if (!Number.isFinite(ngRateNum)) return 0;
+
+  if (ngRateNum <= 1) {
+    return normalizeRate((1 - ngRateNum) * 100);
+  }
+
+  return normalizeRate(Math.max(0, 100 - ngRateNum));
+};
+
+const buildStatPayload = (data = {}) => {
+  const total = data.total ?? 0;
+  const hg = data.hg ?? 0;
+  return {
+    total,
+    hg,
+    rate: deriveQualifiedRate(total, hg, data.rate),
+  };
+};
+
 const fetchQualityStats = async () => {
   try {
     const res = await getZhsProductMonitoring();
     if (res && res.code === 200 && res.data) {
-      const { total, hg, rate } = res.data;
-      qualityStats.value = {
-        qualifiedInspectionOrders: total ?? 0,
-        qualifiedOrders: hg ?? 0,
-        qualifiedRate: typeof rate === 'number' ? rate : (parseFloat(rate) || 0)
-      };
+      const { todayData = {}, monthData = {} } = res.data;
+
+      todayStats.value = buildStatPayload(todayData);
+      monthStats.value = buildStatPayload(monthData);
       return;
     }
   } catch (e) {
     console.error('获取今日检验统计失败:', e);
   }
   // 回退到 mock
-  qualityStats.value = {
-    qualifiedInspectionOrders: mockQualityStats.qualifiedInspectionOrders,
-    qualifiedOrders: mockQualityStats.qualifiedOrders,
-    qualifiedRate: mockQualityStats.qualifiedRate
-  };
+  todayStats.value = buildStatPayload(mockQualityStats.today);
+  monthStats.value = buildStatPayload(mockQualityStats.month);
 };
 
 // 统一的刷新函数
@@ -407,28 +458,40 @@ onMounted(() => {
   background: rgba(79,142,247,0.1);
 } */
 
-.stat-item {
+.stats-row {
   display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  gap: 0.8rem;
+  /* height: clamp(90px, 8vh, 120px); */
+  flex-wrap: wrap;
+}
+
+.stat-item {
+  flex: 1 1 clamp(120px, 5vw, 220px);
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
   text-align: center;
-  padding: 0.5rem 1rem;
-  background: rgba(79,142,247,0.1);
-  border-radius: 4px;
-  min-width: 120px;
-  gap: 10px;
+  padding: 0.5rem 0.6rem;
+  background: linear-gradient(180deg, rgba(0, 83, 159, 0.65), rgba(0, 36, 95, 0.65));
+  border: 1px solid rgba(0, 174, 255, 0.4);
+  border-radius: 6px;
+  box-shadow: 0 0 12px rgba(0, 174, 255, 0.15);
+  gap: 0.2rem;
 }
 
 .stat-label {
-  font-size: 0.7vw;
-  color: rgb(255, 255, 255);
-  margin-bottom: 0.3rem;
+  font-size: 0.55vw;
+  color: rgba(255, 255, 255, 0.8);
 }
 
 .stat-value {
-  font-size: 1.2vw;
+  font-size: 0.8vw;
   font-weight: bold;
   color: #00eaff;
-  text-shadow: 0 0 10px rgba(0, 234, 255, 0.5);
+  text-shadow: 0 0 12px rgba(0, 234, 255, 0.6);
 }
 
 h2 {

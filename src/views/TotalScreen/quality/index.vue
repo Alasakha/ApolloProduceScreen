@@ -5,8 +5,14 @@
     <dv-border-box11 :titleWidth=350 title="浙江阿波罗运动科技股份有限公司">
       <div class="box">
         <Header></Header>
-        <Line2></Line2>
-        <Line3></Line3>
+        <div class="section-container">
+          <h2 class="section-title">检验发现问题数人员排名</h2>
+          <Line2></Line2>
+        </div>
+        <div class="section-container">
+          <h2 class="section-title">质量检验现况</h2>
+          <Line3></Line3>
+        </div>
       </div>
 
     </dv-border-box11>
@@ -125,5 +131,28 @@ body {
 ::-webkit-scrollbar {
   width: 0;
   height: 0;
+}
+
+/* 标题容器 */
+.section-container {
+  margin-bottom: 1vh;
+}
+
+.section-title {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #fff;
+  text-align: center;
+  margin: 0.3vh 0 0.5vh 0;
+  padding: 0.5vh 2vw;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.8);
+  letter-spacing: 0.1em;
+  border: 2px solid #00d9ff;
+  border-radius: 4px;
+  display: inline-block;
+  width: fit-content;
+  margin-left: 50%;
+  transform: translateX(-50%);
+  box-shadow: 0 0 10px rgba(0, 217, 255, 0.5), inset 0 0 10px rgba(0, 217, 255, 0.2);
 }
 </style>

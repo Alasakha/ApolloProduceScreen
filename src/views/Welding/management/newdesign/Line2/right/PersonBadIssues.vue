@@ -179,7 +179,7 @@ const getDefaultColor = (index: number): string => {
 // 图表配置 - 半环图配置
 const chartConfig = computed(() => ({
     radius: ['40%', '70%'] as [string, string], // 环形：内半径40%，外半径70%
-    center: ['50%', '50%'] as [string, string], // 中心点居中
+    center: ['50%', '70%'] as [string, string], // 中心点居中
     startAngle: 180, // 从180度开始（左侧）
     endAngle: 0, // 到0度结束（右侧），形成下半圆
     showLabel: true,
@@ -414,6 +414,8 @@ onUnmounted(() => {
     width: 100%;
     height: 100%;
     overflow: hidden;
+    padding: 10px;
+    box-sizing: border-box;
 }
 
 /* Dialog样式 */

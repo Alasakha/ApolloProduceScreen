@@ -108,6 +108,30 @@ const calcProgress = device => {
   flex: 1;
 }
 
+/* 1080p 分辨率优化 */
+@media (min-width: 1920px) and (max-width: 2059px) {
+  .flex-container {
+    gap: 0.6rem;
+    padding: 0.6rem;
+  }
+  
+  .row {
+    gap: 0.6rem;
+  }
+}
+
+/* 小屏幕优化 */
+@media (max-width: 1919px) {
+  .flex-container {
+    gap: 0.5rem;
+    padding: 0.5rem;
+  }
+  
+  .row {
+    gap: 0.5rem;
+  }
+}
+
 @media (max-width: 1024px) {
   .row {
     flex-direction: column;

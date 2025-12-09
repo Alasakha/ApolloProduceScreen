@@ -6,8 +6,30 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted, watch, nextTick, computed } from 'vue'
-import * as echarts from 'echarts'
-import type { EChartsOption, ECharts } from 'echarts'
+import * as echarts from 'echarts/core'
+import {
+    TooltipComponent,
+    LegendComponent,
+    TitleComponent,
+    GraphicComponent,
+    type TooltipComponentOption,
+    type LegendComponentOption,
+    type TitleComponentOption,
+    type GraphicComponentOption
+} from 'echarts/components'
+import { PieChart, type PieSeriesOption } from 'echarts/charts'
+import { CanvasRenderer } from 'echarts/renderers'
+import type { ComposeOption, ECharts } from 'echarts/core'
+import { GLOBAL_PIE_CHART_COLORS } from '@/utils/pieChartColors'
+
+echarts.use([
+    TooltipComponent,
+    LegendComponent,
+    TitleComponent,
+    GraphicComponent,
+    PieChart,
+    CanvasRenderer
+])
 
 // 定义数据项接口
 export interface PieChartItem {
@@ -27,6 +49,7 @@ interface Props {
     showPointer?: boolean
     emptyText?: string
     emptyTextColor?: string
+    emptyTextPosition?: [string | number, string | number]
     startAngle?: number
     endAngle?: number
     showLegend?: boolean
@@ -40,7 +63,8 @@ const props = withDefaults(defineProps<Props>(), {
     showValue: true,
     showPointer: true,
     emptyText: '暂无数据',
-    emptyTextColor: '#909399',
+    emptyTextColor: '#009944',
+    emptyTextPosition: () => ['45%', '80%'],
     startAngle: undefined,
     endAngle: undefined,
     showLegend: true
@@ -56,65 +80,70 @@ const chartRef = ref<HTMLElement>()
 let chartInstance: ECharts | null = null
 
 // 默认颜色配置
-const defaultColors = [
-    '#4A90E2', '#7B68EE', '#9370DB', '#8A2BE2', 
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
-    '#FFEAA7', '#DDA0DD', '#98D8E8', '#F7DC6F'
-]
+const defaultColors = GLOBAL_PIE_CHART_COLORS
+
+type PieChartOption = ComposeOption<
+    TooltipComponentOption |
+    LegendComponentOption |
+    TitleComponentOption |
+    GraphicComponentOption |
+    PieSeriesOption
+>
+
+// 判断是否有真实数据
+const hasRealData = computed(() => {
+    return props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
+})
+
+// 处理图表数据 - 无数据时创建默认数据
+const processedData = computed(() => {
+    if (hasRealData.value) {
+        return props.data
+    } else {
+        // 无数据时，创建一个完整的绿色饼图
+        return [{
+            name: '暂无数据',
+            value: 100,
+            color: props.emptyTextColor || '#00ff00'
+        }]
+    }
+})
 
 // 初始化图表
 const initChart = () => {
     if (!chartRef.value) return
     
-    // 销毁旧实例
+    const width = chartRef.value.clientWidth
+    const height = chartRef.value.clientHeight
+    if (width === 0 || height === 0) {
+        setTimeout(() => initChart(), 100)
+        return
+    }
+    
     if (chartInstance) {
         chartInstance.dispose()
     }
     
-    // 创建新实例
     chartInstance = echarts.init(chartRef.value)
+    updateChart()
     
-    // 设置配置项
-    const option: EChartsOption = getChartOption()
-    chartInstance.setOption(option)
-    
-    // 绑定点击事件
     chartInstance.on('click', (params: any) => {
-        console.log('ECharts点击事件:', params)
         emit('click', params)
     })
     
-    // 监听窗口大小变化
     window.addEventListener('resize', handleResize)
 }
 
-// 当没有有效数据时，创建一个默认的"暂无数据"项
-const chartData = computed(() => {
-    const hasData = props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
-    if (hasData) {
-        return props.data
-    } else {
-        // value 设为 1 才能显示半环，0 不会显示
-        return [{
-            name: '暂无数据',
-            value: 1,
-            color: '#279f27' // 绿色
-        }]
-    }
-})
-
 // 获取图表配置
-const getChartOption = (): EChartsOption => {
-    // 检查是否有数据
-    const hasData = props.data && props.data.length > 0 && props.data.some(item => item.value > 0)
+const getChartOption = (): PieChartOption => {
+    const isNoData = !hasRealData.value
     
     return {
         title: props.title ? {
-            // text: props.title,
             left: 'center',
             top: '5%',
             textStyle: {
-                color: '#ffff',
+                color: '#fff',
                 fontSize: 16,
                 fontWeight: 'bold'
             }
@@ -123,18 +152,20 @@ const getChartOption = (): EChartsOption => {
         tooltip: {
             trigger: 'item',
             formatter: (params: any) => {
+                if (isNoData) {
+                    return '暂无数据'
+                }
                 return `${params.name}: ${params.value}(${params.percent}%)`
             },
-            backgroundColor: 'rgba(255,255,255,0.95)',
-            borderColor: '#ddd',
+            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+            borderColor: '#333',
             textStyle: {
                 color: '#fff',
-                fontSize: 14,
-                fontWeight: 'bold'
+                fontSize: 14
             }
         },
         
-        legend: props.showLegend ? {
+        legend: (props.showLegend && !isNoData) ? {
             orient: 'vertical',
             left: 'left',
             top: 'middle',
@@ -156,16 +187,17 @@ const getChartOption = (): EChartsOption => {
                 center: props.center,
                 startAngle: props.startAngle,
                 endAngle: props.endAngle,
-                data: chartData.value.map((item, index) => ({
+                avoidLabelOverlap: false,
+                minAngle: 0,
+                data: processedData.value.map((item, index) => ({
                     name: item.name,
                     value: item.value,
                     itemStyle: {
                         color: item.color || defaultColors[index % defaultColors.length]
                     }
                 })),
-                // 当没有数据时，隐藏标签线
-                labelLine: hasData ? {
-                    show: props.showLabel && props.showPointer,
+                labelLine: {
+                    show: !isNoData && props.showLabel && props.showPointer,
                     length: 15,
                     length2: 10,
                     smooth: true,
@@ -173,15 +205,12 @@ const getChartOption = (): EChartsOption => {
                         color: '#666',
                         width: 2
                     }
-                } : {
-                    show: false
                 },
-                
-                // 标签配置 - 优化字体颜色和可读性
                 label: {
-                    show: hasData ? props.showLabel : false, // 无数据时隐藏标签
+                    show: !isNoData && props.showLabel,
                     position: 'outside',
                     formatter: (params: any) => {
+                        if (isNoData) return ''
                         if (props.showValue && props.showPointer) {
                             return `${params.name}\n${params.value}(${params.percent}%)`
                         } else if (props.showValue) {
@@ -192,17 +221,12 @@ const getChartOption = (): EChartsOption => {
                         return ''
                     },
                     fontSize: 13,
-                    // fontWeight: 'bold',
-                    // 使用白色字体
                     color: '#fff',
-                    // 添加文字阴影，提高可读性
                     textShadowColor: 'rgba(0, 0, 0, 0.8)',
                     textShadowBlur: 2,
                     textShadowOffsetX: 1,
                     textShadowOffsetY: 1
                 },
-                
-                // 高亮效果
                 emphasis: {
                     itemStyle: {
                         shadowBlur: 15,
@@ -212,44 +236,45 @@ const getChartOption = (): EChartsOption => {
                     label: {
                         fontSize: 15,
                         fontWeight: 'bold',
-                        color: '#fff',
-                        textShadowColor: 'rgba(0, 0, 0, 1)',
-                        textShadowBlur: 3,
-                        textShadowOffsetX: 1,
-                        textShadowOffsetY: 1
+                        color: '#fff'
                     }
                 },
-                
-                // 动画配置
                 animationType: 'scale',
                 animationEasing: 'elasticOut',
                 animationDelay: (idx: number) => idx * 200
             }
         ],
         
-        // 空数据时的处理 - 在图表中心显示"暂无数据"文字
-        graphic: hasData ? undefined : [
+        // 无数据时在中心显示文字
+        graphic: isNoData ? [
             {
                 type: 'text',
-                left: 'center',
-                top: 'center',
+                left: props.emptyTextPosition[0],
+                top: props.emptyTextPosition[1],
+                z: 100,
                 style: {
                     text: props.emptyText,
                     fontSize: 18,
                     fontWeight: 'bold',
-                    fill: props.emptyTextColor || '#279f27'
+                    fill: props.emptyTextColor || '#00ff00'
                 }
             }
-        ]
+        ] : undefined
     }
 }
 
-// 更新图表数据
+// 更新图表
 const updateChart = () => {
-    if (chartInstance) {
+    if (!chartInstance) return
+    
         const option = getChartOption()
         chartInstance.setOption(option, true)
+    
+    nextTick(() => {
+        if (chartInstance) {
+            chartInstance.resize()
     }
+    })
 }
 
 // 处理窗口大小变化
@@ -265,8 +290,6 @@ watch(() => props.data, () => {
         updateChart()
     })
 }, { deep: true })
-
-
 
 // 组件挂载
 onMounted(() => {
@@ -284,7 +307,7 @@ onUnmounted(() => {
     window.removeEventListener('resize', handleResize)
 })
 
-// 暴露方法给父组件
+// 暴露方法
 defineExpose({
     getChartInstance: () => chartInstance,
     resize: handleResize,
@@ -301,6 +324,5 @@ defineExpose({
 .chart-container {
     width: 100%;
     height: 100%;
-    min-height: 300px;
 }
 </style> 

@@ -42,11 +42,11 @@
                   placement="left"
                   effect="dark"
                 >
-                  <svg class="warn-icon" width="38" height="38" viewBox="0 0 24 24">
+                  <!-- <svg class="warn-icon" width="38" height="38" viewBox="0 0 24 24">
                     <polygon points="12,3 22,20 2,20" fill="#FFD600" stroke="#FFA000" stroke-width="2"/>
                     <rect x="11" y="9" width="2" height="5" fill="#FFA000"/>
                     <rect x="11" y="16" width="2" height="2" fill="#FFA000"/>
-                  </svg>
+                  </svg> -->
                 </el-tooltip>
               </div>
             </div>

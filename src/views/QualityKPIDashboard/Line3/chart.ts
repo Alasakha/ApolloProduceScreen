@@ -1,3 +1,4 @@
+import { GLOBAL_PIE_CHART_COLORS } from '@/utils/pieChartColors';
 export function createOption(title, data) {
   const BACKGROUND_COLOR = 'rgb(3, 4, 94,0.3)';
   
@@ -49,8 +50,7 @@ export function createOption(title, data) {
               },
               itemStyle: {
                   color: function(params) {
-                      const colors = ['#00ffff', '#0077ff', '#ff6b6b']; // 增加第三个颜色
-                      return colors[params.dataIndex % colors.length];
+                      return GLOBAL_PIE_CHART_COLORS[params.dataIndex % GLOBAL_PIE_CHART_COLORS.length];
                   },
                   shadowBlur: 5,
                   shadowColor: 'rgba(0, 0, 0, 0.3)'

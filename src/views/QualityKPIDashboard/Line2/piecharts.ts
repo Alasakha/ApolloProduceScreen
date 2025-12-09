@@ -1,4 +1,6 @@
 // createChartOption.ts
+import { GLOBAL_PIE_CHART_COLORS } from '@/utils/pieChartColors';
+
 export function createChartOption(title: string, rawData: any) {
   const isEmpty = !rawData || rawData.length === 0;
 
@@ -7,10 +9,7 @@ export function createChartOption(title: string, rawData: any) {
     : rawData;
 
   return {
-    color: [
-      '#247BA0', '#70C1B3', '#B2DBBF', '#F3FFBD',
-      '#FF1654'
-    ],
+    color: GLOBAL_PIE_CHART_COLORS,
     title: {
       text: title,
       top: '4%',

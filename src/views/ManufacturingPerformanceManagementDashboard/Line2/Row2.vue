@@ -40,7 +40,7 @@
       <div class="department-section">
 
         <div class="data-cards-row">
-          <div class="section-title text-xs 2xl:text-sm 3xl:text-xs 4xl:text-sm">金工一部涂装</div>
+          <div class="section-title text-xs 2xl:text-sm 3xl:text-xs 4xl:text-sm">金工一部</div>
           <DataCard 
             :value="currentPaintingData.target" 
             unit="%" 

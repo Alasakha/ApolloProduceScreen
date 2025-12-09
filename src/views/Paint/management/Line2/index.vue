@@ -3,15 +3,19 @@
         <QualityChart class="flex-1 min-w-0"></QualityChart>
 
         <rightcontent class="flex-1 min-w-0"></rightcontent>
-        <Abnormal class="flex-2 min-w-0"></Abnormal>
+        <!-- <Abnormal class="flex-2 min-w-0"></Abnormal> -->
+        <WorkOrderClosingRate :prod-line="workOrderProdLine" class="flex-1"/>
     </div>
 </template>
 
 
 <script setup lang="ts">
+import {ref} from 'vue'
 import QualityChart from './qualityQues.vue'
-import Abnormal from '../ScrollTable/leftcontent.vue'
+// import Abnormal from '../ScrollTable/leftcontent.vue'
 import rightcontent from './rightContent.vue'
+import WorkOrderClosingRate from '../components/WorkOrderClosingRate.vue'
+const workOrderProdLine = ref('金工二部涂装')
 </script>
 
 <style scoped>

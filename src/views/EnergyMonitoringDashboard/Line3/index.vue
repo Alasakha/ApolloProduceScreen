@@ -81,6 +81,18 @@
               </div>
             </div>
             
+            <!-- 年度电量数据 -->
+            <div class="flex items-center">
+              <span class="data-icon">📅</span>
+              <span class="text-white  text-xs sm:text-sm md:text-base xl:text-xs  2xl:text-[8px] 3xl:text-[8px] 4xl:text-sm">年度电量数据</span>
+              <div class="number-display">
+                <span class="number-value" :style="{ fontSize: getFontSize(), color: '#00eeff' }">
+                  {{ item.yearlyElectric }}
+                </span>
+                <span class="number-unit" :style="{ fontSize: getFontSize() * 0.7, color: '#00eeff' }">度</span>
+              </div>
+            </div>
+            
             <!-- 空压机月度分摊值（仅显示在需要分摊的车间） -->
             <div class="flex items-center" v-if="item.airCompressorAllocation !== undefined">
               <span class="data-icon">💨</span>
@@ -94,19 +106,37 @@
             </div>
             
             <!-- 添加填写原因按钮 -->
-            <div class="reason-section" v-if="Number(item.ratio) > 0.5">
-              <div class="reason-info">
+            <div 
+              class="reason-section" 
+              v-if="Number(item.ratio) > 0.5"
+              @click="toggleReasonSection(index)"
+            >
+              <div class="reason-info" v-show="expandedReasonIndex === index">
                 <span class="reason-icon">⚠️</span>
                 <span class="reason-label">超过原因：</span>
                 <span class="reason-text">{{ item.reason || '暂未填写' }}</span>
               </div>
-              <button 
-                class="reason-btn"
-                @click="openReasonDialog(item)"
-              >
-                <span class="btn-icon">✏️</span>
-                填写原因
-              </button>
+              <div class="reason-actions" v-show="expandedReasonIndex === index">
+                <button 
+                  class="reason-btn"
+                  @click.stop="openReasonDialog(item)"
+                >
+                  <span class="btn-icon">✏️</span>
+                  填写原因
+                </button>
+                <button 
+                  class="reason-cancel-btn"
+                  @click.stop="expandedReasonIndex = null"
+                >
+                  取消
+                </button>
+              </div>
+              <div class="reason-collapsed" v-show="expandedReasonIndex !== index">
+                <span class="reason-icon">⚠️</span>
+                <span class="reason-label">超过原因：</span>
+                <span class="reason-text">{{ item.reason || '暂未填写' }}</span>
+                <span class="reason-hint">点击查看详情</span>
+              </div>
             </div>
           </div>
         </div>
@@ -227,6 +257,7 @@ const newReason = ref('')
 const feedbackMessage = ref('')
 const feedbackType = ref<'success' | 'error'>('success')
 const submittingReason = ref(false)
+const expandedReasonIndex = ref<number | null>(null) // 记录展开的原因框索引
 
 import { useEnergyStore } from '@/store/energy'
 
@@ -348,6 +379,9 @@ const energyData = computed(() => {
       return item.machName
     }
 
+    // 年度电量数据：从 monthlyStandardData 的 number 字段获取
+    const yearlyElectric = standardItem?.number ? Number(standardItem.number).toFixed(1) : '0.0'
+
     const result = {
       ...item,
       standardTotal,        // 标准总电
@@ -355,6 +389,7 @@ const energyData = computed(() => {
       standardPerUnit,      // 标准每台
       actualPerUnit,        // 实际每台（月）
       actualPerUnitDaily,   // 实际每台（日）
+      yearlyElectric,       // 年度电量数据
       ratio,
       workshopName: getWorkshopName()
     }
@@ -442,6 +477,15 @@ const getFontSize = () => {
   if (width >= 1500) return 12
   if (width >= 1200) return 10
   return 9
+}
+
+// 切换原因区域展开/收起
+const toggleReasonSection = (index: number) => {
+  if (expandedReasonIndex.value === index) {
+    expandedReasonIndex.value = null
+  } else {
+    expandedReasonIndex.value = index
+  }
 }
 
 // 打开填写原因弹窗
@@ -747,6 +791,13 @@ const submitReason = async () => {
   margin-top: 2px;
   padding-top: 8px;
   border-top: 1px solid rgba(255, 255, 255, 0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.reason-section:hover {
+  background: rgba(255, 170, 0, 0.05);
+  border-radius: 4px;
 }
 
 .reason-info {
@@ -758,6 +809,36 @@ const submitReason = async () => {
   border-radius: 4px;
   border: 1px solid rgba(255, 170, 0, 0.2);
   gap: 6px;
+}
+
+.reason-actions {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.reason-collapsed {
+  display: flex;
+  align-items: center;
+  padding: 4px 6px;
+  background: rgba(255, 170, 0, 0.05);
+  border-radius: 4px;
+  border: 1px solid rgba(255, 170, 0, 0.15);
+  gap: 6px;
+  transition: all 0.3s ease;
+}
+
+.reason-collapsed:hover {
+  background: rgba(255, 170, 0, 0.1);
+  border-color: rgba(255, 170, 0, 0.3);
+}
+
+.reason-hint {
+  color: #ffaa00;
+  font-size: 9px;
+  opacity: 0.7;
+  margin-left: auto;
+  font-style: italic;
 }
 
 .reason-icon {
@@ -803,9 +884,30 @@ const submitReason = async () => {
   font-weight: 600;
   cursor: pointer;
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-  width: 100%;
+  flex: 1;
   box-shadow: 0 2px 4px rgba(255, 107, 107, 0.3);
   gap: 4px;
+}
+
+.reason-cancel-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.1);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 6px;
+  padding: 6px 10px;
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 60px;
+}
+
+.reason-cancel-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.5);
 }
 
 .btn-icon {

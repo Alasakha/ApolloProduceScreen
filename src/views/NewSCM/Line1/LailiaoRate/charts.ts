@@ -54,7 +54,7 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
         containLabel: true
       },
       legend: {
-        data: ['常规客户', 'A类客户'],
+        data: ['A类客户','常规客户'],
         textStyle: {
           color: '#fff'
         }
@@ -99,7 +99,7 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
       },
       series: [
         {
-          name: '常规客户',
+          name: 'A类客户',
           type: 'bar',
           itemStyle: {
             normal: {
@@ -117,10 +117,10 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
               return `${formattedValue}%`
             }
           },
-          data: orderedRegularData.map(item => item.value),
+          data: orderedAClassData.map(item => item.value),
         },
         {
-          name: 'A类客户',
+          name: '常规客户',
           type: 'bar',
           itemStyle: {
             normal: {
@@ -138,7 +138,7 @@ export function createChartOption(regularData: ChartDataItem[], aClassData: Char
               return `${formattedValue}%`
             }
           },
-          data: orderedAClassData.map(item => item.value),
+          data: orderedRegularData.map(item => item.value),
         }
       ]
     };

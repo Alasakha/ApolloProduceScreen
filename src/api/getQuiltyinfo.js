@@ -113,6 +113,18 @@ export const getIncomingInspection2 = (prodLine ) => {
   })
 }  
 
+// 本月来料合格率
+export const getIncomingOkRate = (prodLine) => {
+  const config = {
+    url: '/quality/incomingOkRate',
+    method: 'get',
+  }
+  if (prodLine) {
+    config.params = { prodLine }
+  }
+  return request(config)
+}
+
 //错漏检累计次数
 // export const getMistakesAndOmissions = (prodLine ) => {
 //   return request({
@@ -381,3 +393,89 @@ export const getMonthCxBad = () => {
 //       "performanceTotal": null,
 //       "nonPerformanceTotal": null
 //     },
+
+// jsjdComplete 
+export const getJsjdComplete = (sts ) => {
+  return request({
+    url: '/quality/jsjdComplete',
+    method: 'get',
+    params: { sts }
+  })
+}
+
+// /jsjdCompletePie 
+export const getJsjdCompletePie = () => {
+  return request({
+    url: '/quality/jsjdCompletePie',
+    method: 'get',
+  })
+}
+
+// /quality/csyjbCompletePie
+export const getCsyjbCompletePie = () => {
+  return request({
+    url: '/quality/csyjbCompletePie',
+    method: 'get',
+  })
+}
+
+// /quality/csyjbComplete?sts=%E5%AE%8C%E6%88%90
+export const getCsyjbComplete = (sts ) => {
+  return request({
+    url: '/quality/csyjbComplete',
+    method: 'get',
+    params: { sts }
+  })
+}
+
+
+// /quality/newProdOkRate 新品来料合格率
+  // {
+  //   "code": 200,
+  //   "message": "操作成功",
+  //   "data": [
+  //     {
+  //       "cx": "BE33",
+  //       "total": 0,
+  //       "okCount": 0
+  //     },
+  //     {
+  //       "cx": "BE35",
+  //       "total": 0,
+  //       "okCount": 0
+  //     }
+  //   ]
+// }
+export const getNewProdOkRate = () => {  // 传递 prodLine 参数
+  return request({
+    url: '/quality/newProdOkRate',
+    method: 'get',
+  })
+}
+
+
+// /apollo/SCM/abnormalQualityToday
+export const getAbnormalQualityToday = (params = {}) => {
+  return request({
+    url: '/SCM/abnormalQualityToday',
+    method: 'get',
+    params
+  })
+}
+
+// InspectorDept
+export const getInspectorDept = () => {
+  return request({
+    url: '/quality/InspectorDept',
+    method: 'get',
+  })
+}
+
+// /apollo/quality/newProdOkRateDetail 新品来料合格率详情
+export const getNewProdOkRateDetail = (cx) => {
+  return request({
+    url: '/quality/newProdOkRateDetail',
+    method: 'get',
+    params: { cx }
+  })
+}

@@ -69,7 +69,14 @@ function autoResize(
   };
 
   const bindDomResizeCallback = () => {
-    domObserver = observerDomResize(domHtml!, debounceInitWHFun);
+    if (!domHtml) {
+      if (import.meta.env.DEV) {
+        console.warn("autoResize: dom element is missing, skip binding resize observer.");
+      }
+      return;
+    }
+
+    domObserver = observerDomResize(domHtml, debounceInitWHFun);
 
     useEventListener(window, "resize", debounceInitWHFun);
   };

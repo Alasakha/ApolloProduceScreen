@@ -57,7 +57,7 @@
                   }}</span
                 >
               </div>
-              <div class="param-row">
+              <!-- <div class="param-row">
                 <span class="param-label">压力：</span>
                 <span class="param-std"
                   >标准：{{
@@ -67,7 +67,7 @@
                 <span class="param-act"
                   >实际值：{{ pressure !== null && pressure !== undefined && pressure !== "" ? pressure : "暂无数据" }}</span
                 >
-              </div>
+              </div> -->
               <div class="param-row">
                 <span class="param-label">射速：</span>
                 <span class="param-std"
@@ -79,7 +79,7 @@
                   >实际值：{{ maxspeed !== null && maxspeed !== undefined && maxspeed !== "" ? maxspeed : "暂无数据" }}</span
                 >
               </div>
-              <div class="param-row">
+              <!-- <div class="param-row">
                 <span class="param-label">保压时间：</span>
                 <span class="param-std"
                   >标准：{{
@@ -89,7 +89,7 @@
                 <span class="param-act"
                   >实际值：{{ keeptime !== null && keeptime !== undefined && keeptime !== "" ? keeptime : "暂无数据" }}</span
                 >
-              </div>
+              </div> -->
             </div>
             <!-- 右侧能耗监控区域 -->
             <!-- <div class="energy-block">
@@ -343,16 +343,16 @@ const allWarnings = computed(() => {
   }
 
   // 检查压力 (±5%)
-  if (hasStrandData(props.stdPressure) === "暂无标准") {
-    warnings.push("压力：暂无标准");
-  } else if (props.pressure) {
-    const stdValue = Number(props.stdPressure);
-    const actualValue = Number(props.pressure);
-    const percentDiff = Math.abs(actualValue - stdValue) / stdValue * 100;
-    if (percentDiff > 5) {
-      warnings.push(`压力超出偏差 (偏差: ${percentDiff.toFixed(1)}%)`);
-    }
-  }
+  // if (hasStrandData(props.stdPressure) === "暂无标准") {
+  //   warnings.push("压力：暂无标准");
+  // } else if (props.pressure) {
+  //   const stdValue = Number(props.stdPressure);
+  //   const actualValue = Number(props.pressure);
+  //   const percentDiff = Math.abs(actualValue - stdValue) / stdValue * 100;
+  //   if (percentDiff > 5) {
+  //     warnings.push(`压力超出偏差 (偏差: ${percentDiff.toFixed(1)}%)`);
+  //   }
+  // }
 
   // 检查射速 (+5%)
   if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
@@ -374,23 +374,23 @@ const allWarnings = computed(() => {
   }
 
   // 检查保压时间 (+5%)
-  if (hasStrandData(props.stdKeeptime) === "暂无标准") {
-    warnings.push("保压时间：暂无标准");
-  } else if (props.keeptime) {
-    const stdValue = Number(props.stdKeeptime);
-    // 计算偏差值：标准值 * 5%，向上取整
-    const deviationValue = stdValue * 0.05;
-    const roundedDeviation = Math.ceil(deviationValue);
+  // if (hasStrandData(props.stdKeeptime) === "暂无标准") {
+  //   warnings.push("保压时间：暂无标准");
+  // } else if (props.keeptime) {
+  //   const stdValue = Number(props.stdKeeptime);
+  //   // 计算偏差值：标准值 * 5%，向上取整
+  //   const deviationValue = stdValue * 0.05;
+  //   const roundedDeviation = Math.ceil(deviationValue);
     
-    const actualValue = Number(props.keeptime);
-    const lowerLimit = stdValue - roundedDeviation;
-    const upperLimit = stdValue + roundedDeviation;
+  //   const actualValue = Number(props.keeptime);
+  //   const lowerLimit = stdValue - roundedDeviation;
+  //   const upperLimit = stdValue + roundedDeviation;
     
-    if (actualValue < lowerLimit || actualValue > upperLimit) {
-      const diff = actualValue - stdValue;
-      warnings.push(`保压时间超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}%)`);
-    }
-  }
+  //   if (actualValue < lowerLimit || actualValue > upperLimit) {
+  //     const diff = actualValue - stdValue;
+  //     warnings.push(`保压时间超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}%)`);
+  //   }
+  // }
   return warnings;
 });
 </script>
@@ -625,7 +625,7 @@ const allWarnings = computed(() => {
   border-radius: 4px;
 }
 .info-progress-area {
-  height: 40%;
+  height: 50%;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -679,7 +679,7 @@ const allWarnings = computed(() => {
   padding-right: 30px;
 }
 .params-area {
-  height: 60%;
+  height: 50%;
   display: flex;
   flex-direction: column;
   justify-content: space-evenly;
@@ -781,37 +781,188 @@ const allWarnings = computed(() => {
   box-sizing: border-box;
 }
 
-/* 小屏幕下紧凑样式 */
-@media (max-width: 1200px) {
-  .order-card {
-    padding: 10px 8px;
-    font-size: 0.9em;
-    border-radius: 10px;
+/* 1080p (1920px) 分辨率优化 */
+@media (min-width: 1920px) and (max-width: 2059px) {
+  .order-card-glow {
+    border-radius: 12px;
   }
+  
   .order-card-title {
-    font-size: 1em;
+    height: 32px;
+    font-size: 16px;
+    letter-spacing: 1px;
   }
+  
+  .order-card-badge {
+    top: 8px;
+    right: 14px;
+    font-size: 13px;
+    padding: 3px 12px 3px 10px;
+  }
+  
+  .order-card-main {
+    gap: 12px;
+    padding: 0.3vw;
+  }
+  
+  .order-card-left {
+    gap: 12px;
+  }
+  
+  .order-card-block {
+    border-radius: 8px;
+    border-width: 1.5px;
+  }
+  
+  .order-card-block-label {
+    font-size: 12px;
+    margin-bottom: 1px;
+  }
+  
+  .order-card-block-value {
+    font-size: 18px;
+  }
+  
+  .info-progress-area {
+    margin-bottom: 8px;
+  }
+  
+  .info-row {
+    margin-bottom: 6px;
+  }
+  
+  .info-top,
+  .info-bottom {
+    gap: 8px;
+  }
+  
+  .info-code,
+  .info-name,
+  .info-spec-value {
+    font-size: 0.95em;
+  }
+  
+  .progress-row {
+    gap: 8px;
+    padding-right: 20px;
+  }
+  
+  .progress-bar-bg {
+    height: 40%;
+    border-width: 1px;
+  }
+  
+  .progress-text {
+    font-size: 14px;
+    min-width: 40px;
+  }
+  
+  .params-area {
+    gap: 6px;
+  }
+  
+  .params-block {
+    row-gap: 8px;
+    column-gap: 12px;
+    max-width: 95%;
+  }
+  
   .param-label,
   .param-std,
   .param-act {
     font-size: 0.9em;
   }
-  .energy-block {
-    padding: 8px 6px;
-    font-size: 0.9em;
+  
+  .param-std,
+  .param-act {
+    padding: 1px 4px;
+  }
+  
+  .warning-area {
+    padding: 8px 12px 6px 12px;
+    border-radius: 10px;
+    border-width: 1.5px;
+  }
+  
+  .warning-title {
+    font-size: 14px;
+    margin-bottom: 4px;
+  }
+  
+  .warning-content-list li {
+    font-size: 0.85em;
+    margin-bottom: 1px;
   }
 }
-@media (max-width: 800px) {
-  .order-card {
-    padding: 6px 2px;
-    font-size: 0.8em;
-    border-radius: 6px;
+
+/* 小屏幕下紧凑样式 */
+@media (max-width: 1919px) {
+  .order-card-glow {
+    border-radius: 10px;
   }
+  
   .order-card-title {
-    font-size: 0.95em;
+    height: 28px;
+    font-size: 14px;
+    letter-spacing: 0.5px;
   }
-  .energy-block {
-    padding: 4px 2px;
+  
+  .order-card-badge {
+    top: 6px;
+    right: 12px;
+    font-size: 11px;
+    padding: 2px 10px 2px 8px;
+  }
+  
+  .order-card-main {
+    gap: 10px;
+    padding: 0.25vw;
+  }
+  
+  .order-card-left {
+    gap: 10px;
+  }
+  
+  .order-card-block {
+    border-radius: 6px;
+    border-width: 1px;
+  }
+  
+  .order-card-block-label {
+    font-size: 11px;
+  }
+  
+  .order-card-block-value {
+    font-size: 16px;
+  }
+  
+  .info-code,
+  .info-name,
+  .info-spec-value {
+    font-size: 0.85em;
+  }
+  
+  .progress-text {
+    font-size: 12px;
+    min-width: 36px;
+  }
+  
+  .params-block {
+    row-gap: 6px;
+    column-gap: 10px;
+  }
+  
+  .param-label,
+  .param-std,
+  .param-act {
+    font-size: 0.8em;
+  }
+  
+  .warning-title {
+    font-size: 12px;
+  }
+  
+  .warning-content-list li {
     font-size: 0.8em;
   }
 }

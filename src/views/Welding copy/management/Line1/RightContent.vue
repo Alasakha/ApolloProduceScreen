@@ -20,9 +20,9 @@
               ></div>
             </div>
             <!-- 晚班人数 -->
-             <div class="peizhi flex-1">
+             <!-- <div class="peizhi flex-1">
               <div ref="Indicators5" class="w-full h-[100%]"></div>
-            </div>
+            </div> -->
           </div>
 
           <!-- 右侧两个仪表盘 -->

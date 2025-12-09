@@ -28,7 +28,6 @@
                      <el-table-column prop="peopleName" label="操作人" width="120" />
                 </el-table>
             </div>
-
         </div>
         
         <template #footer>

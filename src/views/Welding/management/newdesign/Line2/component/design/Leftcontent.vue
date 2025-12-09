@@ -171,6 +171,8 @@
           num_total: deviceGroup.num_total,
           doing_count: deviceGroup.doing_count,
           machine_count: deviceGroup.machine_count,
+          teach_count: deviceGroup.teach_count,
+          warn_count: deviceGroup.warn_count,
           gdNum: index + 1,
           // 计算进度百分比
           progress: deviceGroup.qty_total > 0 ? Math.round((deviceGroup.num_total / deviceGroup.qty_total) * 100) : 0,
@@ -352,7 +354,7 @@
     padding: 0.2rem 0.2rem 0 0;
     width: 100%;
     height: 100%;
-    overflow: hidden; /* 防止外层出现滚动条 */
+    /* overflow: hidden; 防止外层出现滚动条 */
   }
   
   .cards-container {
@@ -425,7 +427,7 @@
     flex-wrap: wrap;
     gap: 1rem;
     max-height: 70vh;
-    overflow-y: auto;
+    /* overflow-y: auto; */
     padding: 1rem 0;
   }
   

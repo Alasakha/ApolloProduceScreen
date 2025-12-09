@@ -18,84 +18,75 @@
     
     <div class="grid grid-cols-1 gap-3 h-[calc(100%-4rem)] overflow-y-auto">
       <!-- 粉体线PLC监控 -->
-      <div class="bg-opacity-20 rounded-lg p-3 border border-cyan-400 border-opacity-30 flex flex-col h-full">
-        <div class="text-base font-semibold text-cyan-300 mb-2 text-center" style="letter-spacing: 1px;">
-          粉体线PLC (FX3G-24MR)
+      <div class="bg-opacity-20 rounded-lg p-3 border border-orange-400 border-opacity-30 flex flex-col h-full">
+        <div class="text-base font-semibold text-cyan-300 mb-2 flex items-center justify-center gap-2" style="letter-spacing: 1px;">
+          <span>粉体线PLC (FX3G-24MR)</span>
+          <span v-if="isTemperatureExceeded(powderLineData)" class="text-orange-300 text-sm font-semibold animate-pulse">
+            ⚠️ 温度偏差超过±5°C
+          </span>
         </div>
         <div class="grid grid-cols-2 gap-2 text-sm flex-1">
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ powderLineData.temperature !== null ? powderLineData.temperature + '°C' : '暂无' }}</span>
+            <span>实时温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(powderLineData.temperature) }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ powderLineData.workTemp !== null ? powderLineData.workTemp + '°C' : '暂无' }}</span>
+            <span>标准温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(powderLineData.standard) }}</span>
           </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>超温状态:</span>
-            <span :class="powderLineData.overTemp ? 'text-red-400' : 'text-green-400'" class="font-semibold">{{ powderLineData.overTemp ? '是' : '否' }}</span>
-          </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>低温状态:</span>
-            <span :class="powderLineData.lowTemp ? 'text-yellow-400' : 'text-green-400'" class="font-semibold">{{ powderLineData.lowTemp ? '是' : '否' }}</span>
+          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400 col-span-2">
+            <span>运行状态:</span>
+            <span :class="[getStatusClass(powderLineData.status), 'font-semibold']">{{ formatStatusText(powderLineData.status) }}</span>
           </div>
         </div>
       </div>
       
       <!-- 贴标线PLC监控 -->
-      <div class="bg-opacity-20 rounded-lg p-3 border border-cyan-400 border-opacity-30 flex flex-col h-full">
-        <div class="text-base font-semibold text-cyan-300 mb-2 text-center" style="letter-spacing: 1px;">
-          贴标线PLC (FX3G-24MR)
+      <div class="bg-opacity-20 rounded-lg p-3 border border-orange-400 border-opacity-30 flex flex-col h-full">
+        <div class="text-base font-semibold text-cyan-300 mb-2 flex items-center justify-center gap-2" style="letter-spacing: 1px;">
+          <span>贴标线PLC (FX3G-24MR)</span>
+          <span v-if="isTemperatureExceeded(labelLineData)" class="text-orange-300 text-sm font-semibold animate-pulse">
+            ⚠️ 温度偏差超过±5°C
+          </span>
         </div>
         <div class="grid grid-cols-2 gap-2 text-sm flex-1">
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>固化炉超温:</span>
-            <span :class="labelLineData.overTemp ? 'text-red-400' : 'text-green-400'" class="font-semibold">{{ labelLineData.overTemp ? '是' : '否' }}</span>
+            <span>实时温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(labelLineData.temperature) }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>生产计量:</span>
-            <span class="text-white font-semibold">{{ labelLineData.productionCount }}</span>
+            <span>标准温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(labelLineData.standard) }}</span>
           </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ labelLineData.workTemp !== null ? labelLineData.workTemp + '°C' : '暂无' }}</span>
-          </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ labelLineData.temperature !== null ? labelLineData.temperature + '°C' : '暂无' }}</span>
+          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400 col-span-2">
+            <span>运行状态:</span>
+            <span :class="[getStatusClass(labelLineData.status), 'font-semibold']">{{ formatStatusText(labelLineData.status) }}</span>
           </div>
         </div>
       </div>
+
+
       
       <!-- 液体线PLC监控 -->
-      <div class="bg-opacity-20 rounded-lg p-3 border border-cyan-400 border-opacity-30 flex flex-col h-full">
-        <div class="text-base font-semibold text-cyan-300 mb-2 text-center" style="letter-spacing: 1px;">
-          液体线PLC (FX3G-40MR)
+      <div class="bg-opacity-20 rounded-lg p-3 border border-orange-400 border-opacity-30 flex flex-col h-full">
+        <div class="text-base font-semibold text-cyan-300 mb-2 flex items-center justify-center gap-2" style="letter-spacing: 1px;">
+          <span>液体线PLC (FX3G-40MR)</span>
+          <span v-if="isTemperatureExceeded(liquidLineData)" class="text-orange-300 text-sm font-semibold animate-pulse">
+            ⚠️ 温度偏差超过±5°C
+          </span>
         </div>
         <div class="grid grid-cols-2 gap-2 text-sm flex-1">
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>固化炉超温:</span>
-            <span :class="liquidLineData.overTemp ? 'text-red-400' : 'text-green-400'" class="font-semibold">{{ liquidLineData.overTemp ? '是' : '否' }}</span>
+            <span>实时温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(liquidLineData.temperature) }}</span>
           </div>
           <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>生产计量:</span>
-            <span class="text-white font-semibold">{{ liquidLineData.productionCount }}</span>
+            <span>标准温度:</span>
+            <span class="text-white font-semibold">{{ formatTemperature(liquidLineData.standard) }}</span>
           </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>工作温度:</span>
-            <span class="text-white font-semibold">{{ liquidLineData.workTemp !== null ? liquidLineData.workTemp + '°C' : '暂无' }}</span>
-          </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>超温写入:</span>
-            <span :class="liquidLineData.overTempWrite ? 'text-red-400' : 'text-green-400'" class="font-semibold">{{ liquidLineData.overTempWrite ? '是' : '否' }}</span>
-          </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>低温写入:</span>
-            <span :class="liquidLineData.lowTempWrite ? 'text-yellow-400' : 'text-green-400'" class="font-semibold">{{ liquidLineData.lowTempWrite ? '是' : '否' }}</span>
-          </div>
-          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400">
-            <span>固化炉温度:</span>
-            <span class="text-white font-semibold">{{ liquidLineData.temperature !== null ? liquidLineData.temperature + '°C' : '暂无' }}</span>
+          <div class="text-cyan-200 flex items-center justify-between p-2 bg-opacity-20 rounded border border-cyan-400 col-span-2">
+            <span>运行状态:</span>
+            <span :class="[getStatusClass(liquidLineData.status), 'font-semibold']">{{ formatStatusText(liquidLineData.status) }}</span>
           </div>
         </div>
       </div>
@@ -105,151 +96,118 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onUnmounted } from 'vue'
-import { getTemperature4 } from '@/api/getStampWeldinfo'
+import { getTemperature4, type Temperature4 } from '@/api/getStampWeldinfo'
 import { eventBus } from '@/utils/eventbus'
 
-// 粉体线PLC数据
-const powderLineData = ref({
-  temperature: null,    // 固化炉温度
-  workTemp: null,       // 固化炉工作温度写入
-  overTemp: false,     // 固化炉超温写入
-  lowTemp: false       // 固化炉低温写入
+interface PlcLineState {
+  temperature: number | null;
+  standard: number | null;
+  status: number | null;
+}
+
+const createLineState = (): PlcLineState => ({
+  temperature: null,
+  standard: null,
+  status: null
 })
 
-// 贴标线PLC数据
-const labelLineData = ref({
-  overTemp: false,     // 固化炉超温
-  productionCount: 1250, // 生产计量信号
-  workTemp: null,       // 固化炉工作温度写入
-  temperature: null     // 固化炉温度
-})
+const powderLineData = ref<PlcLineState>(createLineState())
+const labelLineData = ref<PlcLineState>(createLineState())
+const liquidLineData = ref<PlcLineState>(createLineState())
 
-// 皮膜线PLC数据
-const filmLineData = ref({
-  productionCount: 980, // 生产计量信号
-  workTemp: null,       // 固化炉工作温度写入
-  overTemp: false,     // 固化炉超温写入
-  temperature: null     // 固化炉温度
-})
-
-// 液体线PLC数据
-const liquidLineData = ref({
-  overTemp: false,     // 固化炉超温
-  productionCount: 1100, // 生产计量信号
-  workTemp: null,       // 固化炉工作温度写入
-  overTempWrite: false, // 固化炉超温写入
-  lowTempWrite: false,  // 固化炉低温写入
-  temperature: null     // 固化炉温度
-})
-
-// T4炉PLC数据
-const t4FurnaceData = ref({
-  overTemp: false,     // 炉内超温
-  tempReached: true,   // 炉内温度到达
-  insulationTime: 45,  // 保温计时
-  timerEnd: false      // 保温计时结束
-})
-
-// API数据更新
 const isLoading = ref(false)
 const apiError = ref('')
+
+const normalizeTemperature = (value?: number | null): number | null => {
+  return typeof value === 'number' && !Number.isNaN(value) ? value : null
+}
+
+const normalizeStatus = (status?: number | null): number | null => {
+  if (status === null || status === undefined) return null
+  return status > 0 ? 1 : 0
+}
+
+const deriveStatusFromTemp = (temperature: number | null): number | null => {
+  if (temperature === null) return null
+  return temperature === 0 ? 0 : 1
+}
+
+const formatTemperature = (value: number | null) => {
+  if (value === null) return '暂无'
+  return `${value.toFixed(1)}°C`
+}
+
+const formatStatusText = (status: number | null) => {
+  if (status === null) return '未知'
+  return status === 1 ? '运行' : '停机'
+}
+
+const getStatusClass = (status: number | null) => {
+  if (status === null) return 'text-amber-300'
+  return status === 1 ? 'text-green-400' : 'text-red-400'
+}
+
+// 判断温度偏差是否超过±5°C
+const isTemperatureExceeded = (lineData: PlcLineState): boolean => {
+  if (lineData.temperature === null || lineData.standard === null || lineData.temperature === 0) {
+    return false
+  }
+  const diff = Math.abs(lineData.temperature - lineData.standard)
+  return diff > 5
+}
+
+const updateLineState = (
+  target: { value: PlcLineState },
+  actual?: number | null,
+  standard?: number | null,
+  status?: number | null
+) => {
+  target.value.temperature = normalizeTemperature(actual)
+  target.value.standard = normalizeTemperature(standard)
+
+  if (status === null || status === undefined) {
+    target.value.status = deriveStatusFromTemp(target.value.temperature)
+  } else {
+    target.value.status = normalizeStatus(status)
+  }
+}
 
 const updatePLCData = async () => {
   try {
     isLoading.value = true
     apiError.value = ''
-    
-    // 获取真实温度数据
+
     const response = await getTemperature4()
-    const tempData = response.data
-    
-    // 更新粉体线数据 (pmx)
-    powderLineData.value.temperature = tempData.pmx
-    powderLineData.value.workTemp = tempData.pmx - 5
-    powderLineData.value.overTemp = tempData.pmx > 200
-    powderLineData.value.lowTemp = tempData.pmx < 160
-    
-    // 更新贴标线数据 (tbx) 
-    labelLineData.value.temperature = tempData.tbx
-    labelLineData.value.workTemp = tempData.tbx - 5
-    labelLineData.value.overTemp = tempData.tbx > 195
-    
-    // 更新液体线数据 (ytx)
-    liquidLineData.value.temperature = tempData.ytx
-    liquidLineData.value.workTemp = tempData.ytx - 5
-    liquidLineData.value.overTemp = tempData.ytx > 185
-    liquidLineData.value.overTempWrite = liquidLineData.value.overTemp
-    liquidLineData.value.lowTempWrite = tempData.ytx < 150
-    
-    // 保持生产计数的模拟更新（如果API没有提供）
-    labelLineData.value.productionCount += Math.floor(Math.random() * 3)
-    filmLineData.value.productionCount += Math.floor(Math.random() * 2)
-    liquidLineData.value.productionCount += Math.floor(Math.random() * 4)
-    
-    // 检查报警条件
-    checkAlarmConditions()
-    
+    const tempData: Partial<Temperature4> = response.data ?? {}
+
+    updateLineState(powderLineData, tempData.ftx ?? null, tempData.ftxStandard ?? null, tempData.ftxStatus ?? null)
+    updateLineState(labelLineData, tempData.tbx ?? null, tempData.tbxStandard ?? null, tempData.tbxStatus ?? null)
+    updateLineState(liquidLineData, tempData.ytx ?? null, tempData.ytxStandard ?? null, tempData.ytxStatus ?? null)
   } catch (error) {
     console.error('获取温度数据失败:', error)
     apiError.value = '数据获取失败，请检查网络连接'
-    
-    // 发生错误时设置数据为null，显示"暂无"
     setDataToNull()
   } finally {
     isLoading.value = false
   }
 }
 
-// 设置数据为null，显示"暂无"
 const setDataToNull = () => {
-  powderLineData.value.temperature = null
-  powderLineData.value.workTemp = null
-  powderLineData.value.overTemp = false
-  powderLineData.value.lowTemp = false
-  
-  labelLineData.value.temperature = null
-  labelLineData.value.workTemp = null
-  labelLineData.value.overTemp = false
-  
-  liquidLineData.value.temperature = null
-  liquidLineData.value.workTemp = null
-  liquidLineData.value.overTemp = false
-  liquidLineData.value.overTempWrite = false
-  liquidLineData.value.lowTempWrite = false
+  const targets = [powderLineData, labelLineData, liquidLineData]
+  targets.forEach(line => {
+    line.value.temperature = null
+    line.value.standard = null
+    line.value.status = null
+  })
 }
 
-const checkAlarmConditions = () => {
-  // 检查超温报警
-  if (powderLineData.value.overTemp) {
-    console.warn('粉体线固化炉超温！', powderLineData.value.temperature)
-  }
-  if (labelLineData.value.overTemp) {
-    console.warn('贴标线固化炉超温！', labelLineData.value.temperature)
-  }
-  if (filmLineData.value.overTemp) {
-    console.warn('皮膜线固化炉超温！', filmLineData.value.temperature)
-  }
-  if (liquidLineData.value.overTemp) {
-    console.warn('液体线固化炉超温！', liquidLineData.value.temperature)
-  }
-  if (t4FurnaceData.value.overTemp) {
-    console.warn('T4炉内超温！')
-  }
-}
-
-// 组件挂载时启动数据更新
 onMounted(async () => {
-  // 立即获取一次数据
   await updatePLCData()
-  
-  // 只监听EventBus刷新事件，不设置定时器
   eventBus.on('refreshData', updatePLCData)
   eventBus.on('globalRefresh', updatePLCData)
 })
 
-// 组件卸载时清理事件监听
 onUnmounted(() => {
-  // 移除EventBus监听
   eventBus.off('refreshData', updatePLCData)
   eventBus.off('globalRefresh', updatePLCData)
 })

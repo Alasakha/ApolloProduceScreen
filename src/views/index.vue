@@ -82,6 +82,9 @@ const lines = ref([
   { id: "JinGongDashboard", name: "金工绩效看板",router:"/jingongdashboard" },
   { id: "ZongZhuangDashboard", name: "总装绩效看板",router:"/zongzhuangdashboard" },
   { id: "EquipmentDashboard", name: "设备管理看板",router:"/equipmentdashboard" },
+  { id: "", name: "来料品质管理看板", router: "/incomingquality" },
+  { id: "", name: "供应商质量管理绩效看板", router: "/SupplierQualityManagement" },
+  { id: "", name: "冲压生产看板", router: "/newstampmanagement" },
 ]);
 
 // 获取 lines 中指定范围的数据

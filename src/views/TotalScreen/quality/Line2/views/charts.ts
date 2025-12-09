@@ -7,7 +7,21 @@ export function createChartOption(data) {
       xAxis: {
         type: 'category',
         axisLabel: {
-          color: '#fff'
+          color: '#fff',
+          rotate: 45, // 旋转45度，避免标签重叠
+          interval: 0, // 强制显示所有标签
+          fontSize: 12, // 设置字体大小
+          formatter: function(value: string) {
+            // 如果标签太长，进行换行处理（每8个字符换行）
+            if (value.length > 8) {
+              const lines = []
+              for (let i = 0; i < value.length; i += 8) {
+                lines.push(value.substr(i, 8))
+              }
+              return lines.join('\n')
+            }
+            return value
+          }
         },
         axisLine: {
           lineStyle: {
@@ -16,15 +30,21 @@ export function createChartOption(data) {
         },
         data: data.map(item => item.name),
       },
+      grid: {
+        left: '3%',
+        right: '4%',
+        bottom: '0%', // 增加底部边距，为旋转的标签留出空间
+        top: '15%',
+        containLabel: true
+      },
       yAxis: {
         type: 'value',
-        // name: '合格率/%',
+        // name: '数量',
         nameTextStyle: {
           color: '#fff'
         },
         axisLabel: {
-          color: '#fff',
-          formatter: '{value}%' // 添加百分号
+          color: '#fff'
         },
         axisLine: {
           lineStyle: {
@@ -36,7 +56,7 @@ export function createChartOption(data) {
         show: true,
         position: 'top', // 显示在柱子顶部
         color: '#fff',   // 文字颜色
-        formatter: '{c}%' // 加上百分号
+        formatter: '{c}' // 显示数量
       },
       series: [
         {

@@ -31,7 +31,7 @@
 
       <div class="data-cards-row">
         <div class="section-title-with-toggle text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
-          <div class="text-xs 2xl:text-sm 3xl:text-xs 4xl:text-sm">金工一部涂装</div>
+          <div class="text-xs 2xl:text-sm 3xl:text-xs 4xl:text-sm">金工一部</div>
         </div>
         <DataCard 
       

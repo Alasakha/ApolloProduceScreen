@@ -510,20 +510,6 @@ export interface PaintingPassRate {
   rate: number
   firstRate: number
 }
-// /stampingWelding/getTemperature4
-export const getTemperature4 = (): Promise<{data: Temperature4}> => {
-  return request({
-    url: '/stampingWelding/getTemperature4',
-    method: 'get',
-  })
-}
-export interface Temperature4 {
-  pmx: number //粉体线 固化炉温度
-  tbx: number //铁板线 固化炉温度
-  ytx: number //液体线 固化炉温度
-}
-
-
 // paintingPassRateDetail 二部 直通率点击详细信息
 export const getPaintingPassRateDetail = (): Promise<{data: PaintingPassRateDetail[]}> => {
   return request({
@@ -747,4 +733,316 @@ export interface ProductionScheduleProgressItem {
   export interface TodayBadIssuesPerson {
     ngResponPeople: string;
     total: number;
+  }
+
+
+// curl -X 'GET' \
+// 'http://192.168.1.197:10999/apollo/stampingWelding/sghGdComplete?prodLine=%E9%87%91%E5%B7%A5%E4%B8%80%E9%83%A8%E7%84%8A%E6%8E%A5' \
+// -H 'accept: */*'
+export const getSghGdComplete = (prodLine: string): Promise<OrderSettlementResponse> => {
+  return request<OrderSettlementResponse>({
+      url: '/stampingWelding/sghGdComplete',
+      method: 'get',
+      params: { prodLine }
+    })
+  }
+  // TS类型定义
+  export interface OrderSettlementItem {
+    workNo: string | null;
+    workCenter: string | null;
+    customer: string | null; //类型 A 常规
+    number: string | null;
+    articleNumber: string | null;
+    articleName: string | null;
+    specifications: string | null;
+    dateTime: string | null;
+    productionQuantity: string | null; // 计划数
+    inboundQuantity: string | null; // 完成数
+    inboundTime: string | null;
+    finalInboundQuantity: string | null;
+    finalInboundTime: string | null;
+    completionJudgment: string | null;
+    reason: string | null;
+    duty: string | null;
+    completeDate: string | null;
+    planNum: string | null;
+    daysBetween: number;
+  }
+
+  export interface OrderSettlementData {
+    orderSettlement_month: OrderSettlementItem[]; // 月度
+    orderSettlement_today: OrderSettlementItem[]; // 今日
+  }
+
+  export interface OrderSettlementResponse {
+    code: number;
+    message: string;
+    data: OrderSettlementData;
+  }
+
+
+    // curl -X 'GET' \
+    // 'http://192.168.1.197:10999/apollo/stampingWelding/weekData20062007?prodLine=2006' \
+    // -H 'accept: */*'
+    export const getWeekData20062007 = (prodLine: string): Promise<GetWeekData20062007Response> => {
+      return request({
+        url: '/stampingWelding/weekData20062007',
+        method: 'get',
+        params: { prodLine }
+      })
+    }
+    // 接口响应数据类型定义
+    export interface WeekData20062007 {
+      ty003: string;                  // 日期，格式如 "20251122"
+      monthPlan: number;              // 月计划产量
+      monthDone: number;              // 月实际完成产量
+      monthGdDone: number | null;     // 月工单实际完成产量
+      monthGdOnTime: number | null;   // 月工单准时完成产量
+    }
+
+    export interface GetWeekData20062007Response {
+      code: number;                   // 状态码
+      message: string;                // 返回消息
+      data: {
+        weekData: WeekData20062007[]; // 周数据列表
+        weekNum: number;              // 周数
+      };
+    }
+
+
+
+  //   curl -X 'GET' \
+  // 'http://192.168.1.197:10999/apollo/stampingWelding/weekDataTotal20062007?prodLine=2006' \
+  // -H 'accept: */*'
+  export const getWeekDataTotal20062007 = (prodLine: string): Promise<GetWeekDataTotal20062007Response> => {
+    return request({
+      url: '/stampingWelding/weekDataTotal20062007',
+      method: 'get',
+      params: { prodLine }
+    })
+  }
+  export interface GetWeekDataTotal20062007Response {
+    code: number;
+    message: string;
+    data: {
+      ty003: string | null;
+      monthPlan: number;
+      monthDone: number;
+      monthGdDone: number | null;
+      monthGdOnTime: number | null;
+    };
+  }
+
+  // /stampingWelding/guanjianMachine 关键设备生产监控
+  export interface GuanjianMachineItem {
+    macNo: string; // 设备编号
+    macName?: string | null; // 设备名称
+    workNo: string | null; // 工单号
+    processId: string | null; // 工序ID
+    num: number; // 数量
+    processName: string | null; // 工序名称
+    creatorName: string | null; // 创建人
+    item_description: string | null; // 工单名称（当前生产品名）
+    ty004: string | number; // 排产数量
+    productId: string | null; // 品号
+    state: string; // 状态
+  }
+
+  export interface GetGuanjianMachineResponse {
+    code: number;
+    message: string;
+    data: GuanjianMachineItem[];
+  }
+
+  export const getGuanjianMachine = (): Promise<GetGuanjianMachineResponse> => {
+    return request({
+      url: '/stampingWelding/guanjianMachine',
+      method: 'get'
+    })
+  }
+
+  // /stampingWelding/banjinMachine 板金设备生产监控
+  export interface BanjinMachineItem {
+    macNo: string; // 设备编号
+    macName?: string | null; // 设备名称
+    workNo: string | null; // 工单号
+    processId: string | null; // 工序ID
+    num: number; // 数量
+    processName: string | null; // 工序名称
+    creatorName: string | null; // 创建人
+    item_description: string | null; // 工单名称（当前生产品名）
+    ty004: string | number; // 排产数量
+    productId: string | null; // 品号
+    state: string; // 状态
+  }
+
+  export interface GetBanjinMachineResponse {
+    code: number;
+    message: string;
+    data: BanjinMachineItem[];
+  }
+
+  export const getBanjinMachine = (): Promise<GetBanjinMachineResponse> => {
+    return request({
+      url: '/stampingWelding/banjinMachine',
+      method: 'get'
+    })
+  }
+
+  // /stampingWelding/cyQualityPici 质量数据监控
+  export interface QualityDayData {
+    inspectionDate: string | null;
+    total: number;
+    hg: number;
+    ng: number;
+    rate: number | null;
+  }
+
+  export interface GetCyQualityPiciResponse {
+    code: number;
+    message: string;
+    data: {
+      monthData: QualityDayData;
+      dayData: QualityDayData[];
+    };
+  }
+
+  export const getCyQualityPici = (): Promise<GetCyQualityPiciResponse> => {
+    return request({
+      url: '/stampingWelding/cyQualityPici',
+      method: 'get'
+    })
+  }
+
+  // /stampingWelding/cyQualityPiciPie 冲压质量批次监控 - 责任人饼图
+  export interface CyQualityPiciPieItem {
+    dutyPeopleName: string; // 责任人姓名
+    total: number;          // 批次数量
+  }
+
+  export interface GetCyQualityPiciPieResponse {
+    code: number;
+    message: string;
+    data: CyQualityPiciPieItem[];
+  }
+
+  export const getCyQualityPiciPie = (
+    startTime: string,
+    endTime: string
+  ): Promise<GetCyQualityPiciPieResponse> => {
+    return request({
+      url: '/stampingWelding/cyQualityPiciPie',
+      method: 'get',
+      params: { startTime, endTime }
+    })
+  }
+
+  // /stampingWelding/monthData2006 月度数据接口
+  export interface MonthData2006 {
+    ty003: string | null;        // 日期
+    monthPlan: number;            // 月计划产量
+    monthDone: number;            // 月实际完成产量
+    monthGdDone: number;          // 月工单实际完成产量
+    monthGdOnTime: number;        // 月工单准时完成产量
+    pcTotal?: number;            // 排产数
+    done?: number;                // 完成数
+  }
+
+  export interface GetMonthData2006Response {
+    code: number;
+    message: string;
+    data: MonthData2006;
+  }
+
+  export const getMonthData2006 = (): Promise<GetMonthData2006Response> => {
+    return request({
+      url: '/stampingWelding/monthData2006',
+      method: 'get'
+    })
+  }
+
+
+
+  // /stampingWelding/getTemperature4 温度数据
+  // curl -X 'GET' \
+  // 'http://192.168.1.197:10999/apollo/stampingWelding/getTemperature4' \
+  // -H 'accept: */*'
+export interface Temperature4 {
+  ftxStandard: number;   // 粉体线标准温度
+  ftx: number;           // 粉体线实际温度
+  tbxStandard: number;   // 贴标线标准温度
+  tbx: number;           // 贴标线实际温度
+  ytxStandard: number;   // 液体线标准温度
+  ytx: number;           // 液体线实际温度
+  ftxStatus?: number;    // 粉体线运行状态（1运行/0停机）
+  tbxStatus?: number;    // 贴标线运行状态（1运行/0停机）
+  ytxStatus?: number;    // 液体线运行状态（1运行/0停机）
+}
+  export interface GetTemperature4Response {
+    code: number;
+    message: string;
+    data: Temperature4;
+  }
+
+  export const getTemperature4 = (): Promise<GetTemperature4Response> => {
+    return request({
+      url: '/stampingWelding/getTemperature4',
+      method: 'get'
+    })
+  }
+
+
+
+
+  // /stampingWelding/getTemperature1 温度汇总数据
+  // curl -X 'GET' \
+  // 'http://192.168.1.197:10999/apollo/stampingWelding/getTemperature1' \
+  // -H 'accept: */*'
+  export interface Temperature1 {
+    t4: number;             // T4炉实际温度
+    t6Standard: number;     // T6炉标准温度
+    t6: number;             // T6炉实际温度
+    pmxStandard: number;    // 皮膜线标准温度
+    t4Standard: number;     // T4炉标准温度
+    pmx: number;            // 皮膜线实际温度
+  }
+
+  export interface GetTemperature1Response {
+    code: number;
+    message: string;
+    data: Temperature1;
+  }
+
+  export const getTemperature1 = (): Promise<GetTemperature1Response> => {
+    return request({
+      url: '/stampingWelding/getTemperature1',
+      method: 'get'
+    });
+  }
+
+  
+
+  // /stampingWelding/cyDoingMachine
+  export interface CyDoingMachineDoingDetail {
+    macNo: string;
+    macName: string;
+  }
+
+  export interface CyDoingMachineData {
+    total: number;
+    doingCount: number;
+    doingDetailList: CyDoingMachineDoingDetail[];
+  }
+
+  export interface CyDoingMachine {
+    code: number;
+    message: string;
+    data: CyDoingMachineData;
+  }
+
+  export const getCyDoingMachine = (): Promise<CyDoingMachine> => {
+    return request({
+      url: '/stampingWelding/cyDoingMachine',
+      method: 'get'
+    })
   }

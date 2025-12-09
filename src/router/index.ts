@@ -205,6 +205,22 @@ const routes: RouteRecordRaw[] = [
     name: 'EquipmentDashboard',   // 路由名
     component: () => import('@/views/EquipmentDashboard/index.vue')
   },
+  {
+    path: '/incomingquality',
+    name: 'Incomingquality',
+    component: () => import('@/views/TotalScreen/LaiLiao/index.vue')
+  },
+  {
+    path: '/SupplierQualityManagement',
+    name: '/SupplierQualityManagement',
+    component: () => import('@/views/TotalScreen/SupplierQualityManagement/index.vue')
+  },
+  {
+    path: '/newstampmanagement',
+    name: 'NewStampManagement',
+    component: () => import('@/views/NewStamp/index.vue')
+  }
+
 ];
 
 

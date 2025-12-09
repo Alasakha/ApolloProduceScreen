@@ -1,23 +1,20 @@
 <template>
   <div class="line1-container flex flex-col ">
-    <div class="grid grid-cols-4 gap-2 h-full">
+    <div class="grid grid-cols-3 gap-2 h-full">
       <dv-border-box-12 class="data-box ">
-        <Datacard title="今日排产工单单数" EnlishTitle="TodayPlanned" :value="productionData.pcGdTotal" />
+        <Datacard title="月度计划数" EnlishTitle="TodayPlanned" :value="monthData.monthPlan" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="已派工单数" EnlishTitle="ProducedToday" :value="productionData.gdPg" 
+      <Datacard title="已完成数" EnlishTitle="ProducedToday" :value="monthData.monthDone" 
       @click="() => handleClick('已派工单数', 'getStampingPgAbnormal')"/>
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="已报工单数" EnlishTitle="ProducedRate" :value="productionData.gdDone" 
+      <Datacard title="达成率" EnlishTitle="ProducedRate" :value="monthRate+'%'" 
       @click="() => handleClick('已报工单数', 'getStampingBgAbnormal')"/>
       </dv-border-box-12>
 
-      <dv-border-box-12 class="data-box ">
-      <Datacard title="达成率" EnlishTitle="PassRateToday" :value="productionData.gdRate+'%'" />
-      </dv-border-box-12>
 
     </div>
 
@@ -26,11 +23,17 @@
       <Datacard title="今日排产产量" EnlishTitle="PassRateToday" :value="productionData.pcTotal" />
       </dv-border-box-12>
       <dv-border-box-12 class="data-box ">
-        <Datacard title="已报工产量" EnlishTitle="InspectionsToday" :value="productionData.done" />
+        <Datacard title="已完成数" EnlishTitle="InspectionsToday" :value="productionData.done" />
       </dv-border-box-12>
 
       <dv-border-box-12 class="data-box ">
-      <Datacard title="达成率" EnlishTitle="QualifiedToday" :value="productionData.rate+'%'" />
+      <Datacard 
+        title="达成率" 
+        EnlishTitle="QualifiedToday" 
+        :value="productionData.pcTotal && productionData.done !== 0 
+          ? ((productionData.done / productionData.pcTotal) * 100).toFixed(1) + '%' 
+          : '0%'" 
+      />
       </dv-border-box-12>
 
       <!-- <dv-border-box-12 class="data-box ">
@@ -55,8 +58,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount } from 'vue'
-import { getTodayProduction, type TodayProduction, getApolloStampingWelding, type ApolloStampingWelding } from '@/api/getStampWeldinfo'
+import { ref, computed, onMounted, onBeforeUnmount } from 'vue'
+import { getTodayProduction, type TodayProduction, getApolloStampingWelding, type ApolloStampingWelding, getMonthData2006, type MonthData2006 } from '@/api/getStampWeldinfo'
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
 import Datacard from '../components/Datacard.vue'
@@ -90,6 +93,22 @@ const apolloStampingWeldingData = ref<ApolloStampingWelding>({
   toBeInspected: 0
 })
 
+const monthData = ref<MonthData2006>({
+  ty003: null,
+  monthPlan: 0,
+  monthDone: 0,
+  monthGdDone: 0,
+  monthGdOnTime: 0,
+  pcTotal: 0,
+  done: 0
+})
+
+// 计算月度达成率
+const monthRate = computed(() => {
+  if (monthData.value.monthPlan === 0) return 0
+  return Math.round((monthData.value.monthDone / monthData.value.monthPlan) * 100)
+})
+
 
 
 const fetchData = async (prodLine) => {
@@ -106,6 +125,7 @@ const fetchData = async (prodLine) => {
     const lineValue = getLine()
     const res = await getTodayProduction(lineValue)
     const apolloRes = await getApolloStampingWelding(lineValue)
+    const monthRes = await getMonthData2006()
     
     if (res.code === 200) {
       // 格式化数据,去除小数点
@@ -125,6 +145,10 @@ const fetchData = async (prodLine) => {
     
     if (apolloRes.code === 200) {
       apolloStampingWeldingData.value = apolloRes.data
+    }
+    
+    if (monthRes.code === 200) {
+      monthData.value = monthRes.data
     }
   } catch (error) {
     console.error('获取今日生产数据失败:', error)
