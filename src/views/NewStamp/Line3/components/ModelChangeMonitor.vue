@@ -2,9 +2,9 @@
   <div class="model-change-monitor">
     <div class="section-title">换型监控</div>
     <div ref="chartRef" class="chart-container"></div>
-    <div class="section-footer">
+    <!-- <div class="section-footer">
       <button class="detail-btn" @click="handleDetailClick">点击看明细</button>
-    </div>
+    </div> -->
   </div>
 </template>
 
@@ -13,19 +13,28 @@ import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
 import * as echarts from 'echarts'
 import type { ECharts } from 'echarts'
 import { eventBus } from '@/utils/eventbus'
+import { getAdjust } from '@/api/getStampWeldinfo'
 
 const chartRef = ref<HTMLElement>()
 let chartInstance: ECharts | null = null
 
-// Mock数据
-const chartData = ref([
-  { date: '11月19日', value: 4 },
-  { date: '11月20日', value: 5 },
-  { date: '11月21日', value: 3 },
-  { date: '11月22日', value: 0 },
-  { date: '11月23日', value: 0 },
-  { date: '11月24日', value: 0 }
-])
+interface ChartItem {
+  date: string
+  value: number
+}
+
+const chartData = ref<ChartItem[]>([])
+
+const formatDate = (dateStr: string) => {
+  if (!dateStr) return ''
+  const parts = dateStr.split('-')
+  if (parts.length === 3) {
+    const month = Number(parts[1]) || 0
+    const day = Number(parts[2]) || 0
+    return `${month}月${day}日`
+  }
+  return dateStr
+}
 
 const initChart = () => {
   if (!chartRef.value) return
@@ -40,8 +49,8 @@ const initChart = () => {
     grid: {
       left: '10%',
       right: '10%',
-      bottom: '15%',
-      top: '10%',
+      bottom: '0%',
+      top: '20%',
       containLabel: true
     },
     xAxis: {
@@ -124,14 +133,16 @@ const initChart = () => {
 
 const fetchData = async () => {
   try {
-    // TODO: 连接真实 API
-    // const res = await getModelChangeData()
-    // if (res.code === 200) {
-    //   chartData.value = res.data
-    //   nextTick(() => {
-    //     initChart()
-    //   })
-    // }
+    const res = await getAdjust()
+    if (res.code === 200 && Array.isArray(res.data)) {
+      chartData.value = res.data.map(item => ({
+        date: formatDate(item.monthday),
+        value: item.total ?? 0
+      }))
+      nextTick(() => {
+        initChart()
+      })
+    }
   } catch (error) {
     console.error('获取换型监控数据失败:', error)
   }
@@ -141,15 +152,12 @@ const handleResize = () => {
   chartInstance?.resize()
 }
 
-const handleDetailClick = () => {
-  // TODO: 打开详情弹窗
-  console.log('查看换型明细')
-}
+// const handleDetailClick = () => {
+//   // TODO: 打开详情弹窗
+//   console.log('查看换型明细')
+// }
 
 onMounted(() => {
-  nextTick(() => {
-    initChart()
-  })
   fetchData()
   eventBus.on('refreshData', fetchData)
   window.addEventListener('resize', handleResize)

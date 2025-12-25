@@ -1,6 +1,8 @@
 <template>
   <div class="fault-ranking">
-    <div class="title">设备异常故障排行 (月份)</div>
+    <div class="title">
+      设备异常故障排行({{ currentMonth }})
+    </div>
     <div class="ranking-container">
       <div class="total-badge">
         <div class="badge-icon">⚠️</div>
@@ -58,7 +60,7 @@ const { initChart, setOption, onClick } = useEcharts(chartRef)
 
 const totalFaults = ref(0)
 const faultData = ref<any[]>([])
-
+const currentMonth = ref('')
 // Dialog 相关
 const dialogVisible = ref(false)
 const dialogTitle = ref('设备异常明细')
@@ -72,6 +74,7 @@ const fetchData = async () => {
       faultData.value = res.data
       // 计算总故障次数
       totalFaults.value = res.data.reduce((sum: number, item: any) => sum + (item.num || 0), 0)
+      currentMonth.value = getCurrentMonth()
     }
   } catch (error) {
     console.error('获取设备异常数据失败:', error)
@@ -206,6 +209,14 @@ const createChartOption = (data: any[]) => {
     ]
   }
 }
+
+const getCurrentMonth= () =>{
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth() + 1
+  return `${year}-${month}`
+}
+
 
 // 监听数据变化，更新图表
 watch(faultData, (newData) => {

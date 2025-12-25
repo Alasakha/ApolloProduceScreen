@@ -1,139 +1,94 @@
 <template>
   <div class="oee-monitor">
     <div class="title">关键设备OEE监控</div>
-    <div class="gauge-container">
-      <div ref="chartRef" class="gauge-chart"></div>
+    <div class="monitor-list">
+      <div v-if="!workshopStats.length" class="empty">暂无数据</div>
+      <div v-for="(stat, idx) in workshopStats" :key="idx" class="workshop-row">
+        <div class="workshop-name">
+          {{
+            {
+              CY: '冲压车间',
+              HJ: '焊接车间',
+              JG2: '金工二部车间',
+              ZHS: '注塑车间'
+            }[stat.name] || stat.name
+          }}
+        </div>
+        <div class="workshop-total">总数: <strong>{{ stat.total }}</strong></div>
+        <div class="workshop-meet">达标数: <strong>{{ stat.meet }}</strong></div>
+        <div class="workshop-rate" :class="{ low: stat.rate < threshold }">达成率:{{ stat.rate }}%</div>
+        <el-button type="text" class="reason-btn" @click="openReason(stat)">原因</el-button>
+      </div>
     </div>
+    <ReasonDialog
+      :visible="showReasonDialog"
+      :metricInfo="reasonMetric"
+      :code="reasonMetric.code"
+      :showMetrics="false"
+      @close="showReasonDialog = false"
+      @submit="handleReasonSubmit"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, nextTick, watch } from 'vue'
-import { storeToRefs } from 'pinia'
-import { useEcharts } from '@/utils/useEcharts'
-import { useOeeStore } from '@/store/oee'
+import { ref, onMounted } from 'vue'
+import { getMachineOee } from '@/api/equipment'
+import ReasonDialog from '@/components/ReasonDialog.vue'
+import { ElMessage } from 'element-plus'
 
-const chartRef = ref<HTMLElement | null>(null)
-const { initChart, setOption } = useEcharts(chartRef)
+const workshopStats = ref<{ name: string; total: number; meet: number; rate: number; data: any[] }[]>([])
+const threshold = 85
 
-const oeeStore = useOeeStore()
-const { avgOee } = storeToRefs(oeeStore)
+const showReasonDialog = ref(false)
+const reasonMetric = ref({ name: '', period: '昨日', target: 0, actual: 0, achievement: 0, code: '' })
 
-const oeeValue = ref(0)
-
-const createGaugeOption = (value: number) => {
-  return {
-    series: [
-      {
-        type: 'gauge',
-        center: ['50%', '50%'],
-        radius: '90%',
-        min: 0,
-        max: 100,
-        progress: {
-          show: true,
-          roundCap: true,
-          width: 12,
-          itemStyle: {
-            color: {
-              type: 'linear',
-              x: 0,
-              y: 0,
-              x2: 1,
-              y2: 0,
-              colorStops: [
-                { offset: 0, color: '#00d4ff' },
-                { offset: 0.5, color: '#00ff88' },
-                { offset: 1, color: '#ffaa00' }
-              ]
-            }
-          }
-        },
-        pointer: {
-          show: true,
-          length: '60%',
-          width: 6,
-          itemStyle: {
-            color: '#00d4ff'
-          }
-        },
-        axisLine: {
-          lineStyle: {
-            width: 18,
-            color: [[1, 'rgba(0, 238, 255, 0.1)']]
-          }
-        },
-        axisTick: {
-          distance: -20,
-          splitNumber: 5,
-          lineStyle: {
-            color: '#999',
-            width: 1
-          }
-        },
-        splitLine: {
-          distance: -20,
-          length: 14,
-          lineStyle: {
-            color: '#999',
-            width: 2
-          }
-        },
-        axisLabel: {
-          distance: -12,
-          formatter: (value: number) => Math.floor(value),
-          color: '#fff',
-          fontSize: 12
-        },
-        anchor: {
-          show: true,
-          size: 20,
-          itemStyle: {
-            borderColor: '#00d4ff',
-            borderWidth: 2
-          }
-        },
-        detail: {
-          valueAnimation: true,
-          fontSize: 28,
-          offsetCenter: [0, '70%'],
-          formatter: (value: number) => Math.floor(value) + '%',
-          color: '#00d4ff',
-          fontWeight: 'bold'
-        },
-        data: [
-          {
-            value: value,
-            name: 'OEE'
-          }
-        ]
-      }
-    ]
+const loadStats = async () => {
+  const res = await getMachineOee()
+  const groups: Record<string, any[]> = {}
+  if (res && res.code === 200) {
+    if (Array.isArray(res.data)) {
+      groups['全部'] = res.data
+    } else if (res.data && typeof res.data === 'object') {
+      Object.assign(groups, res.data)
+    }
   }
+  const stats: any[] = []
+  for (const [key, arr] of Object.entries(groups)) {
+    const list = Array.isArray(arr) ? arr : []
+    const total = list.length
+    let meet = 0
+    for (const it of list) {
+      const raw = typeof it.oee === 'number' ? it.oee : NaN
+      const v = Number.isFinite(raw) ? (raw > 1 ? raw : raw * 100) : NaN
+      if (Number.isFinite(v) && v >= threshold) {
+        meet++
+      }
+      // NA (非数字) 视为不达标
+    }
+    const rate = total ? Math.round((meet / total) * 100) : 0
+    stats.push({ name: key, total, meet, rate, data: list })
+  }
+  workshopStats.value = stats
 }
 
-onMounted(() => {
-  nextTick(() => {
-    initChart()
-    const option = createGaugeOption(oeeValue.value)
-    setOption(option)
-  })
-})
+const openReason = (stat: any) => {
+  reasonMetric.value.name = `${stat.name} OEE 达成情况`
+  reasonMetric.value.actual = stat.rate
+  reasonMetric.value.target = threshold
+  reasonMetric.value.achievement = stat.rate
+  reasonMetric.value.code = `OEE_${stat.name}`
+  showReasonDialog.value = true
+}
 
-// 监听平均 OEE 更新仪表盘
-watch(avgOee, (val) => {
-  oeeValue.value = val
-  nextTick(() => {
-    const option = createGaugeOption(oeeValue.value)
-    setOption(option)
-  })
-}, { immediate: true })
+const handleReasonSubmit = (payload: any) => {
+  console.log('OEE 原因提交:', payload)
+  ElMessage.success('原因分析已提交')
+  showReasonDialog.value = false
+}
 
 onMounted(async () => {
-  await oeeStore.fetchOee()
-  oeeValue.value = avgOee.value
-  const option = createGaugeOption(oeeValue.value)
-  setOption(option)
+  await loadStats()
 })
 </script>
 
@@ -155,26 +110,54 @@ onMounted(async () => {
   border-bottom: 1px solid rgba(0, 212, 255, 0.3);
 }
 
-.gauge-container {
+.monitor-list {
   flex: 1;
-  min-height: 0;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  overflow: auto;
 }
 
-.gauge-chart {
-  width: 100%;
-  height: 100%;
-  max-width: 400px;
-  max-height: 400px;
+.workshop-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  background: rgba(0, 150, 255, 0.06);
+  border: 1px solid rgba(0, 150, 255, 0.12);
+  border-radius: 4px;
+}
+.workshop-name {
+  color: #ffffff;
+  font-weight: 600;
+  min-width: 120px;
+}
+.workshop-total, .workshop-meet {
+  color: #8cc8ff;
+}
+.workshop-rate {
+  color: #00d4ff;
+  font-weight: bold;
+}
+.workshop-rate.low {
+  color: #ff4d4f;
+}
+.reason-btn {
+  margin-left: auto;
+  color: #8cc8ff;
+}
+.empty {
+  color: #8cc8ff;
+  text-align: center;
+  padding: 12px 0;
 }
 
 /* 大屏优化 */
 @media (min-width: 1920px) {
-  .title {
-    font-size: 20px;
-  }
+  .title { font-size: 20px; }
+  .workshop-name { font-size: 16px; }
+  .workshop-rate { font-size: 16px; }
 }
 </style>
 

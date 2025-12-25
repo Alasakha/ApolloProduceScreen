@@ -903,7 +903,7 @@ export const getSghGdComplete = (prodLine: string): Promise<OrderSettlementRespo
     message: string;
     data: {
       monthData: QualityDayData;
-      dayData: QualityDayData[];
+      dayData: QualityDayData;
     };
   }
 
@@ -923,7 +923,7 @@ export const getSghGdComplete = (prodLine: string): Promise<OrderSettlementRespo
   export interface GetCyQualityPiciPieResponse {
     code: number;
     message: string;
-    data: CyQualityPiciPieItem[];
+    data: CyQualityPiciPieItem[]  ;
   }
 
   export const getCyQualityPiciPie = (
@@ -1046,3 +1046,29 @@ export interface Temperature4 {
       method: 'get'
     })
   }
+
+
+
+  /**
+   * 调机
+   * GET /apollo/stampingWelding/adjust
+   * 返回按天统计的调机总数
+   */
+  export interface MonthTotalData {
+    monthday: string; // 日期，例如 '2025-12-05'
+    total: number;    // 当天的调机总数
+  }
+
+  export interface GetAdjustResponse {
+    code: number;     // 例如 200
+    message: string;  // 例如 "操作成功"
+    data: MonthTotalData[];
+  }
+
+  export const getAdjust = (): Promise<GetAdjustResponse> => {
+    return request({
+      url: '/stampingWelding/adjust',
+      method: 'get'
+    });
+  };
+

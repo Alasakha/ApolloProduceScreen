@@ -1,6 +1,6 @@
 <template>
   <div class="equipment-info">
-    <div class="title">焊接线上的设备看板</div>
+    <div class="title">自动化智能生产设备</div>
     <div class="info-container">
       <!-- 设备图片 -->
       <div class="equipment-image-container">
@@ -42,15 +42,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, computed } from 'vue'
+import { ref, watch, computed, onMounted } from 'vue'
 import gebanjiImg from '@/assets/equipment/gebanji.jpg'
 import geguanjiImg from '@/assets/equipment/geguanji.jpg'
 import wanguanjiImg from '@/assets/equipment/wanguanji.jpg'
+import jieyanjiImg from '@/assets/equipment/sonxia.png'
+import { getSingleMachineInfo, type SingleMachineInfoItem } from '@/api/equipment'
 
 const props = defineProps<{
   selectedEquipment?: any
 }>()
 
+const machineList = ref<SingleMachineInfoItem[]>([])
 const equipmentInfo = ref({
   name: '激光割管机1',
   status: '运行中',
@@ -58,23 +61,80 @@ const equipmentInfo = ref({
   nextMaintenanceTime: '2024-12-25'
 })
 
+// 获取机器信息
+const fetchMachineInfo = async () => {
+  try {
+    const res = await getSingleMachineInfo()
+    if (res.code === 200 && res.data) {
+      machineList.value = res.data
+      // 如果有选中的设备，更新信息
+      if (props.selectedEquipment) {
+        updateEquipmentInfo(props.selectedEquipment)
+      } else if (machineList.value.length > 0) {
+        // 默认显示第一个设备
+        const firstMachine = machineList.value[0]
+        updateEquipmentInfoFromMachine(firstMachine)
+      }
+    }
+  } catch (error) {
+    console.error('获取机器信息失败:', error)
+  }
+}
+
+// 从接口数据更新设备信息
+const updateEquipmentInfoFromMachine = (machine: SingleMachineInfoItem) => {
+  equipmentInfo.value = {
+    name: machine.macName || '未知设备',
+    status: machine.state || '待机',
+    totalRunningTime: `${machine.powerOnTime}小时`,
+    nextMaintenanceTime: machine.nextBaoyangTime || '-'
+  }
+}
+
+// 根据选中的设备更新信息
+const updateEquipmentInfo = (equipment: any) => {
+  // 如果 equipment 有 macNo 或 macName，从接口数据中查找
+  if (equipment?.macNo || equipment?.macName) {
+    const machine = machineList.value.find(
+      m => m.macNo === equipment.macNo || m.macName === equipment.macName || m.macName === equipment.name
+    )
+    if (machine) {
+      updateEquipmentInfoFromMachine(machine)
+      return
+    }
+  }
+  
+  // 否则使用传入的数据
+  equipmentInfo.value = {
+    name: equipment.name || equipment.macName || '未知设备',
+    status: equipment.status || equipment.state || '待机',
+    totalRunningTime: equipment.totalRunningTime || `${equipment.powerOnTime || 0}小时`,
+    nextMaintenanceTime: equipment.nextMaintenanceTime || equipment.nextBaoyangTime || '-'
+  }
+}
+
 // 根据设备名称获取对应的图片
 const getEquipmentImage = (name: string): string | null => {
   if (!name) return null
   
   const nameLower = name.toLowerCase()
   
+  
   // 割板机
-  if (nameLower.includes('割板') || nameLower.includes('gebanji')) {
+  if (nameLower.includes('切板') || nameLower.includes('gebanji')) {
     return gebanjiImg
   }
   // 割管机
-  if (nameLower.includes('割管') || nameLower.includes('geguanji')) {
+  if (nameLower.includes('切管') ||  nameLower.includes('割管')) {
     return geguanjiImg
   }
   // 弯管机
   if (nameLower.includes('弯管') || nameLower.includes('wanguanji')) {
     return wanguanjiImg
+  }
+  // 焊接机器人
+  if (nameLower.includes('自动焊') || nameLower.includes('jieyanji')) {
+    return jieyanjiImg
   }
   
   return null
@@ -87,14 +147,13 @@ const equipmentImage = computed(() => {
 
 watch(() => props.selectedEquipment, (newEquipment) => {
   if (newEquipment) {
-    equipmentInfo.value = {
-      name: newEquipment.name || '未知设备',
-      status: newEquipment.status || '待机',
-      totalRunningTime: newEquipment.totalRunningTime || '0小时',
-      nextMaintenanceTime: newEquipment.nextMaintenanceTime || '-'
-    }
+    updateEquipmentInfo(newEquipment)
   }
 }, { immediate: true })
+
+onMounted(() => {
+  fetchMachineInfo()
+})
 </script>
 
 <style scoped>

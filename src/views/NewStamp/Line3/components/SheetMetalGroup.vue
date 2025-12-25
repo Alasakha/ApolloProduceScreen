@@ -2,7 +2,7 @@
   <div class="sheet-metal-group h-full flex flex-col gap-3">
     <!-- 上部分：人员信息 -->
     <div class="personnel-section">
-      <PersonnelPanel :title="'板金组'" :data="personnelData" />
+      <PersonnelPanel :title="'钣金组'" :data="personnelData" />
     </div>
 
     <!-- 下部分：关键设备生产监控 -->

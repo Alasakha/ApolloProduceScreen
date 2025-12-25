@@ -1,41 +1,138 @@
 <template>
   <div class="equipment-data">
     <div class="title">设备管理数据</div>
-    <div class="data-grid">
-      <div class="data-item">
-        <div class="item-label">正在运行(台)</div>
-        <div class="item-value">{{ data.running }}</div>
+    <div class="data-container">
+      <!-- 关键设备运行状态 -->
+      <div class="data-section">
+        <div class="section-title">
+          <span>关键设备运行状态</span>
+          <el-button class="reason-btn" type="link" @click="openReasonDialog('running')">原因分析</el-button>
+        </div>
+        <div class="data-grid">
+          <div class="data-item running">
+            <div class="item-label">正在运行(台)</div>
+            <div class="item-value">{{ data.running }}</div>
+          </div>
+          <div class="data-item standby">
+            <div class="item-label">待机设备(台)</div>
+            <div class="item-value">{{ data.standby }}</div>
+          </div>
+          <div class="data-item abnormal">
+            <div class="item-label">异常设备(台)</div>
+            <div class="item-value">{{ data.abnormal }}</div>
+          </div>
+          <div class="data-item total">
+            <div class="item-label">总设备数(台)</div>
+            <div class="item-value">{{ runningTotal }}</div>
+          </div>
+        </div>
       </div>
-      <div class="data-item">
-        <div class="item-label">待机设备(台)</div>
-        <div class="item-value">{{ data.standby }}</div>
-      </div>
-      <div class="data-item">
-        <div class="item-label">异常设备(台)</div>
-        <div class="item-value">{{ data.abnormal }}</div>
-      </div>
-      <div class="data-item highlight">
-        <div class="item-label">完成点检数(台)</div>
-        <div class="item-value">{{ data.completedInspection }}</div>
-      </div>
-      <div class="data-item highlight">
-        <div class="item-label">未点检数(台)</div>
-        <div class="item-value">{{ data.uninspected }}</div>
-      </div>
-      <div class="data-item">
-        <div class="item-label">设备总量(台)</div>
-        <div class="item-value">{{ data.total }}</div>
+
+      <!-- 设备保养维修状态 -->
+      <div class="data-section">
+        <div class="section-title">
+          <span>设备保养维修状态</span>
+          <el-button class="reason-btn" type="link" @click="openReasonDialog('inspection')">点检原因分析</el-button>
+          <el-button class="small-reason-btn" type="link" @click.stop="openReasonDialog('repair')">维修原因</el-button>
+        </div>
+        <div class="data-grid">
+          <div class="data-item ">
+            <div class="item-label">完成点检数(台)</div>
+            <div class="item-value">{{ data.completedInspection }}</div>
+          </div>
+          <div class="data-item abnormal">
+            <div class="item-label">未点检数(台)</div>
+            <div class="item-value">{{ data.uninspected }}</div>
+          </div>
+          <div class="data-item">
+            <div class="item-label">设备总量(台)</div>
+            <div class="item-value">{{ data.total }}</div>
+          </div>
+          
+          <div class="data-item standby clickable" @click="showRepairDialog = true">
+            <div class="item-label">
+              待维修数量(台)
+   
+            </div>
+            <div class="item-value">{{ data.repairCount }}</div>
+          </div>
+          <div class="data-item ">
+            <div class="item-label">维修完成数量(台)</div>
+            <div class="item-value">{{ data.repairCompleteCount }}</div>
+          </div>
+          <div class="data-item ">
+            <div class="item-label">报修数量(台)</div>
+            <div class="item-value">{{ repairTotal }}</div>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- 待维修详细列表弹窗 -->
+    <el-dialog
+      v-model="showRepairDialog"
+      title="待维修设备详细列表"
+      width="70%"
+      class="repair-dialog"
+    >
+      <el-table
+        :data="repairList"
+        v-loading="loading"
+        max-height="60vh"
+        style="width: 100%"
+        border
+      >
+        <el-table-column prop="deviceId" label="设备编号" width="150" />
+        <el-table-column prop="deviceName" label="设备名称" min-width="200" />
+        <el-table-column prop="moctyudf05" label="备注" min-width="150">
+          <template #default="scope">
+            {{ scope.row.moctyudf05 || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="status" label="状态" width="120">
+          <template #default="scope">
+            {{ scope.row.status || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="lvTwoLastMaintenanceDay" label="二级保养日期" width="150">
+          <template #default="scope">
+            {{ scope.row.lvTwoLastMaintenanceDay || '-' }}
+          </template>
+        </el-table-column>
+        <el-table-column prop="lvThreeLastMaintenanceDay" label="三级保养日期" width="150">
+          <template #default="scope">
+            {{ scope.row.lvThreeLastMaintenanceDay || '-' }}
+          </template>
+        </el-table-column>
+      </el-table>
+      <template #footer>
+        <div class="dialog-footer">
+          <span>共 {{ repairList.length }} 条记录</span>
+          <el-button type="primary" @click="showRepairDialog = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
+    <!-- 原因分析对话框（复用通用组件） -->
+    <ReasonDialog
+      :visible="showReasonDialog"
+      :metricInfo="reasonMetric"
+      :code="reasonMetric.code"
+      :showMetrics="false"
+      @close="showReasonDialog = false"
+      @submit="handleReasonSubmit"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
+import ReasonDialog from '@/components/ReasonDialog.vue'
+import { ElMessage } from 'element-plus'
 import {
   getMachineInspection,
   getKeyMachineStatus,
-  type MachineInspectionData
+  type MachineInspectionData,
+  type MachineRepairItem
 } from '@/api/equipment'
 
 interface EquipmentStats {
@@ -45,6 +142,8 @@ interface EquipmentStats {
   total: number
   completedInspection: number
   uninspected: number
+  repairCount: number
+  repairCompleteCount: number
 }
 
 const data = ref<EquipmentStats>({
@@ -53,7 +152,65 @@ const data = ref<EquipmentStats>({
   abnormal: 3,
   total: 60,
   completedInspection: 55,
-  uninspected: 5
+  uninspected: 5,
+  repairCount: 0,
+  repairCompleteCount: 0
+})
+
+const repairList = ref<MachineRepairItem[]>([])
+const showRepairDialog = ref(false)
+const loading = ref(false)
+
+// 运行总数 = 正在运行 + 待机 + 异常（用于第一栏显示总设备数）
+const runningTotal = computed(() => {
+  const r = Number(data.value.running) || 0
+  const s = Number(data.value.standby) || 0
+  const a = Number(data.value.abnormal) || 0
+  return r + s + a
+})
+
+// 原因分析对话框（复用同一弹框，不同场景通过 code 区分）
+const showReasonDialog = ref(false)
+const reasonMetric = ref({
+  name: '',
+  period: '实时',
+  target: 100,
+  actual: 0,
+  achievement: 0,
+  code: ''
+})
+
+const openReasonDialog = (type = 'running') => {
+  // 根据类型设置 metric 信息和实际值
+  if (type === 'running') {
+    reasonMetric.value.name = '关键设备运行状态'
+    reasonMetric.value.actual = Number(data.value.running) || 0
+    reasonMetric.value.code = 'EQUIP_RUNNING'
+    reasonMetric.value.achievement = runningTotal.value ? Math.round((reasonMetric.value.actual / runningTotal.value) * 100) : 0
+  } else if (type === 'inspection') {
+    reasonMetric.value.name = '设备点检情况'
+    reasonMetric.value.actual = Number(data.value.completedInspection) || 0
+    reasonMetric.value.code = 'EQUIP_INSPECTION'
+    reasonMetric.value.achievement = data.value.total ? Math.round((reasonMetric.value.actual / data.value.total) * 100) : 0
+  } else if (type === 'repair') {
+    reasonMetric.value.name = '设备维修情况'
+    reasonMetric.value.actual = Number(data.value.repairCount) || 0
+    reasonMetric.value.code = 'EQUIP_REPAIR'
+    reasonMetric.value.achievement = data.value.total ? Math.round((reasonMetric.value.actual / data.value.total) * 100) : 0
+  }
+  showReasonDialog.value = true
+}
+
+const handleReasonSubmit = (payload: any) => {
+  console.log('原因提交:', payload)
+  ElMessage.success('原因分析已提交')
+  showReasonDialog.value = false
+}
+const repairTotal = computed(() => {
+  const r = Number(data.value.repairCompleteCount) || 0
+  const s = Number(data.value.repairCount) || 0
+
+  return r +s
 })
 
 const toNumber = (value: unknown, fallback = 0) => {
@@ -81,7 +238,14 @@ const applyInspectionData = (payload: MachineInspectionData) => {
     abnormal: resolveCount(data.value.abnormal, payload.repairCount, payload.repair, payload.abnormal),
     total: resolveCount(data.value.total, payload.total),
     completedInspection: toNumber(payload.checkCount, data.value.completedInspection),
-    uninspected: toNumber(payload.uncheckCount, data.value.uninspected)
+    uninspected: toNumber(payload.uncheckCount, data.value.uninspected),
+    repairCount: toNumber(payload.repairCount, data.value.repairCount),
+    repairCompleteCount: toNumber(payload.repairCompleteCount, data.value.repairCompleteCount)
+  }
+  
+  // 保存待维修设备列表
+  if (Array.isArray(payload.repair) && payload.repair.length > 0) {
+    repairList.value = payload.repair
   }
 }
 
@@ -119,6 +283,8 @@ onMounted(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
+  min-height: 0;
 }
 
 .title {
@@ -129,14 +295,82 @@ onMounted(() => {
   margin-bottom: 12px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  flex-shrink: 0;
+}
+
+.data-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.data-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.data-section:first-child {
+  flex: 0 0 auto;
+  min-height: 0;
+}
+
+.data-section:last-child {
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.section-title {
+  color: #00d4ff;
+  font-size: 14px;
+  font-weight: bold;
+  text-align: left;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  flex-shrink: 0;
+}
+.section-title .reason-btn {
+  float: right;
+  color: #8cc8ff;
+  font-size: 12px;
+  padding: 0 6px;
+}
+.section-title .reason-btn:hover {
+  color: #00d4ff;
+}
+.small-reason-btn {
+  margin-left: 8px;
+  color: #8cc8ff;
+  font-size: 12px;
+  padding: 0 4px;
+}
+.small-reason-btn:hover {
+  color: #00d4ff;
 }
 
 .data-grid {
   flex: 1;
   display: grid;
   grid-template-columns: repeat(3, 1fr);
-  grid-template-rows: repeat(2, 1fr);
   gap: 8px;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.data-section:first-child .data-grid {
+  grid-template-rows: 1fr;
+  grid-template-columns: repeat(4, 1fr);
+  height: 100%;
+}
+
+.data-section:last-child .data-grid {
+  grid-template-rows: repeat(2, 1fr);
+  height: 100%;
 }
 
 .data-item {
@@ -144,11 +378,13 @@ onMounted(() => {
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  padding: 12px 8px;
+  padding: 8px 6px;
   background: rgba(0, 150, 255, 0.1);
   border-radius: 4px;
   border: 1px solid rgba(0, 150, 255, 0.2);
   transition: all 0.3s;
+  min-height: 0;
+  overflow: hidden;
 }
 
 .data-item:hover {
@@ -163,19 +399,65 @@ onMounted(() => {
   border-color: rgba(255, 165, 0, 0.3);
 }
 
+.data-item.clickable {
+  cursor: pointer;
+}
+
+.data-item.clickable:hover {
+  background: rgba(255, 165, 0, 0.25);
+  border-color: rgba(255, 165, 0, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(255, 165, 0, 0.3);
+}
+
+/* 分类颜色 */
+.data-item.running {
+  background: rgba(40, 167, 69, 0.08);
+  border-color: rgba(40, 167, 69, 0.2);
+}
+.data-item.running .item-value {
+  color: #28a745;
+}
+
+.data-item.standby {
+  background: rgba(255, 165, 0, 0.08);
+  border-color: rgba(255, 165, 0, 0.25);
+}
+.data-item.standby .item-value {
+  color: #ff8c00;
+}
+
+.data-item.abnormal {
+  background: rgba(255, 99, 71, 0.08);
+  border-color: rgba(255, 99, 71, 0.25);
+}
+.data-item.abnormal .item-value {
+  color: #ff4d4f;
+}
+
+.data-item.total {
+  background: rgba(0, 212, 255, 0.06);
+  border-color: rgba(0, 212, 255, 0.2);
+}
+.data-item.total .item-value {
+  color: #00d4ff;
+}
+
 .item-label {
   color: #ffffff;
-  font-size: 13px;
+  font-size: 12px;
   text-align: center;
-  margin-bottom: 8px;
+  margin-bottom: 6px;
   line-height: 1.2;
+  flex-shrink: 0;
 }
 
 .item-value {
   color: #00d4ff;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: bold;
   text-align: center;
+  flex-shrink: 0;
 }
 
 /* 大屏优化 */
@@ -185,12 +467,27 @@ onMounted(() => {
   }
   
   .item-label {
-    font-size: 15px;
+    font-size: 14px;
   }
   
   .item-value {
-    font-size: 28px;
+    font-size: 26px;
   }
+}
+
+.repair-dialog :deep(.el-dialog__body) {
+  padding: 20px;
+}
+
+.dialog-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.dialog-footer span {
+  color: #ffffff;
+  font-size: 14px;
 }
 </style>
 

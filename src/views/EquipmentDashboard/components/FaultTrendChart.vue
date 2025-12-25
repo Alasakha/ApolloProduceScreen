@@ -127,7 +127,7 @@ const createChartOption = (data: any[]) => {
     },
     series: [
       {
-        type: 'bar',
+        type: 'line',
         data: data.map(item => item.value),
         itemStyle: {
           color: {

@@ -16,22 +16,24 @@
           </div>
         </div>
         
-        <div class="form-group">
-          <label class="form-label">目标值</label>
-          <div class="metric-value">{{ metricInfo.target }}%</div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">实际值</label>
-          <div class="metric-value">{{ metricInfo.actual }}%</div>
-        </div>
-        
-        <div class="form-group">
-          <label class="form-label">达成率</label>
-          <div class="metric-value" :class="getAchievementClass(metricInfo.achievement)">
-            {{ metricInfo.achievement }}%
+        <template v-if="showMetrics">
+          <div class="form-group">
+            <label class="form-label">目标值</label>
+            <div class="metric-value">{{ metricInfo.target }}%</div>
           </div>
-        </div>
+          
+          <div class="form-group">
+            <label class="form-label">实际值</label>
+            <div class="metric-value">{{ metricInfo.actual }}%</div>
+          </div>
+          
+          <div class="form-group">
+            <label class="form-label">达成率</label>
+            <div class="metric-value" :class="getAchievementClass(metricInfo.achievement)">
+              {{ metricInfo.achievement }}%
+            </div>
+          </div>
+        </template>
         
         <div class="form-group">
           <label class="form-label required">原因分析</label>
@@ -116,6 +118,11 @@ const props = defineProps({
   code: {
     type: String,
     default: ''
+  },
+  // 控制是否显示目标/实际/达成率字段（默认显示）
+  showMetrics: {
+    type: Boolean,
+    default: true
   }
 })
 

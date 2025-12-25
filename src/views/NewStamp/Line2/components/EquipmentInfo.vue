@@ -1,7 +1,7 @@
 <template>
   <div class="equipment-info h-full flex items-center justify-around">
     <div class="metric-item">
-      <span class="label">设备总数:</span>
+      <span class="label">常规设备总数:</span>
       <span class="value">{{ equipmentData.total }}</span>
     </div>
     <div class="metric-item">

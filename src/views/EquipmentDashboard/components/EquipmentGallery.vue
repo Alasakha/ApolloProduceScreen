@@ -26,17 +26,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import gebanjiImg from '@/assets/equipment/gebanji.jpg'
 import geguanjiImg from '@/assets/equipment/geguanji.jpg'
 import wanguanjiImg from '@/assets/equipment/wanguanji.jpg'
 import jieyanjiImg from '@/assets/equipment/sonxia.png'
+import { getSingleMachineInfo, type SingleMachineInfoItem } from '@/api/equipment'
 
 const emit = defineEmits<{
   (e: 'equipment-select', equipment: any): void
 }>()
 
 const selectedIndex = ref(0)
+const machineList = ref<SingleMachineInfoItem[]>([])
 
 // 根据设备名称获取对应的图片
 const getEquipmentImage = (name: string): string | null => {
@@ -45,11 +47,11 @@ const getEquipmentImage = (name: string): string | null => {
   const nameLower = name.toLowerCase()
   
   // 割板机
-  if (nameLower.includes('割板') || nameLower.includes('gebanji')) {
+  if (nameLower.includes('切板') || nameLower.includes('gebanji')) {
     return gebanjiImg
   }
   // 割管机
-  if (nameLower.includes('割管') || nameLower.includes('geguanji')) {
+  if (nameLower.includes('切管') ||  nameLower.includes('割管')) {
     return geguanjiImg
   }
   // 弯管机
@@ -57,34 +59,52 @@ const getEquipmentImage = (name: string): string | null => {
     return wanguanjiImg
   }
   // 焊接机器人
-  if (nameLower.includes('焊接') || nameLower.includes('jieyanji')) {
+  if (nameLower.includes('自动焊') || nameLower.includes('jieyanji')) {
     return jieyanjiImg
   }
   
   return null
 }
 
-const equipmentList = ref([
-  { name: '激光割管机1', status: '运行中', totalRunningTime: '1250小时', nextMaintenanceTime: '2024-12-25' },
-  { name: '激光割管机2', status: '待机', totalRunningTime: '980小时', nextMaintenanceTime: '2024-12-20' },
-  { name: '激光割管机3', status: '运行中', totalRunningTime: '1100小时', nextMaintenanceTime: '2024-12-22' },
-  { name: '自动弯管机1', status: '运行中', totalRunningTime: '1350小时', nextMaintenanceTime: '2024-12-28' },
-  { name: '自动弯管机2', status: '待机', totalRunningTime: '890小时', nextMaintenanceTime: '2024-12-18' },
-  { name: '激光割板机1', status: '运行中', totalRunningTime: '1200小时', nextMaintenanceTime: '2024-12-24' },
-  { name: '激光割板机2', status: '运行中', totalRunningTime: '1050小时', nextMaintenanceTime: '2024-12-21' },
-  { name: '松下焊接机器人工作站', status: '运行中', totalRunningTime: '1500小时', nextMaintenanceTime: '2024-12-30' }
-])
+// 将接口数据转换为组件需要的格式
+const equipmentList = computed(() => {
+  return machineList.value.map(machine => ({
+    name: machine.macName,
+    macNo: machine.macNo,
+    macName: machine.macName,
+    status: machine.state || '待机',
+    state: machine.state,
+    totalRunningTime: `${machine.powerOnTime}小时`,
+    powerOnTime: machine.powerOnTime,
+    nextMaintenanceTime: machine.nextBaoyangTime,
+    nextBaoyangTime: machine.nextBaoyangTime
+  }))
+})
+
+// 获取机器信息
+const fetchMachineInfo = async () => {
+  try {
+    const res = await getSingleMachineInfo()
+    if (res.code === 200 && res.data) {
+      machineList.value = res.data
+      // 如果有数据，自动选择第一个设备
+      if (equipmentList.value.length > 0) {
+        handleSelect(equipmentList.value[0], 0)
+      }
+    }
+  } catch (error) {
+    console.error('获取机器信息失败:', error)
+  }
+}
 
 const handleSelect = (equipment: any, index: number) => {
   selectedIndex.value = index
   emit('equipment-select', equipment)
 }
 
-// 组件挂载时自动选择第一个设备
+// 组件挂载时获取数据
 onMounted(() => {
-  if (equipmentList.value.length > 0) {
-    handleSelect(equipmentList.value[0], 0)
-  }
+  fetchMachineInfo()
 })
 </script>
 

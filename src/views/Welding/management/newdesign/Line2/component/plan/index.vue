@@ -77,10 +77,10 @@
               <span class="value">{{ item.pg }}</span>
             </div>
             <div class="data-item">
-              <span class="value">{{ item.done > 0 ? item.done : '未开机' }}</span>
+              <span class="value">{{ item.done > -1 ? item.done : '未开机' }}</span>
             </div>
             <div class="data-item">
-              <span class="value">{{ Number(formatRate(item.rate)) > 0? formatRate(item.rate)+'%' : '未开机' }}</span>
+              <span class="value">{{ Number(formatRate(item.rate)) >= 0? formatRate(item.rate)+'%' : '未开机' }}</span>
             </div>
           </div>
         </div>

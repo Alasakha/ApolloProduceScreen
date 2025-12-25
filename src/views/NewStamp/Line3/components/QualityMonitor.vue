@@ -66,30 +66,29 @@ const fetchData = async () => {
       const monthRate = monthData.rate !== null && monthData.rate !== undefined
         ? Math.round(monthData.rate * 100) / 100
         : (monthTotal > 0 ? Math.round((monthHg / monthTotal) * 100 * 100) / 100 : 0)
-      
+
       monthlyData.value = {
         totalBatches: monthTotal,
         qualifiedBatches: monthHg,
         qualifiedRate: monthRate
       }
 
-      // 处理今日数据（汇总 dayData 数组中的所有数据）
-      const dayDataList = res.data.dayData || []
-      if (dayDataList.length > 0) {
-        // 汇总所有今日数据
-        const todayTotal = dayDataList.reduce((sum, item) => sum + (item.total || 0), 0)
-        const todayHg = dayDataList.reduce((sum, item) => sum + (item.hg || 0), 0)
-        const todayRate = todayTotal > 0 
-          ? Math.round((todayHg / todayTotal) * 100 * 100) / 100 
-          : 0
-        
+      // 处理今日数据（dayData是单个对象）
+      const dayDataObj = res.data.dayData
+      if (dayDataObj) {
+        const todayTotal = dayDataObj.total || 0
+        const todayHg = dayDataObj.hg || 0
+        // 使用 dayData.rate（假设已是百分比0-100），否则手动计算
+        const todayRate = dayDataObj.rate !== null && dayDataObj.rate !== undefined
+          ? Math.round(dayDataObj.rate * 100) / 100
+          : (todayTotal > 0 ? Math.round((todayHg / todayTotal) * 100 * 100) / 100 : 0)
+
         todayData.value = {
           totalBatches: todayTotal,
           qualifiedBatches: todayHg,
           qualifiedRate: todayRate
         }
       } else {
-        // 如果没有今日数据，重置为0
         todayData.value = {
           totalBatches: 0,
           qualifiedBatches: 0,
