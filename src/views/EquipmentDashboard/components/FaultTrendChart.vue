@@ -1,6 +1,6 @@
 <template>
   <div class="fault-trend-chart">
-    <div class="title">易发生故障设备统计</div>
+    <div class="title">{{Year}}年度易发生故障设备统计</div>
     <div class="chart-subtitle">推移图</div>
     <div class="chart-container">
       <div ref="chartRef" class="chart"></div>
@@ -9,10 +9,10 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, onBeforeUnmount, nextTick, computed } from 'vue'
 import { useEcharts } from '@/utils/useEcharts'
 import { getFaultyEquipment, type FaultyEquipmentItem } from '@/api/equipment'
-
+const Year = computed(() => new Date().getFullYear())
 const chartRef = ref<HTMLElement | null>(null)
 const { initChart, setOption } = useEcharts(chartRef)
 

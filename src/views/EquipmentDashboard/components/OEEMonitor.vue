@@ -14,10 +14,27 @@
             }[stat.name] || stat.name
           }}
         </div>
-        <div class="workshop-total">总数: <strong>{{ stat.total }}</strong></div>
-        <div class="workshop-meet">达标数: <strong>{{ stat.meet }}</strong></div>
-        <div class="workshop-rate" :class="{ low: stat.rate < threshold }">达成率:{{ stat.rate }}%</div>
-        <el-button type="text" class="reason-btn" @click="openReason(stat)">原因</el-button>
+        <div class="metrics">
+          <div class="metric">
+            <div class="metric-label">总数</div>
+            <div class="metric-value">{{ stat.total }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">达标数</div>
+            <div class="metric-value">{{ stat.meet }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">未达标数</div>
+            <div class="metric-value unmet">{{ stat.total - stat.meet }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">达成率</div>
+            <div class="metric-value">{{ stat.rate }}%</div>
+          </div>
+        </div>
+        <div class="actions">
+          <el-button type="text" class="reason-btn" @click="openReason(stat)">原因</el-button>
+        </div>
       </div>
     </div>
     <ReasonDialog
@@ -36,6 +53,7 @@ import { ref, onMounted } from 'vue'
 import { getMachineOee } from '@/api/equipment'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { ElMessage } from 'element-plus'
+import { fillInReason } from '@/api/produceperformance'
 
 const workshopStats = ref<{ name: string; total: number; meet: number; rate: number; data: any[] }[]>([])
 const threshold = 85
@@ -83,8 +101,23 @@ const openReason = (stat: any) => {
 
 const handleReasonSubmit = (payload: any) => {
   console.log('OEE 原因提交:', payload)
-  ElMessage.success('原因分析已提交')
-  showReasonDialog.value = false
+  // 调用后端提交接口
+  if (reasonMetric.value?.code) {
+    fillInReason(reasonMetric.value.code, payload.reason || '', payload.solution || '')
+      .then(() => {
+        ElMessage.success('原因分析已提交')
+      })
+      .catch(err => {
+        console.error('提交失败', err)
+        ElMessage.error('提交失败，请重试（已本地保存）')
+      })
+      .finally(() => {
+        showReasonDialog.value = false
+      })
+  } else {
+    ElMessage.warning('缺少提交代码，已本地保存')
+    showReasonDialog.value = false
+  }
 }
 
 onMounted(async () => {
@@ -122,30 +155,51 @@ onMounted(async () => {
 .workshop-row {
   display: flex;
   align-items: center;
-  gap: 12px;
-  padding: 8px 12px;
-  background: rgba(0, 150, 255, 0.06);
-  border: 1px solid rgba(0, 150, 255, 0.12);
-  border-radius: 4px;
+  gap: 16px;
+  padding: 12px 16px;
+  background: linear-gradient(90deg, rgba(0,20,40,0.12), rgba(0,40,80,0.06));
+  border: 1px solid rgba(0, 150, 255, 0.08);
+  border-radius: 6px;
 }
 .workshop-name {
   color: #ffffff;
-  font-weight: 600;
+  font-weight: 700;
+  min-width: 160px;
+  font-size: 15px;
+}
+.metrics {
+  display: flex;
+  gap: 18px;
+  align-items: center;
+  flex: 1;
+}
+.metric {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
   min-width: 120px;
 }
-.workshop-total, .workshop-meet {
+.metric-label {
   color: #8cc8ff;
+  font-size: 12px;
 }
-.workshop-rate {
+.metric-value {
   color: #00d4ff;
-  font-weight: bold;
+  font-weight: 700;
+  font-size: 18px;
 }
-.workshop-rate.low {
+.metric-value.unmet {
   color: #ff4d4f;
 }
-.reason-btn {
+.actions {
   margin-left: auto;
+}
+.reason-btn {
   color: #8cc8ff;
+  border: 1px solid rgba(140,200,255,0.08);
+  background: rgba(0,0,0,0.06);
+  padding: 4px 8px;
+  border-radius: 4px;
 }
 .empty {
   color: #8cc8ff;

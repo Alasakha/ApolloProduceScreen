@@ -187,6 +187,14 @@ const handleOverlayClick = () => {
 // 监听visible变化，重置表单和加载数据
 watch(() => props.visible, (newVal) => {
   if (newVal) {
+    // 重置表单为默认，避免上次打开残留内容
+    formData.value = {
+      reason: '',
+      solution: '',
+      responsible: '',
+      expectedDate: '',
+      remark: ''
+    }
     loadData() // 对话框打开时加载数据
 
 

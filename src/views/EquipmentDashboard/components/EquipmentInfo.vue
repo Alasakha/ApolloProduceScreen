@@ -119,9 +119,8 @@ const getEquipmentImage = (name: string): string | null => {
   
   const nameLower = name.toLowerCase()
   
-  
   // 割板机
-  if (nameLower.includes('切板') || nameLower.includes('gebanji')) {
+  if (nameLower.includes('割板') || nameLower.includes('gebanji')) {
     return gebanjiImg
   }
   // 割管机
@@ -133,7 +132,7 @@ const getEquipmentImage = (name: string): string | null => {
     return wanguanjiImg
   }
   // 焊接机器人
-  if (nameLower.includes('自动焊') || nameLower.includes('jieyanji')) {
+  if (nameLower.includes('焊') || nameLower.includes('jieyanji')) {
     return jieyanjiImg
   }
   

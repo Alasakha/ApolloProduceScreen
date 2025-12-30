@@ -55,7 +55,7 @@
           <div class="device-data">
             <div class="section-title mt-4">日计划完成情况</div>
             <div class="data-item ml-[2%]">
-              <span class="value">PMC日机台排产数</span>
+              <span class="value">计划数</span>
             </div>
             <div class="data-item">
               <span class="value">完成数</span>

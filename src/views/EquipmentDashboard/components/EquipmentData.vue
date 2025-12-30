@@ -9,7 +9,7 @@
           <el-button class="reason-btn" type="link" @click="openReasonDialog('running')">原因分析</el-button>
         </div>
         <div class="data-grid">
-          <div class="data-item running">
+          <div class="data-item running clickable" @click="openRunningDialog">
             <div class="item-label">正在运行(台)</div>
             <div class="item-value">{{ data.running }}</div>
           </div>
@@ -23,7 +23,7 @@
           </div>
           <div class="data-item total">
             <div class="item-label">总设备数(台)</div>
-            <div class="item-value">{{ runningTotal }}</div>
+            <div class="item-value">{{ data.total }}</div>
           </div>
         </div>
       </div>
@@ -46,7 +46,7 @@
           </div>
           <div class="data-item">
             <div class="item-label">设备总量(台)</div>
-            <div class="item-value">{{ data.total }}</div>
+            <div class="item-value">{{ runningTotal }}</div>
           </div>
           
           <div class="data-item standby clickable" @click="showRepairDialog = true">
@@ -57,11 +57,11 @@
             <div class="item-value">{{ data.repairCount }}</div>
           </div>
           <div class="data-item ">
-            <div class="item-label">维修完成数量(台)</div>
+            <div class="item-label">{{Year}}年度维修完成数量(台)</div>
             <div class="item-value">{{ data.repairCompleteCount }}</div>
           </div>
           <div class="data-item ">
-            <div class="item-label">报修数量(台)</div>
+            <div class="item-label">{{Year}}报修数量(台)</div>
             <div class="item-value">{{ repairTotal }}</div>
           </div>
         </div>
@@ -112,6 +112,30 @@
         </div>
       </template>
     </el-dialog>
+    <!-- 正在运行设备列表弹窗 -->
+    <el-dialog
+      v-model="showRunningDialog"
+      title="正在运行设备列表"
+      width="50%"
+      class="running-dialog"
+    >
+      <el-table
+        :data="runningList"
+        v-loading="loading"
+        max-height="60vh"
+        style="width: 100%"
+        border
+      >
+        <el-table-column prop="machCode" label="设备编号" width="150" />
+        <el-table-column prop="machName" label="设备名称" min-width="200" />
+      </el-table>
+      <template #footer>
+        <div class="dialog-footer">
+          <span>共 {{ runningList.length }} 条记录</span>
+          <el-button type="primary" @click="showRunningDialog = false">关闭</el-button>
+        </div>
+      </template>
+    </el-dialog>
     <!-- 原因分析对话框（复用通用组件） -->
     <ReasonDialog
       :visible="showReasonDialog"
@@ -128,6 +152,7 @@
 import { ref, onMounted, computed } from 'vue'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { ElMessage } from 'element-plus'
+import { fillInReason } from '@/api/produceperformance'
 import {
   getMachineInspection,
   getKeyMachineStatus,
@@ -156,18 +181,22 @@ const data = ref<EquipmentStats>({
   repairCount: 0,
   repairCompleteCount: 0
 })
-
+const Year = computed(() => new Date().getFullYear())
 const repairList = ref<MachineRepairItem[]>([])
 const showRepairDialog = ref(false)
 const loading = ref(false)
+const runningList = ref<any[]>([])
+const showRunningDialog = ref(false)
 
 // 运行总数 = 正在运行 + 待机 + 异常（用于第一栏显示总设备数）
 const runningTotal = computed(() => {
-  const r = Number(data.value.running) || 0
-  const s = Number(data.value.standby) || 0
-  const a = Number(data.value.abnormal) || 0
-  return r + s + a
+  const r = Number(data.value.completedInspection) || 0
+  const s = Number(data.value.uninspected) || 0
+
+  return r + s 
 })
+
+
 
 // 原因分析对话框（复用同一弹框，不同场景通过 code 区分）
 const showReasonDialog = ref(false)
@@ -201,10 +230,21 @@ const openReasonDialog = (type = 'running') => {
   showReasonDialog.value = true
 }
 
-const handleReasonSubmit = (payload: any) => {
+const handleReasonSubmit = async (payload: any) => {
   console.log('原因提交:', payload)
-  ElMessage.success('原因分析已提交')
-  showReasonDialog.value = false
+  try {
+    if (reasonMetric.value?.code) {
+      await fillInReason(reasonMetric.value.code, payload.reason || '', payload.solution || '')
+      ElMessage.success('原因分析已提交')
+    } else {
+      ElMessage.warning('缺少提交代码，已本地保存')
+    }
+  } catch (error) {
+    console.error('提交原因失败', error)
+    ElMessage.error('提交失败，请重试（已本地保存）')
+  } finally {
+    showReasonDialog.value = false
+  }
 }
 const repairTotal = computed(() => {
   const r = Number(data.value.repairCompleteCount) || 0
@@ -265,6 +305,13 @@ const fetchKeyMachineStatusData = async () => {
     const response = await getKeyMachineStatus()
     if (response?.data) {
       applyInspectionData(response.data)
+      // 如果接口返回 doing 列表，保存正在运行列表用于弹窗显示
+      if (Array.isArray(response.data.doing)) {
+        runningList.value = response.data.doing.map((it: any) => ({
+          machCode: it.machCode || it.mac_no || it.macCode || it.mac_no,
+          machName: it.machName || it.mac_name || it.machName
+        }))
+      }
     }
   } catch (error) {
     console.error('获取关键设备状态失败', error)
@@ -275,6 +322,11 @@ onMounted(() => {
   fetchMachineInspectionData()
   fetchKeyMachineStatusData()
 })
+
+const openRunningDialog = () => {
+  // 确保列表已加载，然后打开对话框
+  showRunningDialog.value = true
+}
 </script>
 
 <style scoped>

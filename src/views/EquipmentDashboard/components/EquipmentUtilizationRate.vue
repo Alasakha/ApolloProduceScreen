@@ -11,6 +11,7 @@
     <el-button type="link" class="toggle-list" @click="showList = !showList">{{ showList ? '隐藏机台' : '展开机台' }}</el-button>
     <el-button type="primary" class="chart-btn" @click="$emit('open-charts-dialog')">查看车间稼动率图</el-button>
   </div>
+
   <div class="content-area">
     <div v-if="showList" class="grid-container">
       <div v-if="!scrollData.length" class="empty">暂无数据</div>
@@ -40,22 +41,7 @@
         <div class="ws-metrics">
           <div class="metric"><div class="label">总数</div><div class="value">{{ ws.total ?? 0 }}</div></div>
           <div class="metric"><div class="label">达标数</div><div class="value">{{ ws.meet ?? 0 }}</div></div>
-          <div class="metric"><div class="label">达成率</div><div class="value">{{ ws.avg !== null ? ws.avg + '%' : '0%' }}</div></div>
-        </div>
-        <div class="ws-rate">
-          <div class="ws-rate-bar">
-            <div
-              class="ws-rate-progress"
-              :style="{
-                width: ws.avg !== null ? ws.avg + '%' : '0%',
-                background: ws.avg !== null ? (ws.avg < 65 || ws.avg > 120 ? '#ff4d4f' : ws.avg >= 65 && ws.avg < 85 ? '#ffaa00' : '#00ff88') : 'rgba(0,0,0,0.2)'
-              }"
-            ></div>
-          </div>
-          <div class="ws-rate-value">
-            <span v-if="ws.avg !== null">{{ ws.avg }}%</span>
-            <span v-else>NA</span>
-          </div>
+          <div class="metric"><div class="label" style="color: #ff4d4f;">未达标数</div><div class="value" style="color: #ff4d4f">{{ (ws.total ?? 0) - (ws.meet ?? 0) }}</div></div>
         </div>
       </div>
     </div>
@@ -78,6 +64,7 @@ import { ref, onMounted, onBeforeUnmount, computed } from 'vue'
 import { getMachineOee } from '@/api/equipment'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { ElMessage } from 'element-plus'
+import { fillInReason } from '@/api/produceperformance'
 
 const scrollIndex = ref(0)
 let scrollTimer: number | null = null
@@ -92,7 +79,7 @@ const scrollData = computed(() =>
 )
 
 // 每个车间汇总数据
-const workshopSummaries = ref<{ code: string; label: string; avg: number | null; total?: number; meet?: number }[]>([])
+const workshopSummaries = ref<{ code: string; label: string; avg: number | null; rate: number; total?: number; meet?: number }[]>([])
 // 每个车间对应的原因文本
 const workshopReasons = ref<Record<string, string>>({})
 
@@ -108,18 +95,26 @@ const reasonMetric = ref({
 
 const openReasonDialog = (ws: any) => {
   reasonMetric.value.name = `${ws.label} 设备稼动率`
-  reasonMetric.value.actual = ws.avg !== null ? ws.avg : 0
+  reasonMetric.value.actual = ws.rate !== null ? ws.rate : 0
   reasonMetric.value.code = `WORKSHOP_${ws.code}`
-  reasonMetric.value.achievement = ws.avg !== null ? Math.round(ws.avg) : 0
+  reasonMetric.value.achievement = ws.rate !== null ? Math.round(ws.rate) : 0
   showReasonDialog.value = true
 }
 
-const handleReasonSubmit = (payload: any) => {
-  // 保存本地展示，并可在此处调用后端接口
+const handleReasonSubmit = async (payload: any) => {
+  // 保存本地展示
   const code = reasonMetric.value.code.replace('WORKSHOP_', '')
   workshopReasons.value[code] = payload.reason || ''
-  ElMessage.success('原因已保存')
-  showReasonDialog.value = false
+  // 同步到后端
+  try {
+    await fillInReason(reasonMetric.value.code, payload.reason || '', payload.solution || '')
+    ElMessage.success('原因已保存并提交')
+  } catch (error) {
+    console.error('提交原因失败', error)
+    ElMessage.error('提交原因失败，请重试（已本地保存）')
+  } finally {
+    showReasonDialog.value = false
+  }
 }
 
 const workshopLabelMap: Record<string, string> = {
@@ -148,18 +143,23 @@ onMounted(async () => {
     } else if (res.data && typeof res.data === 'object') {
       groups = res.data as Record<string, any[]>
     }
-    // 计算每个车间平均稼动率及总数/达标数
-    const summaries: { code: string; label: string; avg: number | null; total: number; meet: number }[] = []
-    for (const [k, arr] of Object.entries(groups)) {
-      const list = Array.isArray(arr) ? arr : []
-      const vals = list.map(it => (typeof it.operation === 'number' ? (it.operation > 1 ? it.operation : it.operation * 100) : NaN))
-      const valid = vals.filter(v => Number.isFinite(v))
-      const avg = valid.length ? Math.round(valid.reduce((s, v) => s + v, 0) / valid.length) : null
-      const total = list.length
-      const meet = vals.filter(v => Number.isFinite(v) && v >= 85).length
-      summaries.push({ code: k, label: workshopLabel(k), avg, total, meet })
-    }
-    workshopSummaries.value = summaries
+    // 计算每个车间平均稼动率及总数/达标数（达成率 = 达标数/总数）
+   // 计算每个车间平均稼动率及总数/达标数（达成率 = 达标数/总数）
+const summaries: { code: string; label: string; avg: number | null; rate: number; total: number; meet: number }[] = []
+for (const [k, arr] of Object.entries(groups)) {
+  const list = Array.isArray(arr) ? arr : []
+  // vals 用于计算平均稼动率（百分比）
+  const vals = list.map(it => (typeof it.operation === 'number' ? (it.operation > 1 ? it.operation : it.operation * 100) : NaN))
+  const valid = vals.filter(v => Number.isFinite(v))
+  const avg = valid.length ? Math.round(valid.reduce((s, v) => s + v, 0) / valid.length) : null
+  const total = list.length
+  // 使用原始 operation 判断是否达标，阈值区间 [0.65, 1.2]
+  const ops = list.map(it => (typeof it.operation === 'number' ? it.operation : NaN))
+  const meet = ops.filter(v => Number.isFinite(v) && v >= 0.65 && v <= 1.2).length
+  const rate = total ? Math.round((meet / total) * 100) : 0
+  summaries.push({ code: k, label: workshopLabel(k), avg, rate, total, meet })
+}
+workshopSummaries.value = summaries
   } else {
     workshopSummaries.value = []
   }

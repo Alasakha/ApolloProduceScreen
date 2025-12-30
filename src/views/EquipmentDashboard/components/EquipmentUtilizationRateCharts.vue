@@ -122,8 +122,8 @@ const renderWorkshopCharts = () => {
           // - if op <= 1.5 treat as fraction (e.g. 1.15 -> 115%)
           // - if op > 1.5 and <= 100 assume already percentage (e.g. 58 -> 58%)
           // - otherwise fallback to op*100
-          if (op <= 1.5) return op * 100
-          if (op > 1.5 && op <= 100) return op
+          // if (op <= 1.5) return op * 100
+          // if (op > 1.5 && op <= 100) return op
           return op * 100
         }
         const rates = devices.map(d => normalizeOperation(d.operation))
@@ -152,7 +152,7 @@ const renderWorkshopCharts = () => {
           },
           yAxis: {
             type: 'value',
-            max: 100,
+            // max: 100,
             axisLabel: {
               color: '#8cc8ff',
               formatter: '{value}%'
