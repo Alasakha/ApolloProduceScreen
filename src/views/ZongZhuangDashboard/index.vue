@@ -24,6 +24,7 @@
             :chart-type="panel.chartType"
             :chart-data="panel.chartData"
             :chart-type-description="panel.chartTypeDescription"
+            :is-title="panel.isTitle"
             :is-top-quality-mode="panel.isTopQualityMode"
             :second-chart-title="panel.secondChartTitle"
             :second-chart-type="panel.secondChartType"
@@ -49,6 +50,7 @@
             :chart-type="panel.chartType"
             :chart-data="panel.chartData"
             :chart-type-description="panel.chartTypeDescription"
+            :is-title="panel.isTitle"
             :is-top-quality-mode="panel.isTopQualityMode"
             :second-chart-title="panel.secondChartTitle"
             :second-chart-type="panel.secondChartType"
@@ -87,6 +89,7 @@ interface PanelData {
   secondChartType?: 'line' | 'bar' | 'pie' | 'gauge'
   secondChartData?: any
   hideRegular?: boolean
+  isTitle?: boolean
 }
 
 // 接口返回的数据类型
@@ -622,7 +625,7 @@ async function fetchDepartment1Efficiency() {
     const monthDay = getCurrentMonth()
     
     // 获取1004的数据
-    const response = await getProductionAchievementRate('1004', monthDay)
+    const response = await getProductionAchievementRate('10041005', monthDay)
     
     if (response.code === 200) {
       const transformedData = transformEfficiencyData(
@@ -653,7 +656,7 @@ async function fetchDepartment2Efficiency() {
     const monthDay = getCurrentMonth()
     
     // 获取2004的数据
-    const response = await getProductionAchievementRate('2004', monthDay)
+    const response = await getProductionAchievementRate('20042005', monthDay)
     
     if (response.code === 200) {
       const transformedData = transformEfficiencyData(
@@ -807,7 +810,8 @@ const department1Panels = ref<PanelData[]>([
     chartTitle: '工单结单率趋势',
     chartType: 'bar' as const,
     chartData: null,
-    chartTypeDescription: '折线图(标准) + 柱状图(实际)'
+    chartTypeDescription: '折线图(标准) + 柱状图(实际)',
+    isTitle: true
   },
   {
     id: '2',
@@ -816,7 +820,8 @@ const department1Panels = ref<PanelData[]>([
     chartTitle: '直通率趋势',
     chartType: 'line' as const,
     chartData: null,
-    chartTypeDescription: '折线图(每月标准和实际)'
+    chartTypeDescription: '折线图(每月标准和实际)',
+    isTitle: true
   },
   {
     id: '3',
@@ -826,7 +831,8 @@ const department1Panels = ref<PanelData[]>([
     chartType: 'bar' as const,
     chartData: null,
     chartTypeDescription: '柱状图(每月计划和实际)',
-    hideRegular: true
+    hideRegular: true,
+    isTitle:false
   },
   {
     id: '4',
@@ -852,7 +858,8 @@ const department2Panels = ref<PanelData[]>([
     chartTitle: '工单结单率趋势',
     chartType: 'bar' as const,
     chartData: null,
-    chartTypeDescription: '折线图(标准) + 柱状图(实际)'
+    chartTypeDescription: '折线图(标准) + 柱状图(实际)',
+    isTitle: true
   },
   {
     id: '2',
@@ -861,7 +868,9 @@ const department2Panels = ref<PanelData[]>([
     chartTitle: '直通率趋势',
     chartType: 'line' as const,
     chartData: null,
-    chartTypeDescription: '折线图(每月标准和实际)'
+    chartTypeDescription: '折线图(每月标准和实际)',
+    isTitle: true
+
   },
   {
     id: '3',
@@ -871,7 +880,8 @@ const department2Panels = ref<PanelData[]>([
     chartType: 'bar' as const,
     chartData: null,
     chartTypeDescription: '柱状图(每月计划和实际)',
-    hideRegular: true
+    hideRegular: true,
+    isTitle: false
   },
   {
     id: '4',

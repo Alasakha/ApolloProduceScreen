@@ -7,6 +7,7 @@
     "dev": "vite",
     "dev:normal": "vite --mode development",
     "dev:scale": "vite --mode scale",
+    "loction": "vite --mode loction",
     "build": "vue-tsc -b && vite build",
     "build:normal": "vue-tsc -b && vite build --mode development",
     "build:scale": "vue-tsc -b && vite build --mode scale",

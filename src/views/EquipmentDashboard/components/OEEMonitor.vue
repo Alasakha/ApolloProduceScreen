@@ -56,10 +56,11 @@ import { ElMessage } from 'element-plus'
 import { fillInReason } from '@/api/produceperformance'
 
 const workshopStats = ref<{ name: string; total: number; meet: number; rate: number; data: any[] }[]>([])
-const threshold = 85
+const minThreshold = 65
+const maxThreshold = 120
 
 const showReasonDialog = ref(false)
-const reasonMetric = ref({ name: '', period: '昨日', target: 0, actual: 0, achievement: 0, code: '' })
+const reasonMetric = ref({ name: '', period: '昨日', target: 0, actual: 0, achievement: 0, code: '', targetRange: '' })
 
 const loadStats = async () => {
   const res = await getMachineOee()
@@ -78,8 +79,9 @@ const loadStats = async () => {
     let meet = 0
     for (const it of list) {
       const raw = typeof it.oee === 'number' ? it.oee : NaN
-      const v = Number.isFinite(raw) ? (raw > 1 ? raw : raw * 100) : NaN
-      if (Number.isFinite(v) && v >= threshold) {
+      const v = Number.isFinite(raw) ? raw*100 : NaN
+      // 视为达标：v 在 minThreshold 到 maxThreshold（包含）之间
+      if (Number.isFinite(v) && v >= minThreshold && v <= maxThreshold) {
         meet++
       }
       // NA (非数字) 视为不达标
@@ -93,7 +95,10 @@ const loadStats = async () => {
 const openReason = (stat: any) => {
   reasonMetric.value.name = `${stat.name} OEE 达成情况`
   reasonMetric.value.actual = stat.rate
-  reasonMetric.value.target = threshold
+  // 在原因弹窗中显示区间文本
+  // 将 numeric target 保持为最小阈值，同时保留 range 字符串用于展示
+  reasonMetric.value.target = minThreshold
+  reasonMetric.value.targetRange = `${minThreshold}-${maxThreshold}`
   reasonMetric.value.achievement = stat.rate
   reasonMetric.value.code = `OEE_${stat.name}`
   showReasonDialog.value = true

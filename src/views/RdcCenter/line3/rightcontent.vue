@@ -82,54 +82,62 @@ const months = ref(['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8�
 const budgetData = ref([
     { items: [], highlight: false }, // 1月
     { items: [], highlight: false }, // 2月
-    { items: [], highlight: false }, // 3月
-    { items: [], highlight: false }, // 4月
+    { items: [
+         { name: '进化者24Pro', highlight: true },
+    ], highlight: false }, // 3月
+    { items: [
+                { name: '飞驰BE33', highlight: true },
+                { name: '闪电AGB40-1D', highlight: true },
+                { name: '进化者20Pro', highlight: true },
+                { name: '战娃16/16', highlight: true }
+    ], highlight: false }, // 4月
     { 
         items: [
-            { name: '暴风300', highlight: true },
-            { name: '漫游者300', highlight: true }
+            { name: '暴风70', highlight: true },
+            { name: '漫游者CR500', highlight: true },
+            { name: '进化者22Pro', highlight: true }
         ], 
         highlight: false 
     }, // 5月
-    { items: [], highlight: false }, // 6月
+    { items: [
+            { name: '暴风110', highlight: true },
+            { name: '风行者', highlight: true },
+            { name: 'EV800', highlight: true }
+    ], highlight: false }, // 6月
     { 
         items: [
-            { name: '小小战士', highlight: true },
-            { name: '战士', highlight: true }
+            { name: '暴风125', highlight: true },
+            { name: '坦克TK200', highlight: true }
         ], 
         highlight: false 
     }, // 7月
     { 
-        items: [
-            { name: '暴风125', highlight: true },
-            { name: '战尊', highlight: true }
-        ], 
+        items: [], 
         highlight: true 
     }, // 8月 - 橙色背景
     { 
         items: [
-            { name: '暴风110', highlight: true }
+            { name: '飞驰竞技版', highlight: true }
         ], 
         highlight: false 
     }, // 9月
     { 
         items: [
-            { name: '暴风70', highlight: true }
+           { name: 'DNA12 PRO MAX', highlight: true },
+           { name: 'DNA16 PRO MAX', highlight: true },
+           { name: '坦克TK125', highlight: true }
         ], 
         highlight: false 
     }, // 10月
     { 
         items: [
-            { name: '漫游者200', highlight: true },
-            { name: '飞驰', highlight: true },
-            { name: 'EV500', highlight: true }
+
         ], 
         highlight: false 
     }, // 11月
     { 
         items: [
-            { name: 'EV800', highlight: true },
-            { name: 'AE23', highlight: true }
+            { name: '坦克TK300', highlight: true },
         ], 
         highlight: false 
     } // 12月
@@ -145,7 +153,7 @@ const actualData = ref([
     { items: [] }, // 6月
     { items: [] }, // 7月
     { items: [] }, // 8月
-    { items: [{ name: '暴风110' }] }, // 9月
+    { items: [] }, // 9月
     { items: [] }, // 10月
     { items: [] }, // 11月
     { items: [] }  // 12月

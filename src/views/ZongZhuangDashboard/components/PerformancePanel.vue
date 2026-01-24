@@ -18,9 +18,9 @@
       <!-- 普通模式：显示数据区域和图表 -->
       <template v-else-if="!isTopQualityMode">
         <!-- A类数据区域 -->
-        <div class="data-section class-a-data" v-if="description && description.length > 0">
+        <div class="data-section class-a-data" v-if="description && description.length > 0 ">
           <div class="data-category">
-            <h4 class="category-title">A类</h4>
+            <h4 class="category-title" v-if="isTitle === true">A类</h4>
             <div class="data-items">
               <div v-for="(item, index) in description.slice(0, aClassDataEndIndex)" :key="index" class="data-item">
                 <span class="item-label">{{ item.label }}:</span>
@@ -129,6 +129,8 @@ interface Props {
   secondChartData?: any
   // TOP质量问题模式
   isTopQualityMode?: boolean
+  // 是否显示“A类”标题
+  isTitle?: boolean
   // 隐藏常规部分
   hideRegular?: boolean
   // 加载状态
@@ -142,6 +144,7 @@ const props = withDefaults(defineProps<Props>(), {
   secondChartType: 'pie' as const,
   secondChartData: () => ({}),
   isTopQualityMode: false,
+  isTitle: false,
   hideRegular: false,
   loading: false
 })

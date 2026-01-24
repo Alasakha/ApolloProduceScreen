@@ -102,7 +102,7 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getCheckInfo({caigou:params.name,type:2});
+            const res = await getCheckInfo({caigou:params.name,type:1});
             console.log(res)
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
@@ -158,7 +158,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData = () => {
-    const params = { type: 2 };
+    const params = { type: 2,warehouseType:2 };
     getCheckPie(params).then(res => {
 
         isLoading.value = false;

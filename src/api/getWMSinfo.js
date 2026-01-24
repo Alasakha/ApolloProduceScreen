@@ -60,23 +60,19 @@ export const getstagnantAmount= (type) => {
 
 
   // /WMS/deliveryTimelinessRateDetail 
-    export const getdeliveryTimelinessRateDetail= (warehouseKeeper) => {
+    export const getdeliveryTimelinessRateDetail= (params) => {
     return request({
       url: '/WMS/deliveryTimelinessRateDetail',
       method: 'get',
-      params: {
-        warehouseKeeper
-      } 
+      params: params
     })
   }
 
-      export const gettimelyAccountingRateDetail= (warehouseKeeper) => {
+      export const gettimelyAccountingRateDetail= (params) => {
     return request({
       url: '/WMS/timelyAccountingRateDetail',
       method: 'get',
-      params: {
-        warehouseKeeper
-      }
+      params: params
     })
   }
 
@@ -102,19 +98,21 @@ export const getstagnantAmount= (type) => {
   }
 
   // /WMS/timelyAccountingRateDetailPie
-  export const gettimelyAccountingRateDetailPie= () => {
+  export const gettimelyAccountingRateDetailPie= (params) => {
     return request({
       url: '/WMS/timelyAccountingRateDetailPie',
       method: 'get',
+      params: params
     })
   }
 
 
   // /WMS/deliveryTimelinessRate
-  export const getdeliveryTimelinessRate= () => {
+  export const getdeliveryTimelinessRate= (params) => {
     return request({
       url: '/WMS/deliveryTimelinessRate',
       method: 'get',
+      params: params
     })
   }
       //   "warehouseKeeper": "洪梦", X轴
@@ -125,10 +123,14 @@ export const getstagnantAmount= (type) => {
       //   "pmcKpiCount": 0  异常次数
     
     // /\MS/timelyAccountingRate
-    export const gettimelyAccountingRate= () => {
+    export const gettimelyAccountingRate= (params) => {
+      // debug: 打印参数，方便在浏览器 console 确认是否传入
+   
       return request({
         url: '/WMS/timelyAccountingRate',
         method: 'get',
+        params: params
       })
     }
+
 

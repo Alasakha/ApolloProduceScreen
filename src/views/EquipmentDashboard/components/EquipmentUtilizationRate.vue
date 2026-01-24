@@ -155,7 +155,7 @@ for (const [k, arr] of Object.entries(groups)) {
   const total = list.length
   // 使用原始 operation 判断是否达标，阈值区间 [0.65, 1.2]
   const ops = list.map(it => (typeof it.operation === 'number' ? it.operation : NaN))
-  const meet = ops.filter(v => Number.isFinite(v) && v >= 0.65 && v <= 1.2).length
+  const meet = ops.filter(v => Number.isFinite(v) && v >= 0.85 && v <= 1.2).length
   const rate = total ? Math.round((meet / total) * 100) : 0
   summaries.push({ code: k, label: workshopLabel(k), avg, rate, total, meet })
 }

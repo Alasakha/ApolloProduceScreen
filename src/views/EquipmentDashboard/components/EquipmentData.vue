@@ -172,12 +172,12 @@ interface EquipmentStats {
 }
 
 const data = ref<EquipmentStats>({
-  running: 45,
-  standby: 12,
-  abnormal: 3,
-  total: 60,
-  completedInspection: 55,
-  uninspected: 5,
+  running: 0,
+  standby: 0,
+  abnormal: 0,
+  total: 0,
+  completedInspection: 0,
+  uninspected: 0,
   repairCount: 0,
   repairCompleteCount: 0
 })

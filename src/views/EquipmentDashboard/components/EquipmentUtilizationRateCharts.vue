@@ -163,9 +163,8 @@ const renderWorkshopCharts = () => {
           series: [{
             data: rates.map(v => {
               const value = Number.isFinite(v) ? Number(v.toFixed(1)) : NaN
-              const color = (Number.isFinite(value))
-                ? (value < 65 || value > 120) ? '#ff4d4f' : (value >= 65 && value < 85) ? '#ffaa00' : '#00ff88'
-                : '#ff4d4f'
+              const color = (value < 85 || value > 120) ? '#ff4d4f' : '#00ff88'
+            
               return { value: Number.isFinite(value) ? value : 0, itemStyle: { color } }
             }),
             type: 'bar',

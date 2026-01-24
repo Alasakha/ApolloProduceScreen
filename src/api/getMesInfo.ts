@@ -191,6 +191,7 @@ export interface TopQualityResponse {
 
 
 // /report/productionAchievementRate_performance_trend?prodLine=1004  总装一课    1005:总装二课
+    // params: { prodLine,type }
 export const getProductionAchievementRatePerformanceTrend = (prodLine: string | number) => {
   return request({
     url: '/report/productionAchievementRate_performance_trend',

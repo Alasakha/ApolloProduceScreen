@@ -59,6 +59,8 @@ const lines = ref([
   { id: "2005", name: "2005生产计划",router:"P" },
   { id: null, name: "注塑看板",router:"/injection" },
   { id: null, name: "总仓看板",router:"/wms" },
+  { id: null, name: "金工仓库看板",router:"/jingongwarehouse" },
+  { id: null, name: "总装仓库看板",router:"/zongzhuangwarehouse" },
   { id: null, name: "来料收货管理看板",router:"/incoming" },
   { id: null, name: "供应链看板",router:"/newscm" },
   { id: null, name: "生产计划看板",router:"/produceplan" },
@@ -85,6 +87,7 @@ const lines = ref([
   { id: "", name: "来料品质管理看板", router: "/incomingquality" },
   { id: "", name: "供应商质量管理绩效看板", router: "/SupplierQualityManagement" },
   { id: "", name: "冲压生产看板", router: "/newstampmanagement" },
+  { id: "", name: "金工仓看板", router: "/jinggongwms" },
 ]);
 
 // 获取 lines 中指定范围的数据

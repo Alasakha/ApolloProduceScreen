@@ -165,7 +165,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData = () => {
-    const params = { type: 2 };
+    const params = { type: 2, warehouseType:2 };
     getEnterPie(params).then(res => {
         isLoading.value = false;
         processData(res.data);

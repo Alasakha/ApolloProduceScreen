@@ -1,15 +1,36 @@
 import axios from 'axios';
 import { ElMessage } from 'element-plus';
 
+// 根据运行模式动态设置 baseURL
+const getBaseURL = () => {
+  const mode = import.meta.env.MODE;
+  switch (mode) {
+    case 'loction':
+      return 'http://192.168.1.238:10999/apollo';
+    case 'dev':
+    case 'development':
+    default:
+      return 'http://192.168.1.197:10999/apollo';
+  }
+};
+
 // 获取配置的 baseURL
-const baseURL =  'http://192.168.1.197:10999/apollo'; // 默认值可以设置为开发环境的地址
-// http://192.168.1.101:10999/
-// http://192.168.1.197:10999/apollo/quality/passRanking
-// http://192.168.1.185:10999/apollo
+const baseURL = getBaseURL();
 
 // 用于 /api 前缀接口的 baseURL
-const apiBaseURL = 'http://192.168.1.197:10999/api';
+const getApiBaseURL = () => {
+  const mode = import.meta.env.MODE;
+  switch (mode) {
+    case 'loction':
+      return 'http://192.168.1.238:10999/api';
+    case 'dev':
+    case 'development':
+    default:
+      return 'http://192.168.1.197:10999/api';
+  }
+};
 
+const apiBaseURL = getApiBaseURL();
 // 创建一个 axios 实例
 const service = axios.create({
   baseURL: baseURL, // 使用环境变量设置的 baseURL

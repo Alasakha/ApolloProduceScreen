@@ -1,3 +1,4 @@
+/* compatibility and production data store live below */
 import { defineStore } from 'pinia'
 import { getFty, getOnTime, getManufacturingCost, getPaintingProblem } from '@/api/produceperformance'
 import type { TodayProduction, OnTime, ManufacturingCostData, PaintingProblemResponse } from '@/api/produceperformance'

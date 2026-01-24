@@ -21,7 +21,7 @@ import Qualitykpi from '@/views/QualityKPIDashboard/index.vue'
 import SalesPerformanceDashboard from '@/views/SalesPerformanceDashboard/index.vue'
 import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanceDashboard/index.vue'
 import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
-import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard/index.vue'
+import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard copy/index.vue'
 import PurchasePerformanceManagementDashboard from '@/views/PurchasePerformanceManagementDashboard/index.vue'
 const routes: RouteRecordRaw[] = [
   {
@@ -219,6 +219,11 @@ const routes: RouteRecordRaw[] = [
     path: '/newstampmanagement',
     name: 'NewStampManagement',
     component: () => import('@/views/NewStamp/index.vue')
+  },
+    {
+    path: '/jinggongwms',
+    name: 'JinGongWms',
+    component: () => import('@/views/JingGongWMS/index.vue')
   }
 
 ];
