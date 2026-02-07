@@ -90,10 +90,11 @@ export const getstagnantAmount= (type) => {
   }
 
   // /apollo/WMS/deliveryTimelinessRateDetailPie
-  export const getdeliveryTimelinessRateDetailPie= () => {
+  export const getdeliveryTimelinessRateDetailPie= (params) => {
     return request({
       url: '/WMS/deliveryTimelinessRateDetailPie',
       method: 'get',
+      params: params
     })
   }
 
@@ -133,4 +134,10 @@ export const getstagnantAmount= (type) => {
       })
     }
 
-
+export const getstagnantAmountWarehouseType = (params) =>{
+  return request({
+    url:'/WMS/stagnantAmountWarehouseType',
+    method:'get',
+    params:params
+  })
+}

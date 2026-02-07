@@ -3,10 +3,10 @@
     <div class="section-header">
       <div class="title-wrapper">
         <div class="glow-dot"></div>
-        <div class="department-title text-sm font-bold">A类客户直通率监控</div>
+        <div class="department-title font-bold">A类客户直通率监控</div>
       </div>
       <div v-if="manufacturingStore.loading" class="loading-indicator">
-        <span class="pulse-text">数据同步中...</span>
+        <span class="pulse-text text-yellow-500 text-[8px]">数据同步中...</span>
       </div>
     </div>
     
@@ -23,18 +23,18 @@
         <div class="dept-content">
           <div class="data-group">
             <div class="data-item">
-              <span class="label">TARGET</span>
-              <span class="value">{{ dept.data.target }}<small>%</small></span>
+              <span class="label">目标</span>
+              <span class="value text-[10px] 2xl:text-lg 3xl:text-[9px] 4xl:text-2xl font-bold">{{ dept.data.target }}<small>%</small></span>
             </div>
             <div class="data-item">
-              <span class="label">ACTUAL</span>
-              <span class="value">{{ dept.data.actual }}<small>%</small></span>
+              <span class="label">实际</span>
+              <span class="value text-[10px] 2xl:text-lg 3xl:text-[9px] 4xl:text-2xl font-bold">{{ dept.data.actual }}<small>%</small></span>
             </div>
           </div>
 
           <div class="data-item highlight-item" 
                :style="{ '--theme-color': getAchievementColor(dept.data.achievement).textColor }">
-            <span class="label">ACHIEVEMENT</span>
+            <span class="label">达成率</span>
             <span class="value main-value">
               {{ dept.data.achievement }}<small>%</small>
             </span>
@@ -80,12 +80,12 @@ const getAchievementColor = (value) => {
 </script>
 
 <style scoped>
-/* 容器基础样式 */
 .row2-container {
   background: radial-gradient(circle at center, rgba(0, 50, 100, 0.2) 0%, rgba(0, 20, 40, 0.5) 100%);
   border: 1px solid rgba(0, 150, 255, 0.3);
   border-radius: 4px;
-  padding: 12px;
+  /* 重点：减少固定内边距，使用 vh/vw 以在 1080p 自动收缩 */
+  padding: 0.8vh 0.8vw; 
   height: 100%;
   display: flex;
   flex-direction: column;
@@ -93,175 +93,126 @@ const getAchievementColor = (value) => {
   overflow: hidden;
 }
 
-/* 头部发光点装饰 */
-.glow-dot {
-  width: 6px;
-  height: 6px;
-  background: #00d4ff;
-  border-radius: 50%;
-  box-shadow: 0 0 10px #00d4ff, 0 0 20px #00d4ff;
-  margin-right: 10px;
-}
-
 .section-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 15px;
+  align-items: center;
   border-bottom: 1px dashed rgba(0, 150, 255, 0.2);
-  padding-bottom: 8px;
+  /* padding-bottom: 0.5vh; */
+  flex-shrink: 0;
 }
 
 .department-title {
   color: #00d4ff;
   text-shadow: 0 0 8px rgba(0, 212, 255, 0.5);
   letter-spacing: 2px;
+  /* 标题字号自适应 */
+  font-size: clamp(1px, 0.7vw, 12px);
 }
 
-/* 2x2 网格 */
 .departments-grid-2x2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
   grid-template-rows: 1fr 1fr;
-  gap: 15px;
+  /* 重点：间隔也使用响应式单位 */
+  gap: 1vh 1vw;
   flex: 1;
+  min-height: 0; /* 允许网格内部元素自由收缩 */
 }
 
-/* 卡片特效：扫描线 + 粒子底纹 */
 .department-card {
   background: rgba(0, 40, 80, 0.4);
   border: 1px solid rgba(0, 150, 255, 0.2);
-  padding: 15px;
+  padding: 1vh;
   position: relative;
   display: flex;
   flex-direction: column;
+  justify-content: space-between;
   overflow: hidden;
-  transition: all 0.3s;
 }
 
-.department-card:hover {
-  border-color: rgba(0, 150, 255, 0.6);
-  background: rgba(0, 60, 120, 0.5);
-}
-
-/* 粒子点阵背景 */
+/* 所有的特效（粒子、扫描线等）样式完全保留 */
 .card-particles {
-  position: absolute;
-  inset: 0;
+  position: absolute; inset: 0;
   background-image: radial-gradient(rgba(0, 212, 255, 0.1) 1px, transparent 1px);
   background-size: 12px 12px;
   opacity: 0.5;
   pointer-events: none;
 }
 
-/* 动态扫描线 */
 .scan-line {
-  position: absolute;
-  top: 0; left: 0; width: 100%; height: 2px;
+  position: absolute; top: 0; left: 0; width: 100%; height: 2px;
   background: linear-gradient(to right, transparent, rgba(0, 212, 255, 0.4), transparent);
   animation: scan 3s linear infinite;
-  pointer-events: none;
 }
 
-@keyframes scan {
-  0% { top: -10%; }
-  100% { top: 110%; }
-}
+@keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
 
 .dept-info {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  z-index: 1;
+  display: flex; justify-content: space-between; align-items: center;
+  flex-shrink: 0;
+  /* margin-bottom: 0.5vh; */
 }
 
 .dept-name {
-  color: #fff;
-  font-weight: bold;
-  font-size: 15px;
-}
-
-.dept-tag {
-  font-size: 9px;
-  background: rgba(0, 212, 255, 0.2);
-  color: #00d4ff;
-  padding: 1px 4px;
-  border: 1px solid #00d4ff;
-  border-radius: 2px;
+  color: #fff; font-weight: bold;
+  font-size: clamp(1px, 0.5vw, 11px);
 }
 
 .dept-content {
-  display: flex;
-  gap: 10px;
-  flex: 1;
-  z-index: 1;
+  display: flex; gap: 0.8vw; flex: 1; min-height: 0;
 }
 
 .data-group {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
+  flex: 1; display: flex; flex-direction: column; gap: 0.5vh;
 }
 
 .data-item {
   background: rgba(0, 0, 0, 0.3);
-  padding: 8px 10px;
+  padding: 0.5vh 0.6vw;
   border-radius: 4px;
-  display: flex;
-  flex-direction: column;
+  display: flex; flex-direction: row; justify-content: center; align-items: center; gap: 4px;
 }
 
 .highlight-item {
-  flex: 1.2;
+  flex: 1.3;
   border: 1px solid var(--theme-color);
   background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,150,255,0.1) 100%);
-  box-shadow: inset 0 0 15px var(--theme-color);
+  box-shadow: inset 0 0 10px var(--theme-color);
 }
 
 .label {
-  font-size: 10px;
+  font-size: clamp(8px, 0.6vw, 11px);
   color: #8cc8ff;
-  margin-bottom: 2px;
+  line-height: 1.2;
 }
 
 .value {
-  font-size: 18px;
+  /* font-size: clamp(12px, 1.1vw, 20px); */
   font-weight: 800;
   font-family: 'DIN Alternate', sans-serif;
   color: #fff;
 }
 
 .main-value {
-  font-size: 26px; /* 重点突出达成率 */
+  /* 重点：达成率字号在 1080p 屏幕下会自动缩小到合适范围 */
+  font-size: clamp(1px, 1.2vw, 18px);
   line-height: 1;
   text-shadow: 0 0 10px var(--theme-color);
 }
 
-/* 能量条动画 */
 .energy-bar {
-  height: 4px;
-  background: rgba(255, 255, 255, 0.1);
-  margin-top: auto;
-  border-radius: 2px;
-  overflow: hidden;
+  height: 3px; background: rgba(255, 255, 255, 0.1);
+  margin-top: 0.5vh; border-radius: 2px; overflow: hidden;
 }
 
 .energy-fill {
-  height: 100%;
-  background: var(--theme-color);
+  height: 100%; background: var(--theme-color);
   box-shadow: 0 0 8px var(--theme-color);
   transition: width 1.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-.pulse-text {
-  animation: pulse 2s infinite;
-  font-size: 12px;
-  color: #ffd700;
-}
-
-@keyframes pulse {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.5; }
+.dept-tag {
+  font-size: 8px; color: #00d4ff; border: 1px solid #00d4ff; padding: 0 3px; border-radius: 2px;
 }
 </style>

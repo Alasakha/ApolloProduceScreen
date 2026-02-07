@@ -42,7 +42,7 @@ const config = reactive({
 const fetchData = async () => {
   outStoreLoading.value = true
   try {
-    const res = await getdeliveryTimelinessRateDetail({warehouseType:2})
+    const res = await getdeliveryTimelinessRateDetail({warehouseType:3})
     const list = res.data
 
     if (!Array.isArray(list) || list.length === 0) {
@@ -116,7 +116,7 @@ const fetchData = async () => {
 
 // 请求数据
 const fetchData2 = () => {
-const params = {warehouseType:2} ;
+const params = {warehouseType:3} ;
 getdeliveryTimelinessRateDetailPie(params).then(res => {
     processData(res.data);
 }).catch(() => {

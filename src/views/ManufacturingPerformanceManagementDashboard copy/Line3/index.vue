@@ -27,9 +27,9 @@ import Part3 from './Part3.vue'
 .line3-container {
   display: flex;
   gap: 8px;
-  height: 100%;
+  height: 30%;
   color: #fff;
-  height: 100%;
+  /* height: 100%; */
 }
 
 .part-section {

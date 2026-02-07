@@ -8,8 +8,8 @@ const DEPARTMENT_STANDARDS = {
     regular: 93 // 常规标准直通率 72%
   },
   '金工二部': {
-    aClass: 80, // A类标准直通率 75%
-    regular: 80 // 常规标准直通率 72%
+    aClass: 95, // A类标准直通率 75%
+    regular: 93 // 常规标准直通率 72%
   }
 } as const
 

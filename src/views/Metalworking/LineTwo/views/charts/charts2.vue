@@ -47,6 +47,7 @@
 <script setup lang="ts">
 
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import type { PropType } from 'vue';
 import { getEnterPie,getEnterInfo } from '@/api/getIncomingInfo'
 
 
@@ -63,6 +64,12 @@ import TooltipInfo from '@/components/SCM/TooltipInfo/index.vue'
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const chartRef = ref(null);
+
+// props: allow parent to control request params (e.g., type or extra query params)
+const props = defineProps({
+    type: { type: Number, default: 2 },
+    queryParams: { type: Object as PropType<Record<string, any>>, default: () => ({}) }
+})
 
 // 使用 useEcharts
 const { initChart, setOption, onClick, offClick,resizeChart } = useEcharts(chartRef);
@@ -108,7 +115,8 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getEnterInfo({cangguan:params.name,type:2});
+            const infoParams: Record<string, any> = { cangguan: params.name, ...(typeof props.type !== 'undefined' ? { type: props.type } : {}), ...(props.queryParams || {}) };
+            const res = await getEnterInfo(infoParams);
             console.log(res)
             // ·检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
@@ -165,7 +173,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData = () => {
-    const params = { type: 2, warehouseType:2 };
+    const params: Record<string, any> = { ...(typeof props.type !== 'undefined' ? { type: props.type } : {}), ...(props.queryParams || {}) };
     getEnterPie(params).then(res => {
         isLoading.value = false;
         processData(res.data);

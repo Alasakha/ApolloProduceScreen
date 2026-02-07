@@ -5,7 +5,7 @@ import { ref, reactive, computed, watch } from 'vue';
 </script>
 
 <template>
-<div class="title title-main flex justify-center items-center">金工总仓看板</div>
+<div class="title title-main flex justify-center items-center">电动仓看板</div>
 </template>
 
 <style scoped>

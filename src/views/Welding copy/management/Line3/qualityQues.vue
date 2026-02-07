@@ -1,7 +1,11 @@
 <template>
-    <div class="quality-container">
+    <div class="quality-container w-full h-full p-2">
         <div class="quality-title">
-            <h3>今日质量TOP问题</h3>
+            <div class="title-content">
+                <!-- <div class="text-lg font-bold text-white mb-1 text-center" style="letter-spacing: 2px;">
+                    今日质量TOP问题
+                </div> -->
+            </div>
             <el-button 
                 type="primary" 
                 size="small" 
@@ -12,9 +16,11 @@
             </el-button>
         </div>
         <div class="chart-container">
-            <div ref="chartRef" class="pie-chart"></div>
+            <div ref="chartRef" class="echarts-container"></div>
+            <div v-if="!hasValidChartData" class="empty-overlay">
+                暂无数据
+            </div>
         </div>
-
         
         <!-- 明细Dialog -->
         <el-dialog
@@ -46,22 +52,16 @@
                     <el-table-column prop="ta006" label="品号" width="140" />
                     <el-table-column prop="mb002" label="品名" width="230" />
                     <el-table-column prop="mb003" label="规格型号" width="340" />
-                    <!-- <el-table-column prop="ngNO" label="不合格代码" width="120" /> -->
-                    <el-table-column prop="ngName" label="不合格名称" width="150" />
+                    <el-table-column prop="ngNO" label="不合格代码" width="120" />
+                    <!-- <el-table-column prop="ngName" label="不合格名称" width="150" /> -->
                     <el-table-column prop="admin_UNIT_NAME" label="责任部门" width="120" />
                     <el-table-column prop="ngResponPeople" label="责任人" width="100" />
                     <el-table-column prop="nums" label="数量" width="80" />
-                    <el-table-column prop="reason" label="原因" width="150" />
-                    <el-table-column prop="way" label="处理方式" width="150" />
-                    <el-table-column label="操作" width="100" fixed="right">
-                        <template #default="{ row }">
-                            <el-button 
-                                type="primary" 
-                                size="small" 
-                                @click="openReasonDialog(row)"
-                            >
-                                填写
-                            </el-button>
+                    <el-table-column prop="ngReason" label="原因" width="120" />
+                    <el-table-column prop="ngHandle" label="处理方式" width="120" />
+                    <el-table-column label="操作" width="100">
+                        <template #default="scope">
+                            <el-button type="primary" size="small" @click="handleEdit(scope.row)">填写</el-button>
                         </template>
                     </el-table-column>
                 </el-table>
@@ -106,37 +106,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, computed, watch, onBeforeUnmount, nextTick } from 'vue'
+import { ref, onMounted, computed, onUnmounted, watch, nextTick } from 'vue'
 import { Loading } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import * as echarts from 'echarts/core'
-import {
-    TooltipComponent,
-    LegendComponent,
-    TitleComponent,
-    GraphicComponent
-} from 'echarts/components'
-import { PieChart } from 'echarts/charts'
-import { CanvasRenderer } from 'echarts/renderers'
-import type { ECharts } from 'echarts/core'
 import { getTodayBadIssues, getTodayBadIssuesDetail, type TodayBadIssues } from '@/api/getStampWeldinfo'
 import { getAbnormalHandleAdd } from '@/api/getQuiltyinfo'
-import { eventBus } from '@/utils/eventbus'
 import { useRoute } from 'vue-router'
+import { useEcharts } from '@/utils/useEcharts'
+import { createChartOption } from '../components/data'
 
-// 注册 ECharts 组件
-echarts.use([
-    TooltipComponent,
-    LegendComponent,
-    TitleComponent,
-    GraphicComponent,
-    PieChart,
-    CanvasRenderer
-])
+const route = useRoute()
+const prodLine = route.query.prodLine as string
 
 // 图表引用
-const chartRef = ref<HTMLElement>()
-let chartInstance: ECharts | null = null
+const chartRef = ref<HTMLElement | null>(null)
+const { initChart, setOption, onClick, offClick } = useEcharts(chartRef)
 
 // Dialog控制
 const dialogVisible = ref(false)
@@ -152,205 +136,58 @@ const reasonForm = ref({
 })
 const currentRowUid = ref('')
 
-// 获取路由参数
-const route = useRoute()
-const prodLine = computed(() => route.query.prodLine as string || '2007')
+
 
 // 真实API数据
 const apiData = ref<TodayBadIssues[]>([])
 
-// 颜色配置
-const colors = [
-    '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4', '#FFC53D', '#B37FEB',
-    '#4A90E2', '#7B68EE', '#9370DB', '#8A2BE2', '#FFEAA7', '#DDA0DD'
-]
+const normalizeTotal = (value: unknown): number => {
+    if (value === null || value === undefined) return 0
+    if (typeof value === 'number') return Number.isFinite(value) ? value : 0
+
+    const numeric = Number(
+        String(value)
+            .replace(/,/g, '')
+            .replace(/[^0-9.-]/g, '')
+    )
+    return Number.isFinite(numeric) ? numeric : 0
+}
+
+// 图表数据 - 从API数据转换
+const pieSeriesData = computed(() => {
+    if (!apiData.value || apiData.value.length === 0) {
+        return []
+    }
+
+    const validData = apiData.value
+        .map((item, index) => ({
+            name: item.ngName || `问题${index + 1}`,
+            value: normalizeTotal(item.total),
+            itemStyle: { color: getDefaultColor(index) }
+        }))
+        .filter(item => item.value > 0)
+
+    return validData
+})
+
+const hasValidChartData = computed(() => pieSeriesData.value.length > 0)
 
 // 获取默认颜色
 const getDefaultColor = (index: number): string => {
+    const colors = [
+        '#4A90E2', '#7B68EE', '#9370DB', '#8A2BE2', 
+        '#FF6B6B', '#4ECDC4', '#45B7D1', '#96CEB4',
+        '#FFEAA7', '#DDA0DD', '#98D8E8', '#F7DC6F'
+    ]
     return colors[index % colors.length]
-}
-
-// 初始化图表
-const initChart = () => {
-    if (!chartRef.value) return
-    
-    const width = chartRef.value.clientWidth
-    const height = chartRef.value.clientHeight
-    if (width === 0 || height === 0) {
-        setTimeout(() => initChart(), 100)
-        return
-    }
-    
-    if (chartInstance) {
-        chartInstance.dispose()
-    }
-    
-    chartInstance = echarts.init(chartRef.value)
-    updateChart()
-    
-    // 绑定点击事件
-    chartInstance.on('click', (params: any) => {
-        handleChartClick(params)
-    })
-    
-    // 监听窗口大小变化
-    window.addEventListener('resize', handleResize)
-}
-
-// 更新图表
-const updateChart = () => {
-    if (!chartInstance) return
-    
-    const hasData = apiData.value && apiData.value.length > 0 && apiData.value.some(item => item.total > 0)
-    
-    // 处理图表数据
-    let chartData: any[] = []
-    if (hasData) {
-        chartData = apiData.value.map((item, index) => ({
-            name: item.ngName,
-            value: item.total,
-            itemStyle: {
-                color: getDefaultColor(index)
-            }
-        }))
-    } else {
-        // 无数据时显示"暂无数据"的绿色饼图
-        chartData = [{
-            name: '暂无数据',
-            value: 100,
-            itemStyle: {
-                color: '#059142'
-            }
-        }]
-    }
-    
-    const option = {
-        title: {
-            text: '质量TOP问题分布',
-            left: 'center',
-            top: '5%',
-            textStyle: {
-                color: '#fff',
-                fontSize: 16,
-                fontWeight: 'bold'
-            }
-        },
-        tooltip: {
-            trigger: 'item',
-            formatter: (params: any) => {
-                if (!hasData) {
-                    return '暂无数据'
-                }
-                return `${params.name}: ${params.value}(${params.percent}%)`
-            },
-            backgroundColor: 'rgba(0, 0, 0, 0.8)',
-            borderColor: '#333',
-            textStyle: {
-                color: '#fff',
-                fontSize: 14
-            }
-        },
-        legend: hasData ? {
-            orient: 'vertical',
-            left: 'left',
-            top: 'middle',
-            textStyle: {
-                color: '#fff',
-                fontSize: 12,
-                fontWeight: 'bold'
-            },
-            itemGap: 8,
-            itemWidth: 14,
-            itemHeight: 14
-        } : undefined,
-        series: [
-            {
-                name: '质量TOP问题',
-                type: 'pie',
-                radius: '70%',
-                center: ['50%', '50%'],
-                data: chartData,
-                labelLine: {
-                    show: hasData,
-                    length: 15,
-                    length2: 10,
-                    smooth: true,
-                    lineStyle: {
-                        color: '#666',
-                        width: 2
-                    }
-                },
-                label: {
-                    show: hasData,
-                    position: 'outside',
-                    formatter: (params: any) => {
-                        if (!hasData) return ''
-                        return `${params.name}\n${params.value}(${params.percent}%)`
-                    },
-                    fontSize: 13,
-                    color: '#fff',
-                    textShadowColor: 'rgba(0, 0, 0, 0.8)',
-                    textShadowBlur: 2,
-                    textShadowOffsetX: 1,
-                    textShadowOffsetY: 1
-                },
-                emphasis: {
-                    itemStyle: {
-                        shadowBlur: 15,
-                        shadowOffsetX: 0,
-                        shadowColor: 'rgba(0, 0, 0, 0.6)'
-                    },
-                    label: {
-                        fontSize: 15,
-                        fontWeight: 'bold',
-                        color: '#fff'
-                    }
-                },
-                animationType: 'scale',
-                animationEasing: 'elasticOut',
-                animationDelay: (idx: number) => idx * 200
-            }
-        ],
-        graphic: !hasData ? [
-            {
-                type: 'text',
-                left: '50%',
-                top: '50%',
-                z: 100,
-                style: {
-                    text: '暂无数据',
-                    fontSize: 18,
-                    fontWeight: 'bold',
-                    fill: '#00ff00',
-                    textAlign: 'center',
-                    textVerticalAlign: 'middle'
-                }
-            }
-        ] : undefined
-    }
-    
-    chartInstance.setOption(option, true)
-    
-    nextTick(() => {
-        if (chartInstance) {
-            chartInstance.resize()
-        }
-    })
-}
-
-// 处理窗口大小变化
-const handleResize = () => {
-    if (chartInstance) {
-        chartInstance.resize()
-    }
 }
 
 // 获取今日不良TOP问题数据
 const fetchTodayBadIssues = async () => {
     try {
-        console.log('开始获取今日不良TOP问题数据，生产线:', prodLine.value)
+        console.log('开始获取今日不良TOP问题数据，生产线:', prodLine)
         
-        const response = await getTodayBadIssues(prodLine.value)
+        const response = await getTodayBadIssues('2007')
         console.log('API响应数据:', response)
         
         if (response && response.data) {
@@ -361,27 +198,49 @@ const fetchTodayBadIssues = async () => {
             apiData.value = []
         }
         
-        // 更新图表
-        nextTick(() => {
-            updateChart()
-        })
-        
     } catch (error) {
         console.error('获取今日不良TOP问题数据失败:', error)
         apiData.value = []
-        nextTick(() => {
-            updateChart()
-        })
     }
 }
 
 // 处理图表点击
 const handleChartClick = (params: any) => {
-    console.log('点击了图表项:', params)
+    if (!hasValidChartData.value) {
+        console.warn('⚠️ 当前无有效数据，忽略点击事件')
+        return
+    }
+
+    console.log('🎯 Paint组件收到图表点击事件:', params)
+    console.log('点击参数详情:', {
+        name: params.name,
+        value: params.value,
+        dataIndex: params.dataIndex,
+        seriesName: params.seriesName,
+        seriesType: params.seriesType
+    })
+    
     if (params.name) {
+        console.log('✅ 有效点击，准备打开明细Dialog，类别:', params.name)
         openDetailDialog(params.name)
+    } else {
+        console.warn('⚠️ 点击事件缺少name参数:', params)
     }
 }
+
+const updateChartOption = () => {
+    nextTick(() => {
+        initChart()
+        const option = createChartOption('质量TOP问题分布', pieSeriesData.value)
+        setOption(option)
+        offClick(handleChartClick)
+        onClick(handleChartClick)
+    })
+}
+
+watch(pieSeriesData, () => {
+    updateChartOption()
+}, { immediate: true })
 
 // 打开明细Dialog
 const openDetailDialog = (category: string) => {
@@ -396,9 +255,9 @@ const fetchDetailData = async (category: string) => {
     errorMessage.value = ''
     
     try {
-        console.log('开始获取明细数据，类别:', category, '生产线:', prodLine.value)
+        console.log('开始获取明细数据，类别:', category, '生产线:', prodLine)
         
-        const response = await getTodayBadIssuesDetail(prodLine.value)
+        const response = await getTodayBadIssuesDetail(prodLine)
         console.log('明细数据API响应:', response)
         
         if (response && response.data) {
@@ -430,106 +289,87 @@ const handleClose = () => {
     errorMessage.value = ''
 }
 
-// 打开填写原因弹窗
-const openReasonDialog = (row: any) => {
-    console.log('打开填写原因弹窗，行数据:', row)
-    currentRowUid.value = row.uid || ''
-    reasonForm.value = {
-        reason: row.reason || '',
-        way: row.way || ''
+// 定时刷新数据
+let refreshTimer: NodeJS.Timeout | null = null
+
+// 启动定时刷新
+const startAutoRefresh = () => {
+    refreshTimer = setInterval(() => {
+        
+        fetchTodayBadIssues()
+    }, 60000) // 每分钟刷新一次
+}
+
+// 停止定时刷新
+const stopAutoRefresh = () => {
+    if (refreshTimer) {
+        clearInterval(refreshTimer)
+        refreshTimer = null
     }
+}
+
+onMounted(async () => {
+    // 初始加载数据
+    await fetchTodayBadIssues()
+    
+    // 启动自动刷新
+    startAutoRefresh()
+})
+
+// 组件卸载时清理定时器
+onUnmounted(() => {
+    stopAutoRefresh()
+})
+
+// 处理填写按钮点击
+const handleEdit = (row: any) => {
+    console.log('点击填写按钮，行数据:', row)
     reasonDialogVisible.value = true
+    reasonForm.value.reason = row.ngReason || ''
+    reasonForm.value.way = row.ngHandle || ''
+    currentRowUid.value = row.uid
 }
 
-// 清空表单
-const clearReasonForm = () => {
-    reasonForm.value = {
-        reason: '',
-        way: ''
+// 处理原因提交
+const handleReasonSubmit = () => {
+    if (!currentRowUid.value) {
+        ElMessage.error('缺少必要参数')
+        return
     }
+    
+    getAbnormalHandleAdd(currentRowUid.value, reasonForm.value.way, reasonForm.value.reason)
+        .then(res => {
+            if (res.code === 200) {
+                ElMessage.success('提交成功')
+                reasonDialogVisible.value = false
+                // 刷新明细数据
+                fetchDetailData('全部')
+            } else {
+                ElMessage.error('提交失败')
+            }
+        })
+        .catch(error => {
+            console.error('提交失败:', error)
+            ElMessage.error('提交失败')
+        })
 }
 
-// 关闭原因弹窗
+// 清空原因表单
+const clearReasonForm = () => {
+    reasonForm.value.reason = ''
+    reasonForm.value.way = ''
+}
+
+// 关闭原因对话框
 const handleReasonDialogClose = () => {
     reasonDialogVisible.value = false
     clearReasonForm()
 }
 
-// 提交原因
-const handleReasonSubmit = async () => {
-    if (!reasonForm.value.reason.trim() && !reasonForm.value.way.trim()) {
-        ElMessage.warning('请至少填写原因或处理方式')
-        return
-    }
-
-    try {
-        console.log('提交原因数据:', {
-            uid: currentRowUid.value,
-            reason: reasonForm.value.reason,
-            way: reasonForm.value.way
-        })
-
-        const response = await getAbnormalHandleAdd({
-            uid: currentRowUid.value,
-            reason: reasonForm.value.reason,
-            way: reasonForm.value.way
-        })
-
-        console.log('提交结果:', response)
-        
-        if (response && response.code === 200) {
-            ElMessage.success('提交成功')
-            
-            // 更新表格数据
-            const rowIndex = detailData.value.findIndex(item => item.uid === currentRowUid.value)
-            if (rowIndex !== -1) {
-                detailData.value[rowIndex].reason = reasonForm.value.reason
-                detailData.value[rowIndex].way = reasonForm.value.way
-            }
-            
-            reasonDialogVisible.value = false
-            clearReasonForm()
-        } else {
-            ElMessage.error(response?.message || '提交失败')
-        }
-        
-    } catch (error) {
-        console.error('提交原因失败:', error)
-        ElMessage.error('提交失败，请重试')
-    }
-}
-
-
-
-
-
-onMounted(async () => {
-    // 初始化图表
-    nextTick(() => {
-        initChart()
-    })
-    
-    // 初始加载数据
-    await fetchTodayBadIssues()
-    
-    eventBus.on('refreshData', fetchTodayBadIssues)
-})
-
-onBeforeUnmount(() => {
-    eventBus.off('refreshData', fetchTodayBadIssues)
-    
-    // 销毁图表
-    if (chartInstance) {
-        chartInstance.dispose()
-        chartInstance = null
-    }
-    window.removeEventListener('resize', handleResize)
-})
-
 // 监听生产线变化
-watch(prodLine, () => {
-    fetchTodayBadIssues()
-})
+// watch(prodLine, () => {
+//     fetchTodayBadIssues()
+// })
 
 
 </script>
@@ -539,31 +379,33 @@ watch(prodLine, () => {
     display: flex;
     flex-direction: column;
     height: 100%;
-    padding: 16px;
+    width: 100%;
     background: rgba(255, 255, 255, 0.1);
     border-radius: 8px;
-    margin: 0;
-    width: 100%;
+    border: 1px solid rgba(34, 211, 238, 0.3);
+    overflow: hidden; /* 防止内容溢出 */
     box-sizing: border-box;
 }
 
 .quality-title {
-    background: linear-gradient(135deg, #87CEEB, #98D8E8);
-    padding: 8px 16px;
-    border-radius: 6px;
-    margin-bottom: 16px;
     display: flex;
     justify-content: space-between;
     align-items: center;
+    /* margin-bottom: 8px; */
 }
 
-.quality-title h3 {
-    margin: 0;
-    color: #2c3e50;
-    font-size: 16px;
-    font-weight: 600;
+.title-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     flex: 1;
-    text-align: center;
+}
+
+.department-info {
+    color: #87CEEB;
+    font-size: 12px;
+    font-weight: 500;
+    margin-top: 2px;
 }
 
 .detail-button {
@@ -572,6 +414,8 @@ watch(prodLine, () => {
     color: white;
     font-weight: 500;
     transition: all 0.3s ease;
+    font-size: 12px;
+    padding: 4px 8px;
 }
 
 .detail-button:hover {
@@ -585,15 +429,28 @@ watch(prodLine, () => {
     display: flex;
     justify-content: center;
     align-items: center;
-    margin-bottom: 16px;
+    position: relative;
     width: 100%;
-    min-height: 300px;
+    min-height: 0; /* 允许容器收缩 */
+    padding: 8px;
+    box-sizing: border-box;
+
 }
 
-.pie-chart {
+.echarts-container {
     width: 100%;
     height: 100%;
-    min-height: 300px;
+}
+
+.empty-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: #00ff00;
+    font-size: 16px;
+    font-weight: bold;
+    pointer-events: none;
 }
 
 .description-box {

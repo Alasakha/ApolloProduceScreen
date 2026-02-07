@@ -32,28 +32,19 @@
         </dv-border-box8>
     </div>
     
-    <!-- 使用通用详情弹窗组件 -->
-    <DetailDialog
-        v-model="dialogVisible"
-        :title="`${selectedPurchaser}的来料不合格详情`"
-        :loading="tableLoading"
-        :data="detailData"
-        :columns="tableColumns"
-    />
+    <!-- detail dialog handled by parent ExceptionTable -->
 </template>
 
 
 <script setup>
 import BigScreenTitle from '@/components/title.vue'
 import { ref, onMounted, onBeforeUnmount, computed, nextTick, watch } from 'vue';
-import { gettimelyAccountingRateDetail,getdeliveryTimelinessRateDetail} from '@/api/getWMSinfo.js'
 
 import { useRoute } from 'vue-router';
 import { eventBus } from '@/utils/eventbus';
 import { createChartOption } from './charts';
-import { ElMessage } from 'element-plus';
+ 
 import { useEcharts } from '@/utils/useEcharts';
-import DetailDialog from '@/components/SCM/DetailDialog/index.vue';
 import TooltipInfo from '@/components/SCM/TooltipInfo/index.vue'
 
 // 定义 props
@@ -90,32 +81,8 @@ const piedata = ref([]);
 // 使用 useEcharts
 const { initChart, setOption, onClick, offClick,resizeChart } = useEcharts(chartRef);
 
-// 详情弹窗相关
-const dialogVisible = ref(false);
-const tableLoading = ref(false);
-const currentPage = ref(1);
-const pageSize = ref(10);
-const total = ref(0);
-const detailData = ref([]);
-const selectedPurchaser = ref('');
-const currentRequestId = ref(0); // 添加请求标识符
-
-// 分页数据
-const paginatedData = computed(() => {
-    const start = (currentPage.value - 1) * pageSize.value;
-    const end = start + pageSize.value;
-    return detailData.value.slice(start, end);
-});
-
-// 处理分页
-const handleSizeChange = (val) => {
-    pageSize.value = val;
-    currentPage.value = 1;
-};
-
-const handleCurrentChange = (val) => {
-    currentPage.value = val;
-};
+// emit open-detail event so parent can show dialog with details
+const emit = defineEmits(['open-detail']);
 
 // 入库表头
 const rukuColumns = [
@@ -148,68 +115,10 @@ const tableColumns = computed(() => {
     return props.isrukuorchuku ? rukuColumns : chukuColumns
 })
 
-// 处理饼图点击事件
-const handleChartClick = async (params) => {
+// 处理饼图点击事件：发出事件让父组件处理并打开同一个对话框
+const handleChartClick = (params) => {
     if (params && params.name) {
-        const requestId = ++currentRequestId.value; // 生成新的请求ID
-        selectedPurchaser.value = params.name;
-        tableLoading.value = true;
-        dialogVisible.value = true;
-        console.log(selectedPurchaser.value)
-        try {
-            if (props.isrukuorchuku) {
-                // 入库相关接口
-                const res = await gettimelyAccountingRateDetail(selectedPurchaser.value);
-                // 检查这个请求是否是最新的
-                if (requestId === currentRequestId.value) {
-                    if (res.data && Array.isArray(res.data)) {
-                        const formatDetailData = (data) => {
-                            return data.map(item => ({
-                                ...item,
-   
-                            }));
-                        };
-                        detailData.value = formatDetailData(res.data);
-                    } else {
-                        detailData.value = [];
-                        ElMessage.warning('暂无详细数据');
-                    }
-                }
-            } else {
-                // 出库相关接口
-                const res = await getdeliveryTimelinessRateDetail(selectedPurchaser.value);
-                // 检查这个请求是否是最新的
-                if (requestId === currentRequestId.value) {
-                    if (res.data && Array.isArray(res.data)) {
-                        const formatDetailData = (data) => {
-                            return data.map(item => ({
-                                ...item,
-                                required_qty: item.required_qty != null && item.required_qty !== ''
-                                  ? Number(item.required_qty).toFixed(0)
-                                  : '',
-                                issued_qty: item.issued_qty != null && item.issued_qty !== ''
-                                  ? Number(item.issued_qty).toFixed(0)
-                                  : '',
-   
-                            }));
-                        };
-                        detailData.value = formatDetailData(res.data);
-                    } else {
-                        detailData.value = [];
-                        ElMessage.warning('暂无详细数据');
-                    }
-                }
-            }
-        } catch (error) {
-            if (requestId === currentRequestId.value) {
-                ElMessage.error('获取详情失败，请重试');
-                detailData.value = [];
-            }
-        } finally {
-            if (requestId === currentRequestId.value) {
-                tableLoading.value = false;
-            }
-        }
+        emit('open-detail', { name: params.name, isrukuorchuku: props.isrukuorchuku });
     }
 };
 

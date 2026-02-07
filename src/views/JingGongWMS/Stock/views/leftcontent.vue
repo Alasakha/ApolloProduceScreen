@@ -6,10 +6,10 @@
          
         </div>
         <div class="flex-1">
-          <Ruku/>
+          <Ruku :type="2" :queryParams="{ warehouseType: 2 }" />
         </div>
         <div class="flex-1">
-          <ZaiTu/>
+          <ZaiTu :type="2" :queryParams="{ warehouseType: 2 }" />
         </div>
   </div>
 </template>

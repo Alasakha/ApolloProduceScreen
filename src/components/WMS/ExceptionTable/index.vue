@@ -25,7 +25,7 @@
     <div class="table-area">
       <ScrollBoard v-if="!loading && !ischarts" :config="config" />
       <charts v-if="!loading && ischarts" :config="config" :piedata="piedata" 
-      :showPurchaseTotal="showPurchaseTotal" :isrukuorchuku="isrukuorchuku" />
+      :showPurchaseTotal="showPurchaseTotal" :isrukuorchuku="isrukuorchuku" @open-detail="handleDetail" />
       <div v-else class="loading">正在加载......</div>
     </div>
   </div>
@@ -139,6 +139,7 @@
 import { ref, computed } from 'vue'
 import type { PropType } from 'vue'
 import { ElMessage, ElMessageBox } from 'element-plus'
+import { gettimelyAccountingRateDetail,getdeliveryTimelinessRateDetail} from '@/api/getWMSinfo'
 import * as XLSX from 'xlsx'
 import { getdeliveryTimelinessRateAdd } from '@/api/getWMSinfo'
 import ScrollBoard from '@/components/datav/ScrollBoard.vue'
@@ -258,27 +259,93 @@ const handleCurrentChange = (val: number) => {
   currentPage.value = val
 }
 
-// 详情处理
-const handleDetail = () => {
+// 详情处理。可被按钮调用（无参数）或由饼图点击调用（传入 { name, isrukuorchuku }）
+const handleDetail = async (filter?: { name: string, isrukuorchuku?: boolean }) => {
   if (props.loading) {
     ElMessage.warning('数据加载中，请稍后再试')
     return
   }
-  
+
   tableLoading.value = true
   try {
-    // 使用 tableData 而不是 data
-    const sourceData = props.config.tableData || props.config.data
-    tableData.value = sourceData.map((row) => {
-      const rowData: RowData = {
-        mo_d_id: row[row.length - 1]
+    if (filter && filter.name) {
+      // 从后台拉取详情数据，根据入/出库选择不同接口
+      if (filter.isrukuorchuku) {
+        const res = await gettimelyAccountingRateDetail({ warehouseKeeper: filter.name })
+        if (res.data && Array.isArray(res.data)) {
+          // 将接口返回对象映射为表格行对象（尽量匹配表头）
+          tableData.value = res.data.map((item: any) => {
+            const row: any = { mo_d_id: item.mo_d_id ?? '' }
+            props.config.header.forEach((header) => {
+              const keyMap: Record<string, string> = {
+                '仓库名称': 'warehouse_name',
+                '仓管员': 'warehouseKeeper',
+                '到货日期': 'approveDate',
+                '单据号': 'docNo',
+                '采购单号': 'purchase_doc_no',
+                '物料编码': 'item_code',
+                '物料描述': 'itemDescription',
+                '规格': 'itemSpecification'
+              }
+              const propKey = keyMap[header] || header
+              row[header] = item[propKey] ?? item[Object.keys(item).find(k => k.toLowerCase() === String(propKey).toLowerCase())] ?? ''
+            })
+            return row
+          })
+        } else {
+          tableData.value = []
+          ElMessage.warning('暂无详细数据')
+        }
+      } else {
+        const res = await getdeliveryTimelinessRateDetail({ warehouseKeeper: filter.name })
+        if (res.data && Array.isArray(res.data)) {
+          tableData.value = res.data.map((item: any) => {
+            const row: any = { mo_d_id: item.mo_d_id ?? '' }
+            props.config.header.forEach((header) => {
+              const keyMap: Record<string, string> = {
+                '仓位': 'warehouse_name',
+                '仓管员': 'warehouseKeeper',
+                '客户单号': 'udf021',
+                '工单号': 'docNo',
+                '品号': 'item_code',
+                '品名': 'itemDescription',
+                '规格': 'itemSpecification',
+                '需领用量': 'required_qty',
+                '已领用量': 'issued_qty'
+              }
+              const propKey = keyMap[header] || header
+              let value = item[propKey]
+              if ((propKey === 'required_qty' || propKey === 'issued_qty') && (value != null && value !== '')) {
+                value = Number(value).toFixed(0)
+              }
+              row[header] = value ?? item[Object.keys(item).find(k => k.toLowerCase() === String(propKey).toLowerCase())] ?? ''
+            })
+            return row
+          })
+        } else {
+          tableData.value = []
+          ElMessage.warning('暂无详细数据')
+        }
       }
-      props.config.header.forEach((header, index) => {
-        rowData[header] = row[index]
+      total.value = tableData.value.length
+    } else {
+      // 原有查看详情逻辑：通过 config.tableData 或 config.data 构造表格
+      const sourceData = props.config.tableData || props.config.data
+      tableData.value = sourceData.map((row) => {
+        const rowData: RowData = {
+          mo_d_id: row[row.length - 1]
+        }
+        props.config.header.forEach((header, index) => {
+          rowData[header] = row[index]
+        })
+        return rowData
       })
-      return rowData
-    })
-    total.value = tableData.value.length
+      total.value = tableData.value.length
+    }
+  } catch (err) {
+    console.error('获取详情异常', err)
+    tableData.value = []
+    ElMessage.error('获取详情失败')
   } finally {
     tableLoading.value = false
     dialogVisible.value = true

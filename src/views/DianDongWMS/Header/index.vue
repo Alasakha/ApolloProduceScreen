@@ -10,7 +10,7 @@
   
   <script setup lang="ts">
   import logo from '@/views/SCM/views/Header/views/logo.vue';
-  import HeaderTitle from '../Header/title.vue';
+  import HeaderTitle from './title.vue';
   import weather from '@/views/SCM/views/Header/views/weather.vue';
   import Currenttime from '@/views/SCM/views/Header/views/time.vue';
   </script>

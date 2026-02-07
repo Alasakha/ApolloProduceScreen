@@ -88,7 +88,7 @@ const drawChart = (retryCount = 0) => {
 const fetchData = async () => {
   isLoading.value = true;
   try {
-    const res = await getPmcKpiWithCk('E', '金工仓');
+    const res = await getPmcKpiWithCk('E', '电动车仓');
     console.log('fetchData 接口返回:', res);
     if (res.code === 200 && res.data && res.data.length > 0) {
       data.value = res.data;

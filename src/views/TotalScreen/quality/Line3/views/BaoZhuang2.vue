@@ -275,7 +275,7 @@ onBeforeUnmount(() => {
 }
 
 .card-icon {
-  font-size: 1.25rem;
+  font-size: 0.7rem;
   margin-bottom: 0.125rem;
   opacity: 0.8;
 }

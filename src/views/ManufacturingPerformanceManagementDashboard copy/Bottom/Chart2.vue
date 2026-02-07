@@ -31,10 +31,10 @@ const error = ref(null)
 // 初始化图表
 const initChart = () => {
   if (!chartRef.value) return
-
+  
   chartInstance = echarts.init(chartRef.value)
   updateChart()
-
+  
   // 监听窗口变化
   window.addEventListener('resize', resizeChart)
 }
@@ -131,15 +131,15 @@ const updateChart = () => {
     series: [
       {
         name: '实际',
-        type: 'bar',
+      type: 'bar',
         data: chartData.value.actual.map(v => v !== null ? v : 0),
         barWidth: '40%',
         itemStyle: { color: '#00d4ff' },
-        label: {
-          show: true,
-          position: 'top',
-          color: '#fff',
-          fontSize: 11,
+      label: {
+        show: true,
+        position: 'top',
+        color: '#fff',
+        fontSize: 11,
           formatter: (params) => params.value !== 0 ? `${params.value}%` : '--'
         },
         markLine: chartTargetValue.value !== null ? {
@@ -199,11 +199,11 @@ onUnmounted(() => {
 }
 
 .chart-title {
-  font-size: 14px;
+  font-size: 8px;
   font-weight: bold;
   color: #00d4ff;
   text-align: center;
-  padding: 12px;
+  padding: 3px;
   border-bottom: 1px solid rgba(0, 150, 255, 0.2);
 }
 

@@ -1,7 +1,7 @@
 <template>
   <div class="combined-trend">
-  <div class="combined-title">{{ titleText }}（点击柱子查看 top3 问题）</div>
-    <div ref="chartRef" class="combined-chart"></div>
+
+  <div ref="chartRef" class="combined-chart" :style="{ height: compactHeight }"></div>
 
     <div v-if="showIssues" class="overlay" @click="closeIssues">
       <div class="issues-dialog" @click.stop>
@@ -37,17 +37,25 @@ const mstore = useManufacturingStore()
 
 const props = defineProps({
   mode: { type: String, default: 'normal' }, // 'normal' or 'A'
-  title: { type: String, default: '' }
+  title: { type: String, default: '' },
+  // optional: only render data for a single workshop (e.g. '金工一部')
+  workshop: { type: String, default: '' },
+  // compact mode reduces chart height for tight layouts
+  compact: { type: Boolean, default: false }
 })
 
 // base workshop names; keys in store are like "金工一部常规类实际" or "金工一部A类实际"
 const baseWorkshops = ['金工一部', '金工二部', '总装一课', '总装二课']
 
-const workshops = baseWorkshops.map(name => {
+let workshops = baseWorkshops.map(name => {
   const actualKey = props.mode === 'A' ? `${name}A类实际` : `${name}常规类实际`
   const targetKey = props.mode === 'A' ? `${name}A类目标` : `${name}常规类目标`
   return { name, actualKey, targetKey }
 })
+// if a specific workshop prop is provided, filter to that one
+if (props.workshop) {
+  workshops = workshops.filter(w => w.name === props.workshop)
+}
 
 const titleText = computed(() => {
   return props.title || (props.mode === 'A' ? 'A类车间月度对比' : '常规类车间月度对比')
@@ -57,6 +65,7 @@ const showIssues = ref(false)
 const issues = ref([])
 const selectedMonth = ref('')
 const loading = ref(false)
+const compactHeight = computed(() => props.compact ? '140px' : '100%')
 
 function buildSeriesAndCategories() {
   const raw = mstore.raw || {}
@@ -194,8 +203,8 @@ function closeIssues(){ showIssues.value=false; issues.value=[]; selectedMonth.v
 </script>
 
 <style scoped>
-.combined-trend { height:100%; display:flex; flex-direction:column; }
-.combined-title{ color:#00d4ff; font-weight:600; text-align:center; padding-bottom:6px }
+.combined-trend { height:100%; display:flex; flex-direction:column;  width: 100%;}
+.combined-title{ color:#00d4ff; font-weight:600; text-align:center; padding-bottom:6px ;width: 100%; }
 .combined-chart{ flex:1; min-height:0 }
 .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000 }
 .issues-dialog{ background:rgba(0,20,40,0.98); padding:12px; border-radius:6px; width:420px; color:#fff }

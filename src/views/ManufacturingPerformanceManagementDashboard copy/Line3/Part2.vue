@@ -3,9 +3,9 @@
     <div class="section-header">
       <div class="title-wrapper">
         <div class="glow-dot"></div>
-        <div class="department-title text-sm font-bold">常规客户直通率监控</div>
+        <div class="department-title text-[12px] font-bold">常规客户直通率监控</div>
         <div class="toggle-buttons ml-4">
-          <button 
+          <!-- <button 
             class="mini-toggle-btn" 
             :class="{ active: currentPeriod === 'monthly' }"
             @click="currentPeriod = 'monthly'"
@@ -14,7 +14,7 @@
             class="mini-toggle-btn" 
             :class="{ active: currentPeriod === 'yearly' }"
             @click="currentPeriod = 'yearly'"
-          >年度</button>
+          >年度</button> -->
         </div>
       </div>
       <div v-if="perfStore.loading" class="loading-indicator">
@@ -28,18 +28,18 @@
         <div class="scan-line"></div>
 
         <div class="dept-info">
-          <span class="dept-name">{{ dept.label }}</span>
+          <span class="dept-name ">{{ dept.label }}</span>
           <span class="live-tag">REGULAR</span>
         </div>
         
         <div class="dept-content">
           <div class="data-group">
-            <div class="data-item">
-              <span class="label">目标</span>
+            <div class="data-item ">
+              <span class="label">目标：</span>
               <span class="value">{{ dept.target }}<small>%</small></span>
             </div>
             <div class="data-item">
-              <span class="label">实际</span>
+              <span class="label">实际：</span>
               <span class="value">{{ dept.actual }}<small>%</small></span>
             </div>
           </div>
@@ -47,7 +47,7 @@
           <div class="data-item highlight-item" 
                :style="{ '--theme-color': getAchievementColor(dept.achievement).textColor }">
             <span class="label">达成率</span>
-            <span class="value main-value">
+            <span class="value main-value text-[1px]">
               {{ dept.achievement }}<small>%</small>
             </span>
             <div class="energy-bar">
@@ -96,14 +96,12 @@ const regularDataList = computed(() => {
   }))
 })
 
-// 根据达成率数值返回颜色
+// 达成率不是百分百以上就红色，其他都是绿色
 const getAchievementColor = (value) => {
   const val = parseFloat(value)
   if (isNaN(val)) return { textColor: '#ffffff' }
-  if (val >= 100) return { textColor: '#00ffcc' } // 亮青色
-  if (val >= 98) return { textColor: '#00d4ff' }  // 天蓝色
-  if (val >= 95) return { textColor: '#ffffff' }  // 白色
-  return { textColor: '#ff4444' }                 // 红色警告
+  if (val > 100) return { textColor: '#00ffcc' } // 绿色
+  return { textColor: '#ff4444' } // 红色
 }
 
 const handleReasonSubmit = (data) => {
@@ -126,7 +124,7 @@ const handleReasonSubmit = (data) => {
 .section-header {
   display: flex;
   justify-content: space-between;
-  margin-bottom: 12px;
+  /* margin-bottom: 12px; */
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(0, 212, 255, 0.2);
 }
@@ -204,10 +202,10 @@ const handleReasonSubmit = (data) => {
 @keyframes scan { 0% { top: -10%; } 100% { top: 110%; } }
 
 .dept-info {
-  display: flex; justify-content: space-between; margin-bottom: 8px; z-index: 1;
+  display: flex; justify-content: space-between; z-index: 1;
 }
 
-.dept-name { color: #fff; font-weight: bold; font-size: 14px; }
+.dept-name { color: #fff; font-weight: bold; font-size: 11px; }
 .live-tag { font-size: 8px; color: #00d4ff; border: 1px solid #00d4ff; padding: 0 3px; border-radius: 2px; }
 
 .dept-content { display: flex; gap: 10px; flex: 1; z-index: 1; }
@@ -215,12 +213,16 @@ const handleReasonSubmit = (data) => {
 
 .data-item {
   background: rgba(0, 0, 0, 0.3);
-  padding: 6px 10px;
+  padding: 4px 6px;
   border-radius: 4px;
-  display: flex; flex-direction: column;
+  display: flex; flex-direction: row;
+  align-items: center;
+  gap: 3px;
 }
 
 .highlight-item {
+  display: flex; flex-direction: column;
+  justify-content: center;
   flex: 1.2;
   border: 1px solid var(--theme-color);
   background: linear-gradient(135deg, rgba(0,0,0,0.4) 0%, rgba(0,150,255,0.05) 100%);
@@ -229,10 +231,10 @@ const handleReasonSubmit = (data) => {
 
 .label { font-size: 10px; color: #8cc8ff; margin-bottom: 2px; }
 .value { font-size: 16px; font-weight: 800; font-family: 'DIN', sans-serif; color: #fff; }
-.main-value { font-size: 24px; text-shadow: 0 0 10px var(--theme-color); }
+.main-value {  text-shadow: 0 0 10px var(--theme-color); }
 .value small { font-size: 10px; margin-left: 2px; }
 
-.energy-bar { height: 4px; background: rgba(255, 255, 255, 0.1); margin-top: auto; border-radius: 2px; overflow: hidden; }
+.energy-bar { height: 4px; background: rgba(255, 255, 255, 0.1); border-radius: 2px; overflow: hidden; }
 .energy-fill { 
   height: 100%; 
   background: var(--theme-color); 

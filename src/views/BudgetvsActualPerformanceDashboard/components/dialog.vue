@@ -35,7 +35,8 @@ import { getFinanceList, updateFinanceById } from '@/api/getIncomingInfo'
 import { ElMessage } from 'element-plus'
 
 const modelValue = defineModel()
-const months = ['2025-01', '2025-02', '2025-03', '2025-04', '2025-05', '2025-06', '2025-07', '2025-08', '2025-09', '2025-10', '2025-11', '2025-12']
+const currentYear = new Date().getFullYear()
+const months = Array.from({ length: 12 }, (_, i) => `${currentYear}-${String(i + 1).padStart(2, '0')}`)
 const groupMap = { quantity: '数量', income: '收入', profit: '利润' }
 const rowFields = [
   { field: 'ysChallengeYear', label: '挑战值' },

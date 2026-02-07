@@ -143,11 +143,16 @@
   
   <!-- Part4: 车间直通率月度趋势（点击月度显示 top3 问题） -->
   <div class="part-section">
-    <div class="section-title">车间直通率月度目标/实际趋势（点击月份查看 top3 问题）</div>
+    <div class="section-title">车间直通率月度目标/实际趋势（按车间分，点击月份查看 top3 问题）</div>
     <div class="workshop-grid">
-      <WorkshopCombined mode="A" title="A类车间月度目标/实际对比" />
-      <WorkshopCombined mode="normal" title="常规类车间月度目标/实际对比" />
-    </div>
+      <!-- 四列横向并排，每列为一个车间，内含两个紧凑图（A类 & 常规） -->
+      <div class="workshop-card" v-for="wk in ['金工一部','金工二部','总装一课','总装二课']" :key="wk">
+        <div class="workshop-name">{{ wk }}</div>
+        <div class="workshop-mini-grid">
+          <WorkshopCombined :workshop="wk" mode="both" :title="`${wk} 目标/实际（A类 & 常规）`" :compact="true" />
+        </div>
+      </div>
+    </div>  
   </div>
   <ReasonDialog
       :visible="reasonDialogVisible"
@@ -367,10 +372,11 @@ const handleReasonSubmitProduce = (data) => {
   /* font-size: 11px; */
   font-weight: bold;
   color: #00d4ff;
-  margin-bottom: 6px;
+  /* margin-bottom: 6px; */
   text-align: center;
   border-bottom: 1px solid rgba(0, 150, 255, 0.3);
   padding-bottom: 3px;
+  font-size: 12px;
 }
 
 .metrics-content {
@@ -473,14 +479,36 @@ const handleReasonSubmitProduce = (data) => {
 }
 
 .workshop-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  display: flex;
+  flex-direction: row;
   gap: 8px;
   margin-top: 8px;
-  /* 让网格行可伸缩并填满父容器高度，保证子图表有足够高度 */
   flex: 1;
   min-height: 0;
-  grid-auto-rows: 1fr;
+}
+
+.workshop-card {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(0,0,0,0.05);
+  padding: 6px;
+  border-radius: 4px;
+  min-height: 0;
+  width: 100%;
+}
+.workshop-name {
+  color: #8cc8ff;
+  font-weight: 600;
+  text-align: center;
+  font-size: 12px;
+}
+.workshop-mini-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 6px;
+  height: 100%;
+  min-height: 0;
 }
 
 /* 响应式调整 */

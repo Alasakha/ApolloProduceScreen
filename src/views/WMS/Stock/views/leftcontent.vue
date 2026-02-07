@@ -6,7 +6,7 @@
          
         </div>
         <div class="flex-1">
-          <Ruku/>
+          <Ruku :type="2" "/>
         </div>
         <div class="flex-1">
           <ZaiTu/>

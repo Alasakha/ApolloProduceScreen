@@ -224,7 +224,18 @@ const routes: RouteRecordRaw[] = [
     path: '/jinggongwms',
     name: 'JinGongWms',
     component: () => import('@/views/JingGongWMS/index.vue')
-  }
+  },
+      {
+    path: '/diandongwms',
+    name: 'DianGongWms',
+    component: () => import('@/views/DianDongWMS/index.vue')
+  },
+  {
+    path: '/salesdashboard',
+    name: 'SalesDashboard',
+    component: () => import('@/components/SalesDashboard/Dashboard.vue')
+  },
+
 
 ];
 

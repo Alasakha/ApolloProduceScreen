@@ -3,10 +3,10 @@
   <dv-full-screen-container>
     <dv-border-box11 title="浙江阿波罗运动科技股份有限公司" :title-width="400" >
       <div class="w-full h-full flex flex-col pl-4 pr-4 gap-4">
-        <Header class="h-[18vh]"></Header>
-        <Line2 class="h-[20vh]"></Line2>
-        <Line3 class="h-[6vh]"></Line3>
-        <Line4 class="h-[2vh]"></Line4>
+        <Header ></Header>
+        <Line2 ></Line2>
+        <Line3></Line3>
+        <Line4 ></Line4>
         <!-- <chart class="h-[12vh]"></chart> -->
         <!-- <Bottom class="h-[26vh]"></Bottom> -->
       </div>

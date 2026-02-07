@@ -40,7 +40,7 @@ const config = reactive({
 const fetchData = async () => {
   inStoreLoading.value = true
   try {
-    const res = await gettimelyAccountingRateDetail({warehouseType:2})
+    const res = await gettimelyAccountingRateDetail({warehouseType:3})
     const list = res.data
     // console.log(list)
 
@@ -91,7 +91,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData2 = () => {
-const params = { warehouseType:2 };
+const params = { warehouseType:3 };
 gettimelyAccountingRateDetailPie(params).then(res => {
     processData(res.data);
 }).catch(() => {

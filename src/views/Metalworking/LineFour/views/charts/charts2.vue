@@ -46,6 +46,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
+import type { PropType } from 'vue';
 import { getCheckPie ,getCheckInfo} from '@/api/getIncomingInfo'
 
 import { eventBus } from '@/utils/eventbus';
@@ -59,6 +60,12 @@ import TooltipInfo from '@/components/SCM/TooltipInfo/index.vue'
 const isLoading = ref(true);
 const isDataEmpty = ref(false);
 const chartRef = ref(null);
+
+// props: allow parent to control request params (e.g., type or extra query params)
+const props = defineProps({
+    type: { type: Number, default: 2 },
+    queryParams: { type: Object as PropType<Record<string, any>>, default: () => ({}) }
+})
 
 // 使用 useEcharts
 const { initChart, setOption, onClick, offClick,resizeChart } = useEcharts(chartRef);
@@ -93,7 +100,7 @@ const tableColumns = [
 
 ]
 
-// 处理饼图点击事件
+// 处理饼图点击事件（使用 props 构造详情请求参数）
 const handleChartClick = async (params) => {
     if (params && params.name) {
         const requestId = ++currentRequestId.value; // 生成新的请求ID
@@ -102,7 +109,8 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getCheckInfo({caigou:params.name,type:1});
+            const infoParams: Record<string, any> = { caigou: params.name, ...(typeof props.type !== 'undefined' ? { type: props.type } : {}), ...(props.queryParams || {}) };
+            const res = await getCheckInfo(infoParams);
             console.log(res)
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
@@ -156,9 +164,9 @@ const processData = (data) => {
     console.log(processedData.value)
 }
 
-// 请求数据
+// 请求数据（使用 props 构造参数）
 const fetchData = () => {
-    const params = { type: 2,warehouseType:2 };
+    const params: Record<string, any> = { ...(typeof props.type !== 'undefined' ? { type: props.type } : {}), ...(props.queryParams || {}) };
     getCheckPie(params).then(res => {
 
         isLoading.value = false;

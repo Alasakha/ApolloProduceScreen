@@ -14,7 +14,7 @@
 
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
-import {getstagnantAmount} from  '@/api/getWMSinfo'
+import {getstagnantAmountWarehouseType} from  '@/api/getWMSinfo'
 import { eventBus } from '@/utils/eventbus';
 
 const isLoading = ref(true);
@@ -39,7 +39,7 @@ const config = reactive({
 const fetchData = async () => {
   try {
     isLoading.value = true;
-    const res = await getstagnantAmount(2);
+    const res = await getstagnantAmountWarehouseType({warehouseType:3});
     if (res.data && Array.isArray(res.data)) {
       const transformed = res.data.map(item => [
         item.warehouse_name +'-' + item.warehouseKeeper || '暂无数据',

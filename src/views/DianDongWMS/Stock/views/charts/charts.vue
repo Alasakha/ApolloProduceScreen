@@ -131,7 +131,7 @@ const handleChartClick = async (params) => {
         dialogVisible.value = true;
         
         try {
-            const res = await getPlanInfo({caigou:params.name,type:1});
+            const res = await getPlanInfo({caigou:params.name,type:2});
             // 检查这个请求是否是最新的
             if (requestId === currentRequestId.value) {
                 console.log('API返回数据:', res.data);
@@ -186,7 +186,7 @@ const processData = (data) => {
 
 // 请求数据
 const fetchData = () => {
-    const params = { type: 1 };
+    const params = { type: 2 };
     getPlanPie(params).then(res => {
         isLoading.value = false;
         processData(res.data);

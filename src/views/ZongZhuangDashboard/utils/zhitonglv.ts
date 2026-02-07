@@ -24,12 +24,12 @@ export interface QualityReportData {
 // 部门标准配置
 const DEPARTMENT_STANDARDS = {
   '总装一课': {
-    aClass: 75, // A类标准直通率 75%
-    regular: 72 // 常规标准直通率 72%
+    aClass: 88, // A类标准直通率 75%
+    regular: 83 // 常规标准直通率 72%
   },
   '总装二课': {
-    aClass: 89, // A类标准直通率 89%
-    regular: 87 // 常规标准直通率 87%
+    aClass: 91, // A类标准直通率 89%
+    regular: 90 // 常规标准直通率 87%
   }
 } as const
 

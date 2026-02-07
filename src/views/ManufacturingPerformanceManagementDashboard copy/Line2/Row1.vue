@@ -1,7 +1,7 @@
 <template>
   <div class="row1-container flex-1">
     <!-- A类客户合计 -->
-    <div class="section-title text-xs 2xl:text-sm 3xl:text-base 4xl:text-lg">
+    <div class="section-title text-xs 2xl:text-sm 3xl:text-[6px] 4xl:text-lg">
       A类客户合计
       <span v-if="loading" class="loading-indicator">加载中...</span>
       <span v-if="error" class="error-indicator" :title="error">❌</span>
@@ -26,7 +26,15 @@
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">实际</div>
-            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.monthly.actual }}%</div>
+            <div class="metric-value 
+              text-[10px] 
+              sm:text-[11px] 
+              2xl:text-lg 
+              3xl:text-xl 
+              4xl:text-2xl 
+              font-bold truncate-text">
+              {{ customerData.monthly.actual }}%
+            </div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">达成率</div>
@@ -195,7 +203,7 @@ onUnmounted(() => {})
 }
 
 .section-title {
-  /* font-size: 12px; */
+  font-size: 8px;
   font-weight: bold;
   color: #00d4ff;
   margin-bottom: 8px;
@@ -290,13 +298,11 @@ onUnmounted(() => {})
 }
 
 .metric-value {
-  /* font-size: 13px; */
-  height: 70%;
-  font-weight: bold;
-  color: #fff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  width: 100%;
+  white-space: nowrap; /* 强制不换行 */
+  overflow: hidden;    /* 隐藏溢出 */
+  text-overflow: clip; /* 或者 ellipsis，但看板类建议直接微调字号 */
+  line-height: 1.2;
 }
 
 .achievement-excellent {
@@ -318,7 +324,7 @@ onUnmounted(() => {})
 .loading-indicator {
   color: #00d4ff;
   font-size: 10px;
-  margin-left: 8px;
+  margin-left: 6px;
   animation: pulse 1.5s infinite;
 }
 

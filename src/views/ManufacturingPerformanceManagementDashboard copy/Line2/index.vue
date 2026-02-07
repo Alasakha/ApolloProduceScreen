@@ -21,7 +21,7 @@ import Row3 from './Row3.vue'
 .line2-container {
   display: flex;
   gap: 6px;
-  height: 100%;
+  height: 30%;
   width: 100%;
 }
 </style>

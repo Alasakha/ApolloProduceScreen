@@ -1,63 +1,83 @@
 <template>
   <div class="row3-container flex-1">
-    <!-- 订单准交监控（月） -->
-    <div class="departments-content">
-      <div class="issues-section">
-        <div class="section-title text-[12px]">A类订单准交（月）</div>
-        <div class="issues-grid">
-          <div class="issue-item">
-            <div class="issue-name">目标</div>
-            <div class="issue-percentage">{{ monthData.A.target !== null ? (monthData.A.target * 100).toFixed(1) + '%' : '--' }}</div>
-          </div>
-          <div class="issue-item">
-            <div class="issue-name">本月已入库工单数</div>
-            <div class="issue-percentage">{{ monthData.A.total }}</div>
-          </div>
-          <div class="issue-item">
-            <div class="issue-name">本月准交工单数</div>
-            <div class="issue-percentage">{{ monthData.A.ontime }}</div>
-          </div>
-          <div class="issue-item">
-            <div class="issue-name">准交率</div>
-            <div class="issue-percentage">{{ monthData.A.rate !== null ? (monthData.A.rate * 100).toFixed(1) + '%' : '--' }}</div>
-          </div>
-        </div>
-      </div>
+    <div v-if="monthData && monthData.A" class="departments-content">
+      
+      <div v-for="(item, key) in { A: monthData.A, regular: monthData.regular }" :key="key" class="tech-card">
+        <div class="card-bg-decoration"></div>
 
-      <div class="issues-section">
-        <div class="section-title text-[12px]">常规类订单准交（月）</div>
-        <div class="issues-grid">
-          <div class="issue-item">
-            <div class="issue-name">目标</div>
-            <div class="issue-percentage">{{ monthData.regular.target !== null ? (monthData.regular.target * 100).toFixed(1) + '%' : '--' }}</div>
+        <div class="card-header">
+          <div class="title-line">
+            <span class="tech-dot"></span>
+            <span class="title-text">{{ key === 'A' ? 'A类订单' : '常规类订单' }}准交监控</span>
           </div>
-          <div class="issue-item">
-            <div class="issue-name">本月已入库工单数</div>
-            <div class="issue-percentage">{{ monthData.regular.total }}</div>
+          <div class="live-tag">实时数据</div>
+        </div>
+        
+        <div class="card-body">
+          <div class="value-split-container">
+            <div class="data-block">
+              <div class="block-label">当前准交率</div>
+              <div class="block-value actual" :class="key === 'A' ? 'blue-glow' : 'green-glow'">
+                {{ item.rate !== null ? (item.rate * 100).toFixed(1) : '--' }}<small>%</small>
+              </div>
+            </div>
+
+            <div class="v-line"></div>
+
+            <div class="data-block">
+              <div class="block-label">KPI 目标值</div>
+              <div class="block-value target">
+                {{ item.target ? (item.target * 100).toFixed(1) : '0.0' }}<small>%</small>
+              </div>
+            </div>
           </div>
-          <div class="issue-item">
-            <div class="issue-name">本月准交工单数</div>
-            <div class="issue-percentage">{{ monthData.regular.ontime }}</div>
+
+          <div class="progress-wrap">
+            <div class="progress-info">
+              <span>达成进度</span>
+              <span>{{ Math.min((item.rate || 0) * 100, 100).toFixed(0) }}%</span>
+            </div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" 
+                   :class="key === 'A' ? 'blue-fill' : 'green-fill'"
+                   :style="{ width: Math.min((item.rate || 0) * 100, 100) + '%' }">
+              </div>
+              <div class="target-line" :style="{ left: (item.target * 100) + '%' }"></div>
+            </div>
           </div>
-          <div class="issue-item">
-            <div class="issue-name">准交率</div>
-            <div class="issue-percentage">{{ monthData.regular.rate !== null ? (monthData.regular.rate * 100).toFixed(1) + '%' : '--' }}</div>
+
+          <div class="bottom-grid">
+            <div class="grid-item">
+              <span class="grid-label">本月已入库</span>
+              <span class="grid-num">{{ item.total }}</span>
+            </div>
+            <div class="grid-item">
+              <span class="grid-label">本月准交数</span>
+              <span class="grid-num">{{ item.ontime }}</span>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+    <div v-else class="loading-box">
+      <div class="sync-text">系统数据同步中...</div>
+    </div>
   </div>
 </template>
-
 <script setup>
 import { computed } from 'vue'
 import { useManufacturingStore } from '@/stores/manufacturing'
 
 const m = useManufacturingStore()
 
-// 月度准交监控：A类与常规类
+/**
+ * 月度准交监控计算属性
+ * 增加默认值防止模板渲染时发生 undefined 错误
+ */
 const monthData = computed(() => {
   const d = m.onTimeMonthRaw || {}
+  
   return {
     A: {
       target: d['A类订单准交目标'] ?? null,
@@ -73,173 +93,159 @@ const monthData = computed(() => {
     }
   }
 })
-
 </script>
 
 <style scoped>
+/* 容器适配 */
 .row3-container {
-  background: rgba(0, 30, 60, 0.3);
-  border: 1px solid rgba(0, 150, 255, 0.3);
-  border-radius: 6px;
-  padding: 8px;
-  backdrop-filter: blur(5px);
-  color: #fff;
   height: 100%;
+  width: 100%;
   display: flex;
-  flex-direction: column;
-}
-
-.section-title {
-  font-weight: bold;
-  color: #00d4ff;
-  margin-bottom: 8px;
-  text-align: center;
-  border-bottom: 1px solid rgba(0, 150, 255, 0.3);
-  padding-bottom: 4px;
+  box-sizing: border-box;
 }
 
 .departments-content {
-  /* 更紧凑：使用两列网格，减少纵向占用 */
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 10px;
-  height: 100%; /* 确保撑满父级 */
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
   width: 100%;
+  height: 100%;
 }
 
-.issues-section {
-  background: rgba(0, 30, 60, 0.3);
-  border: 1px solid rgba(0, 150, 255, 0.3);
-  border-radius: 6px;
-  padding: 6px 8px;
-  backdrop-filter: blur(5px);
+/* 高冷科技感卡片主体 */
+.tech-card {
+  position: relative;
+  background: rgba(10, 26, 47, 0.6);
+  border: 1px solid rgba(0, 242, 255, 0.15);
+  padding: 12px 16px;
   display: flex;
   flex-direction: column;
-  max-height: 100%;
-  overflow: hidden;
-  flex: 1; /* 让两个卡片纵向撑开 */
-  justify-content: space-between; /* 标题和网格拉开距离 */
-
+  /* justify-content: space-between; */
+  overflow: hidden; /* 防止溢出父组件 */
 }
 
-.issues-section .section-title {
-  font-weight: bold;
-  color: #00d4ff;
-  margin-bottom: 6px;
-  text-align: left;
-  border-bottom: none;
-  padding-bottom: 0;
-  font-size: 12px;
-}
-
-.issues-grid {
-  /* 每个 section 内部改为两列，减少纵向高度 */
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px; /* 稍微加大间距更美观 */
-  flex: 1; /* 关键：占据剩余高度 */
-  align-content: stretch; /* 关键：让行内容铺满 */
-}
-
-.issue-item {
+/* 标题样式 */
+.card-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.12);
-  transition: all 0.2s ease;
-  position: relative;
-  font-size: 12px;
-  line-height: 1;
-  height: 100%; /* 让每个小方块填满网格单元格 */
-  min-height: unset; /* 移除最小高度限制 */
-  padding: 8px 12px; /* 适当增加内边距提升呼吸感 */
+  margin-bottom: 8px;
 }
 
-.issue-item:hover {
-  background: rgba(0, 0, 0, 0.18);
-  transform: none;
+.tech-dot {
+  width: 4px; height: 4px;
+  background: #00f2ff;
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 5px #00f2ff;
 }
 
-/* 正常状态 */
-.issue-normal {
-  border-left: 3px solid #00d4ff;
-}
-
-/* 重大问题 */
-.issue-major {
-  border-left: 3px solid #ffa500;
-  background: rgba(255, 165, 0, 0.1);
-}
-
-/* 警告状态（直通率未达标时的红色警示） */
-.issue-warning {
-  border-left: 3px solid #ff4444;
-  background: rgba(255, 68, 68, 0.15);
-  animation: warning-pulse 2s infinite;
-}
-
-/* 警示动画 */
-@keyframes warning-pulse {
-  0%, 100% {
-    box-shadow: 0 0 5px rgba(255, 68, 68, 0.3);
-  }
-  50% {
-    box-shadow: 0 0 15px rgba(255, 68, 68, 0.6);
-  }
-}
-
-/* 暂无问题点样式 */
-.no-issues-item {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 8px;
-  border-radius: 4px;
-  background: rgba(0, 0, 0, 0.2);
-  border-left: 3px solid #666;
-}
-
-.no-issues-text {
-  color: #888;
-  font-style: italic;
-}
-
-/* .issue-warning::before {
-  content: '⚠';
-  position: absolute;
-  left: -15px;
-  top: 50%;
-  transform: translateY(-50%);
-  color: #ff4444;
-  animation: warning-blink 1s infinite;
-} */
-
-/* @keyframes warning-blink {
-  0%, 50% {
-    opacity: 1;
-  }
-  51%, 100% {
-    opacity: 0.3;
-  }
-} */
-
-.issue-name {
-  color: #8cc8ff;
-  flex: 1;
-}
-
-.issue-warning .issue-name {
-  color: #ffcccc;
-  font-weight: bold;
-}
-
-.issue-percentage {
-  font-weight: bold;
+.title-text {
   color: #fff;
+  font-size: 14px;
+  font-weight: 500;
+  letter-spacing: 1px;
 }
 
-.issue-warning .issue-percentage {
-  color: #ff8888;
+.live-tag {
+  font-size: 10px;
+  color: rgba(0, 242, 255, 0.5);
+  border: 1px solid rgba(0, 242, 255, 0.2);
+  padding: 1px 4px;
 }
+
+/* 数据对比区布局 */
+.value-split-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 0;
+}
+
+.data-block { flex: 1; text-align: center; }
+
+.v-line {
+  width: 1px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.block-label {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+.block-value {
+  font-family: 'DIN Alternate', sans-serif;
+  font-size: 28px; /* 缩小了实际值，增大目标值感官 */
+  font-weight: bold;
+}
+
+.block-value small { font-size: 12px; margin-left: 2px; }
+
+/* 实际值配色 */
+.blue-glow { color: #fff; text-shadow: 0 0 10px rgba(0, 242, 255, 0.3); }
+.green-glow { color: #00ffcc; }
+
+/* 目标值配色 - 此时与实际值字号一致，显得更大更重要 */
+.target { color: rgba(255, 255, 255, 0.9); }
+
+/* 进度条 */
+.progress-wrap { margin: 10px 0; }
+
+.progress-info {
+  display: flex;
+  justify-content: space-between;
+  font-size: 10px;
+  color: rgba(255, 255, 255, 0.4);
+  margin-bottom: 4px;
+}
+
+.progress-bar-bg {
+  height: 4px;
+  background: rgba(255, 255, 255, 0.05);
+  position: relative;
+}
+
+.progress-bar-fill {
+  height: 100%;
+  transition: width 1s ease-in-out;
+}
+.blue-fill { background: #00f2ff; }
+.green-fill { background: #00ffcc; }
+
+.target-line {
+  position: absolute;
+  top: -4px;
+  width: 2px;
+  height: 12px;
+  background: #fff;
+  box-shadow: 0 0 5px #fff;
+}
+
+/* 底部网格数据 */
+.bottom-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  padding-top: 8px;
+  border-top: 1px dashed rgba(255, 255, 255, 0.1);
+}
+
+.grid-item { display: flex; flex-direction: column; }
+
+.grid-label { font-size: 10px; color: rgba(255, 255, 255, 0.3); }
+.grid-num { font-size: 16px; color: #fff; font-family: 'DIN'; }
+
+/* 加载状态 */
+.loading-box {
+  width: 100%; height: 100%;
+  display: flex; justify-content: center; align-items: center;
+  color: #00f2ff;
+}
+
+.sync-text { animation: blink 2s infinite; font-size: 12px; }
+
+@keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
 </style>
