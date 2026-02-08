@@ -148,9 +148,8 @@ interface Props {
   dimensionLabel?: string
 }
 
-const props = withDefaults(defineProps<Props>(), {
-  dimensionLabel: '维度'
-})
+const props = defineProps<Props>()
+const dimensionLabel = computed(() => props.dimensionLabel || '维度')
 
 const formatNumber = (num: number): string => {
   return num.toLocaleString()
