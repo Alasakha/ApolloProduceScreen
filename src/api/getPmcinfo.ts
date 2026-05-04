@@ -123,3 +123,70 @@ export const getYsComplete = () => {
     method: 'get',
   })
 }
+
+// 物料配送列表
+export const getMaterialDeliveryList = () => {
+  return request({
+    url: '/PMC/materialDeliveryList',
+    method: 'get',
+  })
+}
+
+// 物料配送单个工单详情
+export const getMaterialDeliveryDetail = (doc_no: string) => {
+  return request({
+    url: '/PMC/materialDeliveryDetail',
+    method: 'get',
+    params: { doc_no }
+  })
+}
+
+// AGV使用率
+export const getAgvUseRate = () => {
+  return request({
+    url: '/PMC/agvUseRate',
+    method: 'get',
+  })
+}
+
+export const getOutboundShipping = () => {
+  return request({
+    url: '/PMC/outboundShipping',
+    method: 'get',
+  })
+}
+
+// 出库发货明细
+export const getOutboundShippingDetail = () => {
+  return request({
+    url: '/PMC/outboundShippingDetail',
+    method: 'get',
+  })
+}
+
+// 库存信息
+export const getInventoryInformation = () => {
+  return request({
+    url: '/PMC/inventoryInformation',
+    method: 'get',
+  })
+}
+
+// 库存信息明细
+export const getInventoryInformationDetail = () => {
+  return request({
+    url: '/PMC/inventoryInformationDetail',
+    method: 'get',
+  })
+}
+
+// 数据填充分析接口
+// fill_key: 字段名称（如"月度计划出库发货数"、"今日计划出库发货数"）
+// fill_value: 要填写的数值
+export const fillDataAnalysis = (fill_key: string, fill_value: number) => {
+  return request({
+    url: '/incoming/fillDataAnalysis',
+    method: 'post',
+    params: { fill_key, fill_value }
+  })
+}

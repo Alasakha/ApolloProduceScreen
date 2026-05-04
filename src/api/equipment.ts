@@ -117,21 +117,40 @@ export const getMachineAbnormalDetail = (category: string): Promise<MachineAbnor
 }
 
 // /machine/oee
-export interface OeeItem {
+export interface MachineOeeItem {
   monthday: string
   mac_no: string
   mac_name: string
-  oee: number
+  oee: number | null
   operation: number
-  performance: number
-  pass: number
+  performance: number | null
+  pass: number | null
+  output: number | null
+  standard_output: number | null
+  emp: string | null
+  uuid: string | null
+  startup: number
+  standard_startup: number
+}
+
+export interface WorkCenterOee {
+  work_center: string
+  total_count: number
+  complete_count: number
+  complete_count_rate: number
+  target_operation: string
+  all_operation: number
+  operation_rate: number
+  machineOeeList: MachineOeeItem[]
 }
 
 export interface OeeResponse {
   code: number
   message: string
-  data: OeeItem[]
+  data: WorkCenterOee[]
 }
+
+export type OeeItem = MachineOeeItem
 
 export const getMachineOee = (workshop?: string): Promise<OeeResponse> => {
   const data: Record<string, unknown> = {}

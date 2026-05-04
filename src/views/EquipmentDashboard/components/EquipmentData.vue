@@ -6,7 +6,7 @@
       <div class="data-section">
         <div class="section-title">
           <span>关键设备运行状态</span>
-          <el-button class="reason-btn" type="link" @click="openReasonDialog('running')">原因分析</el-button>
+          <el-button class="reason-btn" link @click="openReasonDialog('running')">原因分析</el-button>
         </div>
         <div class="data-grid">
           <div class="data-item running clickable" @click="openRunningDialog">
@@ -32,8 +32,8 @@
       <div class="data-section">
         <div class="section-title">
           <span>设备保养维修状态</span>
-          <el-button class="reason-btn" type="link" @click="openReasonDialog('inspection')">点检原因分析</el-button>
-          <el-button class="small-reason-btn" type="link" @click.stop="openReasonDialog('repair')">维修原因</el-button>
+          <el-button class="reason-btn" link @click="openReasonDialog('inspection')">点检原因分析</el-button>
+          <el-button class="small-reason-btn" link @click.stop="openReasonDialog('repair')">维修原因</el-button>
         </div>
         <div class="data-grid">
           <div class="data-item ">

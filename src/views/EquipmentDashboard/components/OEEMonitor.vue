@@ -5,14 +5,7 @@
       <div v-if="!workshopStats.length" class="empty">暂无数据</div>
       <div v-for="(stat, idx) in workshopStats" :key="idx" class="workshop-row">
         <div class="workshop-name">
-          {{
-            {
-              CY: '冲压车间',
-              HJ: '焊接车间',
-              JG2: '金工二部车间',
-              ZHS: '注塑车间'
-            }[stat.name] || stat.name
-          }}
+          {{ stat.name }}
         </div>
         <div class="metrics">
           <div class="metric">
@@ -31,6 +24,16 @@
             <div class="metric-label">达成率</div>
             <div class="metric-value">{{ stat.rate }}%</div>
           </div>
+          <!-- <div class="metric">
+            <div class="metric-label">目标稼动率</div>
+            <div class="metric-value target">{{ stat.targetOperation }}</div>
+          </div>
+          <div class="metric">
+            <div class="metric-label">稼动率</div>
+            <div class="metric-value" :class="{ unmet: stat.operationRate < 85 }">
+              {{ stat.operationRate }}%
+            </div>
+          </div> -->
         </div>
         <div class="actions">
           <el-button type="text" class="reason-btn" @click="openReason(stat)">原因</el-button>
@@ -50,55 +53,31 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from 'vue'
-import { getMachineOee } from '@/api/equipment'
+import { storeToRefs } from 'pinia'
+import { useOeeStore } from '@/store/oee'
 import ReasonDialog from '@/components/ReasonDialog.vue'
 import { ElMessage } from 'element-plus'
 import { fillInReason } from '@/api/produceperformance'
 
-const workshopStats = ref<{ name: string; total: number; meet: number; rate: number; data: any[] }[]>([])
-const minThreshold = 65
-const maxThreshold = 120
+const oeeStore = useOeeStore()
+const { workshopStats } = storeToRefs(oeeStore)
 
 const showReasonDialog = ref(false)
-const reasonMetric = ref({ name: '', period: '昨日', target: 0, actual: 0, achievement: 0, code: '', targetRange: '' })
-
-const loadStats = async () => {
-  const res = await getMachineOee()
-  const groups: Record<string, any[]> = {}
-  if (res && res.code === 200) {
-    if (Array.isArray(res.data)) {
-      groups['全部'] = res.data
-    } else if (res.data && typeof res.data === 'object') {
-      Object.assign(groups, res.data)
-    }
-  }
-  const stats: any[] = []
-  for (const [key, arr] of Object.entries(groups)) {
-    const list = Array.isArray(arr) ? arr : []
-    const total = list.length
-    let meet = 0
-    for (const it of list) {
-      const raw = typeof it.oee === 'number' ? it.oee : NaN
-      const v = Number.isFinite(raw) ? raw*100 : NaN
-      // 视为达标：v 在 minThreshold 到 maxThreshold（包含）之间
-      if (Number.isFinite(v) && v >= minThreshold && v <= maxThreshold) {
-        meet++
-      }
-      // NA (非数字) 视为不达标
-    }
-    const rate = total ? Math.round((meet / total) * 100) : 0
-    stats.push({ name: key, total, meet, rate, data: list })
-  }
-  workshopStats.value = stats
-}
+const reasonMetric = ref({
+  name: '',
+  period: '昨日',
+  target: 0,
+  actual: 0,
+  achievement: 0,
+  code: '',
+  targetRange: ''
+})
 
 const openReason = (stat: any) => {
   reasonMetric.value.name = `${stat.name} OEE 达成情况`
   reasonMetric.value.actual = stat.rate
-  // 在原因弹窗中显示区间文本
-  // 将 numeric target 保持为最小阈值，同时保留 range 字符串用于展示
-  reasonMetric.value.target = minThreshold
-  reasonMetric.value.targetRange = `${minThreshold}-${maxThreshold}`
+  reasonMetric.value.target = 85
+  reasonMetric.value.targetRange = stat.targetOperation
   reasonMetric.value.achievement = stat.rate
   reasonMetric.value.code = `OEE_${stat.name}`
   showReasonDialog.value = true
@@ -106,7 +85,6 @@ const openReason = (stat: any) => {
 
 const handleReasonSubmit = (payload: any) => {
   console.log('OEE 原因提交:', payload)
-  // 调用后端提交接口
   if (reasonMetric.value?.code) {
     fillInReason(reasonMetric.value.code, payload.reason || '', payload.solution || '')
       .then(() => {
@@ -126,7 +104,7 @@ const handleReasonSubmit = (payload: any) => {
 }
 
 onMounted(async () => {
-  await loadStats()
+  await oeeStore.fetchOee()
 })
 </script>
 
@@ -196,6 +174,10 @@ onMounted(async () => {
 .metric-value.unmet {
   color: #ff4d4f;
 }
+.metric-value.target {
+  color: #ffd700;
+  font-size: 16px;
+}
 .actions {
   margin-left: auto;
 }
@@ -219,5 +201,3 @@ onMounted(async () => {
   .workshop-rate { font-size: 16px; }
 }
 </style>
-
-

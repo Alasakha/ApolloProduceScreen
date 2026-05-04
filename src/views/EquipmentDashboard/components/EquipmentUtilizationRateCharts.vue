@@ -33,7 +33,48 @@
               :key="workshopName"
               class="workshop-chart-card"
             >
-              <div class="workshop-title">{{ workshopLabel(workshopName) }}设备稼动率</div>
+              <div class="workshop-summary-bar">
+                <div class="summary-item">
+                  <span class="summary-label">设备数</span>
+                  <span class="summary-value">{{ workshopSummary[workshopName]?.total_count ?? '-' }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">达标台数</span>
+                  <span class="summary-value">{{ workshopSummary[workshopName]?.complete_count ?? '-' }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">台数达标率</span>
+                  <span class="summary-value" :class="getRateClass(workshopSummary[workshopName]?.complete_count_rate)">
+                    {{ formatPercent(workshopSummary[workshopName]?.complete_count_rate) }}
+                  </span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">目标稼动率</span>
+                  <span class="summary-value target">{{ workshopSummary[workshopName]?.target_operation ?? '-' }}</span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">累计稼动率</span>
+                  <span class="summary-value" :class="getRateClass(workshopSummary[workshopName]?.all_operation)">
+                    {{ formatPercent(workshopSummary[workshopName]?.all_operation) }}
+                  </span>
+                </div>
+                <div class="summary-item">
+                  <span class="summary-label">稼动率达标率</span>
+                  <span class="summary-value" :class="getRateClass(workshopSummary[workshopName]?.operation_rate)">
+                    {{ formatPercent(workshopSummary[workshopName]?.operation_rate) }}
+                  </span>
+                </div>
+              </div>
+              <div class="workshop-title">
+                {{ workshopLabel(workshopName) }} 关键设备稼动率
+                <span class="chart-subtitle">
+                  累计稼动率
+                  <span :class="getRateClass(workshopSummary[workshopName]?.all_operation)">
+                    {{ formatPercent(workshopSummary[workshopName]?.all_operation) }}
+                  </span>
+                  {{ workshopSummary[workshopName]?.target_operation ? '/ 目标 ' + workshopSummary[workshopName].target_operation : '' }}
+                </span>
+              </div>
               <div class="workshop-chart" :ref="el => setChartRef(el, workshopName)"></div>
             </div>
           </div>
@@ -61,21 +102,51 @@ const emit = defineEmits(['update:visible', 'close'])
 // 状态
 const selectedWorkshopFilter = ref('all')
 const workshopData = ref<Record<string, any[]>>({})
+const workshopSummary = ref<Record<string, {
+  work_center: string
+  total_count: number
+  complete_count: number
+  complete_count_rate: number
+  target_operation: string
+  all_operation: number
+  operation_rate: number
+}>>({})
 const availableWorkshops = ref<string[]>([])
-const chartRefs = ref<Record<string, HTMLElement>>({})
-const chartInstances = ref<Record<string, any>>({})
-const resizeHandlers = ref<Record<string, () => void>>({})
-// 车间代码到中文映射
-const workshopLabelMap: Record<string, string> = {
-  全部: '全部车间',
+
+// code → 中文映射
+const codeToLabel: Record<string, string> = {
   CY: '冲压(CY)',
   HJ: '焊接(HJ)',
   JG2: '金工二部(JG2)',
   ZHS: '注塑(ZHS)'
 }
+// 中文 → code 映射
+const labelToCode: Record<string, string> = {
+  '金工一部冲压车间': 'CY',
+  '金工一部焊接车间': 'HJ',
+  '金工二部': 'JG2',
+  '注塑车间': 'ZHS'
+}
+
+const chartRefs = ref<Record<string, HTMLElement>>({})
+const chartInstances = ref<Record<string, any>>({})
+const resizeHandlers = ref<Record<string, () => void>>({})
 
 const workshopLabel = (code: string) => {
-  return workshopLabelMap[code] || code
+  return codeToLabel[code] || code
+}
+
+const formatPercent = (val: any) => {
+  if (typeof val !== 'number' || Number.isNaN(val)) return '-'
+  return (val * 100).toFixed(1) + '%'
+}
+
+const getRateClass = (val: any) => {
+  if (typeof val !== 'number' || Number.isNaN(val)) return ''
+  const pct = val * 100
+  if (pct >= 85) return 'rate-green'
+  if (pct > 0) return 'rate-yellow'
+  return 'rate-gray'
 }
 
 const setChartRef = (el: any, workshopName: string) => {
@@ -86,20 +157,23 @@ const setChartRef = (el: any, workshopName: string) => {
 
 const fetchAndRender = async () => {
   const res = await getMachineOee()
-  if (res && res.code === 200) {
-    if (Array.isArray(res.data)) {
-      workshopData.value = { 全部: res.data }
-    } else if (res.data && typeof res.data === 'object') {
-      workshopData.value = res.data as Record<string, any[]>
-    } else {
-      workshopData.value = {}
+  if (res && res.code === 200 && Array.isArray(res.data)) {
+    const groups: Record<string, any[]> = {}
+    const summary: Record<string, any> = {}
+    for (const wc of res.data) {
+      const code = labelToCode[wc.work_center] || wc.work_center
+      groups[code] = wc.machineOeeList
+      summary[code] = wc
     }
+    workshopData.value = groups
+    workshopSummary.value = summary
+    availableWorkshops.value = Object.keys(groups)
   } else {
     workshopData.value = {}
+    workshopSummary.value = {}
+    availableWorkshops.value = []
   }
 
-  const dataKeys = Object.keys(workshopData.value)
-  availableWorkshops.value = dataKeys.filter(k => k !== '全部')
   // 如果父组件传入初始车间则使用之（点击卡片时会传入），否则默认为全部
   selectedWorkshopFilter.value = props.initialWorkshop || 'all'
   renderWorkshopCharts()
@@ -118,13 +192,9 @@ const renderWorkshopCharts = () => {
         const names = devices.map(d => d.mac_name || d.mac_no || '未知设备')
         const normalizeOperation = (op: any) => {
           if (typeof op !== 'number' || Number.isNaN(op)) return NaN
-          // Heuristic:
-          // - if op <= 1.5 treat as fraction (e.g. 1.15 -> 115%)
-          // - if op > 1.5 and <= 100 assume already percentage (e.g. 58 -> 58%)
-          // - otherwise fallback to op*100
-          // if (op <= 1.5) return op * 100
-          // if (op > 1.5 && op <= 100) return op
-          return op * 100
+          // operation > 1：已经是小数形式（如 1.13 表示 113%）
+          // operation <= 1：需要乘 100 转为百分比
+          return  op * 100
         }
         const rates = devices.map(d => normalizeOperation(d.operation))
         const option = {
@@ -132,12 +202,35 @@ const renderWorkshopCharts = () => {
             trigger: 'axis',
             backgroundColor: 'rgba(0, 0, 0, 0.8)',
             borderColor: '#00d4ff',
-            textStyle: { color: '#ffffff' }
+            textStyle: { color: '#ffffff' },
+            formatter: (params: any) => {
+              const bar = params.find((p: any) => p.seriesName === '设备稼动率')
+              if (!bar) return ''
+              const d = devices[bar.dataIndex]
+              const op = typeof d.operation === 'number' ? d.operation * 100 : d.operation
+              const pct = typeof op === 'number' ? op.toFixed(1) + '%' : op ?? '-'
+              return `
+                <div style="padding:4px 0">
+                  <div style="font-weight:bold;margin-bottom:6px;color:#00d4ff">${bar.name}</div>
+                  <div>稼动率: <span style="color:#00ff88">${pct}</span></div>
+                  <div>计划时长: <span style="color:#ffd700">${d.startup ?? '-'} h</span></div>
+                  <div>标准时长: <span style="color:#ffd700">${d.standard_startup ?? '-'} h</span></div>
+                </div>
+              `
+            }
+          },
+          legend: {
+            data: ['设备稼动率', '目标下限 85%', '目标上限 100%'],
+            bottom: 0,
+            textStyle: { color: '#8cc8ff', fontSize: 12 },
+            inactiveColor: '#555',
+            itemWidth: 20,
+            itemHeight: 10
           },
           grid: {
             left: '5%',
             right: '5%',
-            bottom: '10%',
+            bottom: '18%',
             containLabel: true
           },
           xAxis: {
@@ -161,10 +254,11 @@ const renderWorkshopCharts = () => {
             splitLine: { lineStyle: { color: 'rgba(0, 212, 255, 0.1)' } }
           },
           series: [{
+            name: '设备稼动率',
             data: rates.map(v => {
               const value = Number.isFinite(v) ? Number(v.toFixed(1)) : NaN
               const color = (value < 85 || value > 120) ? '#ff4d4f' : '#00ff88'
-            
+
               return { value: Number.isFinite(value) ? value : 0, itemStyle: { color } }
             }),
             type: 'bar',
@@ -185,7 +279,27 @@ const renderWorkshopCharts = () => {
                 shadowBlur: 10
               }
             }
-          }]
+          },
+          {
+            name: '目标下限 85%',
+            type: 'line',
+            data: names.map(() => 85),
+            silent: true,
+            lineStyle: {
+              color: '#ffd700',
+              width: 2,
+              type: 'dashed'
+            },
+            itemStyle: { opacity: 0 },
+            label: {
+              show: true,
+              position: 'insideEndTop',
+              formatter: '85%',
+              color: '#ffd700',
+              fontSize: 11
+            }
+          },
+]
         }
         chartInstance.setOption(option)
         chartInstances.value[workshopName] = chartInstance
@@ -210,6 +324,9 @@ watch(() => props.visible, (val) => {
     chartInstances.value = {}
     chartRefs.value = {}
     resizeHandlers.value = {}
+    workshopData.value = {}
+    workshopSummary.value = {}
+    availableWorkshops.value = []
   }
 })
 
@@ -402,6 +519,47 @@ const close = () => {
   min-height: 760px;
 }
 
+.workshop-summary-bar {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 12px;
+  padding: 10px 12px;
+  background: rgba(0, 20, 40, 0.6);
+  border-radius: 6px;
+  border: 1px solid rgba(0, 212, 255, 0.15);
+  flex-wrap: wrap;
+}
+
+.summary-item {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 1;
+  min-width: 80px;
+}
+
+.summary-label {
+  font-size: 11px;
+  color: #8cc8ff;
+  margin-bottom: 4px;
+  opacity: 0.8;
+}
+
+.summary-value {
+  font-size: 15px;
+  font-weight: 700;
+  color: #00d4ff;
+}
+
+.summary-value.target {
+  font-size: 13px;
+  color: #ffd700;
+}
+
+.rate-green { color: #00ff88 !important; }
+.rate-yellow { color: #ffd700 !important; }
+.rate-gray { color: #8cc8ff !important; opacity: 0.6; }
+
 .workshop-title {
   color: #00d4ff;
   font-size: 16px;
@@ -410,6 +568,16 @@ const close = () => {
   margin-bottom: 16px;
   padding-bottom: 8px;
   border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.chart-subtitle {
+  font-size: 13px;
+  font-weight: 400;
+  color: #8cc8ff;
 }
 
 .workshop-chart {

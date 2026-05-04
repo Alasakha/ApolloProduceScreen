@@ -21,12 +21,12 @@
             <div class="stat-row rate-row">
               <span class="stat-label">准交率</span>
               <span class="stat-value rate" :class="getRateClass(item.rate)">
-                {{ item.rate !== null ? (item.rate * 100).toFixed(1) + '%' : '--' }}
+                {{ item.total === 0 ? '应入库为0' : (item.rate !== null ? (item.rate * 100).toFixed(1) + '%' : '--') }}
               </span>
             </div>
           </div>
           <div class="mini-progress-bg">
-            <div class="mini-progress-fill" :style="{ width: (item.rate || 0) * 100 + '%' }"></div>
+            <div class="mini-progress-fill" :style="{ width: (item.total > 0 ? (item.rate || 0) * 100 : 0) + '%' }"></div>
           </div>
         </div>
       </div>
@@ -52,12 +52,12 @@
             <div class="stat-row rate-row">
               <span class="stat-label">准交率</span>
               <span class="stat-value rate" :class="getRateClass(item.rate)">
-                {{ item.rate !== null ? (item.rate * 100).toFixed(1) + '%' : '--' }}
+                {{ item.total === 0 ? '应入库为0' : (item.rate !== null ? (item.rate * 100).toFixed(1) + '%' : '--') }}
               </span>
             </div>
           </div>
           <div class="mini-progress-bg">
-            <div class="mini-progress-fill" :style="{ width: (item.rate || 0) * 100 + '%' }"></div>
+            <div class="mini-progress-fill" :style="{ width: (item.total > 0 ? (item.rate || 0) * 100 : 0) + '%' }"></div>
           </div>
         </div>
       </div>

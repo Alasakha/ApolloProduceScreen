@@ -1,10 +1,12 @@
 <template>
   <div class='pl-5 pt-1'>
     <div class="flex justify-center items-center text-lg text-white font-bold relative">
-      <p class="tracking-widest text-xl ">原材料投入产出监控</p>
-      <!-- <div class="absolute right-4">
-        <el-button size="small" type="primary" @click="dialogVisible = true">详细</el-button>
-      </div> -->
+      <p class="tracking-widest text-xl">原材料投入产出监控</p>
+      <el-tooltip content="正常：±5% | 预警：±5%~±10% | 报警：超出±10%" placement="bottom">
+        <el-icon class="ml-2 cursor-pointer" style="color: #409eff; font-size: 18px; vertical-align: middle;">
+          <InfoFilled />
+        </el-icon>
+      </el-tooltip>
     </div>
     <div class="relative" style="width:47vw;height:19vh;">
       <materialScrollBoard 
@@ -45,7 +47,7 @@ import { reactive, ref, onMounted,onBeforeUnmount, computed } from 'vue'
 import { getInputOutput } from '@/api/getInjection'
 import { eventBus } from '@/utils/eventbus';
 import  {ElMessage} from 'element-plus'
-import { Loading } from '@element-plus/icons-vue'
+import { Loading, InfoFilled } from '@element-plus/icons-vue'
 import materialScrollBoard from '@/components/datav/MaterialScrollBoard.vue'
 
 // 时间维度：month-本月, week-本周, day-本日
@@ -394,12 +396,12 @@ const updateHuiliaoInfo = (payload: Record<string, any> = {}) => {
 
 /**
  * 根据产出比状态设置行的CSS类名
- * @param _row 行数据（未使用，但MaterialScrollBoard组件要求此参数）
- * @param rowIndex 行索引
+ * @param row 行数据对象，包含 rowIndex（原始数据索引）
+ * @param _rowIndex 视觉索引（滚动后位置会变化，不使用）
  * @returns CSS类名
  */
-const getRowClassName = (_row: any, rowIndex: number): string => {
-  const status = rowStatusMap.value.get(rowIndex)
+const getRowClassName = (row: any, _rowIndex: number): string => {
+  const status = rowStatusMap.value.get(row.rowIndex)
   if (status === 'warning') {
     return 'output-ratio-warning'  // 预警：黄色
   } else if (status === 'alarm') {

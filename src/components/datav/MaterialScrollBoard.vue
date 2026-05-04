@@ -27,13 +27,12 @@
         <div
           v-for="(row, ri) in state.rows"
           :key="`${row.toString()}${row.scroll}`"
-          :class="['row-item', props.rowClassName ? props.rowClassName(row, ri) : '', getRowClass(row)]"
+          :class="['row-item', props.rowClassName ? props.rowClassName(row, ri) : '']"
           :style="`
             height: ${state.heights[ri]}px;
             line-height: ${state.heights[ri]}px;
             background-color: ${getRowBackgroundColor(row)};
           `"
-          :title="`行${ri}: 使用率=${row.ceils[7]}, 背景色=${getRowBackgroundColor(row)}`"
         >
           <div
             v-for="(ceil, ci) in row.ceils"
@@ -254,12 +253,6 @@
     });
     
     return normalColor;
-  }
-  
-  // 获取行CSS类名（取消红色判断）
-  function getRowClass(_row: any) {
-    // 不再进行红色判断，始终返回空字符串
-    return '';
   }
 
   function handleClick(ci: number, row: any, ceil: any) {

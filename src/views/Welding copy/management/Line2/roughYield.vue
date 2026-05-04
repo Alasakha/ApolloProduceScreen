@@ -1,7 +1,7 @@
 <template>
     <div class="yield-container" @click="openDetailDialog">
         <div class="yield-title">
-            <h3>毛坯直通率</h3>
+            <h3>毛坯直通率1</h3>
             <span class="click-note">(点击进入可以查看和编辑不合格问题明细)</span>
         </div>
         <div class="yield-content">

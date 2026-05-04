@@ -1,21 +1,38 @@
 <template>
   <div class="combined-trend">
-
   <div ref="chartRef" class="combined-chart" :style="{ height: compactHeight }"></div>
-
     <div v-if="showIssues" class="overlay" @click="closeIssues">
       <div class="issues-dialog" @click.stop>
-        <h3>{{ selectedMonth }} - Top 顶部不良</h3>
+        
+        <h3>{{ selectedWorkshop }} - {{ selectedMonth }} - Top 问题</h3>
         <div v-if="loading">加载中...</div>
         <div v-else>
-          <div v-if="issues.length">
-            <div v-for="(it, idx) in issues.slice(0,3)" :key="idx" class="issue-item">
-              <div class="issue-name">{{ it.ngName }}</div>
-              <div class="issue-ratio">{{ (it.ratio*100).toFixed(1) }}%</div>
-              <div class="issue-total">({{ it.total }})</div>
+          <!-- A类问题 -->
+          <div class="issue-section">
+            <div class="issue-section-title">A类</div>
+            <div v-if="issuesA.length">
+              <div v-for="(it, idx) in issuesA.slice(0,3)" :key="'a'+idx" class="issue-item">
+                <div class="issue-name">{{ it.ngName }}</div>
+                <div class="issue-type">{{ it.ngNatureType }}</div>
+                <div class="issue-ratio">{{ (it.ratio*100).toFixed(1) }}%</div>
+                <div class="issue-total">({{ it.total }})</div>
+              </div>
             </div>
+            <div v-else class="no-data">无数据</div>
           </div>
-          <div v-else>无数据</div>
+          <!-- 常规类问题 -->
+          <div class="issue-section">
+            <div class="issue-section-title">常规类</div>
+            <div v-if="issuesRegular.length">
+              <div v-for="(it, idx) in issuesRegular.slice(0,3)" :key="'r'+idx" class="issue-item">
+                <div class="issue-name">{{ it.ngName }}</div>
+                <div class="issue-type">{{ it.ngNatureType }}</div>
+                <div class="issue-ratio">{{ (it.ratio*100).toFixed(1) }}%</div>
+                <div class="issue-total">({{ it.total }})</div>
+              </div>
+            </div>
+            <div v-else class="no-data">无数据</div>
+          </div>
         </div>
         <div class="dialog-actions">
           <button @click="closeIssues">关闭</button>
@@ -26,10 +43,11 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch, nextTick, computed, defineProps } from 'vue'
+import { ref, onMounted, watch, nextTick, computed, defineProps, defineEmits } from 'vue'
 import * as echarts from 'echarts'
 import { useManufacturingStore } from '@/stores/manufacturing'
-import { getPaintingProblem } from '@/api/produceperformance'
+
+const emit = defineEmits(['workshop-click'])
 
 const chartRef = ref(null)
 let chartInstance = null
@@ -62,8 +80,10 @@ const titleText = computed(() => {
 })
 
 const showIssues = ref(false)
-const issues = ref([])
+const issuesA = ref([])
+const issuesRegular = ref([])
 const selectedMonth = ref('')
+const selectedWorkshop = ref('')
 const loading = ref(false)
 const compactHeight = computed(() => props.compact ? '140px' : '100%')
 
@@ -128,28 +148,52 @@ function initChart() {
     const { months } = buildSeriesAndCategories()
     const month = months[idx]
     if (!month) return
-    const startDay = `${month}-01`
-    // calculate endDay similar to before
-    const [y,mon] = month.split('-').map(Number)
-    const now = new Date()
-    const endDay = (y===now.getFullYear() && mon===now.getMonth()+1) ? `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}` : `${y}-${String(mon).padStart(2,'0')}-${String(new Date(y,mon,0).getDate()).padStart(2,'0')}`
-    await fetchIssues(startDay, endDay)
+    // 获取点击的车间名称
+    const workshopName = params.seriesName.replace(' 实际', '').replace(' 目标', '')
+    // 直接从 store 获取数据（页面加载时已请求）
+    fetchIssuesFromStore(workshopName)
     selectedMonth.value = month
+    selectedWorkshop.value = workshopName
     showIssues.value = true
   })
 }
 
-async function fetchIssues(startDay,endDay) {
-  loading.value = true
-  try {
-    const res = await getPaintingProblem(startDay,endDay)
-    if (res && res.code === 200 && res.data) {
-      // merge a and b
-      issues.value = [...(res.data.a||[]), ...(res.data.b||[])].sort((a,b)=>b.total-a.total)
-    } else issues.value = []
-  } catch(e) { issues.value = [] }
-  finally { loading.value = false }
+// 从 store 获取车间 Top 问题数据（页面加载时已请求）
+function fetchIssuesFromStore(workshopName) {
+  const workshopData = mstore.topIssueWorkshopData.find(item => item.workCenter === workshopName)
+  if (workshopData) {
+    issuesA.value = workshopData['A类'] || []
+    issuesRegular.value = workshopData['常规类'] || []
+  } else {
+    issuesA.value = []
+    issuesRegular.value = []
+  }
 }
+
+// 废弃：点击时不再请求，改为从 store 获取
+// async function fetchIssues(startDay, endDay, workshopName) {
+//   loading.value = true
+//   try {
+//     const res = await getTopIssueWorkshop(startDay, endDay)
+//     if (res && res.data && res.data.code === 200 && res.data.data) {
+//       const workshopData = res.data.data.find(item => item.workCenter === workshopName)
+//       if (workshopData) {
+//         issuesA.value = workshopData['A类'] || []
+//         issuesRegular.value = workshopData['常规类'] || []
+//       } else {
+//         issuesA.value = []
+//         issuesRegular.value = []
+//       }
+//     } else {
+//       issuesA.value = []
+//       issuesRegular.value = []
+//     }
+//   } catch(e) { 
+//     issuesA.value = []
+//     issuesRegular.value = []
+//   }
+//   finally { loading.value = false }
+// }
 
 function updateChart() {
   if (!chartInstance) return
@@ -199,7 +243,13 @@ function updateChart() {
 onMounted(async ()=>{ await nextTick(); initChart() })
 watch(()=>mstore.raw, ()=>updateChart(), { deep:true })
 
-function closeIssues(){ showIssues.value=false; issues.value=[]; selectedMonth.value='' }
+function closeIssues(){ 
+  showIssues.value = false
+  issuesA.value = []
+  issuesRegular.value = []
+  selectedMonth.value = ''
+  selectedWorkshop.value = ''
+}
 </script>
 
 <style scoped>
@@ -207,12 +257,17 @@ function closeIssues(){ showIssues.value=false; issues.value=[]; selectedMonth.v
 .combined-title{ color:#00d4ff; font-weight:600; text-align:center; padding-bottom:6px ;width: 100%; }
 .combined-chart{ flex:1; min-height:0 }
 .overlay{ position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; align-items:center; justify-content:center; z-index:1000 }
-.issues-dialog{ background:rgba(0,20,40,0.98); padding:12px; border-radius:6px; width:420px; color:#fff }
+.issues-dialog{ background:rgba(0,20,40,0.98); padding:12px; border-radius:6px; width:500px; color:#fff; max-height:80vh; overflow-y:auto }
+.issue-section{ margin-bottom:12px; padding-bottom:8px; border-bottom:1px dashed rgba(255,255,255,0.1) }
+.issue-section:last-child{ border-bottom:none; margin-bottom:0 }
+.issue-section-title{ color:#00d4ff; font-weight:bold; font-size:14px; margin-bottom:8px; padding-bottom:4px; border-bottom:1px solid rgba(0,212,255,0.3) }
 .issue-item{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px dashed rgba(255,255,255,0.04) }
 .issue-name{ color:#8cc8ff; flex:1 }
+.issue-type{ color:#ffaa00; width:80px; text-align:center }
 .issue-ratio{ color:#fff; width:60px; text-align:right }
 .issue-total{ color:#aaa; width:48px; text-align:right }
-.dialog-actions{ text-align:right; margin-top:8px }
+.no-data{ color:#666; text-align:center; padding:8px 0 }
+.dialog-actions{ text-align:right; margin-top:12px }
 .dialog-actions button{ background:#0a7; border-radius:4px; padding:6px 10px; color:#003 }
 </style>
 

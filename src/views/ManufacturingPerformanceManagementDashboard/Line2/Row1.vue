@@ -49,7 +49,7 @@
         <div class="metrics-row">
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度目标</div>
-            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">{{ customerData.yearly.target }}%</div>
+            <div class="metric-value text-[11px] sm:text-xs md:text-sm lg:text-base xl:text-lg 2xl:text-xl 3xl:text-2xl 4xl:text-3xl font-bold">65%</div>
           </div>
           <div class="metric-item">
             <div class="metric-label text-[8px] 2xl:text-[10px] 3xl:text-xs 4xl:text-sm">年度累计</div>

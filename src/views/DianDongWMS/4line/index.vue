@@ -44,7 +44,7 @@ const fetchData = () => {
       rawData.value[1] = res.data.zzek || [];
 
       const nextday = getNextDay();
-      name.value[0] = rawData.value[0].map((item: any) => [
+      name.value[0] = rawData.value[1].map((item: any) => [
         nextday,
         item.customerOrderNo,
         item.supplierCode,

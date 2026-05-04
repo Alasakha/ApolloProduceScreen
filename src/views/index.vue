@@ -18,10 +18,7 @@
 
         <!-- 走马灯第 1 组：前 5 个 -->
           <div class="small h-auto flex gap-4 flex-wrap pl-4 py-2">
-
-
         <!-- 走马灯第 3 组：第 8 ~ 11 个 -->
-     
             <button
               v-for="line in lines"
               :key="line.id"
@@ -30,8 +27,6 @@
             >
               {{ line.name }}
             </button>
-   
-  
     </div>
   </div>
 </div>
@@ -90,6 +85,11 @@ const lines = ref([
   { id: "", name: "冲压生产看板", router: "/newstampmanagement" },
   { id: "", name: "金工仓看板", router: "/jinggongwms" },
   { id: "", name: "销售仪表板", router: "/salesdashboard" },
+  { id: "MaterialDelivery", name: "物料配送看板", router: "/materialdeliverydashboard" },
+  { id: "PackagingOutbound", name: "包装成品发货管理看板", router: "/packagingoutbounddashboard" },
+  { id: "Welding2", name: "金工二部焊接生产管理看板", router: "/welding2dashboard" },
+  { id: "Welding2Paint", name: "金工二部涂装生产管理看板", router: "/welding2paintdashboard" },
+  { id: "ProductionPlanProgress", name: "生产计划进度", router: "/productionplanprogress" },
 ]);
 
 // 获取 lines 中指定范围的数据

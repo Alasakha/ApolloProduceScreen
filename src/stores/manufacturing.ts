@@ -1,6 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import { postNewFPY, postNewBarChartFPY, postNewOnTimeMonth, postNewOnTimeDay } from '@/api/getManufacturing'
+import { getTopIssueWorkshop } from '@/api/produceperformance'
 
 export const useManufacturingStore = defineStore('manufacturing', () => {
   const raw = ref<Record<string, any>>({})
@@ -11,6 +12,8 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
   const onTimeDayRaw = ref<Record<string, any>>({})
   const onTimeMonthLoading = ref(false)
   const onTimeDayLoading = ref(false)
+  const topIssueWorkshopData = ref<any[]>([])  // 车间Top问题数据
+  const topIssueLoading = ref(false)
 
   async function fetchNewFPY(startDay?: string, endDay?: string) {
     loading.value = true
@@ -75,6 +78,24 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
       }
     } finally {
       onTimeDayLoading.value = false
+    }
+  }
+
+  // 获取车间Top问题数据
+  async function fetchTopIssueWorkshop(startDay: string, endDay: string) {
+    topIssueLoading.value = true
+    try {
+      const res = await getTopIssueWorkshop(startDay, endDay)
+      if (res && res.code === 200 && res.data && res.data.code === 200) {
+        topIssueWorkshopData.value = res.data.data || []
+      } else {
+        topIssueWorkshopData.value = []
+      }
+    } catch (e) {
+      console.error('获取车间Top问题失败:', e)
+      topIssueWorkshopData.value = []
+    } finally {
+      topIssueLoading.value = false
     }
   }
 
@@ -168,10 +189,13 @@ export const useManufacturingStore = defineStore('manufacturing', () => {
     trendLoading,
     onTimeMonthLoading,
     onTimeDayLoading,
+    topIssueWorkshopData,
+    topIssueLoading,
     fetchNewFPY,
     fetchNewBarChartFPY,
     fetchOnTimeMonth,
     fetchOnTimeDay,
+    fetchTopIssueWorkshop,
     ...getters
   }
 })

@@ -27,7 +27,10 @@
         :device="device"
         :machineCode="device.macCode"
         :cycnDone="device.cycnDone"
+        :standardJp="device.standardJp"
+        :ecyct="device.ecyct"
       />
+      
     </div>
   </div>
 </template>
@@ -55,8 +58,8 @@ const fetchData = async () => {
         const hour = parseFloat(device.hourBetween || 0);
         return sum + power * hour;
       }, 0);
-      console.log(total)
-      powerStore.setTotalStandardPower(Number(total.toFixed(1)));
+        console.log(total)
+        powerStore.setTotalStandardPower(Number(total.toFixed(1)));
       loading.value = false;
     }
 

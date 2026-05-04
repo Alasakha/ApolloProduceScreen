@@ -23,6 +23,10 @@ import BudgetvsActualPerformanceDashboard from '@/views/BudgetvsActualPerformanc
 import EnergyMonitoringDashboard from '@/views/EnergyMonitoringDashboard/index.vue'
 import ManufacturingPerformanceManagementDashboard from '@/views/ManufacturingPerformanceManagementDashboard copy/index.vue'
 import PurchasePerformanceManagementDashboard from '@/views/PurchasePerformanceManagementDashboard/index.vue'
+import MaterialDeliveryDashboard from '@/views/MaterialDeliveryDashboard/index.vue'
+import PackagingOutboundDashboard from '@/views/PackagingOutboundDashboard/index.vue'
+import Welding2Dashboard from '@/views/Welding2Dashboard/index.vue'
+import Welding2PaintDashboard from '@/views/Welding2PaintDashboard/index.vue'
 const routes: RouteRecordRaw[] = [
   {
     path: '/',
@@ -181,6 +185,30 @@ const routes: RouteRecordRaw[] = [
     props: (route) => ({ prodLine: route.query.prodLine }) // 通过 query 获取 prodLine
   },
   {
+    path: '/materialdeliverydashboard',
+    name: 'MaterialDeliveryDashboard',
+    component: MaterialDeliveryDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine })
+  },
+  {
+    path: '/packagingoutbounddashboard',
+    name: 'PackagingOutboundDashboard',
+    component: PackagingOutboundDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine })
+  },
+  {
+    path: '/welding2dashboard',
+    name: 'Welding2Dashboard',
+    component: Welding2Dashboard,
+    props: (route) => ({ prodLine: route.query.prodLine })
+  },
+  {
+    path: '/welding2paintdashboard',
+    name: 'Welding2PaintDashboard',
+    component: Welding2PaintDashboard,
+    props: (route) => ({ prodLine: route.query.prodLine })
+  },
+  {
     path: '/control-board', // URL地址
     name: 'ControlBoard',   // 路由名
     component: () => import('@/views/ControlBoard/index.vue')
@@ -234,6 +262,11 @@ const routes: RouteRecordRaw[] = [
     path: '/salesdashboard',
     name: 'SalesDashboard',
     component: () => import('@/components/SalesDashboard/Dashboard.vue')
+  },
+  {
+    path: '/productionplanprogress',
+    name: 'ProductionPlanProgress',
+    component: () => import('@/views/ProductionPlanProgress/index.vue')
   },
 
 

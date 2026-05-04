@@ -1,5 +1,6 @@
 <template>
   <div class="line2-container w-full flex items-center px-4">
+
     <!-- 左侧：人员信息 -->
     <div class="left-section flex-1 h-full">
       <PersonnelInfo />
@@ -25,7 +26,7 @@ import EquipmentInfo from './components/EquipmentInfo.vue'
 
 <style scoped>
 .line2-container {
-  height: 6vh;
+  height: 3vh;
   min-height: 50px;
   gap: 1vw;
 }

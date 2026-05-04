@@ -44,7 +44,7 @@
         <div class="params-area">
           <div class="main-row">
             <div class="params-block">
-              <div class="param-row">
+              <!-- <div class="param-row">
                 <span class="param-label">温度：</span>
                 <span class="param-std"
                   >标准：{{
@@ -56,7 +56,7 @@
                     temperature !== null && temperature !== undefined && temperature !== "" ? temperature : "暂无数据"
                   }}</span
                 >
-              </div>
+              </div> -->
               <!-- <div class="param-row">
                 <span class="param-label">压力：</span>
                 <span class="param-std"
@@ -68,7 +68,7 @@
                   >实际值：{{ pressure !== null && pressure !== undefined && pressure !== "" ? pressure : "暂无数据" }}</span
                 >
               </div> -->
-              <div class="param-row">
+              <!-- <div class="param-row">
                 <span class="param-label">射速：</span>
                 <span class="param-std"
                   >标准：{{
@@ -77,6 +77,18 @@
                 >
                 <span class="param-act"
                   >实际值：{{ maxspeed !== null && maxspeed !== undefined && maxspeed !== "" ? maxspeed : "暂无数据" }}</span
+                >
+              </div> -->
+              <!-- 周期 -->
+              <div class="param-row">
+                <span class="param-label">周期：</span>
+                <span class="param-std"
+                  >标准：{{
+                    standardJp !== null && standardJp !== undefined && standardJp !== "" ? standardJp : "暂无标准"
+                  }}</span
+                >
+                <span class="param-act"
+                  >实际值：{{ ecyct !== null && ecyct !== undefined && ecyct !== "" ? ecyct : "暂无数据" }}</span
                 >
               </div>
               <!-- <div class="param-row">
@@ -123,7 +135,7 @@
       </div>
     </div>
     <!-- 警告区域 -->
-    <div v-if="allWarnings.length > 0" class="warning-area">
+    <div v-if="allWarnings && allWarnings.length > 0" class="warning-area">
       <div class="warning-title">
         <span>⚠ 警告</span>
       </div>
@@ -257,6 +269,20 @@ const props = defineProps({
   cycn: {
     type: number,
     default: ""
+  },
+  // 周期参数
+  ecYc: {
+    type: [Number, String],
+    default: null
+  },
+  // 标准周期 (standardJp 参数)
+  standardJp: {
+    type: [Number, String],
+    default: null
+  },
+  ecyct: {
+    type: [Number, String],
+    default: null
   }
 });
 
@@ -333,14 +359,14 @@ const allWarnings = computed(() => {
   const warnings = [];
 
   // 检查温度 (±15)
-  if (hasStrandData(props.stdTemperature) === "暂无标准") {
-    warnings.push("温度：暂无标准");
-  } else if (props.temperature) {
-    const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
-    if (diff > 15) {
-      warnings.push(`温度超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
-    }
-  }
+  // if (hasStrandData(props.stdTemperature) === "暂无标准") {
+  //   warnings.push("温度：暂无标准");
+  // } else if (props.temperature) {
+  //   const diff = Math.abs(Number(props.temperature) - Number(props.stdTemperature));
+  //   if (diff > 15) {
+  //     warnings.push(`温度超出偏差 (偏差: ${diff.toFixed(1)}℃)`);
+  //   }
+  // }
 
   // 检查压力 (±5%)
   // if (hasStrandData(props.stdPressure) === "暂无标准") {
@@ -355,43 +381,38 @@ const allWarnings = computed(() => {
   // }
 
   // 检查射速 (+5%)
-  if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
-    warnings.push("射速：暂无标准");
-  } else if (props.maxspeed) {
-    const stdValue = Number(props.stdMaxspeed);
-    // 计算偏差值：标准值 * 5%，向上取整
-    const deviationValue = stdValue * 0.05;
-    const roundedDeviation = Math.ceil(deviationValue);
-    
-    const actualValue = Number(props.maxspeed);
-    const lowerLimit = stdValue - roundedDeviation;
-    const upperLimit = stdValue + roundedDeviation;
-    
-    if (actualValue < lowerLimit || actualValue > upperLimit) {
-      const diff = actualValue - stdValue;
-      warnings.push(`射速超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}mm/s)`);
-    }
-  }
-
-  // 检查保压时间 (+5%)
-  // if (hasStrandData(props.stdKeeptime) === "暂无标准") {
-  //   warnings.push("保压时间：暂无标准");
-  // } else if (props.keeptime) {
-  //   const stdValue = Number(props.stdKeeptime);
+  // if (hasStrandData(props.stdMaxspeed) === "暂无标准") {
+  //   warnings.push("射速：暂无标准");
+  // } else if (props.maxspeed) {
+  //   const stdValue = Number(props.stdMaxspeed);
   //   // 计算偏差值：标准值 * 5%，向上取整
   //   const deviationValue = stdValue * 0.05;
   //   const roundedDeviation = Math.ceil(deviationValue);
     
-  //   const actualValue = Number(props.keeptime);
+  //   const actualValue = Number(props.maxspeed);
   //   const lowerLimit = stdValue - roundedDeviation;
   //   const upperLimit = stdValue + roundedDeviation;
     
   //   if (actualValue < lowerLimit || actualValue > upperLimit) {
   //     const diff = actualValue - stdValue;
-  //     warnings.push(`保压时间超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}%)`);
+  //     warnings.push(`射速超出偏差 (偏差: ${diff > 0 ? '+' : ''}${diff.toFixed(1)}mm/s)`);
   //   }
   // }
-  return warnings;
+
+// 检查周期 (超出标准就报警)
+if (!props.standardJp && props.standardJp !== 0) {
+  warnings.push("周期：暂无标准");
+} else if (props.ecyct !== null && props.ecyct !== undefined && props.ecyct !== "") {
+  const stdValue = Number(props.standardJp);
+  const actualValue = Number(props.ecyct);
+
+  if (actualValue > stdValue) {
+    const diff = actualValue - stdValue;
+    warnings.push(`周期超出标准 (偏差: +${diff.toFixed(1)}s)`);
+  }
+}
+
+return warnings;
 });
 </script>
 

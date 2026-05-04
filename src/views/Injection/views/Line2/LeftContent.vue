@@ -102,6 +102,28 @@
       </dv-border-box-12>
     </div>
 
+    <!-- 关键设备稼动率 -->
+    <div class="grid grid-cols-6 gap-2 h-full mt-2">
+      <dv-border-box-12 class="data-box">
+        <Datacard title="月度目标" EnlishTitle="Target" value="85%" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box">
+        <Datacard title="月度实际稼动率" EnlishTitle="MonthOperation" :value="keyMachineData.monthOperation + '%'" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box">
+        <Datacard title="月度达标率" EnlishTitle="MonthRatio" :value="keyMachineData.monthRatio + '%'" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box">
+        <Datacard title="今日目标" EnlishTitle="Target" value="85%" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box">
+        <Datacard title="今日实际稼动率" EnlishTitle="DayOperation" :value="keyMachineData.dayOperation + '%'" />
+      </dv-border-box-12>
+      <dv-border-box-12 class="data-box">
+        <Datacard title="今日达标率" EnlishTitle="DayRatio" :value="keyMachineData.dayRatio + '%'" />
+      </dv-border-box-12>
+    </div>
+
   </div>
  
 </template>
@@ -111,7 +133,7 @@ import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { useRoute } from 'vue-router'
 import { eventBus } from '@/utils/eventbus'
 import Datacard from './components/Datacard.vue'
-import { getMonthCompleteGd, getTodayPlanComplete } from '@/api/getInjection'
+import { getMonthCompleteGd, getTodayPlanComplete, getKeyMachineOperation } from '@/api/getInjection'
 
 const route = useRoute()
 const prodLine = route.query.prodLine as string
@@ -136,11 +158,20 @@ const workOrderData = ref({
   todayClosingRate: 0
 })
 
+// 关键设备稼动率数据
+const keyMachineData = ref({
+  monthOperation: 0,
+  monthRatio: 0,
+  dayOperation: 0,
+  dayRatio: 0
+})
+
 const fetchData = async (_prodLine) => {
   try {
-    const [todayRes, monthRes] = await Promise.all([
+    const [todayRes, monthRes, operationRes] = await Promise.all([
       getTodayPlanComplete(),
-      getMonthCompleteGd('注塑车间')
+      getMonthCompleteGd('注塑车间'),
+      getKeyMachineOperation(1)
     ])
 
     if (todayRes && todayRes.code === 200 && todayRes.data) {
@@ -176,6 +207,19 @@ const fetchData = async (_prodLine) => {
       workOrderData.value.todayPlanOrders = todayPlanOrders
       workOrderData.value.todayCompletedOnTime = todayCompletedOnTime
       workOrderData.value.todayClosingRate = todayClosingRateCalc
+    }
+
+    if (operationRes && operationRes.code === 200 && Array.isArray(operationRes.data)) {
+      const monthItem = operationRes.data.find(item => item.label === 'MONTH')
+      const dayItem = operationRes.data.find(item => item.label === 'DAY')
+      if (monthItem) {
+        keyMachineData.value.monthOperation = Math.round(parseFloat(monthItem.operation) * 10000) / 100
+        keyMachineData.value.monthRatio = Math.round(parseFloat(monthItem.ratio) * 10000) / 100
+      }
+      if (dayItem) {
+        keyMachineData.value.dayOperation = Math.round(parseFloat(dayItem.operation) * 10000) / 100
+        keyMachineData.value.dayRatio = Math.round(parseFloat(dayItem.ratio) * 10000) / 100
+      }
     }
   } catch (error) {
     console.error('获取数据失败:', error)

@@ -140,9 +140,11 @@ function calculateRate(numerator: number, denominator: number): string {
 
 // 转换工单结单率接口数据为面板数据
 function transformOrderSettlementData(
-  apiData: OrderSettlementItem[],
-  department: '金工一部' | '金工二部'
+  apiData: OrderSettlementItem[]
+  
 ): Partial<PanelData> {
+
+console.log('原始工单结单率接  口数据:', apiData)  
 
   // 按客户类型分组计算
   const aClassData = apiData.filter(item => item.customer === 'A')
@@ -167,9 +169,9 @@ function transformOrderSettlementData(
   }, 0)
   const regularRate = calculateRate(regularCompletedTotal, regularPlanTotal)
   
-  // 根据部门设置目标值
-  const aClassTarget = department === '金工一部' ? '100%' : '100%'
-  const regularTarget = department === '金工一部' ? '95%' : '95%'
+  // 从接口返回的 target 字段获取目标值，如果没有则使用默认值
+  const aClassTarget = aClassData[0]?.target ? `${aClassData[0].target}%` : '100%'
+  const regularTarget = regularData[0]?.target ? `${regularData[0].target}%` : '95%'
   
   return {
     description: [
@@ -186,7 +188,6 @@ function transformOrderSettlementData(
       { label: '目标达成率', value: regularRate },
      
     ]
-    // 注意：chartData 需要其他接口或历史数据，暂时保持原有数据
   }
 }
 
@@ -213,7 +214,7 @@ async function fetchDepartment1OrderSettlement() {
     const response = await getOrderSettlementPerformance('金工一部焊接', startDate, endDate)
     
     if (response.code === 200 && response.data?.orderSettlement) {
-      const transformedData = transformOrderSettlementData(response.data.orderSettlement, '金工一部')
+      const transformedData = transformOrderSettlementData(response.data.orderSettlement)
       // 更新第一个面板（工单结单率）的数据
       if (department1Panels.value[0]) {
         department1Panels.value[0].description = transformedData.description || []
@@ -233,7 +234,7 @@ async function fetchDepartment2OrderSettlement() {
     const response = await getOrderSettlementPerformance('金工二部焊接', startDate, endDate)
     
     if (response.code === 200 && response.data?.orderSettlement) {
-      const transformedData = transformOrderSettlementData(response.data.orderSettlement, '金工二部')
+      const transformedData = transformOrderSettlementData(response.data.orderSettlement)
       // 更新第一个面板（工单结单率）的数据
       if (department2Panels.value[0]) {
         department2Panels.value[0].description = transformedData.description || []

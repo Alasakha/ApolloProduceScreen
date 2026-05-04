@@ -1,3 +1,4 @@
+
 import request from '../utils/request'
 
 // /report/orderSettlement_performance 开始日期取本月第一天  结束日期取今天   workCenter：总装一课 总装二课 金工一部焊接 金工二部焊接
@@ -149,11 +150,11 @@ export interface QualityReportPerformanceTrendResponse {
 
 
 // /quality/topDayCategory?prodLine=10041005&dayStart=2025-10-01&dayEnd=2025-11-01 开始日期取本月第一天  结束日期取今天   总之一课装配prodLine：1004  总之一课包装1005  总装二课装配：2004 总装二课包装：2005
-export const getTopDayCategory = (prodLine: string | number, dayStart: string, dayEnd: string) => {
+export const getTopDayCategory = (prodLine: string | number, startDay: string, endDay: string) => {
   return request({
     url: '/quality/topDayCategory',
     method: 'get',
-    params: { prodLine, dayStart, dayEnd }
+    params: { prodLine, startDay, endDay}
   })
 }
 
@@ -289,6 +290,8 @@ export interface PassRateChongyaItem {
 export interface PassRatePerformanceData {
   hjPassRate_a: number | null
   hjPassRate_normal: number | null
+  target_a: number | null  // A类目标直通率，如 95 表示 95%
+  target_normal: number | null  // 常规类目标直通率，如 93 表示 93%
   painting_a: PassRatePaintingItem[]
   painting_normal: PassRatePaintingItem[]
   chongya: PassRateChongyaItem[]

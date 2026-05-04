@@ -12,7 +12,7 @@
           </div>
           <!-- 关键设备稼动率 -->
           <div class="section-middle">
-            <EquipmentUtilizationRate @open-charts-dialog="openChartsDialog" />
+            <WorkshopUtilizationSummary @open-charts-dialog="openChartsDialog" />
           </div>
           <!-- 易发生故障设备统计 -->
           <div class="section-bottom">
@@ -63,7 +63,7 @@
 import { ref } from 'vue'
 import Header from './Header/index.vue'
 import EquipmentData from './components/EquipmentData.vue'
-import EquipmentUtilizationRate from './components/EquipmentUtilizationRate.vue'
+import WorkshopUtilizationSummary from './components/WorkshopUtilizationSummary.vue'
 import EquipmentUtilizationRateCharts from './components/EquipmentUtilizationRateCharts.vue'
 import FaultTrendChart from './components/FaultTrendChart.vue'
 import EquipmentInfo from './components/EquipmentInfo.vue'

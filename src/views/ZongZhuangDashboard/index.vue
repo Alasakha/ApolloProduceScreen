@@ -166,7 +166,11 @@ function transformOrderSettlementData(
   // 按客户类型分组计算
   const aClassData = apiData.filter(item => item.customer === 'A')
   const regularData = apiData.filter(item => item.customer === '常规')
-  
+
+console.log(aClassData, regularData)
+
+
+
   // A类数据计算
   const aClassPlanTotal = aClassData.reduce((sum, item) => {
     return sum + parseInt(item.productionQuantity || '0', 10)
@@ -187,15 +191,18 @@ function transformOrderSettlementData(
   
   // 定义目标结单率标准值
   const standards = {
-    '总装一课': { A: 100, 常规: 95 },
-    '总装二课': { A: 100, 常规: 95 }
+    '总装一课': { A: aClassData[0]?.target, 常规: regularData[0]?.target },
+    '总装二课': { A: aClassData[0]?.target, 常规: regularData[0]?.target }
   }
+
+
+
   const aClassTargetRate = standards[department].A + '%'
   const regularTargetRate = standards[department].常规 + '%'
   
   return {
     description: [
-    { label: '工单完结率目标', value: aClassTargetRate },
+      { label: '工单完结率目标', value: aClassTargetRate },
       { label: 'A类:月度累计排产工单', value: formatNumber(aClassPlanTotal) },
       { label: '累计准交工单', value: formatNumber(aClassCompletedTotal) },
       { label: '目标达成率', value: aClassRate },
@@ -238,6 +245,7 @@ async function fetchDepartment1OrderSettlement() {
         department1Panels.value[0].description = transformedData.description || []
       }
       console.log('✅ 总装一课工单结单率数据获取成功')
+      
     } else {
       console.warn('获取总装一课工单结单率数据失败:', response.message)
     }
@@ -251,13 +259,13 @@ async function fetchDepartment1OrderSettlement() {
 // 获取总装二课工单结单率数据
 async function fetchDepartment2OrderSettlement() {
   try {
-
     department2Loading.value['1'] = true
     const { startDate, endDate } = getDateRange()
     const response = await getOrderSettlementPerformance('总装二课', startDate, endDate)
     
     if (response.code === 200 && response.data?.orderSettlement) {
       const transformedData = transformOrderSettlementData(response.data.orderSettlement, '总装二课')
+      console.log('transformedData:', transformedData)
       // 更新第一个面板（工单结单率）的数据
       if (department2Panels.value[0]) {
         department2Panels.value[0].description = transformedData.description || []

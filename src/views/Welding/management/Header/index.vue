@@ -1,19 +1,21 @@
 <template>
   <!-- 留出标题的高度 -->
    <!-- <div class="h-[3vh] w-full flex justify-center items-center"></div> -->
-  <div class="h-[7vh] w-full flex justify-center items-center pl-1">
+  <div class="h-[10vh] w-full flex justify-center items-center pl-1">
   <Currenttime class="flex-1"></Currenttime>
   <logo class="flex-1"></logo>
   <HeaderTitle class="flex-2"></HeaderTitle>
-  <weather class="flex-2"></weather> 
+  <!-- <weather class="flex-2"></weather> -->
+  <UtilizationRate class="flex-2" :type="3"></UtilizationRate>
   </div>
 </template>
 
 <script setup lang="ts">
 import logo from './views/logo.vue';
 import HeaderTitle from './views/title.vue';
-import weather from './views/weather.vue';
+// import weather from './views/weather.vue';
 import Currenttime from './views/time.vue';
+import UtilizationRate from './views/utilizationRate.vue';
 </script>
 
 <style scoped>

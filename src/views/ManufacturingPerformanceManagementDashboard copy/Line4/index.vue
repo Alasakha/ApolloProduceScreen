@@ -174,6 +174,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import { useProductionDataStore } from '@/store/productionData'
+import { useManufacturingStore } from '@/stores/manufacturing'
 import ReasonDialog from '../component/ReasonDialog.vue'
 import ReasonDialog_produce from '../component/ReasonDialog_produce.vue'
 import { fillInReason } from '@/api/produceperformance'
@@ -185,11 +186,25 @@ const codeRef = ref('')
 const codeRef_produce = ref('')
 // 使用生产数据store
 const productionStore = useProductionDataStore()
+const manufacturingStore = useManufacturingStore()
 const currentMetricInfo = ref({})
 const currentMetricInfo_produce = ref({})
+
+// 获取车间Top问题数据
+const fetchTopIssueData = () => {
+  const today = new Date()
+  const year = today.getFullYear()
+  const month = today.getMonth() + 1
+  const day = today.getDate()
+  const startDay = `${year}-${String(month).padStart(2, '0')}-01`
+  const endDay = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}`
+  manufacturingStore.fetchTopIssueWorkshop(startDay, endDay)
+}
+
 // 启动数据获取和自动刷新
 onMounted(() => {
   productionStore.startAutoRefresh()
+  fetchTopIssueData()
 })
 
 // 清理定时器
@@ -310,11 +325,6 @@ const showManufacturingCostDailyReasonDialog = () => {
   codeRef_produce.value = 'COST'
   reasonDialogVisible_produce.value = true
 }
-
-
-
-
-
 
 
 // 提交原因/对策

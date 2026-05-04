@@ -6,6 +6,7 @@ import Line2 from './Line2/index.vue'
 import Line3 from './Line3/index.vue'
 // import Bottom from './Bottom/index.vue'
 import { BorderBox11 as DvBorderBox11 } from '@kjgl77/datav-vue3'
+import Line2KeyMachine from './Line2/KeyMachine.vue'
 
 onMounted(() => {
   window.dispatchEvent(new Event('resize'));
@@ -20,6 +21,7 @@ onMounted(() => {
 
      <Header></Header>
      <!-- <Line1></Line1> -->
+    <Line2KeyMachine></Line2KeyMachine>
     <Line2></Line2>
     <Line3></Line3>
     <!-- <Bottom></Bottom> -->

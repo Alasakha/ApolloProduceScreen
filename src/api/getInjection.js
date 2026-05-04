@@ -284,6 +284,38 @@ export const getZhsProductMonitoring = () => {
       //     ]
       //   }
       // }
+// curl -X 'GET' \
+//   'http://192.168.1.197:10999/apollo/injection/keyMachineOperation?type=1' \
+//   -H 'accept: */*'
+// {
+//   "code": 200,
+//   "data": [
+//     {
+//       "label": "MONTH",
+//       "target": "0.85",
+//       "startup": "1064.19",
+//       "standard_startup": "2314.34",
+//       "operation": "0.4598",
+//       "ratio": "0.5410"
+//     },
+//     {
+//       "label": "DAY",
+//       "target": "0.85",
+//       "startup": "3.68",
+//       "standard_startup": "4",
+//       "operation": "0.92",
+//       "ratio": "1.08"
+//     }
+//   ]
+// }
+export const getKeyMachineOperation = (type) => {
+  return request({
+    url: '/injection/keyMachineOperation',
+    method: 'get',
+    params: { type },
+  })
+}
+
 export const getInputOutput = (startDay,endDay) => {
   return request({
     url: '/injection/inputOutput',

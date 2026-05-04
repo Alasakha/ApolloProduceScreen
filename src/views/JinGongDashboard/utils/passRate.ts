@@ -1,15 +1,15 @@
 // 金工直通率数据工具函数
 import type { PassRatePerformanceData } from '@/api/getMesInfo'
 
-// 部门标准配置
-const DEPARTMENT_STANDARDS = {
+// 部门默认标准配置（当接口未返回目标时使用）
+const DEPARTMENT_DEFAULT_STANDARDS = {
   '金工一部': {
-    aClass: 95, // A类标准直通率 75%
-    regular: 93 // 常规标准直通率 72%
+    aClass: 95, // A类默认标准直通率
+    regular: 93 // 常规默认标准直通率
   },
   '金工二部': {
-    aClass: 95, // A类标准直通率 75%
-    regular: 93 // 常规标准直通率 72%
+    aClass: 95, // A类默认标准直通率
+    regular: 93 // 常规默认标准直通率
   }
 } as const
 
@@ -67,22 +67,25 @@ export function transformPassRateData(
 ): {
   description: Array<{ label: string; value: string }>
 } {
-  const standards = DEPARTMENT_STANDARDS[department]
+  // 从接口返回的 target 字段获取目标值，如果没有则使用默认值
+  const defaults = DEPARTMENT_DEFAULT_STANDARDS[department]
+  const aClassTarget = apiData.target_a ?? defaults.aClass
+  const regularTarget = apiData.target_normal ?? defaults.regular
   
   // 计算实际直通率
   const aClassActual = calculateAClassThroughput(apiData)
   const regularActual = calculateRegularThroughput(apiData)
   
   // 计算达成率
-  const aClassAchievement = calculateAchievementRate(aClassActual * 100, standards.aClass)
-  const regularAchievement = calculateAchievementRate(regularActual * 100, standards.regular)
+  const aClassAchievement = calculateAchievementRate(aClassActual * 100, aClassTarget)
+  const regularAchievement = calculateAchievementRate(regularActual * 100, regularTarget)
   
   return {
     description: [
-      { label: 'A类直通率目标', value: standards.aClass + '%' },
+      { label: 'A类直通率目标', value: aClassTarget + '%' },
       { label: 'A类月度累计直通率', value: formatPercent(aClassActual) },
       { label: '目标达成率', value: aClassAchievement },
-      { label: '常规直通率目标', value: standards.regular + '%' },
+      { label: '常规直通率目标', value: regularTarget + '%' },
       { label: '常规月度累计直通率', value: formatPercent(regularActual) },
       { label: '目标达成率', value: regularAchievement }
     ]
