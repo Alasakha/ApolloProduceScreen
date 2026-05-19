@@ -12,18 +12,18 @@
 
           <!-- AGV1 -->
           <div class="agv-card">
-            <div class="agv-title">1004A 工位</div>
+            <div class="agv-title">AGV 1号车</div>
             <div class="agv-metrics">
               <div class="metric-item">
-                <span class="metric-label">需求工位数:</span>
+                <span class="metric-label">1号车需求工位数:</span>
                 <span class="metric-value">{{ agv1.planQty }}</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">完成工位数:</span>
+                <span class="metric-label">1号车完成工位数:</span>
                 <span class="metric-value">{{ agv1.completedQty }}</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">完成率:</span>
+                <span class="metric-label">1号车完成率:</span>
                 <span class="metric-value highlight">{{ agv1.ratio }}</span>
               </div>
             </div>
@@ -31,18 +31,18 @@
 
           <!-- AGV2 -->
           <div class="agv-card">
-            <div class="agv-title">1004B 工位</div>
+            <div class="agv-title">AGV 2号车</div>
             <div class="agv-metrics">
               <div class="metric-item">
-                <span class="metric-label">需求工位数:</span>
+                <span class="metric-label">2号车需求工位数:</span>
                 <span class="metric-value">{{ agv2.planQty }}</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">完成工位数:</span>
+                <span class="metric-label">2号车完成工位数:</span>
                 <span class="metric-value">{{ agv2.completedQty }}</span>
               </div>
               <div class="metric-item">
-                <span class="metric-label">完成率:</span>
+                <span class="metric-label">2号车完成率:</span>
                 <span class="metric-value highlight">{{ agv2.ratio }}</span>
               </div>
             </div>

@@ -90,12 +90,12 @@
       
               <th class="title">业务数量</th>
               <th class="title">审核日期</th>
-              <th class="title">计划货日期</th>
+              <th class="title">计划交货日期</th>
               <th class="title">生产进度详情</th>
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(item, index) in orderList" :key="index" :class="{ 'row-highlight': index % 2 === 0 }">
+            <tr v-for="(item, index) in orderList" :key="index" :class="{ 'row-highlight': index % 2 === 0, 'row-overdue': isOverdue(item), 'row-due-soon': isDueSoon(item) }">
               <td class="col-center">{{ item.sequenceNumber }}</td>
               <td class="col-salesman">{{ item.employee_name || '-' }}</td>
               <td class="col-code">{{ item.gdh || '-' }}</td>
@@ -271,6 +271,30 @@ const getOverallProgress = (item: any) => {
     total += (item[step.key] || 0) * weights[idx]
   })
   return Math.round(total * 100)
+}
+
+// 是否超期：今日 > 计划发货日期
+const isOverdue = (item: any) => {
+  const planDate = item.planDeliveryDate
+  if (!planDate) return false
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const delivery = new Date(planDate)
+  delivery.setHours(0, 0, 0, 0)
+  return today > delivery
+}
+
+// 是否三天内预警：今日 >= (计划发货日期 - 3天) 且 未超期
+const isDueSoon = (item: any) => {
+  const planDate = item.planDeliveryDate
+  if (!planDate) return false
+  const today = new Date()
+  today.setHours(0, 0, 0, 0)
+  const delivery = new Date(planDate)
+  delivery.setHours(0, 0, 0, 0)
+  const threshold = new Date(delivery)
+  threshold.setDate(threshold.getDate() - 3)
+  return today >= threshold && today <= delivery
 }
 
 // 跳转页码
@@ -990,6 +1014,44 @@ onUnmounted(() => {
 .status-2 { background: rgba(255, 204, 0, 0.2); color: #ffcc00; }
 .status-3 { background: rgba(0, 255, 136, 0.2); color: #00ff88; }
 .status-4 { background: rgba(255, 102, 102, 0.2); color: #ff6666; }
+
+.row-overdue {
+  background: rgba(255, 50, 50, 0.12) !important;
+  animation: overduePulse 1.5s ease-in-out infinite;
+}
+.row-overdue td {
+  color: #ff6b6b !important;
+}
+.row-overdue td.col-date {
+  color: #ff4444 !important;
+  font-weight: bold;
+}
+.row-overdue td.col-order {
+  color: #ff6b6b !important;
+}
+
+/* 三天内预警 - 橙色 */
+.row-due-soon {
+  background: rgba(255, 160, 0, 0.1) !important;
+  animation: dueSoonPulse 1.5s ease-in-out infinite;
+}
+.row-due-soon td {
+  color: #ffaa00 !important;
+}
+.row-due-soon td.col-date {
+  color: #ff8800 !important;
+  font-weight: bold;
+}
+
+@keyframes dueSoonPulse {
+  0%, 100% { background: rgba(255, 160, 0, 0.06); }
+  50% { background: rgba(255, 160, 0, 0.14); }
+}
+
+@keyframes overduePulse {
+  0%, 100% { background: rgba(255, 50, 50, 0.08); }
+  50% { background: rgba(255, 50, 50, 0.18); }
+}
 
 .empty-cell {
   text-align: center;

@@ -139,10 +139,11 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import Header from './Header/index.vue'
 import CommonScrollTable from '@/components/CommonScrollTable/index.vue'
-import { getOutboundShipping, getOutboundShippingDetail, getInventoryInformation, getInventoryInformationDetail, fillDataAnalysis } from '@/api/getPmcinfo'
+import { getOutboundShipping, getOutboundShippingDetail, getInventoryInformation, getInventoryInformationDetail, fillDataAnalysis ,getoutboundShippingDetail3day} from '@/api/getPmcinfo'
 // 出库发货表格列配置 - 匹配 outboundShippingDetail API
 const outboundColumns = [
-  { prop: 'doc_no', label: '工单号', width: '150px' },
+  { prop: 'doc_no', label: '销售订单号', width: '150px' },
+  { prop: 'customer_order_no', label: '客户单号', width: '150px' },
   { prop: 'item_name', label: '产品名称', width: '200px' },
   { prop: 'cx', label: '车型', width: '100px' },
   { prop: 'business_qty', label: '应发数量', width: '80px', align: 'center' as const },
@@ -150,23 +151,17 @@ const outboundColumns = [
   { prop: 'approvedate', label: '审批时间', width: '160px' }
 ]
 
-// 生产状况表格列配置
+// 近三天出货订单列配置 - 与今日出库发货信息一致
 const productionColumns = [
-  { prop: 'customerOrderNo', label: '客户单号', width: '140px' },
-  { prop: 'vehicleModel', label: '车型名称', width: '100px' },
-  { prop: 'plannedOutboundTime', label: '计划出库时间', width: '130px' },
-  {
-    prop: 'productionStatus',
-    label: '生产状态',
-    width: '90px',
-    type: 'status' as const,
-    statusMap: {
-      '已完工': 'status-completed',
-      '生产中': 'status-producing',
-      '待投产': 'status-pending'
-    }
-  },
-  { prop: 'progress', label: '完成进度', width: '120px', type: 'progress' as const }
+  { prop: 'doc_no', label: '销售订单号', width: '150px' },
+  { prop: 'customer_order_no', label: '客户单号', width: '150px' },
+  { prop: 'item_name', label: '产品名称', width: '200px' },
+  { prop: 'cx', label: '车型', width: '100px' },
+  { prop: 'item_specification', label: '规格', width: '280px' },
+  { prop: 'business_qty', label: '应发数量', width: '80px', align: 'center' as const },
+  { prop: 'sign_business_qty', label: '实发数量', width: '80px', align: 'center' as const },
+  { prop: 'plan_settlement_date', label: '计划结算日期', width: '120px' },
+  { prop: 'approvedate', label: '审批时间', width: '160px' }
 ]
 
 // 库存明细表格列配置 - 匹配 inventoryInformationDetail API
@@ -174,7 +169,7 @@ const inventoryColumns = [
 
     { prop: 'mo_doc_no', label: '工单号', width: '120px' },
   { prop: 'udf021', label: '客户单号', width: '120px' },
-  { prop: 'user_name', label: '业务员', width: '100px' },
+  // { prop: 'user_name', label: '业务员', width: '100px' },
   { prop: 'item_specification', label: '规格', width: '300px' },
   { prop: 'cx', label: '车型', width: '100px' },
   // { prop: 'business_qty', label: '数量', width: '80px', align: 'center' as const },
@@ -256,14 +251,7 @@ const confirmEdit = async () => {
 const todayOutboundData = ref<any[]>([])
 
 // 近三天出货订单
-const upcomingOrders = ref([
-  { customerOrderNo: 'CO20260418001', vehicleModel: 'Model-B', plannedOutboundTime: '2026-04-18 10:00', productionStatus: '生产中', progress: 75 },
-  { customerOrderNo: 'CO20260418002', vehicleModel: 'Model-C', plannedOutboundTime: '2026-04-18 14:00', productionStatus: '已完工', progress: 100 },
-  { customerOrderNo: 'CO20260419001', vehicleModel: 'Model-A', plannedOutboundTime: '2026-04-19 09:00', productionStatus: '生产中', progress: 45 },
-  { customerOrderNo: 'CO20260419002', vehicleModel: 'Model-B', plannedOutboundTime: '2026-04-19 16:00', productionStatus: '待投产', progress: 0 },
-  { customerOrderNo: 'CO20260420001', vehicleModel: 'Model-C', plannedOutboundTime: '2026-04-20 11:00', productionStatus: '生产中', progress: 20 },
-  { customerOrderNo: 'CO20260420002', vehicleModel: 'Model-A', plannedOutboundTime: '2026-04-20 15:00', productionStatus: '待投产', progress: 0 }
-])
+const upcomingOrders = ref([])
 
 // 库存指标 - 使用API数据
 const inventoryMetrics = ref({
@@ -344,6 +332,22 @@ const loadInventoryDetail = async () => {
   }
 }
 
+// 加载近三天出货订单生产状况数据
+const loadoutboundShippingDetail3day = async () => {
+  try {
+    const res: any = await getoutboundShippingDetail3day()
+    if (res.code === 200 && res.data) {
+      upcomingOrders.value = res.data.map((item: any) => ({
+        ...item,
+        plan_settlement_date: item.plan_settlement_date ? item.plan_settlement_date.split(' ')[0] : '--',
+        approvedate: item.approvedate ? item.approvedate.split('.')[0] : '--'
+      }))
+    }
+  } catch (error) {
+    console.error('获取近三天出货订单数据失败：', error)
+  }
+}
+
 let refreshTimer: number | null = null
 
 onMounted(() => {
@@ -352,6 +356,7 @@ onMounted(() => {
   loadOutboundDetail()
   loadInventoryInfo()
   loadInventoryDetail()
+  loadoutboundShippingDetail3day()
 
   // 每30秒刷新一次数据
   refreshTimer = window.setInterval(() => {

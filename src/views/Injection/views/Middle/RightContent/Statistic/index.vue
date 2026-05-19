@@ -29,6 +29,9 @@
         :cycnDone="device.cycnDone"
         :standardJp="device.standardJp"
         :ecyct="device.ecyct"
+        :pmcPcHour="device.pmcPcHour"
+        :actualHour="device.actualHour"
+        :operationRatio="device.operationRatio"
       />
       
     </div>

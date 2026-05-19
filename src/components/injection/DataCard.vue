@@ -91,6 +91,13 @@
                   >实际值：{{ ecyct !== null && ecyct !== undefined && ecyct !== "" ? ecyct : "暂无数据" }}</span
                 >
               </div>
+
+                <div class="param-row">
+                <span class="param-std-machine">计划加工时长：{{ pmcPcHour ? pmcPcHour.toFixed(1) : '暂无数据' }}</span>
+                <span class="param-std-machine">实际加工时长：{{ actualHour ? actualHour.toFixed(1) : '暂无数据' }}</span>
+                <span class="param-std-machine">稼动率：{{ (operationRatio * 100).toFixed(2) }}%</span>
+              </div>
+              
               <!-- <div class="param-row">
                 <span class="param-label">保压时间：</span>
                 <span class="param-std"
@@ -281,6 +288,18 @@ const props = defineProps({
     default: null
   },
   ecyct: {
+    type: [Number, String],
+    default: null
+  },
+  pmcPcHour: {
+    type: [Number, String],
+    default: null
+  },
+  actualHour: {
+    type: [Number, String],
+    default: null
+  },
+  operationRatio: {
     type: [Number, String],
     default: null
   }
@@ -633,6 +652,14 @@ return warnings;
   text-align: center;
   font-size: 1em;
   background: rgba(255, 215, 0, 0.1);
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+.param-std-machine{
+  color: #ffffff;
+  text-align: center;
+  font-size: 1em;
+  background: rgba(141, 22, 221, 0.384);
   padding: 2px 6px;
   border-radius: 4px;
 }

@@ -591,11 +591,14 @@ async function fetchDepartment2OrderSettlementTrend() {
 function transformEfficiencyData(
   assemblyData: GetMesInfoResponse | null,
   packagingData: GetMesInfoResponse | null = null,
-  standard: number = 89
+  target?: number
 ): Partial<PanelData> {
   if (!assemblyData?.data) {
     return {}
   }
+
+  // 从接口获取目标值，如果没有则默认 90
+  const standard = target ?? assemblyData.data.target ?? 90
 
   const assemblyPcDays = assemblyData.data.pcDays || 0
   const assemblyAchieveDays = assemblyData.data.achieveDays || 0
@@ -613,8 +616,8 @@ function transformEfficiencyData(
   const actualAchievementNum = totalPcDays > 0 
     ? (totalAchieveDays / totalPcDays * 100)
     : 0
-  const achievementRate = standard > 0
-    ? (actualAchievementNum / standard * 100).toFixed(1) + '%'
+  const achievementRate = Number(standard) > 0
+    ? (actualAchievementNum / Number(standard) * 100).toFixed(1) + '%'
     : '0%'
 
   return {
@@ -638,8 +641,7 @@ async function fetchDepartment1Efficiency() {
     if (response.code === 200) {
       const transformedData = transformEfficiencyData(
         response as GetMesInfoResponse,
-        null,
-        89
+        null
       )
       
       // 更新第三个面板（人效达成率）的数据
@@ -669,8 +671,7 @@ async function fetchDepartment2Efficiency() {
     if (response.code === 200) {
       const transformedData = transformEfficiencyData(
         response as GetMesInfoResponse,
-        null,
-        89
+        null
       )
       
       // 更新第三个面板（人效达成率）的数据

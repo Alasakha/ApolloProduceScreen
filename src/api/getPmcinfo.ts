@@ -172,6 +172,14 @@ export const getInventoryInformation = () => {
   })
 }
 
+// 库存信息
+export const getoutboundShippingDetail3day = () => {
+  return request({
+    url: '/PMC/outboundShippingDetail_3day',
+    method: 'get',
+  })
+}
+
 // 库存信息明细
 export const getInventoryInformationDetail = () => {
   return request({

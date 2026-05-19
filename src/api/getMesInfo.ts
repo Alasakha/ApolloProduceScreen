@@ -75,6 +75,7 @@ export interface GetMesInfoResponse {
     pcDays: number //月度累计排产天数
     achieveDays: number //月度人效达成天数
     achieveRate: string  //人效达成率
+    target: string //人效达成率目标值
   }
 }
 
@@ -451,3 +452,58 @@ export interface EfficiencyJgPerformanceTrendResponse {
     [monthKey: string]: EfficiencyJgPerformanceTrendMonthData
   }
 }
+
+
+// 直通率接口（焊装）
+// /report/passRate?prodLine=2003&dayStart=2026-05-01&dayEnd=2026-05-12
+export const getPassRate = (prodLine: string | number, dayStart: string, dayEnd: string) => {
+  return request({
+    url: '/report/passRate',
+    method: 'get',
+    params: { prodLine, dayStart, dayEnd }
+  })
+}
+
+// 直通率每日数据项（焊装用）
+export interface PassRateDayItem {
+  inspectionDate: string
+  cjTotal: number
+  hchTotal: number
+  wjTotal: number
+  cjNg: number
+  hchNg: number
+  wjNg: number
+  cjHg: number
+  hchHg: number
+  wjHg: 0
+  cjFirstNg: number
+  hchFirstNg: number
+  wjFirstNg: number
+  rate: number
+  firstRate: number | null
+}
+
+// 直通率响应类型（焊装）
+export interface PassRateResponse {
+  code: number
+  message: string
+  data: {
+    hjPassRate_a: PassRateDayItem[]
+    hjPassRate_normal: PassRateDayItem[]
+    painting_a: PassRateDayItem[]
+    painting_normal: PassRateDayItem[]
+    chongya: any[]
+    zhusu: any[]
+  }
+}
+
+
+// orderSettlement
+export const getOrderSettlement = (workCenter: string, dateTimeStart: string, dateTimeStop: string) => {
+  return request({
+    url: '/report/orderSettlement',
+    method: 'get',
+    params: { workCenter, dateTimeStart, dateTimeStop }
+  })
+}
+

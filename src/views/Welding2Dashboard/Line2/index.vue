@@ -18,7 +18,9 @@
     </div>
     
     <div class="cards-wrapper" v-if="!collapsed">
-      <TransitionGroup name="card-fade" tag="div" class="cards-scroll" ref="scrollContainer">
+      <div v-if="machineLoading" class="loading-tip">加载中...</div>
+      <div v-else-if="machineCards.length === 0" class="loading-tip">暂无设备数据</div>
+      <TransitionGroup v-else name="card-fade" tag="div" class="cards-scroll" ref="scrollContainer">
         <MachineCard
           v-for="(card, index) in machineCards"
           :key="card.id"
@@ -35,10 +37,14 @@
 import { ref, onMounted, onBeforeUnmount } from 'vue'
 import { eventBus } from '@/utils/eventbus'
 import MachineCard from '../components/MachineCard.vue'
+import { getTemperature4 } from '@/api/getStampWeldinfo'
+import { getMonthProductionCust } from '@/api/getMesInfo'
 
+const ProductionLine = ref('2007')
 const collapsed = ref(false)
 const isDetailMode = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
+const machineLoading = ref(true)
 
 interface MachineCard {
   id: number
@@ -59,261 +65,63 @@ interface MachineCard {
   alarm: string
 }
 
-const machineCards = ref<MachineCard[]>([
-  {
-    id: 1,
-    name: '涂装线1号',
-    model: 'PT-2000',
-    status: 'running',
-    todayPlan: 450,
-    planHours: 8,
-    currentProduct: 'AEC-TDQ01-12L',
-    planQty: 450,
-    doneQty: 320,
-    standardTemp: 180,
-    actualTemp: 182,
-    completionRate: 71,
-    processedHours: 5.8,
-    activationRate: 95,
-    processName: '底漆喷涂',
-    alarm: ''
-  },
-  {
-    id: 2,
-    name: '涂装线2号',
-    model: 'PT-2000',
-    status: 'running',
-    todayPlan: 380,
-    planHours: 8,
-    currentProduct: 'AGA300AEO18EFI',
-    planQty: 380,
-    doneQty: 285,
-    standardTemp: 175,
-    actualTemp: 176,
-    completionRate: 75,
-    processedHours: 6.0,
-    activationRate: 98,
-    processName: '面漆喷涂',
-    alarm: ''
-  },
-  {
-    id: 3,
-    name: '涂装线3号',
-    model: 'PT-1500',
-    status: 'adjusting',
-    todayPlan: 300,
-    planHours: 8,
-    currentProduct: 'DNB-250CC',
-    planQty: 300,
-    doneQty: 150,
-    standardTemp: 180,
-    actualTemp: 178,
-    completionRate: 50,
-    processedHours: 4.0,
-    activationRate: 72,
-    processName: '烘干固化',
-    alarm: ''
-  },
-  {
-    id: 4,
-    name: '涂装线4号',
-    model: 'PT-2000',
-    status: 'running',
-    todayPlan: 420,
-    planHours: 8,
-    currentProduct: 'DNS200A-01',
-    planQty: 420,
-    doneQty: 420,
-    standardTemp: 175,
-    actualTemp: 190,
-    completionRate: 100,
-    processedHours: 8.0,
-    activationRate: 100,
-    processName: '面漆喷涂',
-    alarm: '超差报警：温度偏高'
-  },
-  {
-    id: 5,
-    name: '涂装线5号',
-    model: 'PT-1800',
-    status: 'fault',
-    todayPlan: 350,
-    planHours: 8,
-    currentProduct: 'DXF150-12L',
-    planQty: 350,
-    doneQty: 120,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 34,
-    processedHours: 2.5,
-    activationRate: 35,
-    processName: '预处理',
-    alarm: '设备故障停机'
-  },
-  {
-    id: 6,
-    name: '涂装线6号',
-    model: 'PT-2000',
-    status: 'standby',
-    todayPlan: 280,
-    planHours: 8,
-    currentProduct: '--',
-    planQty: 280,
-    doneQty: 0,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 0,
-    processedHours: 0,
-    activationRate: 0,
-    processName: '--',
-    alarm: ''
-  },
-    {
-    id: 5,
-    name: '涂装线5号',
-    model: 'PT-1800',
-    status: 'fault',
-    todayPlan: 350,
-    planHours: 8,
-    currentProduct: 'DXF150-12L',
-    planQty: 350,
-    doneQty: 120,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 34,
-    processedHours: 2.5,
-    activationRate: 35,
-    processName: '预处理',
-    alarm: '设备故障停机'
-  },
-  {
-    id: 6,
-    name: '涂装线6号',
-    model: 'PT-2000',
-    status: 'standby',
-    todayPlan: 280,
-    planHours: 8,
-    currentProduct: '--',
-    planQty: 280,
-    doneQty: 0,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 0,
-    processedHours: 0,
-    activationRate: 0,
-    processName: '--',
-    alarm: ''
-  },
-    {
-    id: 5,
-    name: '涂装线5号',
-    model: 'PT-1800',
-    status: 'fault',
-    todayPlan: 350,
-    planHours: 8,
-    currentProduct: 'DXF150-12L',
-    planQty: 350,
-    doneQty: 120,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 34,
-    processedHours: 2.5,
-    activationRate: 35,
-    processName: '预处理',
-    alarm: '设备故障停机'
-  },
-  {
-    id: 6,
-    name: '涂装线6号',
-    model: 'PT-2000',
-    status: 'standby',
-    todayPlan: 280,
-    planHours: 8,
-    currentProduct: '--',
-    planQty: 280,
-    doneQty: 0,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 0,
-    processedHours: 0,
-    activationRate: 0,
-    processName: '--',
-    alarm: ''
-  },
-    {
-    id: 5,
-    name: '涂装线5号',
-    model: 'PT-1800',
-    status: 'fault',
-    todayPlan: 350,
-    planHours: 8,
-    currentProduct: 'DXF150-12L',
-    planQty: 350,
-    doneQty: 120,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 34,
-    processedHours: 2.5,
-    activationRate: 35,
-    processName: '预处理',
-    alarm: '设备故障停机'
-  },
-  {
-    id: 6,
-    name: '涂装线6号',
-    model: 'PT-2000',
-    status: 'standby',
-    todayPlan: 280,
-    planHours: 8,
-    currentProduct: '--',
-    planQty: 280,
-    doneQty: 0,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 0,
-    processedHours: 0,
-    activationRate: 0,
-    processName: '--',
-    alarm: ''
-  },
-    {
-    id: 5,
-    name: '涂装线5号',
-    model: 'PT-1800',
-    status: 'fault',
-    todayPlan: 350,
-    planHours: 8,
-    currentProduct: 'DXF150-12L',
-    planQty: 350,
-    doneQty: 120,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 34,
-    processedHours: 2.5,
-    activationRate: 35,
-    processName: '预处理',
-    alarm: '设备故障停机'
-  },
-  {
-    id: 6,
-    name: '涂装线6号',
-    model: 'PT-2000',
-    status: 'standby',
-    todayPlan: 280,
-    planHours: 8,
-    currentProduct: '--',
-    planQty: 280,
-    doneQty: 0,
-    standardTemp: 180,
-    actualTemp: 25,
-    completionRate: 0,
-    processedHours: 0,
-    activationRate: 0,
-    processName: '--',
-    alarm: ''
-  },
-  
-])
+const machineCards = ref<MachineCard[]>([])
+
+async function loadData() {
+  machineLoading.value = true
+  try {
+    const [tempRes, monthRes] = await Promise.all([
+      getTemperature4(),
+      getMonthProductionCust(ProductionLine.value)
+    ])
+
+    const lines: Array<{ name: string; standard: number; actual: number; status?: number }> = []
+    if (tempRes.code === 200 && tempRes.data) {
+      const d = tempRes.data
+      if (d.ftxStandard || d.ftx) lines.push({ name: '粉体线', standard: d.ftxStandard || 0, actual: d.ftx || 0, status: d.ftxStatus })
+      if (d.tbxStandard || d.tbx) lines.push({ name: '贴标线', standard: d.tbxStandard || 0, actual: d.tbx || 0, status: d.tbxStatus })
+      if (d.ytxStandard || d.ytx) lines.push({ name: '液体线', standard: d.ytxStandard || 0, actual: d.ytx || 0, status: d.ytxStatus })
+    }
+
+    const { a_done = 0, b_done = 0 } = monthRes.data || {}
+    const totalDone = a_done + b_done
+    const share = totalDone > 0 ? Math.round(totalDone / Math.max(lines.length, 1)) : 0
+
+    machineCards.value = lines.map((line, idx) => {
+      let status: MachineCard['status'] = 'standby'
+      if (line.status === 1) status = 'running'
+      else if (line.status === 0) status = 'standby'
+
+      let alarm = ''
+      if (line.standard > 0 && Math.abs(line.actual - line.standard) > 5) {
+        alarm = `温度超差：${line.actual}°C`
+      }
+
+      return {
+        id: idx + 1,
+        name: line.name,
+        model: '',
+        status,
+        todayPlan: 0,
+        planHours: 8,
+        currentProduct: '--',
+        planQty: 0,
+        doneQty: share,
+        standardTemp: line.standard,
+        actualTemp: line.actual,
+        completionRate: 0,
+        processedHours: 0,
+        activationRate: line.status === 1 ? 100 : 0,
+        processName: line.status === 1 ? '运行中' : '待机',
+        alarm
+      }
+    })
+  } catch {
+    machineCards.value = []
+  } finally {
+    machineLoading.value = false
+  }
+}
 
 const toggleMode = () => {
   isDetailMode.value = !isDetailMode.value
@@ -325,27 +133,18 @@ const startAutoScroll = () => {
   scrollInterval = setInterval(() => {
     if (scrollContainer.value && !collapsed.value) {
       const container = scrollContainer.value
-      // 检查是否已经滚动到底部
       if (container.scrollTop >= container.scrollHeight - container.clientHeight - 1) {
         container.scrollTop = 0
       } else {
-        container.scrollTop += 1 // 垂直向上滚动
+        container.scrollTop += 1
       }
     }
   }, 50)
 }
 
-const loadData = () => {
-  machineCards.value.forEach(card => {
-    if (card.status === 'running') {
-      card.doneQty = Math.min(card.doneQty + Math.floor(Math.random() * 3), card.planQty)
-      card.completionRate = Math.round((card.doneQty / card.planQty) * 100)
-    }
-  })
-}
-
 onMounted(() => {
   startAutoScroll()
+  loadData()
   eventBus.on('refreshData', loadData)
 })
 
@@ -469,6 +268,8 @@ onBeforeUnmount(() => {
   flex: 1 1 300px;      /* 最小 300px，自动充满剩余空间 */
   max-width: calc(50% - 6px); /* 在宽度足够时，一行最多显示两个（可选） */
 }
+
+.loading-tip { color: #88ccff; font-size: 14px; text-align: center; padding: 30px; }
 
 @media (max-width: 1200px) {
   :deep(.MachineCard) {

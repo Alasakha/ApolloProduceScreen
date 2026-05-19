@@ -5,7 +5,7 @@ type EventHandler = (...args: any[]) => void
 class EventBus {
   private events: { [key: string]: EventHandler[] } = {}
   private autoRefreshTimer: NodeJS.Timeout | null = null
-  private autoRefreshInterval: number = 30000 // 默认30秒刷新一次
+  private autoRefreshInterval: number = 60000*3 // 默认30秒刷新一次
   private isAutoRefreshEnabled: boolean = false
 
   on(event: string, handler: EventHandler) {
