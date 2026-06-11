@@ -13,7 +13,7 @@
 <script lang="ts" setup>
 import { ref, reactive, onMounted, onBeforeUnmount } from 'vue';
 import {getStagnantAmount} from  '@/api/getPmcinfo'
-import { eventBus } from '@/utils/eventbus';
+// import { eventBus } from '@/utils/eventbus';
 import ScrollBoard from '@/components/datav/ScrollBoard.vue';
 
 const isLoading = ref(true);
@@ -62,12 +62,12 @@ const fetchData = async () => {
 };
 
 onMounted(() => {
-  eventBus.on('refreshData', fetchData);
+  // eventBus.on('refreshData', fetchData);
   fetchData();
 });
 
 onBeforeUnmount(() => {
-  eventBus.off('refreshData', fetchData);
+  // eventBus.off('refreshData', fetchData);
 });
 </script>
 

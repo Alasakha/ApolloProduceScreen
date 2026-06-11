@@ -136,3 +136,27 @@ export interface ConsumeResponse {
   message: string;
   data: ConsumeData;
 }
+
+// /apollo/energy/getPowerByCode 按车间code获取耗电数据
+export const getPowerByCode = (dept_code: string) => {
+  return request({
+    url: '/energy/getPowerByCode',
+    method: 'get',
+    params: { dept_code }
+  })
+}
+
+export interface PowerByCodeItem {
+  dept_code: string;
+  dept_name: string;
+  mach_name: string;
+  meter_code: string;
+  day_power: number;
+  month_power: number;
+}
+
+export interface PowerByCodeResponse {
+  code: number;
+  message: string;
+  data: PowerByCodeItem[];
+}

@@ -362,12 +362,14 @@ onMounted(() => {
   async function openAttendanceDialog() {
     attendanceDialogVisible.value = true;
     attendanceLoading.value = true;
-    
+
     try {
       const res = await getSignInMember(prodLineValue.value);
-      if (res.data && Array.isArray(res.data)) {
-        // 将姓名数组转换为对象数组，添加默认值
-        attendanceData.value = res.data.map(name => ({
+      const nightNames = res.data?.night || [];
+      const daytimeNames = res.data?.daytime || [];
+      const allNames = [...nightNames, ...daytimeNames];
+      if (allNames.length > 0) {
+        attendanceData.value = allNames.map(name => ({
           name: name,
           employeeId: '未知工号',
           department: '未知部门'

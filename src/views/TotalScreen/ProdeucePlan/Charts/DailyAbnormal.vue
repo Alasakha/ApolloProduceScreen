@@ -76,10 +76,10 @@
 
   const config = reactive({
     header: [
-      '状态' , '工单号','客户单号','车型名称','工单数量','应完成时间','欠数','处理时长','原因','责任人', '完成期限','警告'
+      '状态' , '工单号','客户单号','车型名称','排产数量','应完成时间','已报数量', '合格数','欠数','处理时长','原因','责任人', '完成期限', '警告'
     ],
     data: [
-      ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
+      ['暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据','暂无数据']
     ],
     index: true,
     columnWidth: [50],
@@ -113,11 +113,14 @@
               item.specifications ?? '无',
               Number(item.productionQuantity) ?? '无',
               item.dateTime  ?? '无',
+              item.inspectiontotal ?? 0,
+              item.oktotal ?? 0,
               Number(item.planNum)-Number(item.finalInboundQuantity),
               item.daysBetween != null ? item.daysBetween + '天' : '无',
               item.reason ?? '无',
               item.duty  ?? '无',
               item.completeDate ?? '无',
+
               isOverdue // 最后一项只用于变色，不展示
             ];
           });

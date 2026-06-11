@@ -355,19 +355,23 @@ onMounted(() => {
     }
   }
 
-  // 打开出勤人员弹窗
-  async function openAttendanceDialog() {
+    // 打开出勤人员弹窗
+    async function openAttendanceDialog() {
     attendanceDialogVisible.value = true;
     attendanceLoading.value = true;
-    
+
     try {
       const res = await getSignInMember(prodLineValue.value);
-      if (res.data && Array.isArray(res.data)) {
-        // 将姓名数组转换为对象数组，添加默认值
-        attendanceData.value = res.data.map(name => ({
+      // 接口返回 { night: [], daytime: [...] }，两个班次的姓名合并
+      const nightList = Array.isArray(res.data?.night) ? res.data.night : [];
+      const daytimeList = Array.isArray(res.data?.daytime) ? res.data.daytime : [];
+      const allNames = [...nightList, ...daytimeList];
+
+      if (allNames.length > 0) {
+        attendanceData.value = allNames.map(name => ({
           name: name,
-          employeeId: '未知工号',
-          department: '未知部门'
+          employeeId: '',
+          department: ''
         }));
       } else {
         attendanceData.value = [];

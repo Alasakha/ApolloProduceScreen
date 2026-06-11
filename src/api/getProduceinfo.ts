@@ -160,7 +160,7 @@ export const getEfficiencyReduceAdd = (prodLine,reduce_minute,reduce_count ,reas
 }
 
 
-// /production/signInMember
+// /apollo/production/signInMember
 export const getSignInMember = (prodLine) => {
   return request({
     url: '/production/signInMember',

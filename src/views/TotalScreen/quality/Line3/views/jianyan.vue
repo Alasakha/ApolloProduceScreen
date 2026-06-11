@@ -38,7 +38,7 @@
 <script setup lang="ts">
 import { ref, onMounted, onBeforeUnmount, nextTick } from 'vue';
 import { getTopDayInspectorWeek } from '@/api/getQuiltyinfo';
-import { eventBus } from '@/utils/eventbus';
+// import { eventBus } from '@/utils/eventbus';
 import { createChartOption } from './charts2';
 import { ElMessage } from 'element-plus';
 import { useEcharts } from '@/utils/useEcharts';
@@ -106,11 +106,11 @@ const fetchData = async () => {
 onMounted(() => {
     fetchData();
     window.addEventListener('resize', resizeChart);
-    eventBus.on('refreshData', fetchData);
+    // eventBus.on('refreshData', fetchData);
 });
 
 onBeforeUnmount(() => {
-    eventBus.off('refreshData', fetchData);
+    // eventBus.off('refreshData', fetchData);
     window.removeEventListener('resize', resizeChart);
 });
 

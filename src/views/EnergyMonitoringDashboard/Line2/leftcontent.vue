@@ -47,7 +47,7 @@
           </div> -->
 
           <!-- 月用水量 -->
-          <div class="data-card monthly-water">
+          <div class="data-card monthly-water" @click="openMonthWaterDialog">
             <div class="card-header">
               <div class="card-icon">📅</div>
               <div class="card-title">月用水量</div>
@@ -83,7 +83,7 @@
           </div>
 
           <!-- 日用水量 -->
-          <div class="data-card daily-water">
+          <div class="data-card daily-water" @click="openDailyWaterDialog">
             <div class="card-header">
               <div class="card-icon">📊</div>
               <div class="card-title">日用水量</div>
@@ -171,6 +171,134 @@
         </div>
       </template>
     </el-dialog>
+
+    <!-- 车间卡片区域 -->
+    <div class="workshop-section">
+      <div class="workshop-header">
+        <span class="workshop-header-title">⚡ 车间耗电</span>
+        <span class="workshop-header-tip">点击卡片查看详情</span>
+      </div>
+      <div class="workshop-grid">
+        <div
+          v-for="dept in workshopList"
+          :key="dept.code"
+          class="workshop-card"
+          @click="openWorkshopDetail(dept)"
+        >
+          <div class="workshop-card-name">{{ dept.name }}</div>
+          <div class="workshop-card-stats">
+            <div class="workshop-stat">
+              <span class="ws-label">今日</span>
+              <span class="ws-value">{{ dept.dayPower }} kWh</span>
+            </div>
+            <div class="workshop-stat">
+              <span class="ws-label">本月</span>
+              <span class="ws-value">{{ dept.monthPower }} kWh</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 车间耗电详情弹窗 -->
+    <el-dialog
+      v-model="showWorkshopDialog"
+      :title="currentWorkshop ? currentWorkshop.name + ' 耗电详情' : ''"
+      width="680px"
+      class="workshop-dialog"
+      :close-on-click-modal="true"
+    >
+      <div class="workshop-detail-content" v-if="workshopDetailList.length > 0">
+        <div class="workshop-summary">
+          <div class="ws-summary-item">
+            <span class="ws-summary-label">今日总耗电</span>
+            <span class="ws-summary-value day">{{ workshopDayTotal }} kWh</span>
+          </div>
+          <div class="ws-summary-item">
+            <span class="ws-summary-label">本月总耗电</span>
+            <span class="ws-summary-value month">{{ workshopMonthTotal }} kWh</span>
+          </div>
+        </div>
+        <el-table :data="workshopDetailList" stripe class="workshop-table" header-cell-class-name="ws-table-header">
+          <el-table-column prop="mach_name" label="机台名称" align="center" />
+          <el-table-column prop="meter_code" label="电表编号" align="center" width="160" />
+          <el-table-column prop="day_power" label="今日耗电(kWh)" align="center">
+            <template #default="{ row }">
+              <span :class="row.day_power < 0 ? 'val-neg' : 'val-pos'">{{ row.day_power.toFixed(2) }}</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="month_power" label="本月耗电(kWh)" align="center">
+            <template #default="{ row }">
+              <span :class="row.month_power < 0 ? 'val-neg' : 'val-pos'">{{ row.month_power.toFixed(2) }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <div v-else class="workshop-empty">暂无数据</div>
+      <template #footer>
+        <el-button @click="showWorkshopDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 日用水量详情弹窗 -->
+    <el-dialog
+      v-model="showDailyWaterDialog"
+      title="💧 日用水量详情"
+      width="600px"
+      class="water-detail-dialog"
+      :close-on-click-modal="true"
+    >
+      <div class="water-detail-content">
+        <div class="water-summary">
+          <div class="ws-summary-item">
+            <span class="ws-summary-label">总日用水量</span>
+            <span class="ws-summary-value day">{{ dailyWaterTotal }} 吨</span>
+          </div>
+        </div>
+        <el-table :data="waterMeterList" stripe class="water-table">
+          <el-table-column prop="mach_name" label="机台名称" align="center" />
+          <el-table-column prop="meter_code" label="水表编号" align="center" width="160" />
+          <el-table-column prop="day_power" label="今日用水量(吨)" align="center">
+            <template #default="{ row }">
+              <span class="water-val">{{ Number(row.day_power || 0).toFixed(2) }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <el-button @click="showDailyWaterDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
+
+    <!-- 月用水量详情弹窗 -->
+    <el-dialog
+      v-model="showMonthWaterDialog"
+      title="💧 月用水量详情"
+      width="600px"
+      class="water-detail-dialog"
+      :close-on-click-modal="true"
+    >
+      <div class="water-detail-content">
+        <div class="water-summary">
+          <div class="ws-summary-item">
+            <span class="ws-summary-label">总月用水量</span>
+            <span class="ws-summary-value month">{{ monthWaterTotal }} 吨</span>
+          </div>
+        </div>
+        <el-table :data="waterMeterList" stripe class="water-table">
+          <el-table-column prop="mach_name" label="机台名称" align="center" />
+          <el-table-column prop="meter_code" label="水表编号" align="center" width="160" />
+          <el-table-column prop="month_power" label="本月用水量(吨)" align="center">
+            <template #default="{ row }">
+              <span class="water-val">{{ Number(row.month_power || 0).toFixed(2) }}</span>
+            </template>
+          </el-table-column>
+        </el-table>
+      </div>
+      <template #footer>
+        <el-button @click="showMonthWaterDialog = false">关闭</el-button>
+      </template>
+    </el-dialog>
   </div>
 </template>
 
@@ -179,6 +307,7 @@ import { computed, reactive, watch, ref, onMounted, onUnmounted } from 'vue'
 import { useEnergyStore } from '@/store/energy'
 import { ElMessage } from 'element-plus'
 import { getRawMaterialMonitoringAdd } from '@/api/getnewInjection'
+import { getPowerByCode, type PowerByCodeItem } from '@/api/enery'
 
 const energyStore = useEnergyStore()
 
@@ -401,6 +530,104 @@ const submitReason = async () => {
     ElMessage.error('提交失败，请重试')
   } finally {
     submitting.value = false
+  }
+}
+
+// ========== 车间耗电相关 ==========
+const workshopList = ref([
+  { code: '1001', name: '金工一部冲中压', dayPower: 0, monthPower: 0 },
+  { code: '1002', name: '注塑部', dayPower: 0, monthPower: 0 },
+  { code: '1003', name: '金工一部焊接', dayPower: 0, monthPower: 0 },
+  { code: '2006', name: '金工二部焊接', dayPower: 0, monthPower: 0 },
+  { code: '2007', name: '金工二部涂装', dayPower: 0, monthPower: 0 },
+])
+
+const showWorkshopDialog = ref(false)
+const currentWorkshop = ref<{ code: string; name: string } | null>(null)
+const workshopDetailList = ref<PowerByCodeItem[]>([])
+
+// ========== 金工二部水表相关 ==========
+interface WaterMeterItem {
+  meter_code: string
+  mach_name: string
+  day_power: number
+  month_power: number
+}
+
+const waterMeterList = ref<WaterMeterItem[]>([])
+const showDailyWaterDialog = ref(false)
+const showMonthWaterDialog = ref(false)
+
+// 获取水表数据
+const fetchWaterMeterData = async () => {
+  try {
+    const res = await getPowerByCode('waterMeter')
+    if (res.code === 200 && res.data) {
+      waterMeterList.value = res.data as WaterMeterItem[]
+    }
+  } catch (e) {
+    console.error('获取金工二部水表数据失败', e)
+  }
+}
+
+// 点击日用水量卡片
+const openDailyWaterDialog = () => {
+  showDailyWaterDialog.value = true
+}
+
+// 点击月用水量卡片
+const openMonthWaterDialog = () => {
+  showMonthWaterDialog.value = true
+}
+
+// 计算水表汇总
+const dailyWaterTotal = computed(() =>
+  waterMeterList.value.reduce((s, i) => s + (Number(i.day_power) || 0), 0).toFixed(2)
+)
+const monthWaterTotal = computed(() =>
+  waterMeterList.value.reduce((s, i) => s + (Number(i.month_power) || 0), 0).toFixed(2)
+)
+
+// 计算汇总
+const workshopDayTotal = computed(() =>
+  workshopDetailList.value.reduce((s, i) => s + i.day_power, 0).toFixed(2)
+)
+const workshopMonthTotal = computed(() =>
+  workshopDetailList.value.reduce((s, i) => s + i.month_power, 0).toFixed(2)
+)
+
+// 初始化时获取1002的车间数据作为示例展示
+onMounted(async () => {
+  try {
+    const res = await getPowerByCode('1002')
+    if (res.code === 200 && res.data) {
+      const data = res.data as PowerByCodeItem[]
+      const daySum = data.reduce((s, i) => s + i.day_power, 0)
+      const monthSum = data.reduce((s, i) => s + i.month_power, 0)
+      workshopList.value = workshopList.value.map(w => {
+        if (w.code === '1002') return { ...w, dayPower: daySum, monthPower: monthSum }
+        return w
+      })
+    }
+  } catch (e) {
+    console.error('获取车间耗电数据失败', e)
+  }
+  // 获取金工二部水表数据
+  fetchWaterMeterData()
+})
+
+// 点击卡片打开详情
+const openWorkshopDetail = async (dept: { code: string; name: string }) => {
+  currentWorkshop.value = dept
+  showWorkshopDialog.value = true
+  workshopDetailList.value = []
+  try {
+    const res = await getPowerByCode(dept.code)
+    if (res.code === 200) {
+      workshopDetailList.value = res.data || []
+    }
+  } catch (e) {
+    console.error('获取详情失败', e)
   }
 }
 </script>
@@ -862,5 +1089,310 @@ const submitReason = async () => {
 :deep(.el-button--primary:hover) {
   background: #00ccdd;
   border-color: #00ccdd;
+}
+
+/* 车间卡片区域 */
+.workshop-section {
+  border-top: 1px solid rgba(0, 238, 255, 0.15);
+  padding: 6px 12px 8px;
+}
+
+.workshop-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+
+.workshop-header-title {
+  color: #00eeff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.workshop-header-tip {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+}
+
+.workshop-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+
+.workshop-card {
+  background: linear-gradient(135deg, rgba(0, 238, 255, 0.06), rgba(0, 102, 255, 0.06));
+  border: 1px solid rgba(0, 238, 255, 0.25);
+  border-radius: 6px;
+  padding: 8px 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
+.workshop-card:hover {
+  border-color: rgba(0, 238, 255, 0.55);
+  box-shadow: 0 3px 12px rgba(0, 238, 255, 0.15);
+  transform: translateY(-2px);
+}
+
+.workshop-card-name {
+  color: #00eeff;
+  font-size: 11px;
+  font-weight: 600;
+  text-align: center;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.workshop-card-stats {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.workshop-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ws-label {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 9px;
+}
+
+.ws-value {
+  color: #fff;
+  font-size: 10px;
+  font-weight: 600;
+}
+
+/* 弹窗样式 */
+.workshop-dialog :deep(.el-dialog) {
+  background: #0d1b2a;
+  border: 1px solid rgba(0, 238, 255, 0.3);
+  border-radius: 12px;
+}
+
+.workshop-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #1a3a5c, #0d2a4a);
+  border-bottom: 1px solid rgba(0, 238, 255, 0.2);
+  padding: 16px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+.workshop-dialog :deep(.el-dialog__title) {
+  color: #00eeff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.workshop-dialog :deep(.el-dialog__body) {
+  padding: 20px 24px;
+  background: #0d1b2a;
+}
+
+.workshop-dialog :deep(.el-dialog__footer) {
+  background: #0d1b2a;
+  border-top: 1px solid rgba(0, 238, 255, 0.1);
+  padding: 12px 24px;
+  border-radius: 0 0 12px 12px;
+}
+
+.workshop-summary {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 14px;
+}
+
+.ws-summary-item {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: rgba(0, 238, 255, 0.05);
+  border: 1px solid rgba(0, 238, 255, 0.12);
+  border-radius: 6px;
+  padding: 8px 12px;
+}
+
+.ws-summary-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+}
+
+.ws-summary-value {
+  font-size: 16px;
+  font-weight: 700;
+}
+
+.ws-summary-value.day { color: #f59e0b; }
+.ws-summary-value.month { color: #34d399; }
+
+.workshop-table {
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.workshop-table :deep(.el-table__header-wrapper th) {
+  background: rgba(0, 238, 255, 0.08) !important;
+  color: #00eeff;
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(0, 238, 255, 0.2) !important;
+}
+
+.workshop-table :deep(.el-table__body-wrapper td) {
+  color: #fff;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.workshop-table :deep(.el-table__body-wrapper tr:nth-child(even) td) {
+  background: rgba(0, 238, 255, 0.02) !important;
+}
+
+.workshop-table :deep(.el-table__body-wrapper tr:hover > td) {
+  background: rgba(0, 238, 255, 0.04) !important;
+}
+
+.val-pos { color: #4ade80; font-weight: 600; }
+.val-neg { color: #f87171; font-weight: 600; }
+
+.workshop-empty {
+  text-align: center;
+  color: rgba(255, 255, 255, 0.4);
+  padding: 40px 0;
+  font-size: 13px;
+}
+
+.workshop-dialog :deep(.el-button) {
+  background: #1e3a5f;
+  border: 1px solid rgba(0, 238, 255, 0.3);
+  color: #00eeff;
+}
+
+.workshop-dialog :deep(.el-button:hover) {
+  background: rgba(0, 238, 255, 0.1);
+  border-color: #00eeff;
+  color: #00eeff;
+}
+
+/* 水表详情弹窗 */
+.water-detail-dialog :deep(.el-dialog) {
+  background: #0d1b2a;
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  border-radius: 12px;
+}
+
+.water-detail-dialog :deep(.el-dialog__header) {
+  background: linear-gradient(135deg, #1a3a5c, #0d2a4a);
+  border-bottom: 1px solid rgba(0, 180, 255, 0.2);
+  padding: 16px 24px;
+  border-radius: 12px 12px 0 0;
+}
+
+.water-detail-dialog :deep(.el-dialog__title) {
+  color: #00b4ff;
+  font-size: 16px;
+  font-weight: 600;
+}
+
+.water-detail-dialog :deep(.el-dialog__body) {
+  padding: 20px 24px;
+  background: #0d1b2a;
+}
+
+.water-detail-dialog :deep(.el-dialog__footer) {
+  background: #0d1b2a;
+  border-top: 1px solid rgba(0, 180, 255, 0.1);
+  padding: 12px 24px;
+  border-radius: 0 0 12px 12px;
+}
+
+.water-detail-dialog :deep(.el-button) {
+  background: #1e3a5f;
+  border: 1px solid rgba(0, 180, 255, 0.3);
+  color: #00b4ff;
+}
+
+.water-detail-dialog :deep(.el-button:hover) {
+  background: rgba(0, 180, 255, 0.1);
+  border-color: #00b4ff;
+  color: #00b4ff;
+}
+
+.water-detail-content {
+  color: #000000;
+}
+
+.water-summary {
+  margin-bottom: 14px;
+}
+
+.water-table {
+  background: transparent;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.water-table :deep(.el-table__header-wrapper th) {
+  background: rgba(0, 180, 255, 0.08) !important;
+  color: #00b4ff;
+  font-weight: 600;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(0, 180, 255, 0.2) !important;
+}
+
+.water-table :deep(.el-table__body-wrapper td) {
+  color: #000000;
+  font-size: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05) !important;
+}
+
+.water-table :deep(.el-table__body-wrapper tr:nth-child(even) td) {
+  background: rgba(0, 180, 255, 0.02) !important;
+}
+
+.water-table :deep(.el-table__body-wrapper tr:hover > td) {
+  background: rgba(0, 180, 255, 0.04) !important;
+}
+
+.water-val { color: #00b4ff; font-weight: 600; }
+
+.water-meter-info {
+  margin-top: 16px;
+  padding: 12px 16px;
+  background: rgba(0, 180, 255, 0.05);
+  border: 1px solid rgba(0, 180, 255, 0.15);
+  border-radius: 8px;
+}
+
+.wm-info-row {
+  display: flex;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.wm-info-row:last-child {
+  margin-bottom: 0;
+}
+
+.wm-info-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-size: 12px;
+  width: 80px;
+}
+
+.wm-info-value {
+  color: #000000;
+  font-size: 13px;
+  font-weight: 500;
 }
 </style>

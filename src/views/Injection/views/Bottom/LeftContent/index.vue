@@ -45,7 +45,7 @@
 <script lang="ts" setup>
 import { reactive, ref, onMounted,onBeforeUnmount, computed } from 'vue'
 import { getInputOutput } from '@/api/getInjection'
-import { eventBus } from '@/utils/eventbus';
+// import { eventBus } from '@/utils/eventbus';
 import  {ElMessage} from 'element-plus'
 import { Loading, InfoFilled } from '@element-plus/icons-vue'
 import materialScrollBoard from '@/components/datav/MaterialScrollBoard.vue'
@@ -254,12 +254,12 @@ const fetchData = async () => {
 // 在组件挂载时启动定时获取数据
 onMounted(() => {
   fetchData(); // 组件挂载时先请求一次
-  eventBus.on("refreshData", fetchData); // 监听全局刷新事件
+  // eventBus.on("refreshData", fetchData); // 监听全局刷新事件
 });
 
 // 清理定时器，避免组件卸载后定时器继续执行
 onBeforeUnmount(() => {
-  eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
+  // eventBus.off("refreshData", fetchData); // 组件销毁时取消监听
 });
 
 const hasValue = (value: unknown) => value !== null && value !== undefined && value !== ''
