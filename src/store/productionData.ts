@@ -306,8 +306,21 @@ export const useProductionDataStore = defineStore('productionData', {
     },
 
     // 获取生产数据
-    async fetchProductionData() {
-      console.log('productionData store: fetchProductionData 开始执行')
+    // options 可按看板按需跳过接口；默认全部请求（制造绩效看板）
+    async fetchProductionData(options: {
+      fty?: boolean
+      onTime?: boolean
+      manufacturingCost?: boolean
+      paintingProblem?: boolean
+    } = {}) {
+      const {
+        fty = true,
+        onTime = true,
+        manufacturingCost = true,
+        paintingProblem = true,
+      } = options
+
+      console.log('productionData store: fetchProductionData 开始执行', { fty, onTime, manufacturingCost, paintingProblem })
       // 如果正在加载，避免重复请求
       if (this.loading) {
         console.log('productionData store: 正在加载中，跳过重复请求')
@@ -336,84 +349,117 @@ export const useProductionDataStore = defineStore('productionData', {
         
         console.log('正在获取生产数据...', { monthParam, yearParam, endDate })
         console.log('接口调用参数详情:', {
-          'getFty(月度)': { startDate: monthParam, endDay: endDate },
-          'getFty(年度)': { startDate: yearParam, endDay: endDate },
-          'getOnTime(月度)': { startDay: monthParam, endDay: endDate },
-          'getOnTime(当日)': { startDay: endDate, endDay: endDate }
+          ...(fty ? {
+            'getFty(月度)': { startDate: monthParam, endDay: endDate },
+            'getFty(年度)': { startDate: yearParam, endDay: endDate },
+          } : {}),
+          ...(onTime ? {
+            'getOnTime(月度)': { startDay: monthParam, endDay: endDate },
+            'getOnTime(当日)': { startDay: endDate, endDay: endDate },
+          } : {}),
         })
         
         console.log('productionData store: 准备调用接口...')
         
         try {
-          // 同时获取月度、年度、准交率、制造费用和涂装问题数据
-          // 使用 Promise.allSettled 避免单个接口失败影响其他接口
-          const responses = await Promise.allSettled([
-            getFty(monthParam, endDate),        // 本月1号到选中结束日期的月度数据（endDate 对应接口的 endDay 参数）
-            getFty(yearParam, endDate),         // 本年1月1号到选中结束日期的年度数据（endDate 对应接口的 endDay 参数）
-            getOnTime(monthParam, endDate),     // 本月1号获取月度准交率（接口只支持开始日期）
-            getOnTime(endDate, endDate),        // 选中结束日期作为开始日期获取准交率（接口只支持开始日期）
-            getManufacturingCost(),             // 获取制造费用数据
-            getPaintingProblem(monthParam, endDate) // 获取涂装问题数据（使用月度时间范围）
-          ])
-          
+          // 按 options 组装请求，避免无关看板被慢接口拖住
+          type NamedRequest = { key: string; promise: Promise<any> }
+          const requests: NamedRequest[] = []
+
+          if (fty) {
+            requests.push(
+              { key: 'monthly', promise: getFty(monthParam, endDate) },
+              { key: 'yearly', promise: getFty(yearParam, endDate) },
+            )
+          }
+          if (onTime) {
+            requests.push(
+              { key: 'onTimeMonthly', promise: getOnTime(monthParam, endDate) },
+              { key: 'onTimeDaily', promise: getOnTime(endDate, endDate) },
+            )
+          }
+          if (manufacturingCost) {
+            requests.push({ key: 'manufacturingCost', promise: getManufacturingCost() })
+          }
+          if (paintingProblem) {
+            requests.push({ key: 'paintingProblem', promise: getPaintingProblem(monthParam, endDate) })
+          }
+
+          if (requests.length === 0) {
+            throw new Error('未配置任何需要请求的接口')
+          }
+
+          const settled = await Promise.allSettled(requests.map(r => r.promise))
+          const resultMap = Object.fromEntries(
+            requests.map((r, i) => [r.key, settled[i]])
+          ) as Record<string, PromiseSettledResult<any>>
+
           console.log('productionData store: 接口调用完成，开始处理响应')
-          
-          // 解构响应结果
-          const [monthlyResult, yearlyResult, onTimeMonthlyResult, onTimeDailyResult, manufacturingCostResult, paintingProblemResult] = responses
-          
-          // 处理月度数据
-          if (monthlyResult.status === 'fulfilled' && monthlyResult.value?.data) {
-            this.monthlyData = monthlyResult.value.data
-            console.log('月度数据获取成功:', monthlyResult.value.data)
-          } else {
-            console.warn('月度数据获取失败:', monthlyResult.status === 'rejected' ? monthlyResult.reason : '无数据')
-          }
-          
-          // 处理年度数据
-          if (yearlyResult.status === 'fulfilled' && yearlyResult.value?.data) {
-            this.yearlyData = yearlyResult.value.data
-            console.log('年度数据获取成功:', yearlyResult.value.data)
-          } else {
-            console.warn('年度数据获取失败:', yearlyResult.status === 'rejected' ? yearlyResult.reason : '无数据')
-          }
-          
-          // 处理月度准交率数据
-          if (onTimeMonthlyResult.status === 'fulfilled' && onTimeMonthlyResult.value?.data) {
-            this.onTimeMonthlyData = onTimeMonthlyResult.value.data
-            console.log('月度准交率数据获取成功:', onTimeMonthlyResult.value.data)
-          } else {
-            console.warn('月度准交率数据获取失败:', onTimeMonthlyResult.status === 'rejected' ? onTimeMonthlyResult.reason : '无数据')
-          }
-          
-          // 处理今日准交率数据
-          if (onTimeDailyResult.status === 'fulfilled' && onTimeDailyResult.value?.data) {
-            this.onTimeDailyData = onTimeDailyResult.value.data
-            console.log('今日准交率数据获取成功:', onTimeDailyResult.value.data)
-          } else {
-            console.warn('今日准交率数据获取失败:', onTimeDailyResult.status === 'rejected' ? onTimeDailyResult.reason : '无数据')
+
+          const takeData = (result?: PromiseSettledResult<any>) =>
+            result?.status === 'fulfilled' ? result.value?.data : undefined
+
+          if (fty) {
+            const monthlyData = takeData(resultMap.monthly)
+            if (monthlyData) {
+              this.monthlyData = monthlyData
+              console.log('月度数据获取成功:', monthlyData)
+            } else {
+              console.warn('月度数据获取失败:', resultMap.monthly?.status === 'rejected' ? resultMap.monthly.reason : '无数据')
+            }
+
+            const yearlyData = takeData(resultMap.yearly)
+            if (yearlyData) {
+              this.yearlyData = yearlyData
+              console.log('年度数据获取成功:', yearlyData)
+            } else {
+              console.warn('年度数据获取失败:', resultMap.yearly?.status === 'rejected' ? resultMap.yearly.reason : '无数据')
+            }
           }
 
-          // 处理制造费用数据
-          if (manufacturingCostResult.status === 'fulfilled' && manufacturingCostResult.value?.data) {
-            this.manufacturingCost = manufacturingCostResult.value.data
-            console.log('制造费用数据获取成功:', manufacturingCostResult.value.data)
-          } else {
-            console.warn('制造费用数据获取失败:', manufacturingCostResult.status === 'rejected' ? manufacturingCostResult.reason : '无数据')
+          if (onTime) {
+            const onTimeMonthlyData = takeData(resultMap.onTimeMonthly)
+            if (onTimeMonthlyData) {
+              this.onTimeMonthlyData = onTimeMonthlyData
+              console.log('月度准交率数据获取成功:', onTimeMonthlyData)
+            } else {
+              console.warn('月度准交率数据获取失败:', resultMap.onTimeMonthly?.status === 'rejected' ? resultMap.onTimeMonthly.reason : '无数据')
+            }
+
+            const onTimeDailyData = takeData(resultMap.onTimeDaily)
+            if (onTimeDailyData) {
+              this.onTimeDailyData = onTimeDailyData
+              console.log('今日准交率数据获取成功:', onTimeDailyData)
+            } else {
+              console.warn('今日准交率数据获取失败:', resultMap.onTimeDaily?.status === 'rejected' ? resultMap.onTimeDaily.reason : '无数据')
+            }
           }
 
-          // 处理涂装问题数据
-          if (paintingProblemResult.status === 'fulfilled' && paintingProblemResult.value?.data) {
-            this.paintingProblemData = paintingProblemResult.value.data
-            console.log('涂装问题数据获取成功:', paintingProblemResult.value.data)
-          } else {
-            console.warn('涂装问题数据获取失败:', paintingProblemResult.status === 'rejected' ? paintingProblemResult.reason : '无数据')
+          if (manufacturingCost) {
+            const manufacturingCostData = takeData(resultMap.manufacturingCost)
+            if (manufacturingCostData) {
+              this.manufacturingCost = manufacturingCostData
+              console.log('制造费用数据获取成功:', manufacturingCostData)
+            } else {
+              console.warn('制造费用数据获取失败:', resultMap.manufacturingCost?.status === 'rejected' ? resultMap.manufacturingCost.reason : '无数据')
+            }
+          }
+
+          if (paintingProblem) {
+            const paintingProblemData = takeData(resultMap.paintingProblem)
+            if (paintingProblemData) {
+              this.paintingProblemData = paintingProblemData
+              console.log('涂装问题数据获取成功:', paintingProblemData)
+            } else {
+              console.warn('涂装问题数据获取失败:', resultMap.paintingProblem?.status === 'rejected' ? resultMap.paintingProblem.reason : '无数据')
+            }
           }
           
           // 更新最后获取时间
           this.lastFetchTime = new Date()
           
           // 检查是否有任何数据获取成功
-          const hasAnyData = responses.some(result => 
+          const hasAnyData = settled.some(result => 
             result.status === 'fulfilled' && result.value?.data
           )
           
@@ -436,22 +482,32 @@ export const useProductionDataStore = defineStore('productionData', {
     },
   
     // 强制刷新数据
-    async refreshData() {
+    async refreshData(options?: {
+      fty?: boolean
+      onTime?: boolean
+      manufacturingCost?: boolean
+      paintingProblem?: boolean
+    }) {
       this.lastFetchTime = null
-      await this.fetchProductionData()
+      await this.fetchProductionData(options)
     },
 
     // 启动自动刷新
-    startAutoRefresh() {
+    startAutoRefresh(options?: {
+      fty?: boolean
+      onTime?: boolean
+      manufacturingCost?: boolean
+      paintingProblem?: boolean
+    }) {
       // 清除之前的定时器
       this.stopAutoRefresh()
       
       // 立即获取一次数据
-      this.fetchProductionData()
+      this.fetchProductionData(options)
       
       // 设置定时刷新（每30分钟）
       this.autoRefreshTimer = setInterval(() => {
-        this.fetchProductionData()
+        this.fetchProductionData(options)
       }, 30 * 60 * 1000) // 30分钟
     },
 

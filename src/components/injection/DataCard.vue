@@ -93,9 +93,9 @@
               </div>
 
                 <div class="param-row">
-                <span class="param-std-machine">计划加工时长：{{ pmcPcHour ? pmcPcHour.toFixed(1) : '暂无数据' }}</span>
-                <span class="param-std-machine">实际加工时长：{{ actualHour ? actualHour.toFixed(1) : '暂无数据' }}</span>
-                <span class="param-std-machine">稼动率：{{ (operationRatio * 100).toFixed(2) }}%</span>
+                <span class="param-std-machine">计划加工时长：{{ formatHour(pmcPcHour) }}</span>
+                <span class="param-std-machine">实际加工时长：{{ formatHour(actualHour) }}</span>
+                <span class="param-std-machine">稼动率：{{ formatRatio(operationRatio) }}</span>
               </div>
               
               <!-- <div class="param-row">
@@ -327,6 +327,20 @@ const showDoneDetailDialog = () => {
 // 关闭已完成详情对话框
 const closeDoneDetailDialog = () => {
   showDoneDialog.value = false;
+};
+
+const formatHour = value => {
+  if (value === null || value === undefined || value === "") return "暂无数据";
+  const num = Number(value);
+  if (Number.isNaN(num)) return "暂无数据";
+  return num.toFixed(1);
+};
+
+const formatRatio = value => {
+  if (value === null || value === undefined || value === "") return "0.00%";
+  const num = Number(value);
+  if (Number.isNaN(num)) return "0.00%";
+  return (num * 100).toFixed(2) + "%";
 };
 
 //判断是否有数据

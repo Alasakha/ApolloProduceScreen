@@ -62,6 +62,14 @@ export const getInvokeDeviceList = () => {
   })
 }
 
+// 获取OPC UA设备综合数据(当日产量/开机时长/状态/工单)
+export const getOpcuaDeviceList = () => {
+  return request({
+    url: '/injection/opcuaDeviceList',
+    method: 'get',
+  })
+}
+
 export const getrawMaterialMonitoring = () => {
   return request({
     url: '/injection/rawMaterialMonitoring',

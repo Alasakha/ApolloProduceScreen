@@ -6,9 +6,9 @@
     </div>
 
     <!-- 中间列：板金组 -->
-    <div class="column flex-1">
+    <!-- <div class="column flex-1">
       <SheetMetalGroup />
-    </div>
+    </div> -->
 
     <!-- 第三列：监控数据 -->
     <div class="column flex-1">
@@ -19,7 +19,7 @@
 
 <script setup lang="ts">
 import PipeFittingGroup from './components/PipeFittingGroup.vue'
-import SheetMetalGroup from './components/SheetMetalGroup.vue'
+// import SheetMetalGroup from './components/SheetMetalGroup.vue'
 import RightColumn from './components/RightColumn.vue'
 </script>
 

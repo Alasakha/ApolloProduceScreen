@@ -1,6 +1,8 @@
 <template>
   <div class="utilization-rate">
-    <div class="title">稼动率</div>
+    <div class="rate-title">
+      <h3>稼动率</h3>
+    </div>
     <div class="rate-container">
       <div v-for="item in apiData" :key="item.label" class="rate-item">
         <div class="item-header">{{ item.label === 'MONTH' ? '月度' : '日计划' }}</div>
@@ -83,23 +85,35 @@ onBeforeUnmount(() => {
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: rgba(0, 0, 0, 0.2);
-  border-radius: 6px;
-  padding: 4px 8px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  margin: 0 8px;
+  width: 100%;
 }
 
-.title {
-  color: #00d4ff;
-  font-size: 12px;
-  font-weight: bold;
+.rate-title {
+  background: #279f27;
+  padding: 8px 16px;
+  border-radius: 6px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.rate-title h3 {
+  margin: 0;
+  color: #ffffff;
+  font-size: 16px;
+  font-weight: 600;
   text-align: center;
-  margin-bottom: 4px;
 }
 
 .rate-container {
   display: flex;
   flex: 1;
-  gap: 8px;
+  gap: 12px;
+  padding: 12px;
+  min-height: 0;
 }
 
 .rate-item {
@@ -107,48 +121,44 @@ onBeforeUnmount(() => {
   display: flex;
   flex-direction: column;
   background: rgba(0, 150, 255, 0.08);
-  border-radius: 4px;
-  padding: 4px;
+  border-radius: 6px;
+  padding: 10px;
+  border: 1px solid rgba(0, 212, 255, 0.2);
 }
 
 .item-header {
-  color: #fff;
-  font-size: 12px;
+  color: #00eaff;
+  font-size: 15px;
   font-weight: bold;
   text-align: center;
-  padding-bottom: 4px;
-  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
-  margin-bottom: 4px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid rgba(0, 212, 255, 0.3);
+  margin-bottom: 8px;
 }
 
 .item-content {
   display: flex;
   flex-direction: column;
-  gap: 2px;
+  gap: 8px;
   flex: 1;
+  justify-content: center;
 }
 
 .metric-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0 4px;
-}
-
-.metric-row.highlight {
-  background: rgba(0, 150, 255, 0.15);
-  border-radius: 2px;
-  margin-top: auto;
+  padding: 4px 8px;
 }
 
 .metric-label {
   color: #8cc8ff;
-  font-size: 10px;
+  font-size: 14px;
 }
 
 .metric-value {
   color: #fff;
-  font-size: 12px;
+  font-size: 18px;
   font-weight: bold;
 }
 </style>

@@ -9,6 +9,9 @@
     <div class="flex-1">
       <QualityQues />
     </div>
+    <div class="flex-1">
+      <PersonBadIssues />
+    </div>
   </div>
 </template>
 
@@ -16,4 +19,5 @@
 import RoughYield from '@/views/Welding/management/Line2/roughYield.vue'
 import SprayingYield from '@/views/Welding/management/Line2/sprayingYield.vue'
 import QualityQues from '@/views/Welding/management/Line3/qualityQues.vue'
+import PersonBadIssues from '@/views/Welding/management/newdesign/Line2/right/PersonBadIssues.vue'
 </script>

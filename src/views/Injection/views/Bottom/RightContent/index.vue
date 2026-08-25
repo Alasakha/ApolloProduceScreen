@@ -199,15 +199,18 @@ const defectiveConfig = reactive({
 })
 
 
-// 机台ID到机台名称的映射
+// 机台ID到机台名称的映射（按机台号对照表）
 const getMachineName = (machineId) => {
   const machineMap = {
-    '102050101001': 'HTF300注塑成型机',
-    '102050101002': 'HTF450注塑成型机', 
-    '102050101003': 'HTF1600注塑成型机',
-    '102050101004': 'HTF2500注塑成型机'
+    '102050101004': 'HTF1600注塑成型机',
+    '102050101003': 'HTF250注塑成型机',
+    '102050101002': 'HTF300注塑成型机',
+    '102050101001': 'HTF450注塑成型机',
+    '102050101007': 'UN550D1S注塑成型机',
+    '102050101006': 'UN900D1S注塑成型机',
+    '102050101005': 'UN1850D1S注塑成型机',
   };
-  return machineMap[machineId] || machineId;
+  return machineMap[String(machineId ?? '').trim()] || machineId;
 };
 
 // 格式化日期为 YYYY-MM-DD

@@ -4,12 +4,9 @@
       <LeftContent/>
 
          <!-- 设备状态 -->
-         <DashboardCard :isShowtilte="false" class="flex-1">
-        <template #title>关键参数监控</template>
-        <div class="h-[100%]">
+         <div class="flex-1 min-h-0">
           <Category/>
         </div>
-      </DashboardCard> 
   
   
    
@@ -19,6 +16,5 @@
   
   <script setup lang="ts">
   import LeftContent from './LeftContent.vue';
-import DashboardCard from "@/components/DashboardCard.vue";
 import Category from '../Middle/RightContent/Statistic/index.vue'
   </script>

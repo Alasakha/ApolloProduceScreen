@@ -28,8 +28,8 @@
 
                 <!-- 第三行：其他组件区域 (30%) -->
                 <div class="components-3row">
-                    <div class="component-half">
-                        <PersonBadIssues />
+                    <div class="component-full">
+                        <UtilizationRate :type="3" />
                     </div>
                 </div>
             </div>
@@ -47,7 +47,7 @@ import Title from '../component/title.vue'
 import PlanTable from '../component/plan/index.vue'
 import WorkOrderClosingRate from '../component/WorkOrderClosingRate.vue'
 import PersonnalSituation from '../component/PersonnalSituation.vue'
-import PersonBadIssues from './PersonBadIssues.vue'
+import UtilizationRate from '@/views/Welding/management/Header/views/utilizationRate.vue'
 import { getMetalworkingEfficiency } from '@/api/getStampinfo'
 import { getTodayProduction, getMonthProduction } from '@/api/getStampWeldinfo'
 import { eventBus } from '@/utils/eventbus'
@@ -185,6 +185,15 @@ onBeforeUnmount(() => {
     width: 50%;
     height: 100%;
     min-width: 0; /* 防止内容溢出 */
+    display: flex;
+    flex-direction: column;
+}
+
+.component-full {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    min-width: 0;
     display: flex;
     flex-direction: column;
 }

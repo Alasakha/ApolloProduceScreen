@@ -159,9 +159,13 @@
   // 生产数据 store
   const productionStore = useProductionDataStore()
 
-  // 启动/停止自动刷新
+  // 启动/停止自动刷新（本看板只用准交率，跳过 fty / 制造费用 / 涂装问题）
   onMounted(() => {
-    productionStore.startAutoRefresh()
+    productionStore.startAutoRefresh({
+      fty: false,
+      manufacturingCost: false,
+      paintingProblem: false,
+    })
   })
   onUnmounted(() => {
     productionStore.stopAutoRefresh()

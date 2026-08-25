@@ -5,17 +5,15 @@
   <Currenttime class="flex-1"></Currenttime>
   <logo class="flex-1"></logo>
   <HeaderTitle class="flex-2"></HeaderTitle>
-  <!-- <weather class="flex-2"></weather> -->
-  <UtilizationRate class="flex-2" :type="3"></UtilizationRate>
+  <weather class="flex-2"></weather>
   </div>
 </template>
 
 <script setup lang="ts">
 import logo from './views/logo.vue';
 import HeaderTitle from './views/title.vue';
-// import weather from './views/weather.vue';
+import weather from './views/weather.vue';
 import Currenttime from './views/time.vue';
-import UtilizationRate from './views/utilizationRate.vue';
 </script>
 
 <style scoped>
